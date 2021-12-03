@@ -4,7 +4,7 @@ package com.realtimetech.opack.interlanguage.code;
 public abstract class Code {
     public enum Type {
         CREATE_OPACK_OBJECT,
-        CREATE_OPACK_LIST,
+        CREATE_OPACK_ARRAY,
 
         CREATE_OPACK_NONE,
         CREATE_OPACK_BOOL,
@@ -12,9 +12,12 @@ public abstract class Code {
         CREATE_OPACK_STRING,
 
         MODIFY_OPACK_OBJECT,
+        MODIFY_OPACK_OBJECT_WITH_STRING,
         MODIFY_OPACK_ARRAY,
+        MODIFY_OPACK_ARRAY_WITH_INDEX,
 
-        GET,
+        PUSH_CONST,
+        PUSH_FIELD,
         CALL
     }
 

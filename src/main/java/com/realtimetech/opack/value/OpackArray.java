@@ -6,6 +6,10 @@ import java.util.Collection;
 import java.util.LinkedList;
 
 public class OpackArray<E extends OpackValue> extends OpackLazyValue<LinkedList<E>> {
+    public OpackArray() {
+        super();
+    }
+
     public OpackArray(@NotNull Collection<E> collection) {
         this.get().addAll(collection);
     }
@@ -24,6 +28,10 @@ public class OpackArray<E extends OpackValue> extends OpackLazyValue<LinkedList<
     @Override
     LinkedList<E> createLazyValue() {
         return new LinkedList<>();
+    }
+
+    public E set(int index, @NotNull E value) {
+        return this.get().set(index,value);
     }
 
     public boolean add(@NotNull E value) {
