@@ -2,28 +2,35 @@ package com.realtimetech.opack.value;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.Array;
-import java.util.HashMap;
+import java.util.Collection;
+import java.util.LinkedList;
 
-public class OpackArray<T extends OpackValue> extends OpackValue<T[]> {
-    public OpackArray(@NotNull Class<T> type, int length) {
-        super((T[]) Array.newInstance(type, length));
+public class OpackArray<E extends OpackValue> extends OpackLazyValue<LinkedList<E>> {
+    public OpackArray(@NotNull Collection<E> collection) {
+        this.get().addAll(collection);
     }
 
-    public OpackArray(T @NotNull [] value) {
-        super(value);
+    public OpackArray(E @NotNull [] collection) {
+        for (E element : collection) {
+            this.add(element);
+        }
     }
 
     @Override
-    public void set(T[] value) {
+    public void set(LinkedList<E> value) {
         throw new UnsupportedOperationException();
     }
 
-    public void set(int index, T value) {
-        super.get()[index] = value;
+    @Override
+    LinkedList<E> createLazyValue() {
+        return new LinkedList<>();
     }
 
-    public T get(int index) {
-        return super.get()[index];
+    public boolean add(@NotNull E value) {
+        return this.get().add(value);
+    }
+
+    public boolean remove(@NotNull E value) {
+        return this.get().remove(value);
     }
 }

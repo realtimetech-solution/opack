@@ -6,4 +6,5 @@ public class OpackString extends OpackValue<String>{
     public OpackString(@NotNull String value) {
         super(value);
     }
+
 }
