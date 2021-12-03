@@ -1,4 +1,9 @@
 package com.realtimetech.opack.value;
 
-public class OpackNone extends OpackValue {
+import org.jetbrains.annotations.NotNull;
+
+public class OpackNone extends OpackValue<Void> {
+    public OpackNone() {
+        super(null);
+    }
 }

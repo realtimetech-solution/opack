@@ -2,17 +2,12 @@ package com.realtimetech.opack.value;
 
 import java.util.HashMap;
 
-public abstract class OpackLazyValue<T> extends OpackValue<T>{
+abstract class OpackLazyValue<T> extends OpackValue<T>{
     public OpackLazyValue() {
         super(null);
     }
 
     abstract T createLazyValue();
-
-    @Override
-    public void set(T value) {
-        throw new Doe
-    }
 
     @Override
     public T get() {

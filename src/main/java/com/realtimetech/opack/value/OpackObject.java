@@ -4,17 +4,22 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 
-public class OpackObject extends OpackLazyValue<HashMap<String, OpackValue>> {
+public class OpackObject<K extends OpackValue, V extends OpackValue> extends OpackLazyValue<HashMap<K, V>> {
     @Override
-    HashMap<String, OpackValue> createLazyValue() {
+    public void set(HashMap<K, V> value) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    HashMap<K, V> createLazyValue() {
         return new HashMap<>();
     }
 
-    public OpackValue get(@NotNull String key) {
+    public V get(@NotNull K key) {
         return this.get().get(key);
     }
 
-    public OpackValue put(@NotNull String key, @NotNull OpackValue opackValue) {
+    public V put(@NotNull K key, @NotNull V opackValue) {
         return this.get().put(key, opackValue);
     }
 }

@@ -1,4 +1,9 @@
 package com.realtimetech.opack.value;
 
-public class OpackNumber extends OpackValue {
+import org.jetbrains.annotations.NotNull;
+
+public class OpackNumber extends OpackValue<Number> {
+    public OpackNumber(@NotNull Number value) {
+        super(value);
+    }
 }
