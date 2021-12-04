@@ -1,9 +1,10 @@
 package com.realtimetech.opack.interlanguage.code;
 
-import com.realtimetech.opack.interlanguage.code.Code;
-
 public class CodeCreateOpackArray extends Code {
-    public CodeCreateOpackArray() {
+    public final int count;
+    public CodeCreateOpackArray(int count) {
         super(Type.CREATE_OPACK_ARRAY);
+
+        this.count = count;
     }
 }

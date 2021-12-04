@@ -2,8 +2,8 @@ package com.realtimetech.opack.value;
 
 import org.jetbrains.annotations.NotNull;
 
-public class OpackBool extends OpackValue<Boolean> {
-    public OpackBool(@NotNull Boolean value) {
+public class OpackBoolean extends OpackValue<Boolean> {
+    public OpackBoolean(@NotNull Boolean value) {
         super(value);
     }
 }

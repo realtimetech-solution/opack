@@ -12,9 +12,8 @@ public abstract class Code {
         CREATE_OPACK_STRING,
 
         MODIFY_OPACK_OBJECT,
-        MODIFY_OPACK_OBJECT_WITH_STRING,
+//        MODIFY_OPACK_OBJECT_WITH_STRING,
         MODIFY_OPACK_ARRAY,
-        MODIFY_OPACK_ARRAY_WITH_INDEX,
 
         PUSH_CONST,
         PUSH_FIELD,

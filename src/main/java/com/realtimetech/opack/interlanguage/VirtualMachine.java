@@ -3,11 +3,11 @@ package com.realtimetech.opack.interlanguage;
 import com.realtimetech.opack.interlanguage.code.*;
 import com.realtimetech.opack.value.*;
 
+import java.util.HashMap;
 import java.util.Stack;
 
 public class VirtualMachine {
-    private CodePushField codePushField;
-    private Object object;
+    private HashMap<Class, PrebuiltCodes> prebuiltMap;
 
     public void sandbox() {
         Stack<CallContext> callStack = new Stack<>();
@@ -32,7 +32,7 @@ public class VirtualMachine {
                         opackStack.push(new OpackNone());
                         break;
                     case CREATE_OPACK_BOOL:
-                        opackStack.push(new OpackBool((Boolean) valueStack.pop()));
+                        opackStack.push(new OpackBoolean((Boolean) valueStack.pop()));
                         break;
                     case CREATE_OPACK_NUMBER:
                         opackStack.push(new OpackNumber((Number) valueStack.pop()));
@@ -76,9 +76,16 @@ public class VirtualMachine {
                         break;
                     case CALL: {
                         Object object = valueStack.pop();
-                        // TODO: Get prebuilt codes from storage
-                        CallContext newCallContext = new CallContext(null, object);
-                        callStack.push(newCallContext);
+                        PrebuiltCodes prebuiltCodes = this.prebuiltMap.getOrDefault(object, null);
+
+                        // TODO: Pre-Transformer
+                        // TODO: etc..
+
+                        if (prebuiltCodes == null){
+                            this.prebuiltMap.put(object.getClass(), Compiler.compile(object.getClass()));
+                        }
+
+                        callStack.push(new CallContext(prebuiltCodes, object));
                         break;
                     }
                 }
