@@ -2,13 +2,15 @@ package com.realtimetech.opack.value;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
-public class OpackObject<K extends OpackValue, V extends OpackValue> extends OpackLazyValue<HashMap<K, V>> {
-    @Override
-    public void set(HashMap<K, V> value) {
-        throw new UnsupportedOperationException();
+public class OpackObject<K, V> extends OpackValue<HashMap<K, V>> {
+    public OpackObject(int length) {
+        this.set(new HashMap<>(length));
     }
+
+    public OpackObject() {}
 
     @Override
     HashMap<K, V> createLazyValue() {

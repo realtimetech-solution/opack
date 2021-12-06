@@ -1,6 +1,6 @@
-package com.realtimetech.opack.interlanguage;
+package com.realtimetech.opack.compile;
 
-import com.realtimetech.opack.interlanguage.code.*;
+import com.realtimetech.opack.compile.code.*;
 import com.realtimetech.opack.value.*;
 
 import java.util.HashMap;
@@ -22,12 +22,16 @@ public class VirtualMachine {
                 callStack.pop();
             } else {
                 switch (code.type) {
-                    case CREATE_OPACK_OBJECT:
-                        opackStack.push(new OpackObject());
+                    case CREATE_OPACK_OBJECT: {
+                        OpackObject opackObject = new OpackObject();
+                        opackStack.push(opackObject);
                         break;
-                    case CREATE_OPACK_ARRAY:
-                        opackStack.push(new OpackArray());
+                    }
+                    case CREATE_OPACK_ARRAY: {
+                        OpackArray opackArray = new OpackArray();
+                        opackStack.push(opackArray);
                         break;
+                    }
                     case CREATE_OPACK_NONE:
                         opackStack.push(new OpackNone());
                         break;
@@ -78,10 +82,10 @@ public class VirtualMachine {
                         Object object = valueStack.pop();
                         PrebuiltCodes prebuiltCodes = this.prebuiltMap.getOrDefault(object, null);
 
-                        // TODO: Pre-Transformer
+                        // TODO: Pre-TransformerInterface
                         // TODO: etc..
 
-                        if (prebuiltCodes == null){
+                        if (prebuiltCodes == null) {
                             this.prebuiltMap.put(object.getClass(), Compiler.compile(object.getClass()));
                         }
 

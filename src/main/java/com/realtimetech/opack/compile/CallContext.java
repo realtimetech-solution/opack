@@ -1,6 +1,6 @@
-package com.realtimetech.opack.interlanguage;
+package com.realtimetech.opack.compile;
 
-import com.realtimetech.opack.interlanguage.code.Code;
+import com.realtimetech.opack.compile.code.Code;
 
 import java.lang.reflect.Field;
 

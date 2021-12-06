@@ -8,16 +8,24 @@ import java.util.Objects;
 public abstract class OpackValue<T> {
     private T value;
 
-    public OpackValue(@NotNull T value){
-        this.value = value;
-    }
+    abstract T createLazyValue();
 
-    public void set(@NotNull T value) {
-        this.value = value;
-    }
+    T get() {
+        if (this.value == null) {
+            synchronized (this) {
+                if (this.value == null) {
+                    this.value = createLazyValue();
+                }
+            }
+        }
 
-    public T get() {
         return this.value;
+    }
+
+    void set(T value) {
+        synchronized (this) {
+            this.value = value;
+        }
     }
 
     @Override

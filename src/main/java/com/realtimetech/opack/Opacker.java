@@ -1,6 +1,7 @@
 package com.realtimetech.opack;
 
-@SingleValueAnnotation(id=aaa.class)
+import com.realtimetech.opack.transformer.TransformerInterface;
+
 public class Opacker {
     public class Builder {
 
