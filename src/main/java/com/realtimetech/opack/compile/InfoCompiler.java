@@ -6,6 +6,7 @@ import com.realtimetech.opack.annotation.Ignore;
 import com.realtimetech.opack.annotation.Transform;
 import com.realtimetech.opack.exception.CompileException;
 import com.realtimetech.opack.transformer.Transformer;
+import com.realtimetech.opack.transformer.TransformerFactory;
 import com.realtimetech.opack.util.ReflectionUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,10 +19,14 @@ import java.util.List;
 public class InfoCompiler {
     final @NotNull Opacker opacker;
 
+    final @NotNull TransformerFactory transformerFactory;
+
     final @NotNull HashMap<Class<?>, ClassInfo> classInfoMap;
 
-    public InfoCompiler(Opacker opacker) {
+    public InfoCompiler(@NotNull Opacker opacker) {
         this.opacker = opacker;
+
+        this.transformerFactory = new TransformerFactory(opacker);
 
         this.classInfoMap = new HashMap<>();
     }
@@ -32,7 +37,7 @@ public class InfoCompiler {
             Class<Transformer> transformerInterfaceClass = (Class<Transformer>) transform.transformer();
 
             try {
-                return (Transformer) this.opacker.getTransformerFactory().get(transformerInterfaceClass);
+                return (Transformer) this.transformerFactory.get(transformerInterfaceClass);
             } catch (InstantiationException e) {
                 throw new CompileException(e);
             }
