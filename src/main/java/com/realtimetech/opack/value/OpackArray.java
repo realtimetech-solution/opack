@@ -22,7 +22,8 @@ public class OpackArray<E> extends OpackValue<ArrayList<E>> {
         this.set(new ArrayList<>(length));
     }
 
-    public OpackArray() {}
+    public OpackArray() {
+    }
 
     @Override
     ArrayList<E> createLazyValue() {
@@ -39,5 +40,13 @@ public class OpackArray<E> extends OpackValue<ArrayList<E>> {
 
     public boolean remove(@NotNull E value) {
         return this.get().remove(value);
+    }
+
+    public E get(int index){
+        return this.get().get(index);
+    }
+
+    public int length() {
+        return this.get().size();
     }
 }

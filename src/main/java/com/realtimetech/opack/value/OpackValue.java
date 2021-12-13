@@ -43,6 +43,6 @@ public abstract class OpackValue<T> {
 
     @Override
     public String toString() {
-        return this.getClass().getSimpleName() + "{" + value + "}";
+        return this.getClass().getSimpleName() + "(" + value + ")";
     }
 }
