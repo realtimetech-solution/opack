@@ -1,6 +1,7 @@
 package com.realtimetech.opack.annotation;
 
-import com.realtimetech.opack.transformer.TransformerInterface;
+import com.realtimetech.opack.transformer.Transformer;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -12,6 +13,6 @@ import java.lang.annotation.Target;
         ElementType.TYPE,
         ElementType.FIELD,
 })
-public @interface Transformer {
-    Class<? extends TransformerInterface> transformer();
+public @interface Transform {
+    @NotNull Class<? extends Transformer> transformer();
 }

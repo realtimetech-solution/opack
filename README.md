@@ -29,7 +29,7 @@ public class ConfuseClassB {
     private String string;
 }
 
-@Transformer(transformer=DebugPrinter.class)
+@Transform(transformer=DebugPrinter.class)
 public class ConfuseClassA {
     @Ignore
     private byte[] bigData;
@@ -37,7 +37,7 @@ public class ConfuseClassA {
     @DeserializeType(type=LinkedList.class)
     private List list;
 
-    @Transformer(transformer=Base64Transformer.class)
+    @Transform(transformer=Base64Transformer.class)
     private byte[] bytes;
 
     private String string;
