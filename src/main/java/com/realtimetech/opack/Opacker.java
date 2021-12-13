@@ -137,29 +137,43 @@ public class Opacker {
             return object;
         }
         try {
+            if (targetClass == type) {
+                return object;
+            }
+
             ClassInfo classInfo = this.infoCompiler.get(targetClass);
 
-            if (object instanceof OpackValue){
+            if (object instanceof OpackValue) {
                 if (classInfo.getTransformer() != null) {
                     object = classInfo.getTransformer().deserialize((OpackValue) object);
                 }
             }
-
-            if (object instanceof OpackValue){
+            if (object instanceof OpackValue) {
                 OpackValue opackValue = (OpackValue) object;
-                if (object instanceof OpackArray) {
-                    OpackArray opackArray = (OpackArray) object;
-                    int length = opackArray.length();
 
-                    object = Array.newInstance(targetClass,length);
-                } else if (object instanceof OpackObject) {
-                    object = ReflectionUtil.createInstanceUnsafe(targetClass);
+                if (targetClass.isArray()) {
+                    if (object instanceof OpackArray) {
+                        OpackArray opackArray = (OpackArray) object;
+                        int length = opackArray.length();
+                        object = Array.newInstance(targetClass.getComponentType(), length);
+                    } else {
+                        throw new Error("??");
+                    }
+                } else {
+                    if (object instanceof OpackObject) {
+                        OpackObject opackObject = (OpackObject) object;
+                        object = ReflectionUtil.createInstanceUnsafe(targetClass);
+                    } else {
+                        throw new Error("??");
+                    }
                 }
-
                 this.objectStack.push(object);
                 this.valueStack.push(opackValue);
                 this.classInfoStack.push(classInfo);
+            } else {
+                throw new Error("??");
             }
+
 
             return object;
         } catch (CompileException | InvocationTargetException | IllegalAccessException exception) {
@@ -188,7 +202,7 @@ public class Opacker {
 
                 for (int index = 0; index < length; index++) {
                     Object element = opackArray.get(index);
-                    Object deserializedValue = this.pushSomeThingDe(i.getTargetClass(), element);
+                    Object deserializedValue = this.pushSomeThingDe(i.getTargetClass().getComponentType(), element);
 
                     Array.set(o, index, deserializedValue);
                 }
@@ -199,7 +213,7 @@ public class Opacker {
                     Object serializedValue = this.pushSomeThingDe(fieldInfo.getField().getType(), element);
 
                     try {
-                        fieldInfo.getField().set(o,serializedValue);
+                        fieldInfo.getField().set(o, serializedValue);
                     } catch (IllegalAccessException e) {
                         e.printStackTrace();
                     }
@@ -217,7 +231,7 @@ public class Opacker {
         public String value1;
         public ExampleSub value2;
         public String value3;
-//        public ExampleSub[] value4;
+        public ExampleSub[] value4;
     }
 
     public static void main(String[] args) throws SerializeException {
@@ -227,13 +241,18 @@ public class Opacker {
         example.value1 = "Test";
         example.value2 = new ExampleSub();
         example.value2.value1 = 190;
-//        example.value4 = new ExampleSub[2];
-//        example.value4[0] = new ExampleSub();
-//        example.value4[1] = new ExampleSub();
+        example.value4 = new ExampleSub[2];
+        example.value4[0] = new ExampleSub();
+        example.value4[1] = new ExampleSub();
+        example.value4[0].value1 = 1293;
+        example.value4[1].value1 = 32478;
 
         OpackValue opackValue = opacker.serialize(example);
         Example d = opacker.derialize(Example.class, opackValue);
 
         System.out.println(d.value2.value1);
+        System.out.println(d.value4.length);
+        System.out.println(d.value4[0].value1);
+        System.out.println(d.value4[1].value1);
     }
 }
