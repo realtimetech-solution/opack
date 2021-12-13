@@ -47,6 +47,9 @@ public class Opacker {
 
         Class<?> type = ReflectionUtil.getClass(object);
 
+        if (ReflectionUtil.checkClassCastable(type, OpackValue.class)) {
+            return object;
+        }
         if (type == String.class) {
             return object;
         }
@@ -210,7 +213,7 @@ public class Opacker {
                 OpackObject opackObject = (OpackObject) v;
                 for (ClassInfo.FieldInfo fieldInfo : i.getFields()) {
                     Object element = opackObject.get(fieldInfo.getField().getName());
-                    Object serializedValue = this.pushSomeThingDe(fieldInfo.getField().getType(), element);
+                    Object serializedValue = this.pushSomeThingDe(fieldInfo.getExplicitType() == null ? fieldInfo.getField().getType() : fieldInfo.getExplicitType(), element);
 
                     try {
                         fieldInfo.getField().set(o, serializedValue);
@@ -232,6 +235,9 @@ public class Opacker {
         public ExampleSub value2;
         public String value3;
         public ExampleSub[] value4;
+
+        @ExplicitType(type = OpackObject.class)
+        public OpackValue opackValue;
     }
 
     public static void main(String[] args) throws SerializeException {
@@ -246,6 +252,9 @@ public class Opacker {
         example.value4[1] = new ExampleSub();
         example.value4[0].value1 = 1293;
         example.value4[1].value1 = 32478;
+        example.opackValue = new OpackObject();
+        ((OpackObject) example.opackValue).put("A", "bbb");
+        ((OpackObject) example.opackValue).put("C", 123213213);
 
         OpackValue opackValue = opacker.serialize(example);
         Example d = opacker.derialize(Example.class, opackValue);
@@ -254,5 +263,7 @@ public class Opacker {
         System.out.println(d.value4.length);
         System.out.println(d.value4[0].value1);
         System.out.println(d.value4[1].value1);
+        System.out.println(((OpackObject) d.opackValue).get("A"));
+        System.out.println(((OpackObject) d.opackValue).get("C"));
     }
 }
