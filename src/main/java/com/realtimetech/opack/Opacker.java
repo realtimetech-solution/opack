@@ -2,11 +2,13 @@ package com.realtimetech.opack;
 
 import com.realtimetech.opack.compile.ClassInfo;
 import com.realtimetech.opack.compile.InfoCompiler;
+import com.realtimetech.opack.example.Example;
 import com.realtimetech.opack.exception.CompileException;
 import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.transformer.Transformer;
-import com.realtimetech.opack.util.FastStack;
+import com.realtimetech.opack.util.structure.FastStack;
+import com.realtimetech.opack.util.OpackArrayConverter;
 import com.realtimetech.opack.util.ReflectionUtil;
 import com.realtimetech.opack.value.OpackArray;
 import com.realtimetech.opack.value.OpackObject;
@@ -17,7 +19,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 
 public class Opacker {
-    public class Builder {
+    public static class Builder {
 
     }
 
@@ -69,33 +71,35 @@ public class Opacker {
         try {
             ClassInfo classInfo = this.infoCompiler.get(clazz);
 
-            /*
-                Optimize algorithm for big array
-             */
-            if (OpackArray.isAllowArrayType(clazz)) {
-                int dimensions = ReflectionUtil.getArrayDimension(clazz);
-                if (dimensions == 1) {
-                    return new OpackArray(ReflectionUtil.cloneArray(object));
-                }
-
-                OpackArray opackArray = new OpackArray(Array.getLength(object));
-
-                this.objectStack.push(object);
-                this.valueStack.push(opackArray);
-                this.classInfoStack.push(classInfo);
-
-                return opackArray;
-            }
-
-            if (OpackValue.isAllowType(clazz)) {
-                return object;
-            }
-
             for (Transformer transformer : classInfo.getTransformers()) {
                 object = transformer.serialize(this, object);
             }
 
             Class<?> objectType = object.getClass();
+            /*
+                Early stopping
+             */
+            if (OpackValue.isAllowType(objectType)) {
+                /*
+                    If directly pass opack value, deep clone
+                 */
+                if (object instanceof OpackValue) {
+                    object = ((OpackValue) object).clone();
+                }
+
+                return object;
+            }
+            /*
+                Optimize algorithm for big array
+             */
+            if (OpackArray.isAllowArrayType(objectType)) {
+                int dimensions = ReflectionUtil.getArrayDimension(objectType);
+                if (dimensions == 1) {
+                    return new OpackArray(ReflectionUtil.cloneArray(object));
+                }
+            }
+
+
             OpackValue opackValue = null;
 
             if (objectType.isArray()) {
@@ -125,7 +129,7 @@ public class Opacker {
                 int length = Array.getLength(object);
 
                 for (int index = 0; index < length; index++) {
-                    Object element = Array.get(object, index);
+                    Object element = ReflectionUtil.getArrayItem(object, index);
                     Object serializedValue = this.prepareObjectSerialize(element.getClass(), element);
 
                     opackArray.add(serializedValue);
@@ -179,10 +183,6 @@ public class Opacker {
         try {
             ClassInfo classInfo = this.infoCompiler.get(clazz);
 
-            if (OpackValue.isAllowType(clazz)) {
-                return object;
-            }
-
             for (Transformer transformer : classInfo.getTransformers()) {
                 object = transformer.deserialize(this, object);
             }
@@ -190,19 +190,44 @@ public class Opacker {
             /*
                 Early stopping
              */
-            if (clazz == object.getClass()) {
+            if (OpackValue.isAllowType(clazz)) {
+                /*
+                    If directly pass opack value, deep clone
+                 */
+                if (object instanceof OpackValue) {
+                    object = ((OpackValue) object).clone();
+                }
                 return object;
             }
 
+            /*
+                Optimize algorithm for big array
+             */
+            if (OpackArray.isAllowArrayType(clazz)) {
+                int dimensions = ReflectionUtil.getArrayDimension(clazz);
+
+                if (dimensions == 1 && object instanceof OpackArray) {
+                    OpackArray opackArray = (OpackArray) object;
+                    Class<?> componentType = clazz.getComponentType();
+
+                    try {
+                        return OpackArrayConverter.convertToArray(componentType, opackArray);
+                    } catch (InvocationTargetException | IllegalAccessException exception) {
+                        throw new DeserializeException("Can't convert OpackArray to native array", exception);
+                    }
+                }
+            }
+
+
             if (object instanceof OpackValue) {
                 OpackValue opackValue = (OpackValue) object;
-                Object targetObjact;
+                Object targetObject;
 
                 if (clazz.isArray()) {
                     if (object instanceof OpackArray) {
                         OpackArray opackArray = (OpackArray) object;
 
-                        targetObjact = Array.newInstance(clazz.getComponentType(), opackArray.length());
+                        targetObject = Array.newInstance(clazz.getComponentType(), opackArray.length());
                     } else {
                         throw new DeserializeException("Target class is array. but, object is not OpackArray");
                     }
@@ -211,7 +236,7 @@ public class Opacker {
                         OpackObject opackObject = (OpackObject) object;
 
                         try {
-                            targetObjact = ReflectionUtil.createInstanceUnsafe(clazz);
+                            targetObject = ReflectionUtil.createInstanceUnsafe(clazz);
                         } catch (InvocationTargetException | IllegalAccessException exception) {
                             throw new DeserializeException("Can't create instance using unsafe method", exception);
                         }
@@ -220,11 +245,13 @@ public class Opacker {
                     }
                 }
 
-                this.objectStack.push(targetObjact);
+                this.objectStack.push(targetObject);
                 this.valueStack.push(opackValue);
                 this.classInfoStack.push(classInfo);
 
-                return targetObjact;
+                return targetObject;
+            } else if (object.getClass() == clazz) {
+                return object;
             } else {
                 throw new DeserializeException("Found object, stack corruption");
             }
@@ -242,13 +269,14 @@ public class Opacker {
 
             if (opackValue instanceof OpackArray) {
                 OpackArray opackArray = (OpackArray) opackValue;
+                Class<?> componentType = object.getClass().getComponentType();
                 int length = opackArray.length();
 
                 for (int index = 0; index < length; index++) {
                     Object element = opackArray.get(index);
-                    Object deserializedValue = this.prepareObjectDeserialize(classInfo.getTargetClass().getComponentType(), element);
+                    Object deserializedValue = this.prepareObjectDeserialize(componentType, element);
 
-                    Array.set(object, index, deserializedValue);
+                    ReflectionUtil.setArrayItem(object, index, ReflectionUtil.cast(componentType, deserializedValue));
                 }
             } else if (opackValue instanceof OpackObject) {
                 OpackObject opackObject = (OpackObject) opackValue;
@@ -256,6 +284,7 @@ public class Opacker {
                     try {
                         Object element = opackObject.get(fieldInfo.getField().getName());
                         Class<?> type = fieldInfo.getType();
+                        Class<?> fieldType = fieldInfo.getField().getType();
 
                         if (fieldInfo.getTransformer() != null) {
                             element = fieldInfo.getTransformer().deserialize(this, element);
@@ -263,7 +292,7 @@ public class Opacker {
 
                         Object deserializedValue = this.prepareObjectDeserialize(type, element);
 
-                        fieldInfo.getField().set(object, deserializedValue);
+                        fieldInfo.getField().set(object, ReflectionUtil.cast(fieldType, deserializedValue));
                     } catch (IllegalAccessException exception) {
                         throw new DeserializeException("Can't set " + fieldInfo.getName() + " field in " + classInfo.getTargetClass().getSimpleName(), exception);
                     }
@@ -273,18 +302,26 @@ public class Opacker {
     }
 
 
-    public static void main(String[] args) throws SerializeException, DeserializeException, IllegalAccessException {
+    public static void main(String[] args) throws SerializeException, DeserializeException, IllegalAccessException, InterruptedException {
+//        Thread.sleep(1024 * 12);
         Opacker opacker = new Opacker();
 
         Example example = new Example();
 
-        OpackValue serialized = opacker.serialize(example);
-        Example deserialized = opacker.deserialize(Example.class, serialized);
+        long s = System.currentTimeMillis();
+        for (int i = 0; i < 512; i++) {
+            OpackValue serialized = opacker.serialize(example);
+            Example deserialized = opacker.deserialize(Example.class, serialized);
+        }
+        long e = System.currentTimeMillis();
+        System.out.println(e - s);
 
+//        OpackValue serialized = opacker.serialize(example);
+//        Example deserialized = opacker.deserialize(Example.class, serialized);
+//        String bool = example.validationObject(deserialized);
+//
+//        System.out.println("Wrong " + bool);
 
-        String bool = example.validationObject(deserialized);
-
-        System.out.println(bool);
 //        System.out.println(deserialized.getBigByteArray().length);
     }
 }

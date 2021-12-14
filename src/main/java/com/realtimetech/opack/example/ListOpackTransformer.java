@@ -1,5 +1,6 @@
-package com.realtimetech.opack;
+package com.realtimetech.opack.example;
 
+import com.realtimetech.opack.Opacker;
 import com.realtimetech.opack.transformer.Transformer;
 import com.realtimetech.opack.value.OpackArray;
 

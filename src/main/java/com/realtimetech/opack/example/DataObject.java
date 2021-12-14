@@ -1,4 +1,4 @@
-package com.realtimetech.opack;
+package com.realtimetech.opack.example;
 
 import com.realtimetech.opack.annotation.Transform;
 

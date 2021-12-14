@@ -1,4 +1,4 @@
-package com.realtimetech.opack.util;
+package com.realtimetech.opack.util.structure;
 
 import org.jetbrains.annotations.NotNull;
 

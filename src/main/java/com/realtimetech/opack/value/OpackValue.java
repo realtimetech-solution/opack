@@ -43,6 +43,8 @@ public abstract class OpackValue<T> {
         }
     }
 
+    public abstract OpackValue clone();
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

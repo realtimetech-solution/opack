@@ -1,5 +1,6 @@
-package com.realtimetech.opack.util;
+package com.realtimetech.opack.util.structure;
 
+import com.realtimetech.opack.util.ReflectionUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Array;
@@ -14,6 +15,10 @@ public class PinnedList<E> implements List<E> {
         }
 
         this.arrayObject = arrayObject;
+    }
+
+    public Object getArrayObject() {
+        return arrayObject;
     }
 
     @Override
@@ -107,7 +112,7 @@ public class PinnedList<E> implements List<E> {
 
     @Override
     public E get(int index) {
-        return (E) Array.get(this.arrayObject, index);
+        return (E) ReflectionUtil.getArrayItem(this.arrayObject, index);
     }
 
     @Override

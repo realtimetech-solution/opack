@@ -1,10 +1,9 @@
 package com.realtimetech.opack.value;
 
-import com.realtimetech.opack.util.PinnedList;
+import com.realtimetech.opack.util.structure.PinnedList;
 import com.realtimetech.opack.util.ReflectionUtil;
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.Array;
 import java.util.*;
 
 public class OpackArray<E> extends OpackValue<List<E>> {
@@ -12,7 +11,7 @@ public class OpackArray<E> extends OpackValue<List<E>> {
         if (clazz.isArray()) {
             Class<?> componentType = ReflectionUtil.getArrayLastComponentType(clazz);
 
-            if(OpackValue.isAllowType(componentType)) {
+            if (OpackValue.isAllowType(componentType)) {
                 return true;
             }
         }
@@ -36,9 +35,6 @@ public class OpackArray<E> extends OpackValue<List<E>> {
         this.set(Arrays.asList(array));
     }
 
-    public OpackArray() {
-    }
-
     public OpackArray(@NotNull Collection<E> collection) {
         this(collection.size());
 
@@ -54,6 +50,9 @@ public class OpackArray<E> extends OpackValue<List<E>> {
 
     public OpackArray(int initialCapacity) {
         this.set(new ArrayList<>(initialCapacity));
+    }
+
+    public OpackArray() {
     }
 
     @Override
@@ -97,5 +96,22 @@ public class OpackArray<E> extends OpackValue<List<E>> {
 
     public int length() {
         return this.get().size();
+    }
+
+    @Override
+    public OpackValue clone() {
+        OpackArray<E> opackArray = new OpackArray<E>(this.length());
+
+        for (int index = 0; index < this.length(); index++) {
+            E object = this.get(index);
+
+            if (object instanceof OpackValue) {
+                object = (E) ((OpackValue) object).clone();
+            }
+
+            opackArray.add(object);
+        }
+
+        return opackArray;
     }
 }

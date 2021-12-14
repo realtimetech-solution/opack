@@ -17,6 +17,10 @@ public class OpackObject<K, V> extends OpackValue<HashMap<K, V>> {
         return new HashMap<>();
     }
 
+    public int size() {
+        return this.get().size();
+    }
+
     public V get(@NotNull K key) {
         return this.get().get(key);
     }
@@ -29,5 +33,26 @@ public class OpackObject<K, V> extends OpackValue<HashMap<K, V>> {
             OpackValue.assertAllowType(value.getClass());
 
         return this.get().put(key, value);
+    }
+
+    @Override
+    public OpackValue clone() {
+        OpackObject<K, V> opackObject = new OpackObject<K, V>(this.size());
+
+        for (K key : this.get().keySet()) {
+            V value = this.get(key);
+
+            if (key instanceof OpackValue) {
+                key = (K) ((OpackValue) key).clone();
+            }
+
+            if (value instanceof OpackValue) {
+                value = (V) ((OpackValue) value).clone();
+            }
+
+            opackObject.put(key, value);
+        }
+
+        return opackObject;
     }
 }

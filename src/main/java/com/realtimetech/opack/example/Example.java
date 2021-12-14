@@ -1,4 +1,4 @@
-package com.realtimetech.opack;
+package com.realtimetech.opack.example;
 
 import com.realtimetech.opack.annotation.ExplicitType;
 import com.realtimetech.opack.annotation.Ignore;
@@ -7,7 +7,6 @@ import com.realtimetech.opack.value.OpackArray;
 import com.realtimetech.opack.value.OpackObject;
 import com.realtimetech.opack.value.OpackValue;
 
-import javax.xml.crypto.Data;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
