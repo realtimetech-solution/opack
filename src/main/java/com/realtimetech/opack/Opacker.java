@@ -146,158 +146,139 @@ public class Opacker {
 
                         opackObject.put(fieldInfo.getName(), serializedValue);
                     } catch (IllegalAccessException exception) {
-                        throw new SerializeException("Cant get " + fieldInfo.getName() + " field data in " + classInfo.getTargetClass().getSimpleName(), exception);
+                        throw new SerializeException("Can't get " + fieldInfo.getName() + " field data in " + classInfo.getTargetClass().getSimpleName(), exception);
                     }
                 }
             }
         }
     }
 
-//    public synchronized <T> T deserialize(Class<T> targetClass, OpackValue opackValue) throws DeserializeException {
-//        if (this.state == State.SERIALIZE)
-//            throw new DeserializeException("Opacker is serializing");
-//
-//        T value = (T) this.prepareObjectDeserialize(targetClass, opackValue);
-//
-//        if (this.state == State.NONE) {
-//            try {
-//                this.state = State.DESERIALIZE;
-//                this.executeDeserializeStack();
-//            } finally {
-//                this.state = State.NONE;
-//            }
-//        }
-//
-//        return value;
-//    }
+    public synchronized <T> T deserialize(Class<T> targetClass, OpackValue opackValue) throws DeserializeException {
+        if (this.state == State.SERIALIZE)
+            throw new DeserializeException("Opacker is serializing");
 
-//    public synchronized Object prepareObjectDeserialize(Class<?> clazz, Object object) throws DeserializeException {
-//        if (clazz == null || object == null) {
-//            return null;
-//        }
-//
-//        try {
-//            ClassInfo classInfo = this.infoCompiler.get(clazz);
-//
-//            /*
-//                Optimize algorithm for big array
-//             */
-//            if (OpackArray.isAllowArrayType(clazz)) {
-//                int dimensions = ReflectionUtil.getArrayDimension(clazz);
-//                if (dimensions == 1) {
-//                    return new OpackArray(ReflectionUtil.cloneArray(object));
-//                }
-//
-//                OpackArray opackArray = new OpackArray(Array.getLength(object));
-//
-//                this.objectStack.push(object);
-//                this.valueStack.push(opackArray);
-//                this.classInfoStack.push(classInfo);
-//
-//                return opackArray;
-//            }
-//
-//            return opackValue;
-//        } catch (CompileException exception) {
-//            throw new DeserializeException("Can't compile " + clazz.getName() + " class information", exception);
-//        }
-//
-//        Class<?> type = object.getClass();
-//
-//        if (type == String.class) {
-//            return object;
-//        }
-//        if (type == Integer.class) {
-//            return object;
-//        }
-//        if (type == Byte.class) {
-//            return object;
-//        }
-//
-//        try {
-//            if (clazz == type) {
-//                return object;
-//            }
-//
-//            ClassInfo classInfo = this.infoCompiler.get(clazz);
-//
-//            for (Transformer transformer : classInfo.getTransformers()) {
-//                object = transformer.deserialize(this, object);
-//            }
-//
-//            if (object instanceof OpackValue) {
-//                OpackValue opackValue = (OpackValue) object;
-//
-//                if (clazz.isArray()) {
-//                    if (object instanceof OpackArray) {
-//                        OpackArray opackArray = (OpackArray) object;
-//                        int length = opackArray.length();
-//                        object = Array.newInstance(clazz.getComponentType(), length);
-//                    } else {
-//                        throw new Error("??");
-//                    }
-//                } else {
-//                    if (object instanceof OpackObject) {
-//                        OpackObject opackObject = (OpackObject) object;
-//                        object = ReflectionUtil.createInstanceUnsafe(clazz);
-//                    } else {
-//                        throw new Error("??");
-//                    }
-//                }
-//                this.objectStack.push(object);
-//                this.valueStack.push(opackValue);
-//                this.classInfoStack.push(classInfo);
-//            } else {
-//                throw new Error("??");
-//            }
-//
-//
-//            return object;
-//        } catch (CompileException | InvocationTargetException | IllegalAccessException exception) {
-//            throw new SerializeException("PUT MESSAGE", exception);
-//        }
-//
-//    }
-//
-//    void executeDeserializeStack() throws DeserializeException {
-//        while (!this.objectStack.isEmpty()) {
-//            Object o = this.objectStack.pop();
-//            OpackValue v = this.valueStack.pop();
-//            ClassInfo i = this.classInfoStack.pop();
-//
-//            if (v instanceof OpackArray) {
-//                OpackArray opackArray = (OpackArray) v;
-//                int length = opackArray.length();
-//
-//                for (int index = 0; index < length; index++) {
-//                    Object element = opackArray.get(index);
-//                    Object deserializedValue = this.prepareObjectDeserialize(i.getTargetClass().getComponentType(), element);
-//
-//                    Array.set(o, index, deserializedValue);
-//                }
-//            } else if (v instanceof OpackObject) {
-//                OpackObject opackObject = (OpackObject) v;
-//                for (ClassInfo.FieldInfo fieldInfo : i.getFields()) {
-//                    Object element = opackObject.get(fieldInfo.getField().getName());
-//                    Object serializedValue = this.prepareObjectDeserialize(fieldInfo.getExplicitType() == null ? fieldInfo.getField().getType() : fieldInfo.getExplicitType(), element);
-//
-//                    try {
-//                        fieldInfo.getField().set(o, serializedValue);
-//                    } catch (IllegalAccessException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//            }
-//        }
-//    }
-//
-//
-//    public static void main(String[] args) throws SerializeException, InterruptedException {
-//        Opacker opacker = new Opacker();
-//
-//        Example example = new Example();
-//        OpackValue opackValue = opacker.executeSerializeStack(example);
-//        OpackObject opackObject = (OpackObject) opackValue;
-//
-//    }
+        T value = (T) this.prepareObjectDeserialize(targetClass, opackValue);
+
+        if (this.state == State.NONE) {
+            try {
+                this.state = State.DESERIALIZE;
+                this.executeDeserializeStack();
+            } finally {
+                this.state = State.NONE;
+            }
+        }
+
+        return value;
+    }
+
+    public synchronized Object prepareObjectDeserialize(Class<?> clazz, Object object) throws DeserializeException {
+        if (clazz == null || object == null) {
+            return null;
+        }
+
+        try {
+            ClassInfo classInfo = this.infoCompiler.get(clazz);
+
+            if (OpackValue.isAllowType(clazz)) {
+                return object;
+            }
+
+            for (Transformer transformer : classInfo.getTransformers()) {
+                object = transformer.deserialize(this, object);
+            }
+
+            /*
+                Early stopping
+             */
+            if (clazz == object.getClass()) {
+                return object;
+            }
+
+            if (object instanceof OpackValue) {
+                OpackValue opackValue = (OpackValue) object;
+                Object targetObjact;
+
+                if (clazz.isArray()) {
+                    if (object instanceof OpackArray) {
+                        OpackArray opackArray = (OpackArray) object;
+
+                        targetObjact = Array.newInstance(clazz.getComponentType(), opackArray.length());
+                    } else {
+                        throw new DeserializeException("Target class is array. but, object is not OpackArray");
+                    }
+                } else {
+                    if (object instanceof OpackObject) {
+                        OpackObject opackObject = (OpackObject) object;
+
+                        try {
+                            targetObjact = ReflectionUtil.createInstanceUnsafe(clazz);
+                        } catch (InvocationTargetException | IllegalAccessException exception) {
+                            throw new DeserializeException("Can't create instance using unsafe method", exception);
+                        }
+                    } else {
+                        throw new DeserializeException("Target class is object. but, object is not OpackObject");
+                    }
+                }
+
+                this.objectStack.push(targetObjact);
+                this.valueStack.push(opackValue);
+                this.classInfoStack.push(classInfo);
+
+                return targetObjact;
+            } else {
+                throw new DeserializeException("Found object, stack corruption");
+            }
+        } catch (CompileException exception) {
+            throw new DeserializeException("Can't compile " + clazz.getName() + " class information", exception);
+        }
+
+    }
+
+    void executeDeserializeStack() throws DeserializeException {
+        while (!this.objectStack.isEmpty()) {
+            Object object = this.objectStack.pop();
+            OpackValue opackValue = this.valueStack.pop();
+            ClassInfo classInfo = this.classInfoStack.pop();
+
+            if (opackValue instanceof OpackArray) {
+                OpackArray opackArray = (OpackArray) opackValue;
+                int length = opackArray.length();
+
+                for (int index = 0; index < length; index++) {
+                    Object element = opackArray.get(index);
+                    Object deserializedValue = this.prepareObjectDeserialize(classInfo.getTargetClass().getComponentType(), element);
+
+                    Array.set(object, index, deserializedValue);
+                }
+            } else if (opackValue instanceof OpackObject) {
+                OpackObject opackObject = (OpackObject) opackValue;
+                for (ClassInfo.FieldInfo fieldInfo : classInfo.getFields()) {
+                    try {
+                        Object element = opackObject.get(fieldInfo.getField().getName());
+                        Class<?> type = fieldInfo.getType();
+
+                        if (fieldInfo.getTransformer() != null) {
+                            element = fieldInfo.getTransformer().deserialize(this, element);
+                        }
+
+                        Object deserializedValue = this.prepareObjectDeserialize(type, element);
+
+                        fieldInfo.getField().set(object, deserializedValue);
+                    } catch (IllegalAccessException exception) {
+                        throw new DeserializeException("Can't set " + fieldInfo.getName() + " field in " + classInfo.getTargetClass().getSimpleName(), exception);
+                    }
+                }
+            }
+        }
+    }
+
+
+    public static void main(String[] args) throws SerializeException, DeserializeException {
+        Opacker opacker = new Opacker();
+
+        Example example = new Example();
+
+        OpackValue serialized = opacker.serialize(example);
+        Example deserialized = opacker.deserialize(Example.class, serialized);
+    }
 }
