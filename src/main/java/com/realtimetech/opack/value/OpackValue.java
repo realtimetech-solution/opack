@@ -1,11 +1,26 @@
 package com.realtimetech.opack.value;
 
+import com.realtimetech.opack.Opacker;
+import com.realtimetech.opack.util.ReflectionUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Objects;
 
 public abstract class OpackValue<T> {
+    public static void assertAllowType(Class<?> clazz) {
+        if (!OpackValue.isAllowType(clazz)) {
+            throw new IllegalArgumentException(clazz.getName() + " is not allowed type, allow only primitive type or String or OpackValues or null");
+        }
+    }
+
+    public static boolean isAllowType(Class<?> clazz) {
+        return ReflectionUtil.isWrapperClass(clazz) ||
+                ReflectionUtil.isPrimitiveClass(clazz) ||
+                (clazz == String.class) ||
+                (OpackValue.class.isAssignableFrom(clazz));
+    }
+
     private T value;
 
     abstract T createLazyValue();

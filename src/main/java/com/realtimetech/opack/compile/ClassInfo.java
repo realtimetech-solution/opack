@@ -1,19 +1,34 @@
 package com.realtimetech.opack.compile;
 
 import com.realtimetech.opack.transformer.Transformer;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
 
 public class ClassInfo {
     public static class FieldInfo {
         final Field field;
+        final String name;
+        final Class<?> type;
+
         final Transformer transformer;
         final Class<?> explicitType;
 
-        public FieldInfo(Field field, Transformer transformer, Class<?> explicitType) {
+        public FieldInfo(@NotNull Field field, Transformer transformer, Class<?> explicitType) {
             this.field = field;
+            this.name = this.field.getName();
+            this.type = explicitType == null ? this.field.getType() : explicitType;
+
             this.transformer = transformer;
             this.explicitType = explicitType;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public Class<?> getType() {
+            return type;
         }
 
         public Field getField() {
@@ -30,12 +45,12 @@ public class ClassInfo {
     }
 
     final Class<?> targetClass;
-    final Transformer transformer;
+    final Transformer[] transformers;
     final FieldInfo[] fields;
 
-    public ClassInfo(Class<?> targetClass, Transformer transformer, FieldInfo[] fields) {
+    public ClassInfo(Class<?> targetClass, Transformer[] transformers, FieldInfo[] fields) {
         this.targetClass = targetClass;
-        this.transformer = transformer;
+        this.transformers = transformers;
         this.fields = fields;
     }
 
@@ -43,8 +58,8 @@ public class ClassInfo {
         return targetClass;
     }
 
-    public Transformer getTransformer() {
-        return transformer;
+    public Transformer[] getTransformers() {
+        return transformers;
     }
 
     public FieldInfo[] getFields() {

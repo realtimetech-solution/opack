@@ -31,19 +31,40 @@ public class InfoCompiler {
         this.classInfoMap = new HashMap<>();
     }
 
-    Transformer getTransformer(AnnotatedElement annotatedElement) throws CompileException {
-        if (annotatedElement.isAnnotationPresent(Transform.class)) {
-            Transform transform = annotatedElement.getAnnotation(Transform.class);
-            Class<Transformer> transformerInterfaceClass = (Class<Transformer>) transform.transformer();
+    void addTransformer(List<Transformer> transformers, AnnotatedElement annotatedElement, boolean root) throws CompileException {
+        if (annotatedElement instanceof Class) {
+            Class<?> clazz = (Class<?>) annotatedElement;
+            Class<?> superClass = clazz.getSuperclass();
 
-            try {
-                return (Transformer) this.transformerFactory.get(transformerInterfaceClass);
-            } catch (InstantiationException e) {
-                throw new CompileException(e);
+            if (superClass != null && superClass != Object.class) {
+                this.addTransformer(transformers, superClass, false);
+            }
+
+            for (Class<?> interfaceClass : clazz.getInterfaces()) {
+                this.addTransformer(transformers, interfaceClass, false);
             }
         }
 
-        return null;
+        if (annotatedElement.isAnnotationPresent(Transform.class)) {
+            Transform transform = annotatedElement.getAnnotation(Transform.class);
+
+            if (root || transform.inheritable()) {
+                Class<Transformer> transformerInterfaceClass = (Class<Transformer>) transform.transformer();
+
+                try {
+                    transformers.add(this.transformerFactory.get(transformerInterfaceClass));
+                } catch (InstantiationException e) {
+                    throw new CompileException(e);
+                }
+            }
+        }
+
+    }
+
+    Transformer[] getTransformer(AnnotatedElement annotatedElement) throws CompileException {
+        List<Transformer> transformers = new LinkedList<>();
+        this.addTransformer(transformers, annotatedElement, true);
+        return transformers.toArray(new Transformer[transformers.size()]);
     }
 
     Class<?> getExplicitType(AnnotatedElement annotatedElement) {
@@ -56,23 +77,31 @@ public class InfoCompiler {
     }
 
     @NotNull ClassInfo compile(@NotNull Class<?> compileClass) throws CompileException {
-        Field[] fields = ReflectionUtil.getAccessibleFields(compileClass);
         List<ClassInfo.FieldInfo> fieldInfos = new LinkedList<>();
+        Transformer[] transformers = new Transformer[0];
 
-        for (Field field : fields) {
-            if (field.isAnnotationPresent(Ignore.class)) {
-                continue;
+        if (!compileClass.isArray() &&
+                compileClass != String.class &&
+                !ReflectionUtil.isPrimitiveClass(compileClass) &&
+                !ReflectionUtil.isWrapperClass(compileClass)) {
+
+            Field[] fields = ReflectionUtil.getAccessibleFields(compileClass);
+            for (Field field : fields) {
+                if (field.isAnnotationPresent(Ignore.class)) {
+                    continue;
+                }
+
+                Transformer[] fieldTransformers = this.getTransformer(field);
+                Class<?> explicitType = this.getExplicitType(field);
+
+                field.setAccessible(true);
+                fieldInfos.add(new ClassInfo.FieldInfo(field, fieldTransformers.length > 0 ? fieldTransformers[0] : null, explicitType));
             }
 
-            Transformer transformer = this.getTransformer(field);
-            Class<?> explicitType = this.getExplicitType(field);
-
-            fieldInfos.add(new ClassInfo.FieldInfo(field, transformer, explicitType));
+            transformers = this.getTransformer(compileClass);
         }
 
-        Transformer transformer = this.getTransformer(compileClass);
-
-        return new ClassInfo(compileClass, transformer, fieldInfos.toArray(new ClassInfo.FieldInfo[fieldInfos.size()]));
+        return new ClassInfo(compileClass, transformers, fieldInfos.toArray(new ClassInfo.FieldInfo[fieldInfos.size()]));
     }
 
     public @NotNull ClassInfo get(@NotNull Class<?> targetClass) throws CompileException {

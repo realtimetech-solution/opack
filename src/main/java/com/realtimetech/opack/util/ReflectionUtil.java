@@ -5,7 +5,6 @@ import org.jetbrains.annotations.NotNull;
 import java.io.ObjectInputStream;
 import java.io.ObjectStreamClass;
 import java.lang.reflect.*;
-import java.sql.Ref;
 import java.util.*;
 
 public class ReflectionUtil {
@@ -24,6 +23,15 @@ public class ReflectionUtil {
             put(long.class, Long.class);
             put(short.class, Short.class);
             put(void.class, Void.class);
+        }
+    });
+    static final Map<Class<?>, Class<?>> WRAPPERS_PRIMITIVES_MAP = Collections.unmodifiableMap(new HashMap<Class<?>, Class<?>>() {
+        {
+            for (Class<?> primitiveType : PRIMITIVES_WRAPPERS_MAP.keySet()) {
+                Class<?> wrapperType = PRIMITIVES_WRAPPERS_MAP.get(primitiveType);
+
+                put(wrapperType, primitiveType);
+            }
         }
     });
 
@@ -87,10 +95,22 @@ public class ReflectionUtil {
         return null;
     }
 
+    public static Object cloneArray(Object object) {
+        if (!object.getClass().isArray()) {
+            throw new IllegalArgumentException(object + " is not array object.");
+        }
+
+        int length = Array.getLength(object);
+        Object newArray = Array.newInstance(object.getClass().getComponentType(), length);
+        System.arraycopy(object, 0, newArray, 0, length);
+        return newArray;
+    }
+
+
     static void addAccessibleFields(List<Field> fieldList, Class<?> clazz) {
         Class<?> superClass = clazz.getSuperclass();
 
-        if (superClass.getSuperclass() != null && superClass != Object.class) {
+        if (superClass != null && superClass != Object.class) {
             ReflectionUtil.addAccessibleFields(fieldList, clazz.getSuperclass());
         }
 
@@ -109,7 +129,66 @@ public class ReflectionUtil {
         return fields.toArray(new Field[fields.size()]);
     }
 
-    public static @NotNull Class<?> getWrapperClassOfPrimitiveClass(Class<?> primitiveClass) {
+    public static int getArrayDimension(Class<?> clazz) {
+        if (!clazz.isArray()) {
+            throw new IllegalArgumentException(clazz + " is not array class.");
+        }
+
+        int count = 0;
+
+        while (true) {
+            Class<?> type = clazz.getComponentType();
+
+            if (type == null) {
+                break;
+            } else {
+                count++;
+                clazz = type;
+            }
+        }
+
+        return count;
+    }
+
+    public static Class<?> getArrayLastComponentType(Class<?> clazz) {
+        if (!clazz.isArray()) {
+            throw new IllegalArgumentException(clazz + " is not array class.");
+        }
+
+        Class<?> last = clazz;
+
+        while (true) {
+            Class<?> type = last.getComponentType();
+
+            if (type == null) {
+                break;
+            } else {
+                last = type;
+            }
+        }
+
+        return last;
+    }
+
+    public static @NotNull boolean isWrapperClass(Class<?> clazz) {
+        return WRAPPERS_PRIMITIVES_MAP.containsKey(clazz);
+    }
+
+    public static @NotNull Class<?> getPrimitiveClassOfWrapperClass(@NotNull Class<?> wrapperClass) {
+        Class<?> primitiveClass = WRAPPERS_PRIMITIVES_MAP.getOrDefault(wrapperClass, null);
+
+        if (primitiveClass == null) {
+            throw new IllegalArgumentException(wrapperClass + " is not primitive class.");
+        }
+
+        return primitiveClass;
+    }
+
+    public static @NotNull boolean isPrimitiveClass(Class<?> clazz) {
+        return PRIMITIVES_WRAPPERS_MAP.containsKey(clazz);
+    }
+
+    public static @NotNull Class<?> getWrapperClassOfPrimitiveClass(@NotNull Class<?> primitiveClass) {
         Class<?> wrapperClass = PRIMITIVES_WRAPPERS_MAP.getOrDefault(primitiveClass, null);
 
         if (wrapperClass == null) {
@@ -117,16 +196,6 @@ public class ReflectionUtil {
         }
 
         return wrapperClass;
-    }
-
-    public static @NotNull Class<?> getClass(@NotNull Object object) {
-        Class<?> clazz = object.getClass();
-
-        if (clazz.isPrimitive()) {
-            clazz = ReflectionUtil.getWrapperClassOfPrimitiveClass(clazz);
-        }
-
-        return clazz;
     }
 
     public static boolean checkClassCastable(@NotNull Class<?> fromClass, @NotNull Class<?> toClass) {
@@ -170,7 +239,7 @@ public class ReflectionUtil {
         Class<?>[] types = new Class[objects.length];
 
         for (int index = 0; index < objects.length; index++) {
-            types[index] = ReflectionUtil.getClass(objects[index]);
+            types[index] = objects[index].getClass();
         }
 
         for (Constructor<?> constructor : constructors) {

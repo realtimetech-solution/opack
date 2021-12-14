@@ -15,4 +15,6 @@ import java.lang.annotation.Target;
 })
 public @interface Transform {
     @NotNull Class<? extends Transformer> transformer();
+
+    @NotNull boolean inheritable() default false;
 }

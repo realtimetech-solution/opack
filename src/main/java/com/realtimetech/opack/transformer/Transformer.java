@@ -1,9 +1,20 @@
 package com.realtimetech.opack.transformer;
 
+import com.realtimetech.opack.Opacker;
 import com.realtimetech.opack.value.OpackValue;
 
-public interface Transformer<T> {
-    public Object serialize(T value);
+public interface Transformer {
+    /**
+     *
+     * @param value
+     * @return
+     */
+    public Object serialize(Opacker opacker, Object value);
 
-    public Object deserialize(OpackValue value);
+    /**
+     *
+     * @param value
+     * @return
+     */
+    public Object deserialize(Opacker opacker, Object value);
 }

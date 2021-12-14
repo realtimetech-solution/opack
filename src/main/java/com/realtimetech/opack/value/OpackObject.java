@@ -2,15 +2,15 @@ package com.realtimetech.opack.value;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public class OpackObject<K, V> extends OpackValue<HashMap<K, V>> {
-    public OpackObject(int length) {
-        this.set(new HashMap<>(length));
+    public OpackObject(int initialCapacity) {
+        this.set(new HashMap<>(initialCapacity));
     }
 
-    public OpackObject() {}
+    public OpackObject() {
+    }
 
     @Override
     HashMap<K, V> createLazyValue() {
@@ -21,7 +21,13 @@ public class OpackObject<K, V> extends OpackValue<HashMap<K, V>> {
         return this.get().get(key);
     }
 
-    public V put(@NotNull K key, @NotNull V opackValue) {
-        return this.get().put(key, opackValue);
+    public V put(@NotNull K key, @NotNull V value) {
+        if (key != null)
+            OpackValue.assertAllowType(key.getClass());
+
+        if (value != null)
+            OpackValue.assertAllowType(value.getClass());
+
+        return this.get().put(key, value);
     }
 }
