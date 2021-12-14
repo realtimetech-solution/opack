@@ -19,9 +19,17 @@ public class OpackArray<E> extends OpackValue<List<E>> {
         return false;
     }
 
-    public OpackArray(@NotNull Object arrayObject) {
+    public static OpackArray createWithArrayObject(@NotNull Object arrayObject){
+        return new OpackArray(arrayObject);
+    }
+
+    OpackArray(@NotNull Object arrayObject) {
         if (!arrayObject.getClass().isArray()) {
-            throw new IllegalArgumentException(arrayObject + " is not array object.");
+            throw new IllegalArgumentException(arrayObject + " is not array object");
+        }
+
+        if (ReflectionUtil.getArrayDimension(arrayObject.getClass()) != 1) {
+            throw new IllegalArgumentException(arrayObject + " must have 1 dimension");
         }
 
         if (!OpackArray.isAllowArrayType(arrayObject.getClass())) {

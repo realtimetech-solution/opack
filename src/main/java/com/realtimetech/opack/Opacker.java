@@ -99,7 +99,7 @@ public class Opacker {
             if (OpackArray.isAllowArrayType(objectType)) {
                 int dimensions = ReflectionUtil.getArrayDimension(objectType);
                 if (dimensions == 1) {
-                    return new OpackArray(ReflectionUtil.cloneArray(object));
+                    return OpackArray.createWithArrayObject(ReflectionUtil.cloneArray(object));
                 }
             }
 
@@ -307,7 +307,8 @@ public class Opacker {
 
 
     public static void main(String[] args) throws SerializeException, DeserializeException, IllegalAccessException, InterruptedException, IOException {
-//        Thread.sleep(1024 * 12);
+
+        //        Thread.sleep(1024 * 12);
         Opacker opacker = new Opacker();
 
         Example example = new Example();
@@ -315,19 +316,16 @@ public class Opacker {
 //        long s = System.currentTimeMillis();
 //        for (int i = 0; i < 512; i++) {
 //            OpackValue serialized = opacker.serialize(example);
-//            System.out.println(serialized.toString().getBytes(StandardCharsets.UTF_8).length);
 //            Example deserialized = opacker.deserialize(Example.class, serialized);
 //        }
 //        long e = System.currentTimeMillis();
 //        System.out.println(e - s);
 
         OpackValue serialized = opacker.serialize(example);
-        Files.writeString(new File("a.txt").toPath(), serialized.toString());
-
-//        Example deserialized = opacker.deserialize(Example.class, serialized);
-//        String bool = example.validationObject(deserialized);
-//
-//        System.out.println("Wrong " + bool);
+        Example deserialized = opacker.deserialize(Example.class, serialized);
+        String bool = example.validationObject(deserialized);
+        if (bool != null)
+            System.out.println("Wrong " + bool);
 
 //        System.out.println(deserialized.getBigByteArray().length);
     }
