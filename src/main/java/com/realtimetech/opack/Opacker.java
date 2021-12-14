@@ -273,12 +273,18 @@ public class Opacker {
     }
 
 
-    public static void main(String[] args) throws SerializeException, DeserializeException {
+    public static void main(String[] args) throws SerializeException, DeserializeException, IllegalAccessException {
         Opacker opacker = new Opacker();
 
         Example example = new Example();
 
         OpackValue serialized = opacker.serialize(example);
         Example deserialized = opacker.deserialize(Example.class, serialized);
+
+
+        String bool = example.validationObject(deserialized);
+
+        System.out.println(bool);
+//        System.out.println(deserialized.getBigByteArray().length);
     }
 }

@@ -1,15 +1,127 @@
 package com.realtimetech.opack;
 
 import com.realtimetech.opack.annotation.ExplicitType;
+import com.realtimetech.opack.annotation.Ignore;
 import com.realtimetech.opack.annotation.Transform;
 import com.realtimetech.opack.value.OpackArray;
 import com.realtimetech.opack.value.OpackObject;
 import com.realtimetech.opack.value.OpackValue;
 
+import javax.xml.crypto.Data;
+import java.lang.reflect.Array;
+import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 public class Example {
+    public String validationObject(Example collectObject) throws IllegalArgumentException, IllegalAccessException {
+        for (Field field : collectObject.getClass().getDeclaredFields()) {
+            if (!field.isAnnotationPresent(Ignore.class)) {
+                Object originalObject = field.get(this);
+                Object targetObject = field.get(collectObject);
+                if (!validation(originalObject, targetObject)) {
+                    return field.getName();
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private boolean validation(Object originalObject, Object targetObject) {
+        if (originalObject == null && targetObject == null) {
+            return true;
+        }
+
+        if (originalObject.getClass() == targetObject.getClass()) {
+            if (originalObject.getClass().isArray() && targetObject.getClass().isArray()) {
+                int originalLength = Array.getLength(originalObject);
+                int targetLength = Array.getLength(targetObject);
+
+                if (originalLength == targetLength) {
+                    for (int index = 0; index < originalLength; index++) {
+                        Object originalElementObject = Array.get(originalObject, index);
+                        Object targetElementObject = Array.get(targetObject, index);
+
+                        if (originalElementObject.getClass() != targetElementObject.getClass()) {
+                            return false;
+                        }
+                    }
+                } else {
+                    return false;
+                }
+            } else if (originalObject instanceof Map && targetObject instanceof Map) {
+                Map<?, ?> originalMap = (Map<?, ?>) originalObject;
+                Map<?, ?> targetMap = (Map<?, ?>) targetObject;
+
+                if (originalMap.keySet().size() == targetMap.keySet().size()) {
+                    for (Object originalKeyObject : originalMap.keySet()) {
+                        if (targetMap.containsKey(originalKeyObject)) {
+                            Object originalValueObject = originalMap.get(originalKeyObject);
+                            Object targetValueObject = targetMap.get(originalKeyObject);
+
+                            if (!validation(originalValueObject, targetValueObject)) {
+                                return false;
+                            }
+                        } else if (originalKeyObject instanceof DataObject) {
+                            boolean oneTime = false;
+
+                            for (Object targetKeyObject : targetMap.keySet()) {
+                                if (validation(originalKeyObject, targetKeyObject)) {
+                                    oneTime = true;
+                                    break;
+                                }
+                            }
+
+                            if (!oneTime) {
+                                return false;
+                            }
+                        } else {
+                            return false;
+                        }
+                    }
+                } else {
+                    return false;
+                }
+            } else if (originalObject instanceof List && targetObject instanceof List) {
+                List<?> originalList = (List<?>) originalObject;
+                List<?> targetList = (List<?>) targetObject;
+
+                if (originalList.size() == targetList.size()) {
+                    for (int i = 0; i < originalList.size(); i++) {
+                        if (!validation(originalList.get(i), targetList.get(i))) {
+                            return false;
+                        }
+                    }
+                } else {
+                    return false;
+                }
+            } else if (originalObject instanceof DataObject && targetObject instanceof DataObject) {
+                DataObject originalTest = (DataObject) originalObject;
+                DataObject targetTest = (DataObject) targetObject;
+
+//                if(targetTest.getIntValue() != null && originalTest.getIntValue() == null) {
+//                    return false;
+//                }
+
+                if(originalTest.getIntegerValue() != null && targetTest.getIntegerValue() == null) {
+                    return false;
+                }
+
+                if (originalTest.getIntValue() != targetTest.getIntValue() || originalTest.getIntegerValue() != targetTest.getIntegerValue()) {
+                    return false;
+                }
+            } else {
+                System.out.println("PASS");
+            }
+        } else {
+            return false;
+        }
+        return true;
+    }
+
     private static Random RANDOM = new Random();
 
     private String stringValue;
