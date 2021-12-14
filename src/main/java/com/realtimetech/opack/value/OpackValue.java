@@ -45,6 +45,8 @@ public abstract class OpackValue<T> {
 
     public abstract OpackValue clone();
 
+    abstract String toString(T value);
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -59,7 +61,7 @@ public abstract class OpackValue<T> {
     }
 
     @Override
-    public String toString() {
-        return this.getClass().getSimpleName() + "(" + value + ")";
+    public final String toString() {
+        return this.getClass().getSimpleName() + "(" + this.toString(get()) + ")";
     }
 }

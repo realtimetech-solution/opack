@@ -36,6 +36,11 @@ public class OpackObject<K, V> extends OpackValue<HashMap<K, V>> {
     }
 
     @Override
+    String toString(HashMap<K, V> value) {
+        return value.toString();
+    }
+
+    @Override
     public OpackValue clone() {
         OpackObject<K, V> opackObject = new OpackObject<K, V>(this.size());
 

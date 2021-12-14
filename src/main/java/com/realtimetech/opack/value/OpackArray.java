@@ -99,6 +99,28 @@ public class OpackArray<E> extends OpackValue<List<E>> {
     }
 
     @Override
+    String toString(List<E> value) {
+        StringBuffer stringBuffer = new StringBuffer();
+
+        stringBuffer.append('[');
+
+        boolean first = true;
+        for (E element : value) {
+            if (first){
+                first = false;
+            }else{
+                stringBuffer.append(',');
+            }
+
+            stringBuffer.append(element.toString());
+        }
+
+        stringBuffer.append(']');
+
+        return stringBuffer.toString();
+    }
+
+    @Override
     public OpackValue clone() {
         OpackArray<E> opackArray = new OpackArray<E>(this.length());
 

@@ -15,8 +15,12 @@ import com.realtimetech.opack.value.OpackObject;
 import com.realtimetech.opack.value.OpackValue;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 
 public class Opacker {
     public static class Builder {
@@ -302,21 +306,24 @@ public class Opacker {
     }
 
 
-    public static void main(String[] args) throws SerializeException, DeserializeException, IllegalAccessException, InterruptedException {
+    public static void main(String[] args) throws SerializeException, DeserializeException, IllegalAccessException, InterruptedException, IOException {
 //        Thread.sleep(1024 * 12);
         Opacker opacker = new Opacker();
 
         Example example = new Example();
 
-        long s = System.currentTimeMillis();
-        for (int i = 0; i < 512; i++) {
-            OpackValue serialized = opacker.serialize(example);
-            Example deserialized = opacker.deserialize(Example.class, serialized);
-        }
-        long e = System.currentTimeMillis();
-        System.out.println(e - s);
+//        long s = System.currentTimeMillis();
+//        for (int i = 0; i < 512; i++) {
+//            OpackValue serialized = opacker.serialize(example);
+//            System.out.println(serialized.toString().getBytes(StandardCharsets.UTF_8).length);
+//            Example deserialized = opacker.deserialize(Example.class, serialized);
+//        }
+//        long e = System.currentTimeMillis();
+//        System.out.println(e - s);
 
-//        OpackValue serialized = opacker.serialize(example);
+        OpackValue serialized = opacker.serialize(example);
+        Files.writeString(new File("a.txt").toPath(), serialized.toString());
+
 //        Example deserialized = opacker.deserialize(Example.class, serialized);
 //        String bool = example.validationObject(deserialized);
 //
