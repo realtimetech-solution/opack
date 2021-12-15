@@ -2,9 +2,11 @@ package com.realtimetech.opack.value;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Set;
 
-public class OpackObject<K, V> extends OpackValue<HashMap<K, V>> {
+public final class OpackObject<K, V> extends OpackValue<HashMap<K, V>> {
     public OpackObject(int initialCapacity) {
         this.set(new HashMap<>(initialCapacity));
     }
@@ -33,6 +35,14 @@ public class OpackObject<K, V> extends OpackValue<HashMap<K, V>> {
             OpackValue.assertAllowType(value.getClass());
 
         return this.get().put(key, value);
+    }
+
+    public Set<K> keySet(){
+        return this.get().keySet();
+    }
+
+    public Collection<V> values(){
+        return this.get().values();
     }
 
     @Override

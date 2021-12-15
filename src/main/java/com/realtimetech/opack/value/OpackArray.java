@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-public class OpackArray<E> extends OpackValue<List<E>> {
+public final class OpackArray<E> extends OpackValue<List<E>> {
     public static boolean isAllowArrayType(Class<?> clazz) {
         if (clazz.isArray()) {
             Class<?> componentType = ReflectionUtil.getArrayLastComponentType(clazz);
