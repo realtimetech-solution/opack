@@ -2,6 +2,7 @@ package com.realtimetech.opack.codec;
 
 import com.realtimetech.opack.util.ReflectionUtil;
 import com.realtimetech.opack.util.StringWriter;
+import com.realtimetech.opack.util.structure.FastStack;
 import com.realtimetech.opack.value.OpackArray;
 import com.realtimetech.opack.value.OpackObject;
 import com.realtimetech.opack.value.OpackValue;
@@ -41,9 +42,12 @@ public class JsonCodec implements OpackCodec<String> {
         CONST_REPLACEMENT_CHARACTERS['\f'] = new char[]{'\\', 'f'};
     }
 
-    public JsonCodec() {
+    private enum DecodeMode {
+        NONE, OBJECT, ARRAY, STRING, NUMBER
     }
 
+    public JsonCodec() {
+    }
 
     void encodeRecursive(StringWriter stringWriter, Object object) {
         if (object == null) {
@@ -64,7 +68,7 @@ public class JsonCodec implements OpackCodec<String> {
                     stringWriter.write(CONST_SEPARATOR_CHARACTER);
                 }
 
-                if(key instanceof OpackValue){
+                if (key instanceof OpackValue) {
                     // Unknown not allowed type to key
                 }
 
@@ -165,9 +169,188 @@ public class JsonCodec implements OpackCodec<String> {
         return stringWriter.toString();
     }
 
+
     @Override
     public OpackValue decode(String data) {
-        return null;
+        FastStack<Object> valueStack = new FastStack<Object>(128);
+        FastStack<DecodeMode> modeStack = new FastStack<DecodeMode>(128);
+        StringWriter stringWriter = new StringWriter();
+
+        modeStack.push(DecodeMode.NONE);
+
+        int pointer = 0;
+
+        int length = data.length();
+        char[] charArray = data.toCharArray();
+        boolean decimal = false;
+        char lastValidChar = ' ';
+        try {
+            DecodeMode currentMode = modeStack.peek();
+            while (pointer <= length - 1) {
+                char currentChar = charArray[pointer];
+
+                if (currentMode == DecodeMode.NONE || currentMode == DecodeMode.OBJECT || currentMode == DecodeMode.ARRAY) {
+                    if (!(currentChar == ' ' || currentChar == '\t' || currentChar == '\n')) {
+                        if (currentChar == '{') {
+                            valueStack.push(new OpackObject<>());
+                            modeStack.push(DecodeMode.OBJECT);
+                            currentMode = modeStack.peek();
+                        } else if (currentChar == '[') {
+                            valueStack.push(new OpackArray<>());
+                            modeStack.push(DecodeMode.ARRAY);
+                            currentMode = modeStack.peek();
+                        } else if (currentChar == '\"') {
+                            modeStack.push(DecodeMode.STRING);
+                            currentMode = modeStack.peek();
+                            stringWriter.reset();
+                        } else if ((currentChar >= '0' && currentChar <= '9') || currentChar == '-') {
+                            modeStack.push(DecodeMode.NUMBER);
+                            currentMode = modeStack.peek();
+                            decimal = false;
+                            stringWriter.reset();
+                            pointer--;
+                        } else if (currentChar == 't') {
+                            valueStack.push(true);
+                            pointer += 3;
+                        } else if (currentChar == 'f') {
+                            valueStack.push(false);
+                            pointer += 4;
+                        } else if (currentChar == 'n') {
+                            valueStack.push(null);
+                            pointer += 3;
+                        } else {
+                            if (currentMode == DecodeMode.OBJECT) {
+                                if (currentChar == ',' || currentChar == '}') {
+                                    if (lastValidChar != '{') {
+                                        Object value = valueStack.pop();
+                                        Object key = valueStack.pop();
+
+                                        OpackObject jsonObject = (OpackObject) valueStack.peek();
+                                        jsonObject.put(key, value);
+                                    }
+
+                                    if (currentChar == '}') {
+                                        modeStack.pop();
+                                        currentMode = modeStack.peek();
+                                    }
+                                }
+                            } else if (currentMode == DecodeMode.ARRAY) {
+                                if (currentChar == ',' || currentChar == ']') {
+                                    if (lastValidChar != '[') {
+                                        Object value = valueStack.pop();
+
+                                        OpackArray jsonArray = (OpackArray) valueStack.peek();
+                                        jsonArray.add(value);
+                                    }
+
+                                    if (currentChar == ']') {
+                                        modeStack.pop();
+                                        currentMode = modeStack.peek();
+                                    }
+                                }
+                            }
+                        }
+
+                        lastValidChar = currentChar;
+                    }
+                } else if (currentMode == DecodeMode.STRING) {
+                    if (currentChar == '\\') {
+                        char nextChar = charArray[pointer + 1];
+
+                        switch (nextChar) {
+                            case '"':
+                                stringWriter.write('\"');
+                                break;
+                            case '\\':
+                                stringWriter.write('\\');
+                                break;
+                            case 'u':
+                                char result = 0;
+                                for(int i = 2; i <= 5; i++){
+                                    char c = charArray[pointer + i];
+                                    result <<= 4;
+                                    if (c >= '0' && c <= '9') {
+                                        result += (c - '0');
+                                    } else if (c >= 'a' && c <= 'f') {
+                                        result += (c - 'a' + 10);
+                                    } else if (c >= 'A' && c <= 'F') {
+                                        result += (c - 'A' + 10);
+                                    } else {
+                                        // Unknown charset unicode
+//                                        throw new IOException("An exception occurred at " + (pointer - 1) + " position character(" + charArray[(pointer - 1)] + ")");
+                                    }
+                                }
+                                pointer+=4;
+                                stringWriter.write(result);
+                                break;
+                            case 'b':
+                                stringWriter.write('\b');
+                                break;
+                            case 'f':
+                                stringWriter.write('\f');
+                                break;
+                            case 'n':
+                                stringWriter.write('\n');
+                                break;
+                            case 'r':
+                                stringWriter.write('\r');
+                                break;
+                            case 't':
+                                stringWriter.write('\t');
+                                break;
+                        }
+
+                        pointer++;
+                    } else if (currentChar == '\"') {
+                        valueStack.push(stringWriter.toString());
+                        modeStack.pop();
+                        currentMode = modeStack.peek();
+                    } else {
+                        stringWriter.write(currentChar);
+                    }
+                } else if (currentMode == DecodeMode.NUMBER) {
+                    if (!(currentChar >= '0' && currentChar <= '9') && currentChar != 'E' && currentChar != 'e' && currentChar != '+'  && currentChar != '-' && currentChar != 'D' && currentChar != 'd' && currentChar != 'F' && currentChar != 'f' && currentChar != 'L' && currentChar != 'l' && currentChar != 'B' && currentChar != 'b' && currentChar != '.') {
+                        modeStack.pop();
+                        currentMode = modeStack.peek();
+
+                        if (decimal) {
+                            double value = Double.parseDouble(stringWriter.toString());
+
+                            if (value == (double) (float) value) {
+                                valueStack.push((float) value);
+                            } else {
+                                valueStack.push(value);
+                            }
+                        } else {
+                            long value = Long.parseLong(stringWriter.toString());
+
+                            if (value == (long) (int) value) {
+                                valueStack.push((int) value);
+                            } else {
+                                valueStack.push(value);
+                            }
+                        }
+
+                        pointer--;
+                    } else {
+                        if (!decimal && currentChar == '.') {
+                            decimal = true;
+                        }
+
+                        stringWriter.write(currentChar);
+                    }
+                }
+
+                pointer++;
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            // Unknown charset unicode
+//            throw new IOException("An exception occurred at " + (pointer - 1) + " position character(" + charArray[(pointer - 1)] + ")");
+        }
+
+        return (OpackValue) valueStack.pop();
     }
 
     public static void main(String[] args) {
@@ -193,6 +376,12 @@ public class JsonCodec implements OpackCodec<String> {
         }
 
         JsonCodec jsonCodec = new JsonCodec();
-        System.out.println(jsonCodec.encode(opackObject));
+
+        String str = jsonCodec.encode(opackObject);
+
+        OpackValue opackValue = jsonCodec.decode(str);
+
+        System.out.println(opackValue);
+
     }
 }

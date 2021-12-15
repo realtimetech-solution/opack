@@ -1,5 +1,6 @@
 package com.realtimetech.opack;
 
+import com.realtimetech.opack.codec.JsonCodec;
 import com.realtimetech.opack.compile.ClassInfo;
 import com.realtimetech.opack.compile.InfoCompiler;
 import com.realtimetech.opack.example.Example;
@@ -327,6 +328,9 @@ public class Opacker {
         if (bool != null)
             System.out.println("Wrong " + bool);
 
+        System.out.println(((OpackObject) serialized).get("opackArrayArray"));
+        JsonCodec jsonCodec = new JsonCodec();
+        Files.writeString(new File("out.json").toPath(), jsonCodec.encode(serialized)) ;
 //        System.out.println(deserialized.getBigByteArray().length);
     }
 }
