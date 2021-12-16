@@ -1,7 +1,6 @@
 package com.realtimetech.opack.transformer;
 
 import com.realtimetech.opack.Opacker;
-import com.realtimetech.opack.value.OpackValue;
 
 public interface Transformer {
     /**

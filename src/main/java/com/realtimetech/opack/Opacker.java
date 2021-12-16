@@ -242,7 +242,7 @@ public class Opacker {
 
                         try {
                             targetObject = ReflectionUtil.createInstanceUnsafe(clazz);
-                        } catch (InvocationTargetException | IllegalAccessException exception) {
+                        } catch (InvocationTargetException | IllegalAccessException | InstantiationException exception) {
                             throw new DeserializeException("Can't create instance using unsafe method", exception);
                         }
                     } else {
@@ -263,7 +263,6 @@ public class Opacker {
         } catch (CompileException exception) {
             throw new DeserializeException("Can't compile " + clazz.getName() + " class information", exception);
         }
-
     }
 
     void executeDeserializeStack() throws DeserializeException {
@@ -330,7 +329,7 @@ public class Opacker {
 
         System.out.println(((OpackObject) serialized).get("opackArrayArray"));
         JsonCodec jsonCodec = new JsonCodec();
-        Files.writeString(new File("out.json").toPath(), jsonCodec.encode(serialized)) ;
+        Files.writeString(new File("out.json").toPath(), jsonCodec.encode(serialized));
 //        System.out.println(deserialized.getBigByteArray().length);
     }
 }

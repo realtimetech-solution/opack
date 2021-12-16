@@ -58,7 +58,6 @@ public class InfoCompiler {
                 }
             }
         }
-
     }
 
     Transformer[] getTransformer(AnnotatedElement annotatedElement) throws CompileException {

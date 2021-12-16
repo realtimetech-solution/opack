@@ -76,8 +76,8 @@ public class PinnedList<E> implements List<E> {
 
     @Override
     public boolean containsAll(@NotNull Collection<?> c) {
-        for(Object o : c){
-            if(!this.contains(o)){
+        for (Object o : c) {
+            if (!this.contains(o)) {
                 return false;
             }
         }
@@ -92,7 +92,7 @@ public class PinnedList<E> implements List<E> {
 
     @Override
     public boolean addAll(int index, @NotNull Collection<? extends E> c) {
-        throw new IllegalArgumentException("aa");
+        throw new UnsupportedOperationException("PinnedList can't modify element.");
     }
 
     @Override
