@@ -278,7 +278,7 @@ public class ReflectionUtil {
         return ReflectionUtil.ALLOCATOR.allocate(clazz);
     }
 
-    public static <T> @NotNull T createInstance(@NotNull Class<T> clazz, Object @NotNull ... objects) throws InvocationTargetException, InstantiationException, IllegalAccessException, IllegalArgumentException {
+    public static <T> @NotNull T createInstance(@NotNull Class<T> clazz, Object @NotNull ... objects) throws InvocationTargetException, InstantiationException, IllegalAccessException {
         int modifiers = clazz.getModifiers();
 
         if (Modifier.isInterface(modifiers)) {

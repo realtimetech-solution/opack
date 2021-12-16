@@ -23,7 +23,7 @@ public class OpackArrayConverter {
         OPACK_ARRAY_GETTER_METHOD.setAccessible(true);
     }
 
-    public static Object convertToArray(Class<?> componentType, OpackArray opackArray) throws InvocationTargetException, IllegalAccessException, IllegalArgumentException {
+    public static Object convertToArray(Class<?> componentType, OpackArray opackArray) throws InvocationTargetException, IllegalAccessException {
         if (!OpackValue.isAllowType(componentType)) {
             throw new IllegalArgumentException(componentType + " type is not allowed");
         }
