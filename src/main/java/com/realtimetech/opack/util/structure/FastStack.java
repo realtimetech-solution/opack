@@ -38,7 +38,7 @@ public class FastStack<T> {
 		this.objects = (T[]) new Object[this.currentSize];
 
 		if (oldObjects != null) {
-			for (int i = 0; i <= currentIndex; i++) {
+			for (int i = 0; i <= this.currentIndex; i++) {
 				this.objects[i] = oldObjects[i];
 			}
 		}

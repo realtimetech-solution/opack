@@ -96,7 +96,7 @@ public class ReflectionUtil {
     }
 
     public static Object cast(Class<?> type, Object object) {
-        if(ReflectionUtil.isPrimitiveClass(type) || ReflectionUtil.isWrapperClass(type)){
+        if (ReflectionUtil.isPrimitiveClass(type) || ReflectionUtil.isWrapperClass(type)) {
             return object;
         }
 
@@ -174,7 +174,6 @@ public class ReflectionUtil {
                 fieldList.add(field);
             }
         }
-
     }
 
     public static Field[] getAccessibleFields(Class<?> clazz) {
@@ -265,29 +264,29 @@ public class ReflectionUtil {
         return toClass.isAssignableFrom(fromClass);
     }
 
-    public static <T> @NotNull T createInstanceUnsafe(@NotNull Class<T> clazz) throws InvocationTargetException, IllegalAccessException {
+    public static <T> @NotNull T createInstanceUnsafe(@NotNull Class<T> clazz) throws InvocationTargetException, IllegalAccessException, InstantiationException {
         int modifiers = clazz.getModifiers();
 
         if (Modifier.isInterface(modifiers)) {
-            throw new IllegalArgumentException("Interface can't be instantiated, got " + clazz.getSimpleName() + " interface.");
+            throw new InstantiationException("Interface can't be instantiated, got " + clazz.getSimpleName() + " interface.");
         }
 
         if (Modifier.isAbstract(modifiers)) {
-            throw new IllegalArgumentException("Abstract class can't be instantiated, got " + clazz.getSimpleName() + " abstract class.");
+            throw new InstantiationException("Abstract class can't be instantiated, got " + clazz.getSimpleName() + " abstract class.");
         }
 
         return ReflectionUtil.ALLOCATOR.allocate(clazz);
     }
 
-    public static <T> @NotNull T createInstance(@NotNull Class<T> clazz, Object @NotNull ... objects) throws InvocationTargetException, InstantiationException, IllegalAccessException {
+    public static <T> @NotNull T createInstance(@NotNull Class<T> clazz, Object @NotNull ... objects) throws InvocationTargetException, InstantiationException, IllegalAccessException, IllegalArgumentException {
         int modifiers = clazz.getModifiers();
 
         if (Modifier.isInterface(modifiers)) {
-            throw new IllegalArgumentException("Interface can't be instantiated, got " + clazz.getSimpleName() + " interface.");
+            throw new InstantiationException("Interface can't be instantiated, got " + clazz.getSimpleName() + " interface.");
         }
 
         if (Modifier.isAbstract(modifiers)) {
-            throw new IllegalArgumentException("Abstract class can't be instantiated, got " + clazz.getSimpleName() + " abstract class.");
+            throw new InstantiationException("Abstract class can't be instantiated, got " + clazz.getSimpleName() + " abstract class.");
         }
 
         Constructor<?>[] constructors = clazz.getDeclaredConstructors();

@@ -14,7 +14,7 @@ public class TransformerFactory {
     @NotNull
     final HashMap<Class<? extends Transformer>, Transformer> transformerMap;
 
-    public TransformerFactory(Opacker opacker) {
+    public TransformerFactory(@NotNull Opacker opacker) {
         this.opacker = opacker;
 
         this.transformerMap = new HashMap<>();
@@ -26,29 +26,33 @@ public class TransformerFactory {
                 if (!this.transformerMap.containsKey(transformerClass)) {
                     T instance = null;
 
-                    if (instance == null) {
+                    try {
+                        // Create instance using Transformer(Opacker) constructor
                         try {
-                            instance = ReflectionUtil.createInstance(transformerClass, this.opacker);
-                        } catch (InvocationTargetException | InstantiationException | IllegalAccessException exception) {
-                            // What can we do?
+                            if (instance == null) {
+                                instance = ReflectionUtil.createInstance(transformerClass, this.opacker);
+                            }
                         } catch (IllegalArgumentException exception) {
                             // Ok, let's find no parameter constructor
                         }
-                    }
 
-                    if (instance == null) {
+                        // Create instance using Transformer() constructor
                         try {
-                            instance = ReflectionUtil.createInstance(transformerClass);
-                        } catch (InvocationTargetException | InstantiationException | IllegalAccessException exception) {
-                            // What can we do?
+                            if (instance == null) {
+                                instance = ReflectionUtil.createInstance(transformerClass);
+                            }
                         } catch (IllegalArgumentException exception) {
-                            System.out.println("a2 " );
-                            // below throw InstantiationException
+                            // Ok, let's throw exception
                         }
+                    } catch (InvocationTargetException | IllegalAccessException exception) {
+                        InstantiationException instantiationException = new InstantiationException(transformerClass.getSimpleName() + " transformer can't instantiation.");
+                        instantiationException.initCause(exception);
+
+                        throw instantiationException;
                     }
 
                     if (instance == null) {
-                        throw new InstantiationException(transformerClass.getSimpleName() + " transformer can't instantiation.");
+                        throw new InstantiationException(transformerClass.getSimpleName() + " transformer must be implemented constructor(Opacker) or constructor().");
                     }
 
                     this.transformerMap.put(transformerClass, instance);
