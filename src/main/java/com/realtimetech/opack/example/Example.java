@@ -20,7 +20,12 @@ public class Example {
             if (!field.isAnnotationPresent(Ignore.class)) {
                 Object originalObject = field.get(this);
                 Object targetObject = field.get(collectObject);
-                if (!validation(originalObject, targetObject)) {
+                try{
+                    if (!validation(originalObject, targetObject)) {
+                        return field.getName();
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
                     return field.getName();
                 }
             }
@@ -109,7 +114,7 @@ public class Example {
                     return false;
                 }
 
-                if (originalTest.getIntValue() != targetTest.getIntValue() || originalTest.getIntegerValue() != targetTest.getIntegerValue()) {
+                if (originalTest.getIntValue() != targetTest.getIntValue() || !originalTest.getIntegerValue().equals(targetTest.getIntegerValue())) {
                     return false;
                 }
             } else {

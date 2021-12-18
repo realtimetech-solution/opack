@@ -96,7 +96,56 @@ public class ReflectionUtil {
     }
 
     public static Object cast(Class<?> type, Object object) {
-        if (ReflectionUtil.isPrimitiveClass(type) || ReflectionUtil.isWrapperClass(type)) {
+        if (ReflectionUtil.isPrimitiveClass(type)) {
+            type = ReflectionUtil.getWrapperClassOfPrimitiveClass(type);
+        }
+        if (ReflectionUtil.isWrapperClass(type)) {
+            Class<?> objectType = object.getClass();
+
+            if (objectType == Long.class) {
+                Long value = (Long) object;
+
+                if (type == Integer.class) {
+                    return value.intValue();
+                } else if (type == Short.class) {
+                    return value.shortValue();
+                } else if (type == Character.class) {
+                    return (char) value.intValue();
+                } else if (type == Byte.class) {
+                    return value.byteValue();
+                }
+            } else if (objectType == Integer.class) {
+                Integer value = (Integer) object;
+
+                if (type == Short.class) {
+                    return value.shortValue();
+                } else if (type == Character.class) {
+                    return (char) value.intValue();
+                } else if (type == Byte.class) {
+                    return value.byteValue();
+                }
+            } else if (objectType == Short.class) {
+                Short value = (Short) object;
+
+                if (type == Character.class) {
+                    return (char) value.intValue();
+                } else if (type == Byte.class) {
+                    return value.byteValue();
+                }
+            } else if (objectType == Character.class) {
+                Character value = (Character) object;
+
+                if (type == Byte.class) {
+                    return (byte) value.charValue();
+                }
+            } else if (objectType == Double.class) {
+                Double value = (Double) object;
+
+                if (type == Float.class) {
+                    return value.floatValue();
+                }
+            }
+
             return object;
         }
 

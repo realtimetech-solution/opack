@@ -8,4 +8,8 @@ public class DeserializeException extends Exception {
     public DeserializeException(String message) {
         super(message);
     }
+
+    public DeserializeException(Throwable cause) {
+        super(cause);
+    }
 }

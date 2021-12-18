@@ -1,12 +1,10 @@
 package com.realtimetech.opack;
 
-import com.realtimetech.opack.codec.JsonCodec;
+import com.realtimetech.opack.codec.json.JsonCodec;
 import com.realtimetech.opack.compile.ClassInfo;
 import com.realtimetech.opack.compile.InfoCompiler;
 import com.realtimetech.opack.example.Example;
-import com.realtimetech.opack.exception.CompileException;
-import com.realtimetech.opack.exception.DeserializeException;
-import com.realtimetech.opack.exception.SerializeException;
+import com.realtimetech.opack.exception.*;
 import com.realtimetech.opack.transformer.Transformer;
 import com.realtimetech.opack.util.structure.FastStack;
 import com.realtimetech.opack.util.OpackArrayConverter;
@@ -20,7 +18,6 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
 public class Opacker {
@@ -299,6 +296,12 @@ public class Opacker {
                         fieldInfo.getField().set(object, ReflectionUtil.cast(fieldType, deserializedValue));
                     } catch (IllegalAccessException exception) {
                         throw new DeserializeException("Can't set " + fieldInfo.getName() + " field in " + classInfo.getTargetClass().getSimpleName(), exception);
+                    } catch (IllegalArgumentException exception) {
+                        //Exception in thread "main" java.lang.IllegalArgumentException: Can not set static int field com.realtimetech.opack.util.ReflectionUtil.a to java.lang.Long
+                        //	at java.base/jdk.internal.reflect.UnsafeFieldAccessorImpl.throwSetIllegalArgumentException(UnsafeFieldAccessorImpl.java:167)
+                        //	at java.base/jdk.internal.reflect.UnsafeFieldAccessorImpl.throwSetIllegalArgumentException(UnsafeFieldAccessorImpl.java:171)
+                        //	at java.base/jdk.internal.reflect.UnsafeStaticIntegerFieldAccessorImpl.set(UnsafeStaticIntegerFieldAccessorImpl.java:96)
+                        throw new DeserializeException(exception);
                     }
                 }
             }
@@ -306,30 +309,35 @@ public class Opacker {
     }
 
 
-    public static void main(String[] args) throws SerializeException, DeserializeException, IllegalAccessException, InterruptedException, IOException {
+    public static void main(String[] args) throws SerializeException, DeserializeException, IllegalAccessException, InterruptedException, IOException, EncodeException, DecodeException {
+//                Thread.sleep(1024 * 12);
 
-        //        Thread.sleep(1024 * 12);
         Opacker opacker = new Opacker();
+        JsonCodec jsonCodec = new JsonCodec.Builder().create();
+        Example originalExample = new Example();
+        long exampleSize = opacker.serialize(originalExample).toString().length();
 
-        Example example = new Example();
+        String jsonString = jsonCodec.encode(opacker.serialize(originalExample));
+        long size = 0;
+        long start = System.currentTimeMillis();
+        for (int i = 0; i < 4; i++) {
+            OpackValue serializedExample = opacker.serialize(originalExample);
+            size += exampleSize;
+            OpackValue decodedValue = jsonCodec.decode(jsonString);
+            Example deserializedExample = opacker.deserialize(Example.class, serializedExample);
+        }
+        long end = System.currentTimeMillis();
+        float speed = (float)size / (float)(end - start);
+        System.out.println(((speed * 1000) / 1024 / 1024) + "mb/s");
+//        Example originalExample = new Example();
+//        OpackValue serializedExample = opacker.serialize(originalExample);
+//        String jsonString = jsonCodec.encode(serializedExample);
+//        OpackValue decodedValue = jsonCodec.decode(jsonString);
+//        Example deserializedExample = opacker.deserialize(Example.class, decodedValue);
+//
+//        String bool = originalExample.validationObject(deserializedExample);
+//        if (bool != null)
+//            System.out.println("Wrong " + bool);
 
-//        long s = System.currentTimeMillis();
-//        for (int i = 0; i < 512; i++) {
-//            OpackValue serialized = opacker.serialize(example);
-//            Example deserialized = opacker.deserialize(Example.class, serialized);
-//        }
-//        long e = System.currentTimeMillis();
-//        System.out.println(e - s);
-
-        OpackValue serialized = opacker.serialize(example);
-        Example deserialized = opacker.deserialize(Example.class, serialized);
-        String bool = example.validationObject(deserialized);
-        if (bool != null)
-            System.out.println("Wrong " + bool);
-
-        System.out.println(((OpackObject) serialized).get("opackArrayArray"));
-        JsonCodec jsonCodec = new JsonCodec();
-        Files.writeString(new File("out.json").toPath(), jsonCodec.encode(serialized));
-//        System.out.println(deserialized.getBigByteArray().length);
     }
 }

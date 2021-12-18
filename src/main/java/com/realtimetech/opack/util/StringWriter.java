@@ -1,5 +1,9 @@
 package com.realtimetech.opack.util;
 
+import com.realtimetech.opack.value.OpackArray;
+
+import java.lang.reflect.Array;
+
 public class StringWriter {
 	private int raiseSize;
 
@@ -66,11 +70,20 @@ public class StringWriter {
 		this.currentIndex = need;
 	}
 
+	public int getLength() {
+		return this.currentIndex + 1;
+	}
+
 	public void reset() {
 		this.currentIndex = -1;
 	}
 
 	public String toString() {
 		return new String(this.chars, 0, this.currentIndex + 1);
+	}
+	public char[] toCharArray() {
+		char[] charArray = new char[this.currentIndex + 1];
+		System.arraycopy(this.chars, 0, charArray, 0, this.currentIndex + 1);
+		return charArray;
 	}
 }
