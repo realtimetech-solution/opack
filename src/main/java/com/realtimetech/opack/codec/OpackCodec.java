@@ -5,10 +5,12 @@ import com.realtimetech.opack.exception.EncodeException;
 import com.realtimetech.opack.value.OpackValue;
 import org.jetbrains.annotations.NotNull;
 
-public abstract class OpackCodec<D> {
-    protected abstract D doEncode(OpackValue opackValue);
+import java.io.IOException;
 
-    protected abstract OpackValue doDecode(D data);
+public abstract class OpackCodec<D> {
+    protected abstract D doEncode(OpackValue opackValue) throws IOException;
+
+    protected abstract OpackValue doDecode(D data) throws IOException;
 
     public D encode(OpackValue opackValue) throws EncodeException {
         try {

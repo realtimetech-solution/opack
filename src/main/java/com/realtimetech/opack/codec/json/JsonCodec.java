@@ -10,6 +10,8 @@ import com.realtimetech.opack.value.OpackArray;
 import com.realtimetech.opack.value.OpackObject;
 import com.realtimetech.opack.value.OpackValue;
 
+import java.io.IOException;
+
 public final class JsonCodec extends OpackCodec<String> {
     public final static class Builder {
         boolean allowOpackValueToKeyValue;
@@ -176,7 +178,7 @@ public final class JsonCodec extends OpackCodec<String> {
     }
 
     @Override
-    protected String doEncode(OpackValue opackValue) {
+    protected String doEncode(OpackValue opackValue) throws IOException {
         StringWriter localStringWriter = new StringWriter(this.builder.encodeStringBufferSize);
         StringWriter stringWriter = new StringWriter(this.builder.encodeStringBufferSize);
         FastStack<Object> opackStack = new FastStack<Object>(this.builder.encodeStackInitialSize);
@@ -250,7 +252,7 @@ public final class JsonCodec extends OpackCodec<String> {
     }
 
     @Override
-    protected OpackValue doDecode(String data) {
+    protected OpackValue doDecode(String data) throws IOException {
         FastStack<Integer> baseStack = new FastStack<Integer>(this.builder.decodeStackInitialSize);
         FastStack<Object> valueStack = new FastStack<Object>(this.builder.decodeStackInitialSize);
         StringWriter stringWriter = new StringWriter();
@@ -265,40 +267,33 @@ public final class JsonCodec extends OpackCodec<String> {
             char currentChar = charArray[pointer++];
 
             if (currentChar == '{') {
-                // Start OpackObject Open
                 baseStack.push(valueStack.getSize());
                 valueStack.push(new OpackObject<>());
             } else if (currentChar == ':') {
-                // Active Pair Mode
-
             } else if (currentChar == '}') {
-                // What to do
                 baseStack.pop();
                 stackMerge = true;
             } else if (currentChar == '[') {
-                // Start OpackArray Open
                 baseStack.push(valueStack.getSize());
                 valueStack.push(new OpackArray<>());
+            } else if (currentChar == ',') {
             } else if (currentChar == ']') {
-                // What to do
                 baseStack.pop();
                 stackMerge = true;
+            } else if (currentChar == ' ' || currentChar == '\t') {
             } else {
                 if (currentChar == '\"') {
                     while (pointer < length) {
                         char literalChar = charArray[pointer++];
 
                         if (literalChar == '\"') {
-                            // End of String
                             valueStack.push(stringWriter.toString());
 
                             stringWriter.reset();
                             stackMerge = true;
                             break;
                         } else if (literalChar == '\\') {
-                            // Parse escape string
-
-                            pointer++; // Seek for get escape char
+                            pointer++;
                             char nextChar = charArray[pointer++];
 
                             switch (nextChar) {
@@ -320,8 +315,7 @@ public final class JsonCodec extends OpackCodec<String> {
                                         } else if (unicode >= 'A' && unicode <= 'F') {
                                             result += (unicode - 'A' + 10);
                                         } else {
-                                            // Unknown charset unicode
-//                                        throw new IOException("An exception occurred at " + (pointer - 1) + " position character(" + charArray[(pointer - 1)] + ")");
+                                            throw new IOException("Parsed unknown unicode pattern at " + (pointer - 1));
                                         }
                                     }
                                     stringWriter.write(result);
@@ -384,6 +378,8 @@ public final class JsonCodec extends OpackCodec<String> {
                     valueStack.push(null);
                     pointer = pointer + 3;
                     stackMerge = true;
+                } else {
+                    throw new IOException("Parsed unknown character at " + pointer + "(" + currentChar + ")");
                 }
             }
 
@@ -403,8 +399,6 @@ public final class JsonCodec extends OpackCodec<String> {
                         Object key = valueStack.pop();
 
                         opackObject.put(key, value);
-                    } else {
-                        // WHAT
                     }
                 } else if (type == OpackArray.class) {
                     if (valueSize == 1) {
@@ -412,15 +406,20 @@ public final class JsonCodec extends OpackCodec<String> {
                         Object value = valueStack.pop();
 
                         opackArray.add(value);
-                    } else {
-                        // WHAT
                     }
                 } else {
-                    // WHAT THE F
+                    throw new IOException("Catched corrupted stack, got " + type.getSimpleName());
                 }
             }
         }
 
         return (OpackValue) valueStack.pop();
+    }
+
+    public static void main(String[] args) throws DecodeException {
+        JsonCodec jsonCodec = new JsonCodec.Builder().create();
+        jsonCodec.decode("{\"a\" 10}");
+
+
     }
 }
