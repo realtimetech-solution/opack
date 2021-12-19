@@ -261,6 +261,7 @@ public final class JsonCodec extends OpackCodec<String> {
 
         int length = data.length();
         char[] charArray = data.toCharArray();
+        boolean literalMode = false;
 
         while (pointer < length) {
             boolean stackMerge = false;
@@ -269,19 +270,23 @@ public final class JsonCodec extends OpackCodec<String> {
             if (currentChar == '{') {
                 baseStack.push(valueStack.getSize());
                 valueStack.push(new OpackObject<>());
+                literalMode = true;
             } else if (currentChar == ':') {
+                literalMode = true;
             } else if (currentChar == '}') {
                 baseStack.pop();
                 stackMerge = true;
             } else if (currentChar == '[') {
                 baseStack.push(valueStack.getSize());
                 valueStack.push(new OpackArray<>());
+                literalMode = true;
             } else if (currentChar == ',') {
+                literalMode = true;
             } else if (currentChar == ']') {
                 baseStack.pop();
                 stackMerge = true;
             } else if (currentChar == ' ' || currentChar == '\t') {
-            } else {
+            } else if (literalMode) {
                 if (currentChar == '\"') {
                     while (pointer < length) {
                         char literalChar = charArray[pointer++];
@@ -381,9 +386,13 @@ public final class JsonCodec extends OpackCodec<String> {
                 } else {
                     throw new IOException("Parsed unknown character at " + pointer + "(" + currentChar + ")");
                 }
+            } else {
+                throw new IOException("Parsed unknown character at " + pointer + "(" + currentChar + ")");
             }
 
             if (stackMerge && !baseStack.isEmpty()) {
+                literalMode = false;
+
                 //Let's merge
                 int baseIndex = baseStack.peek();
                 int valueSize = valueStack.getSize() - baseIndex - 1;
@@ -408,7 +417,7 @@ public final class JsonCodec extends OpackCodec<String> {
                         opackArray.add(value);
                     }
                 } else {
-                    throw new IOException("Catched corrupted stack, got " + type.getSimpleName());
+                    throw new IOException("Caught corrupted stack, got " + type.getSimpleName());
                 }
             }
         }
@@ -418,8 +427,9 @@ public final class JsonCodec extends OpackCodec<String> {
 
     public static void main(String[] args) throws DecodeException {
         JsonCodec jsonCodec = new JsonCodec.Builder().create();
-        jsonCodec.decode("{\"a\" 10}");
+        OpackValue opackValue = jsonCodec.decode("{\"a\": 10, \"b\": [1, 2, 3, 4]}");
 
+        System.out.println(opackValue);
 
     }
 }
