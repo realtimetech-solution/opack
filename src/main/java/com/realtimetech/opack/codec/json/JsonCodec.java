@@ -2,7 +2,6 @@ package com.realtimetech.opack.codec.json;
 
 import com.realtimetech.opack.codec.OpackCodec;
 import com.realtimetech.opack.exception.DecodeException;
-import com.realtimetech.opack.exception.EncodeException;
 import com.realtimetech.opack.util.ReflectionUtil;
 import com.realtimetech.opack.util.StringWriter;
 import com.realtimetech.opack.util.structure.FastStack;
@@ -25,7 +24,7 @@ public final class JsonCodec extends OpackCodec<String> {
             this.allowOpackValueToKeyValue = false;
             this.prettyFormat = false;
 
-            this.encodeStringBufferSize = 1024;
+            this.encodeStringBufferSize = 1024 * 4;
             this.encodeStackInitialSize = 128;
             this.decodeStackInitialSize = 128;
         }
@@ -96,8 +95,24 @@ public final class JsonCodec extends OpackCodec<String> {
 
     final Builder builder;
 
+    final StringWriter encodeLiteralStringWriter;
+    final StringWriter encodeStringWriter;
+    final FastStack<Object> encodeStack;
+
+    final FastStack<Integer> decodeBaseStack;
+    final FastStack<Object> decodeValueStack;
+    final StringWriter decodeStringWriter;
+
     JsonCodec(Builder builder) {
         this.builder = builder;
+
+        this.encodeLiteralStringWriter = new StringWriter(this.builder.encodeStringBufferSize);
+        this.encodeStringWriter = new StringWriter(this.builder.encodeStringBufferSize);
+        this.encodeStack = new FastStack<Object>(this.builder.encodeStackInitialSize);
+
+        this.decodeBaseStack = new FastStack<Integer>(this.builder.decodeStackInitialSize);
+        this.decodeValueStack = new FastStack<Object>(this.builder.decodeStackInitialSize);
+        this.decodeStringWriter = new StringWriter();
     }
 
     boolean encodeLiteral(StringWriter stringWriter, FastStack<Object> opackStack, Object object) {
@@ -179,83 +194,84 @@ public final class JsonCodec extends OpackCodec<String> {
 
     @Override
     protected String doEncode(OpackValue opackValue) throws IOException {
-        StringWriter localStringWriter = new StringWriter(this.builder.encodeStringBufferSize);
-        StringWriter stringWriter = new StringWriter(this.builder.encodeStringBufferSize);
-        FastStack<Object> opackStack = new FastStack<Object>(this.builder.encodeStackInitialSize);
-        opackStack.push(opackValue);
+        this.encodeLiteralStringWriter.reset();
+        this.encodeStringWriter.reset();
+        this.encodeStack.reset();
 
-        while (!opackStack.isEmpty()) {
-            Object object = opackStack.pop();
+        this.encodeStack.push(opackValue);
+
+        while (!this.encodeStack.isEmpty()) {
+            Object object = this.encodeStack.pop();
 
             Class<?> type = object.getClass();
             if (type == char[].class) {
-                stringWriter.write((char[]) object);
+                this.encodeStringWriter.write((char[]) object);
             } else if (type == OpackObject.class) {
                 OpackObject opackObject = (OpackObject) object;
 
-                stringWriter.write(CONST_OBJECT_OPEN_CHARACTER);
-                opackStack.push(CONST_OBJECT_CLOSE_CHARACTER);
+                this.encodeStringWriter.write(CONST_OBJECT_OPEN_CHARACTER);
+                this.encodeStack.push(CONST_OBJECT_CLOSE_CHARACTER);
                 int count = 0;
                 for (Object key : opackObject.keySet()) {
                     Object value = opackObject.get(key);
 
                     if (count != 0) {
-                        opackStack.push(CONST_SEPARATOR_CHARACTER);
+                        this.encodeStack.push(CONST_SEPARATOR_CHARACTER);
                     }
 
-                    opackStack.push(value);
-                    opackStack.push(CONST_OBJECT_MAP_CHARACTER);
-                    opackStack.push(key);
+                    this.encodeStack.push(value);
+                    this.encodeStack.push(CONST_OBJECT_MAP_CHARACTER);
+                    this.encodeStack.push(key);
 
                     count++;
                 }
             } else if (type == OpackArray.class) {
                 OpackArray opackArray = (OpackArray) object;
-                localStringWriter.reset();
+                this.encodeLiteralStringWriter.reset();
 
-                stringWriter.write(CONST_ARRAY_OPEN_CHARACTER);
+                this.encodeStringWriter.write(CONST_ARRAY_OPEN_CHARACTER);
 
                 int size = opackArray.length();
-                int reverseStart = opackStack.getSize();
+                int reverseStart = this.encodeStack.getSize();
 
                 for (int index = 0; index < size; index++) {
                     Object value = opackArray.get(index);
 
-                    if (!this.encodeLiteral(localStringWriter, opackStack, value)) {
-                        opackStack.push(localStringWriter.toCharArray());
-                        opackStack.swap(opackStack.getSize() - 1, opackStack.getSize() - 2);
+                    if (!this.encodeLiteral(this.encodeLiteralStringWriter, this.encodeStack, value)) {
+                        this.encodeStack.push(this.encodeLiteralStringWriter.toCharArray());
+                        this.encodeStack.swap(this.encodeStack.getSize() - 1, this.encodeStack.getSize() - 2);
                         if (index != size - 1) {
-                            opackStack.push(CONST_SEPARATOR_CHARACTER);
+                            this.encodeStack.push(CONST_SEPARATOR_CHARACTER);
                         }
 
-                        localStringWriter.reset();
+                        this.encodeLiteralStringWriter.reset();
                     } else {
                         if (index != size - 1) {
-                            localStringWriter.write(CONST_SEPARATOR_CHARACTER);
+                            this.encodeLiteralStringWriter.write(CONST_SEPARATOR_CHARACTER);
                         }
                     }
                 }
 
-                if (localStringWriter.getLength() > 0) {
-                    opackStack.push(localStringWriter.toCharArray());
-                    localStringWriter.reset();
+                if (this.encodeLiteralStringWriter.getLength() > 0) {
+                    this.encodeStack.push(this.encodeLiteralStringWriter.toCharArray());
+                    this.encodeLiteralStringWriter.reset();
                 }
 
-                opackStack.push(CONST_ARRAY_CLOSE_CHARACTER);
-                opackStack.reverse(reverseStart, opackStack.getSize() - 1);
+                this.encodeStack.push(CONST_ARRAY_CLOSE_CHARACTER);
+                this.encodeStack.reverse(reverseStart, this.encodeStack.getSize() - 1);
             } else {
-                this.encodeLiteral(stringWriter, opackStack, object);
+                this.encodeLiteral(this.encodeStringWriter, this.encodeStack, object);
             }
         }
 
-        return stringWriter.toString();
+        return this.encodeStringWriter.toString();
     }
 
     @Override
     protected OpackValue doDecode(String data) throws IOException {
-        FastStack<Integer> baseStack = new FastStack<Integer>(this.builder.decodeStackInitialSize);
-        FastStack<Object> valueStack = new FastStack<Object>(this.builder.decodeStackInitialSize);
-        StringWriter stringWriter = new StringWriter();
+        this.decodeBaseStack.reset();
+        this.decodeValueStack.reset();
+        this.decodeStringWriter.reset();
 
         int pointer = 0;
 
@@ -267,152 +283,211 @@ public final class JsonCodec extends OpackCodec<String> {
             boolean stackMerge = false;
             char currentChar = charArray[pointer++];
 
-            if (currentChar == '{') {
-                baseStack.push(valueStack.getSize());
-                valueStack.push(new OpackObject<>());
-                literalMode = true;
-            } else if (currentChar == ':') {
-                literalMode = true;
-            } else if (currentChar == '}') {
-                baseStack.pop();
-                stackMerge = true;
-            } else if (currentChar == '[') {
-                baseStack.push(valueStack.getSize());
-                valueStack.push(new OpackArray<>());
-                literalMode = true;
-            } else if (currentChar == ',') {
-                literalMode = true;
-            } else if (currentChar == ']') {
-                baseStack.pop();
-                stackMerge = true;
-            } else if (currentChar == ' ' || currentChar == '\t') {
-            } else if (literalMode) {
-                if (currentChar == '\"') {
-                    while (pointer < length) {
-                        char literalChar = charArray[pointer++];
+            switch (currentChar) {
+                /*
+                    Syntax Parse
+                 */
+                case '{': {
+                    this.decodeBaseStack.push(this.decodeValueStack.getSize());
+                    this.decodeValueStack.push(new OpackObject<>());
+                    literalMode = true;
 
-                        if (literalChar == '\"') {
-                            valueStack.push(stringWriter.toString());
-
-                            stringWriter.reset();
-                            stackMerge = true;
-                            break;
-                        } else if (literalChar == '\\') {
-                            pointer++;
-                            char nextChar = charArray[pointer++];
-
-                            switch (nextChar) {
-                                case '"':
-                                    stringWriter.write('\"');
-                                    break;
-                                case '\\':
-                                    stringWriter.write('\\');
-                                    break;
-                                case 'u':
-                                    char result = 0;
-                                    for (int i = 0; i < 5; i++) {
-                                        char unicode = charArray[pointer++];
-                                        result <<= 4;
-                                        if (unicode >= '0' && unicode <= '9') {
-                                            result += (unicode - '0');
-                                        } else if (unicode >= 'a' && unicode <= 'f') {
-                                            result += (unicode - 'a' + 10);
-                                        } else if (unicode >= 'A' && unicode <= 'F') {
-                                            result += (unicode - 'A' + 10);
-                                        } else {
-                                            throw new IOException("Parsed unknown unicode pattern at " + (pointer - 1));
-                                        }
-                                    }
-                                    stringWriter.write(result);
-                                    break;
-                                case 'b':
-                                    stringWriter.write('\b');
-                                    break;
-                                case 'f':
-                                    stringWriter.write('\f');
-                                    break;
-                                case 'n':
-                                    stringWriter.write('\n');
-                                    break;
-                                case 'r':
-                                    stringWriter.write('\r');
-                                    break;
-                                case 't':
-                                    stringWriter.write('\t');
-                                    break;
-                            }
-                        } else {
-                            stringWriter.write(literalChar);
-                        }
-                    }
-                } else if ((currentChar >= '0' && currentChar <= '9') || currentChar == '-') {
-                    pointer--;
-
-                    boolean decimal = false;
-                    while (pointer < length) {
-                        char literalChar = charArray[pointer++];
-
-                        if (!(literalChar >= '0' && literalChar <= '9') && literalChar != 'E' && literalChar != 'e' && literalChar != '+' && literalChar != '-' && literalChar != '.') {
-                            if (decimal) {
-                                valueStack.push(Double.parseDouble(stringWriter.toString()));
-                            } else {
-                                valueStack.push(Long.parseLong(stringWriter.toString()));
-                            }
-
-                            pointer--;
-                            stringWriter.reset();
-                            stackMerge = true;
-                            break;
-                        } else {
-                            if (literalChar == '.') {
-                                decimal = true;
-                            }
-
-                            stringWriter.write(literalChar);
-                        }
-                    }
-                } else if (currentChar == 't') {
-                    valueStack.push(true);
-                    pointer = pointer + 3;
-                    stackMerge = true;
-                } else if (currentChar == 'f') {
-                    valueStack.push(false);
-                    pointer = pointer + 4;
-                    stackMerge = true;
-                } else if (currentChar == 'n') {
-                    valueStack.push(null);
-                    pointer = pointer + 3;
-                    stackMerge = true;
-                } else {
-                    throw new IOException("Parsed unknown character at " + pointer + "(" + currentChar + ")");
+                    break;
                 }
-            } else {
-                throw new IOException("Parsed unknown character at " + pointer + "(" + currentChar + ")");
+                case '[': {
+                    this.decodeBaseStack.push(this.decodeValueStack.getSize());
+                    this.decodeValueStack.push(new OpackArray<>());
+                    literalMode = true;
+
+                    break;
+                }
+                case '}':
+                case ']': {
+                    if (this.decodeValueStack.getSize() - 1 != this.decodeBaseStack.peek()) {
+                        throw new IOException("Expected literal value but got close syntax character at " + pointer + "(" + currentChar + ")");
+                    }
+
+                    this.decodeBaseStack.pop();
+                    stackMerge = true;
+
+                    break;
+                }
+                case ',':
+                case ':': {
+                    if (literalMode) {
+                        throw new IOException("Expected literal value but got syntax character at " + pointer + "(" + currentChar + ")");
+                    }
+
+                    int baseIndex = this.decodeBaseStack.peek();
+                    int valueSize = this.decodeValueStack.getSize() - baseIndex - 1;
+                    Object object = this.decodeValueStack.get(baseIndex);
+                    Class<?> type = object.getClass();
+
+                    switch (currentChar) {
+                        case ',': {
+                            if (type == OpackObject.class) {
+                                if (valueSize != 0) {
+                                    throw new IOException("There must be a pair of Key and Value. at " + pointer + "(" + currentChar + ")");
+                                }
+                            }
+
+                            break;
+                        }
+                        case ':': {
+                            if (type == OpackObject.class) {
+                                if (valueSize != 1) {
+                                    throw new IOException("There is a colon without a key. at " + pointer + "(" + currentChar + ")");
+                                }
+                            }
+                            if (type == OpackArray.class) {
+                                throw new IOException("Array type cannot contain colons. at " + pointer + "(" + currentChar + ")");
+                            }
+
+                            break;
+                        }
+                    }
+
+                    literalMode = true;
+                    break;
+                }
+
+                case ' ':
+                case '\t': {
+                    // Skip no-meaning character
+                    break;
+                }
+                default: {
+                    /*
+                        Literal Parse
+                     */
+                    if (literalMode) {
+                        if (currentChar == '\"') {
+                            while (pointer < length) {
+                                char literalChar = charArray[pointer++];
+
+                                if (literalChar == '\"') {
+                                    this.decodeValueStack.push(this.decodeStringWriter.toString());
+
+                                    this.decodeStringWriter.reset();
+                                    stackMerge = true;
+                                    break;
+                                } else if (literalChar == '\\') {
+                                    pointer++;
+                                    char nextChar = charArray[pointer++];
+
+                                    switch (nextChar) {
+                                        case '"':
+                                            this.decodeStringWriter.write('\"');
+                                            break;
+                                        case '\\':
+                                            this.decodeStringWriter.write('\\');
+                                            break;
+                                        case 'u':
+                                            char result = 0;
+                                            for (int i = 0; i < 5; i++) {
+                                                char unicode = charArray[pointer++];
+                                                result <<= 4;
+                                                if (unicode >= '0' && unicode <= '9') {
+                                                    result += (unicode - '0');
+                                                } else if (unicode >= 'a' && unicode <= 'f') {
+                                                    result += (unicode - 'a' + 10);
+                                                } else if (unicode >= 'A' && unicode <= 'F') {
+                                                    result += (unicode - 'A' + 10);
+                                                } else {
+                                                    throw new IOException("Parsed unknown unicode pattern at " + pointer + "(" + unicode + ")");
+                                                }
+                                            }
+                                            this.decodeStringWriter.write(result);
+                                            break;
+                                        case 'b':
+                                            this.decodeStringWriter.write('\b');
+                                            break;
+                                        case 'f':
+                                            this.decodeStringWriter.write('\f');
+                                            break;
+                                        case 'n':
+                                            this.decodeStringWriter.write('\n');
+                                            break;
+                                        case 'r':
+                                            this.decodeStringWriter.write('\r');
+                                            break;
+                                        case 't':
+                                            this.decodeStringWriter.write('\t');
+                                            break;
+                                    }
+                                } else {
+                                    this.decodeStringWriter.write(literalChar);
+                                }
+                            }
+                        } else if ((currentChar >= '0' && currentChar <= '9') || currentChar == '-') {
+                            pointer--;
+
+                            boolean decimal = false;
+                            while (pointer < length) {
+                                char literalChar = charArray[pointer++];
+
+                                if (!(literalChar >= '0' && literalChar <= '9') && literalChar != 'E' && literalChar != 'e' && literalChar != '+' && literalChar != '-' && literalChar != '.') {
+                                    if (decimal) {
+                                        this.decodeValueStack.push(Double.parseDouble(this.decodeStringWriter.toString()));
+                                    } else {
+                                        this.decodeValueStack.push(Long.parseLong(this.decodeStringWriter.toString()));
+                                    }
+
+                                    pointer--;
+                                    this.decodeStringWriter.reset();
+                                    stackMerge = true;
+                                    break;
+                                } else {
+                                    if (literalChar == '.') {
+                                        decimal = true;
+                                    }
+
+                                    this.decodeStringWriter.write(literalChar);
+                                }
+                            }
+                        } else if (currentChar == 't') {
+                            this.decodeValueStack.push(true);
+                            pointer = pointer + 3;
+                            stackMerge = true;
+                        } else if (currentChar == 'f') {
+                            this.decodeValueStack.push(false);
+                            pointer = pointer + 4;
+                            stackMerge = true;
+                        } else if (currentChar == 'n') {
+                            this.decodeValueStack.push(null);
+                            pointer = pointer + 3;
+                            stackMerge = true;
+                        } else {
+                            throw new IOException("Parsed unknown character at " + pointer + "(" + currentChar + ")");
+                        }
+                    } else {
+                        throw new IOException("Parsed unknown character at " + pointer + "(" + currentChar + ")");
+                    }
+                }
             }
 
-            if (stackMerge && !baseStack.isEmpty()) {
+            if (stackMerge && !this.decodeBaseStack.isEmpty()) {
                 literalMode = false;
 
                 //Let's merge
-                int baseIndex = baseStack.peek();
-                int valueSize = valueStack.getSize() - baseIndex - 1;
-                Object object = valueStack.get(baseIndex);
+                int baseIndex = this.decodeBaseStack.peek();
+                int valueSize = this.decodeValueStack.getSize() - baseIndex - 1;
+                Object object = this.decodeValueStack.get(baseIndex);
                 Class<?> type = object.getClass();
-
 
                 if (type == OpackObject.class) {
                     if (valueSize == 2) {
                         OpackObject opackObject = (OpackObject) object;
 
-                        Object value = valueStack.pop();
-                        Object key = valueStack.pop();
+                        Object value = this.decodeValueStack.pop();
+                        Object key = this.decodeValueStack.pop();
 
                         opackObject.put(key, value);
                     }
                 } else if (type == OpackArray.class) {
                     if (valueSize == 1) {
                         OpackArray opackArray = (OpackArray) object;
-                        Object value = valueStack.pop();
+                        Object value = this.decodeValueStack.pop();
 
                         opackArray.add(value);
                     }
@@ -422,12 +497,12 @@ public final class JsonCodec extends OpackCodec<String> {
             }
         }
 
-        return (OpackValue) valueStack.pop();
+        return (OpackValue) this.decodeValueStack.get(0);
     }
 
     public static void main(String[] args) throws DecodeException {
         JsonCodec jsonCodec = new JsonCodec.Builder().create();
-        OpackValue opackValue = jsonCodec.decode("{\"a\": 10, \"b\": [1, 2, 3, 4]}");
+        OpackValue opackValue = jsonCodec.decode("{\"a\":{\"a\": \"C\"}, \"b\": [1], 1:[], 2:{1: 2}}");
 
         System.out.println(opackValue);
 

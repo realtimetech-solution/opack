@@ -12,7 +12,7 @@ public abstract class OpackCodec<D> {
 
     protected abstract OpackValue doDecode(D data) throws IOException;
 
-    public D encode(OpackValue opackValue) throws EncodeException {
+    public synchronized D encode(OpackValue opackValue) throws EncodeException {
         try {
             return this.doEncode(opackValue);
         } catch (Exception exception) {
@@ -20,7 +20,7 @@ public abstract class OpackCodec<D> {
         }
     }
 
-    public OpackValue decode(D data) throws DecodeException {
+    public synchronized OpackValue decode(D data) throws DecodeException {
         try {
             return this.doDecode(data);
         } catch (Exception exception) {
