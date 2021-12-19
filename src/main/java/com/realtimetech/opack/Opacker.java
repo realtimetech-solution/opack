@@ -307,37 +307,4 @@ public class Opacker {
             }
         }
     }
-
-
-    public static void main(String[] args) throws SerializeException, DeserializeException, IllegalAccessException, InterruptedException, IOException, EncodeException, DecodeException {
-//                Thread.sleep(1024 * 12);
-
-        Opacker opacker = new Opacker();
-        JsonCodec jsonCodec = new JsonCodec.Builder().create();
-        Example originalExample = new Example();
-        long exampleSize = opacker.serialize(originalExample).toString().length();
-
-        long size = 0;
-        long start = System.currentTimeMillis();
-        for (int i = 0; i < 100; i++) {
-            OpackValue serializedExample = opacker.serialize(originalExample);
-            String jsonString = jsonCodec.encode(serializedExample);
-            size += exampleSize;
-            OpackValue decodedValue = jsonCodec.decode(jsonString);
-            Example deserializedExample = opacker.deserialize(Example.class, decodedValue);
-        }
-        long end = System.currentTimeMillis();
-        float speed = (float)size / (float)(end - start);
-        System.out.println(((speed * 1000) / 1024 / 1024) + "mb/s");
-
-//        OpackValue serializedExample = opacker.serialize(originalExample);
-//        String jsonString = jsonCodec.encode(serializedExample);
-//        OpackValue decodedValue = jsonCodec.decode(jsonString);
-//        Example deserializedExample = opacker.deserialize(Example.class, decodedValue);
-//
-//        String bool = originalExample.validationObject(deserializedExample);
-//        if (bool != null)
-//            System.out.println("Wrong " + bool);
-
-    }
 }

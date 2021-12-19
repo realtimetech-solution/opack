@@ -499,12 +499,4 @@ public final class JsonCodec extends OpackCodec<String> {
 
         return (OpackValue) this.decodeValueStack.get(0);
     }
-
-    public static void main(String[] args) throws DecodeException {
-        JsonCodec jsonCodec = new JsonCodec.Builder().create();
-        OpackValue opackValue = jsonCodec.decode("{\"a\":{\"a\": \"C\"}, \"b\": [1], 1:[], 2:{1: 2}}");
-
-        System.out.println(opackValue);
-
-    }
 }
