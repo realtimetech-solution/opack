@@ -8,6 +8,7 @@ import com.realtimetech.opack.util.structure.FastStack;
 import com.realtimetech.opack.value.OpackArray;
 import com.realtimetech.opack.value.OpackObject;
 import com.realtimetech.opack.value.OpackValue;
+import com.sun.jdi.InvalidTypeException;
 
 import java.io.IOException;
 
@@ -164,7 +165,7 @@ public final class JsonCodec extends OpackCodec<String> {
             stringWriter.write(CONST_STRING_CLOSE_CHARACTER);
         } else {
             if (!OpackValue.isAllowType(type)) {
-                // Unknown Type Exception
+                throw new IllegalArgumentException(type + " is not allow to json encode.");
             }
 
             Class<?> numberType = type;
@@ -177,12 +178,12 @@ public final class JsonCodec extends OpackCodec<String> {
             if (numberType == Double.class) {
                 Double doubleValue = (Double) object;
                 if (Double.isNaN(doubleValue) || Double.isInfinite(doubleValue) || Double.isFinite(doubleValue)) {
-                    // Throw not allowed double value
+                    throw new ArithmeticException("Json format not allow NaN, Infinite, Finite value.");
                 }
             } else if (numberType == Float.class) {
                 Float floatValue = (Float) object;
                 if (Float.isNaN(floatValue) || Float.isInfinite(floatValue) || Float.isFinite(floatValue)) {
-                    // Throw not allowed double value
+                    throw new ArithmeticException("Json format not allow NaN, Infinite, Finite value.");
                 }
             }
 
