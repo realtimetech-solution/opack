@@ -49,6 +49,9 @@ public class Example {
                         Object originalElementObject = Array.get(originalObject, index);
                         Object targetElementObject = Array.get(targetObject, index);
 
+                        if(originalElementObject == null && targetElementObject == null){
+                            continue;
+                        }
                         if (originalElementObject.getClass() != targetElementObject.getClass()) {
                             return false;
                         }
