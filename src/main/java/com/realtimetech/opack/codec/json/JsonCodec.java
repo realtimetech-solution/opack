@@ -177,13 +177,13 @@ public final class JsonCodec extends OpackCodec<String> {
             // Asserts
             if (numberType == Double.class) {
                 Double doubleValue = (Double) object;
-                if (Double.isNaN(doubleValue) || Double.isInfinite(doubleValue) || Double.isFinite(doubleValue)) {
-                    throw new ArithmeticException("Json format not allow NaN, Infinite, Finite value.");
+                if (Double.isNaN(doubleValue) || Double.isInfinite(doubleValue) || !Double.isFinite(doubleValue)) {
+                    throw new ArithmeticException("Json format allow only finite value.");
                 }
             } else if (numberType == Float.class) {
                 Float floatValue = (Float) object;
-                if (Float.isNaN(floatValue) || Float.isInfinite(floatValue) || Float.isFinite(floatValue)) {
-                    throw new ArithmeticException("Json format not allow NaN, Infinite, Finite value.");
+                if (Float.isNaN(floatValue) || Float.isInfinite(floatValue) || !Float.isFinite(floatValue)) {
+                    throw new ArithmeticException("Json format allow only finite value.");
                 }
             }
 
