@@ -11,7 +11,7 @@ public final class OpackArray<E> extends OpackValue<List<E>> {
         if (clazz.isArray()) {
             Class<?> componentType = ReflectionUtil.getArrayLastComponentType(clazz);
 
-            if (OpackValue.isAllowType(componentType)) {
+            if (ReflectionUtil.isPrimitiveClass(componentType)) {
                 return true;
             }
         }
