@@ -1,6 +1,6 @@
 package com.realtimetech.opack.value;
 
-import com.realtimetech.opack.util.structure.PinnedList;
+import com.realtimetech.opack.util.structure.PrimitiveList;
 import com.realtimetech.opack.util.ReflectionUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -36,7 +36,7 @@ public final class OpackArray<E> extends OpackValue<List<E>> {
             throw new IllegalArgumentException(arrayObject + " array element is not allowed type, allow only primitive type or String or OpackValues or null");
         }
 
-        this.set(new PinnedList(arrayObject));
+        this.set(new PrimitiveList(arrayObject));
     }
 
     public OpackArray(E @NotNull [] array) {
@@ -71,7 +71,7 @@ public final class OpackArray<E> extends OpackValue<List<E>> {
     void unpinList() {
         List<E> list = this.get();
 
-        if (list instanceof PinnedList) {
+        if (list instanceof PrimitiveList) {
             this.set((List<E>) Arrays.asList(list.toArray()));
         }
     }

@@ -1,12 +1,10 @@
 package com.realtimetech.opack.codec.dense;
 
 import com.realtimetech.opack.codec.OpackCodec;
-import com.realtimetech.opack.exception.DecodeException;
-import com.realtimetech.opack.exception.EncodeException;
 import com.realtimetech.opack.util.OpackArrayConverter;
 import com.realtimetech.opack.util.ReflectionUtil;
 import com.realtimetech.opack.util.structure.FastStack;
-import com.realtimetech.opack.util.structure.PinnedList;
+import com.realtimetech.opack.util.structure.PrimitiveList;
 import com.realtimetech.opack.value.OpackArray;
 import com.realtimetech.opack.value.OpackObject;
 import com.realtimetech.opack.value.OpackValue;
@@ -102,9 +100,9 @@ public class DenseCodec extends OpackCodec<byte[]> {
 
                 boolean optimized = false;
 
-                if (opackArrayList instanceof PinnedList) {
-                    PinnedList pinnedList = (PinnedList) opackArrayList;
-                    Object arrayObject = pinnedList.getArrayObject();
+                if (opackArrayList instanceof PrimitiveList) {
+                    PrimitiveList primitiveList = (PrimitiveList) opackArrayList;
+                    Object arrayObject = primitiveList.getArrayObject();
                     Class<?> arrayType = arrayObject.getClass();
 
                     if (arrayType == byte[].class) {
