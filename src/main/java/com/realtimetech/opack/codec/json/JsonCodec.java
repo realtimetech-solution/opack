@@ -122,15 +122,20 @@ public final class JsonCodec extends OpackCodec<String> {
         this.decodeStringWriter = new StringWriter();
     }
 
-    boolean encodeLiteral(StringWriter stringWriter, FastStack<Object> opackStack, Object object) {
+    boolean encodeLiteral(StringWriter stringWriter, Object object) {
+        if (object == null) {
+            stringWriter.write(CONST_NULL_CHARACTER);
+            return true;
+        }
+
         Class<?> type = object.getClass();
 
         if (type == OpackObject.class) {
-            opackStack.push(object);
+            this.encodeStack.push(object);
 
             return false;
         } else if (type == OpackArray.class) {
-            opackStack.push(object);
+            this.encodeStack.push(object);
 
             return false;
         } else if (type == String.class) {
@@ -218,12 +223,7 @@ public final class JsonCodec extends OpackCodec<String> {
         while (!this.encodeStack.isEmpty()) {
             Object object = this.encodeStack.pop();
 
-            if (object == null) {
-                this.encodeStack.push(CONST_NULL_CHARACTER);
-                continue;
-            }
-
-            Class<?> type = object.getClass();
+            Class<?> type = object == null ? null : object.getClass();
             if (type == char[].class) {
                 this.encodeStringWriter.write((char[]) object);
             } else if (type == OpackObject.class) {
@@ -296,7 +296,7 @@ public final class JsonCodec extends OpackCodec<String> {
                 for (int index = 0; index < size; index++) {
                     Object value = opackArray.get(index);
 
-                    if (!this.encodeLiteral(this.encodeLiteralStringWriter, this.encodeStack, value)) {
+                    if (!this.encodeLiteral(this.encodeLiteralStringWriter, value)) {
                         if (this.prettyFormat) {
                             if (value instanceof OpackObject) {
                                 prettyIndentStack.push(-1);
@@ -331,7 +331,7 @@ public final class JsonCodec extends OpackCodec<String> {
                 this.encodeStack.push(CONST_ARRAY_CLOSE_CHARACTER);
                 this.encodeStack.reverse(reverseStart, this.encodeStack.getSize() - 1);
             } else {
-                this.encodeLiteral(this.encodeStringWriter, this.encodeStack, object);
+                this.encodeLiteral(this.encodeStringWriter, object);
             }
         }
 
