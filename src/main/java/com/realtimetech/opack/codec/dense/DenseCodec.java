@@ -17,6 +17,15 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class DenseCodec extends OpackCodec<byte[]> {
+    public final static class Builder {
+        public Builder() {
+        }
+
+        public DenseCodec create() {
+            return new DenseCodec(this);
+        }
+    }
+
     private static final byte CONST_TYPE_OPACK_OBJECT = 0x00;
     private static final byte CONST_TYPE_OPACK_ARRAY = 0x01;
 
@@ -40,24 +49,47 @@ public class DenseCodec extends OpackCodec<byte[]> {
     private static final byte CONST_DOUBLE_NATIVE_ARRAY = 0x27;
     private static final byte CONST_NO_NATIVE_ARRAY = 0x2F;
 
+    private static final Object CONTEXT_NULL_OBJECT = new Object();
+    private static final Object CONTEXT_BRANCH_CONTEXT_OBJECT = new Object();
+
+    final ByteArrayOutputStream encodeByteArrayStream;
+    final FastStack<Object> encodeStack;
+
+    int decodePointer;
+    final FastStack<OpackValue> decodeStack;
+    final FastStack<Object[]> decodeContextStack;
+
+    final byte[] byte8Buffer;
+    final byte[] byte4Buffer;
+    final byte[] byte2Buffer;
+
+    DenseCodec(Builder builder) {
+        super();
+
+        this.encodeByteArrayStream = new ByteArrayOutputStream();
+        this.encodeStack = new FastStack<>();
+
+        this.decodePointer = 0;
+        this.decodeStack = new FastStack<>();
+        this.decodeContextStack = new FastStack<>();
+
+        this.byte8Buffer = new byte[8];
+        this.byte4Buffer = new byte[4];
+        this.byte2Buffer = new byte[2];
+
+    }
+
     @Override
     protected byte[] doEncode(OpackValue opackValue) throws IOException {
-        FastStack<Object> objectStack = new FastStack<>();
+        this.encodeStack.push(opackValue);
+        this.encodeByteArrayStream.reset();
 
-        objectStack.push(opackValue);
-
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-
-        byte[] byte8Buffer = new byte[8];
-        byte[] byte4Buffer = new byte[4];
-        byte[] byte2Buffer = new byte[2];
-
-        while (!objectStack.isEmpty()) {
-            Object object = objectStack.pop();
+        while (!this.encodeStack.isEmpty()) {
+            Object object = this.encodeStack.pop();
 
             if (object == null) {
-                byteArrayOutputStream.write(CONST_TYPE_VOID_NULL);
-                byteArrayOutputStream.write(0);
+                this.encodeByteArrayStream.write(CONST_TYPE_VOID_NULL);
+                this.encodeByteArrayStream.write(0);
                 continue;
             }
 
@@ -69,338 +101,340 @@ public class DenseCodec extends OpackCodec<byte[]> {
 
             if (type == OpackObject.class) {
                 OpackObject opackObject = (OpackObject) object;
-
-                byteArrayOutputStream.write(CONST_TYPE_OPACK_OBJECT);
                 int size = opackObject.size();
+
+                this.encodeByteArrayStream.write(CONST_TYPE_OPACK_OBJECT);
                 ByteBuffer.wrap(byte4Buffer).putInt(size);
-                byteArrayOutputStream.write(byte4Buffer);
+                this.encodeByteArrayStream.write(byte4Buffer);
 
                 for (Object key : opackObject.keySet()) {
                     Object value = opackObject.get(key);
-                    objectStack.push(value);
-                    objectStack.push(key);
+                    this.encodeStack.push(value);
+                    this.encodeStack.push(key);
                 }
             } else if (type == OpackArray.class) {
                 OpackArray opackArray = (OpackArray) object;
-
-                List<?> opackArrayList = null;
-                try {
-                    opackArrayList = OpackArrayConverter.getOpackArrayList(opackArray);
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-
-                byteArrayOutputStream.write(CONST_TYPE_OPACK_ARRAY);
                 int length = opackArray.length();
 
-                ByteBuffer.wrap(byte4Buffer).putInt(length);
-                byteArrayOutputStream.write(byte4Buffer);
+                try {
+                    List<?> opackArrayList = OpackArrayConverter.getOpackArrayList(opackArray);
 
-                boolean optimized = false;
+                    this.encodeByteArrayStream.write(CONST_TYPE_OPACK_ARRAY);
+                    ByteBuffer.wrap(byte4Buffer).putInt(length);
+                    this.encodeByteArrayStream.write(byte4Buffer);
 
-                if (opackArrayList instanceof PrimitiveList) {
-                    PrimitiveList primitiveList = (PrimitiveList) opackArrayList;
-                    Object arrayObject = primitiveList.getArrayObject();
-                    Class<?> arrayType = arrayObject.getClass();
+                    boolean optimized = false;
 
-                    if (arrayType == byte[].class) {
-                        byteArrayOutputStream.write(CONST_BYTE_NATIVE_ARRAY);
-                        byte[] array = (byte[]) arrayObject;
-                        byteArrayOutputStream.write(array);
-                        optimized = true;
-                    } else if (arrayType == char[].class) {
-                        byteArrayOutputStream.write(CONST_CHARACTER_NATIVE_ARRAY);
-                        char[] array = (char[]) arrayObject;
-                        ByteBuffer byteBuffer = ByteBuffer.allocate(array.length);
-                        CharBuffer typeBuffer = byteBuffer.asCharBuffer();
-                        typeBuffer.put(array);
+                    if (opackArrayList instanceof PrimitiveList) {
+                        PrimitiveList primitiveList = (PrimitiveList) opackArrayList;
+                        Object arrayObject = primitiveList.getArrayObject();
+                        Class<?> arrayType = arrayObject.getClass();
 
-                        byteArrayOutputStream.write(byteBuffer.array());
-                        optimized = true;
-                    } else if (arrayType == short[].class) {
-                        byteArrayOutputStream.write(CONST_SHORT_NATIVE_ARRAY);
-                        short[] array = (short[]) arrayObject;
-                        ByteBuffer byteBuffer = ByteBuffer.allocate(array.length * 2);
-                        ShortBuffer typeBuffer = byteBuffer.asShortBuffer();
-                        typeBuffer.put(array);
+                        if (arrayType == byte[].class) {
+                            encodeByteArrayStream.write(CONST_BYTE_NATIVE_ARRAY);
+                            byte[] array = (byte[]) arrayObject;
+                            encodeByteArrayStream.write(array);
+                            optimized = true;
+                        } else if (arrayType == char[].class) {
+                            encodeByteArrayStream.write(CONST_CHARACTER_NATIVE_ARRAY);
+                            char[] array = (char[]) arrayObject;
+                            ByteBuffer byteBuffer = ByteBuffer.allocate(array.length);
+                            CharBuffer typeBuffer = byteBuffer.asCharBuffer();
+                            typeBuffer.put(array);
 
-                        byteArrayOutputStream.write(byteBuffer.array());
-                        optimized = true;
-                    } else if (arrayType == int[].class) {
-                        byteArrayOutputStream.write(CONST_INTEGER_NATIVE_ARRAY);
-                        int[] array = (int[]) arrayObject;
-                        ByteBuffer byteBuffer = ByteBuffer.allocate(array.length * 4);
-                        IntBuffer typeBuffer = byteBuffer.asIntBuffer();
-                        typeBuffer.put(array);
+                            encodeByteArrayStream.write(byteBuffer.array());
+                            optimized = true;
+                        } else if (arrayType == short[].class) {
+                            encodeByteArrayStream.write(CONST_SHORT_NATIVE_ARRAY);
+                            short[] array = (short[]) arrayObject;
+                            ByteBuffer byteBuffer = ByteBuffer.allocate(array.length * 2);
+                            ShortBuffer typeBuffer = byteBuffer.asShortBuffer();
+                            typeBuffer.put(array);
 
-                        byteArrayOutputStream.write(byteBuffer.array());
-                        optimized = true;
-                    } else if (arrayType == float[].class) {
-                        byteArrayOutputStream.write(CONST_FLOAT_NATIVE_ARRAY);
-                        float[] array = (float[]) arrayObject;
-                        ByteBuffer byteBuffer = ByteBuffer.allocate(array.length * 4);
-                        FloatBuffer typeBuffer = byteBuffer.asFloatBuffer();
-                        typeBuffer.put(array);
+                            encodeByteArrayStream.write(byteBuffer.array());
+                            optimized = true;
+                        } else if (arrayType == int[].class) {
+                            encodeByteArrayStream.write(CONST_INTEGER_NATIVE_ARRAY);
+                            int[] array = (int[]) arrayObject;
+                            ByteBuffer byteBuffer = ByteBuffer.allocate(array.length * 4);
+                            IntBuffer typeBuffer = byteBuffer.asIntBuffer();
+                            typeBuffer.put(array);
 
-                        byteArrayOutputStream.write(byteBuffer.array());
-                        optimized = true;
-                    } else if (arrayType == long[].class) {
-                        byteArrayOutputStream.write(CONST_LONG_NATIVE_ARRAY);
-                        long[] array = (long[]) arrayObject;
-                        ByteBuffer byteBuffer = ByteBuffer.allocate(array.length * 8);
-                        LongBuffer typeBuffer = byteBuffer.asLongBuffer();
-                        typeBuffer.put(array);
+                            encodeByteArrayStream.write(byteBuffer.array());
+                            optimized = true;
+                        } else if (arrayType == float[].class) {
+                            encodeByteArrayStream.write(CONST_FLOAT_NATIVE_ARRAY);
+                            float[] array = (float[]) arrayObject;
+                            ByteBuffer byteBuffer = ByteBuffer.allocate(array.length * 4);
+                            FloatBuffer typeBuffer = byteBuffer.asFloatBuffer();
+                            typeBuffer.put(array);
 
-                        byteArrayOutputStream.write(byteBuffer.array());
-                        optimized = true;
-                    } else if (arrayType == double[].class) {
-                        byteArrayOutputStream.write(CONST_DOUBLE_NATIVE_ARRAY);
-                        double[] array = (double[]) arrayObject;
-                        ByteBuffer byteBuffer = ByteBuffer.allocate(array.length * 8);
-                        DoubleBuffer typeBuffer = byteBuffer.asDoubleBuffer();
-                        typeBuffer.put(array);
+                            encodeByteArrayStream.write(byteBuffer.array());
+                            optimized = true;
+                        } else if (arrayType == long[].class) {
+                            encodeByteArrayStream.write(CONST_LONG_NATIVE_ARRAY);
+                            long[] array = (long[]) arrayObject;
+                            ByteBuffer byteBuffer = ByteBuffer.allocate(array.length * 8);
+                            LongBuffer typeBuffer = byteBuffer.asLongBuffer();
+                            typeBuffer.put(array);
 
-                        byteArrayOutputStream.write(byteBuffer.array());
-                        optimized = true;
+                            encodeByteArrayStream.write(byteBuffer.array());
+                            optimized = true;
+                        } else if (arrayType == double[].class) {
+                            encodeByteArrayStream.write(CONST_DOUBLE_NATIVE_ARRAY);
+                            double[] array = (double[]) arrayObject;
+                            ByteBuffer byteBuffer = ByteBuffer.allocate(array.length * 8);
+                            DoubleBuffer typeBuffer = byteBuffer.asDoubleBuffer();
+                            typeBuffer.put(array);
+
+                            encodeByteArrayStream.write(byteBuffer.array());
+                            optimized = true;
+                        }
                     }
-                }
 
-                if (!optimized) {
-                    byteArrayOutputStream.write(CONST_NO_NATIVE_ARRAY);
+                    if (!optimized) {
+                        encodeByteArrayStream.write(CONST_NO_NATIVE_ARRAY);
 
-                    for (int index = length - 1; index >= 0; index--) {
-                        Object value = opackArray.get(index);
-                        objectStack.push(value);
+                        for (int index = length - 1; index >= 0; index--) {
+                            Object value = opackArray.get(index);
+                            encodeStack.push(value);
+                        }
                     }
+                } catch (InvocationTargetException | IllegalAccessException e) {
+                    throw new IllegalStateException("Can't access OpackArray native list object.");
                 }
             } else {
                 if (type == boolean.class) {
-                    byteArrayOutputStream.write(CONST_TYPE_BOOLEAN);
-                    byteArrayOutputStream.write((boolean) object ? 1 : 0);
+                    encodeByteArrayStream.write(CONST_TYPE_BOOLEAN);
+                    encodeByteArrayStream.write((boolean) object ? 1 : 0);
                 } else if (type == byte.class) {
-                    byteArrayOutputStream.write(CONST_TYPE_BYTE);
-                    byteArrayOutputStream.write((byte) object);
+                    encodeByteArrayStream.write(CONST_TYPE_BYTE);
+                    encodeByteArrayStream.write((byte) object);
                 } else if (type == char.class) {
-                    byteArrayOutputStream.write(CONST_TYPE_CHARACTER);
-                    byteArrayOutputStream.write((char) object);
+                    encodeByteArrayStream.write(CONST_TYPE_CHARACTER);
+                    encodeByteArrayStream.write((char) object);
                 } else if (type == short.class) {
-                    byteArrayOutputStream.write(CONST_TYPE_SHORT);
+                    encodeByteArrayStream.write(CONST_TYPE_SHORT);
                     short value = (short) object;
 
                     ByteBuffer.wrap(byte2Buffer).putShort(value);
-                    byteArrayOutputStream.write(byte2Buffer);
+                    encodeByteArrayStream.write(byte2Buffer);
                 } else if (type == int.class) {
-                    byteArrayOutputStream.write(CONST_TYPE_INTEGER);
+                    encodeByteArrayStream.write(CONST_TYPE_INTEGER);
                     int value = (int) object;
 
                     ByteBuffer.wrap(byte4Buffer).putInt(value);
-                    byteArrayOutputStream.write(byte4Buffer);
+                    encodeByteArrayStream.write(byte4Buffer);
                 } else if (type == float.class) {
-                    byteArrayOutputStream.write(CONST_TYPE_FLOAT);
+                    encodeByteArrayStream.write(CONST_TYPE_FLOAT);
                     float value = (float) object;
 
                     ByteBuffer.wrap(byte4Buffer).putFloat(value);
-                    byteArrayOutputStream.write(byte4Buffer);
+                    encodeByteArrayStream.write(byte4Buffer);
                 } else if (type == long.class) {
-                    byteArrayOutputStream.write(CONST_TYPE_LONG);
+                    encodeByteArrayStream.write(CONST_TYPE_LONG);
                     long value = (long) object;
 
                     ByteBuffer.wrap(byte8Buffer).putDouble(value);
-                    byteArrayOutputStream.write(byte8Buffer);
+                    encodeByteArrayStream.write(byte8Buffer);
                 } else if (type == double.class) {
-                    byteArrayOutputStream.write(CONST_TYPE_DOUBLE);
+                    encodeByteArrayStream.write(CONST_TYPE_DOUBLE);
                     double value = (double) object;
 
                     ByteBuffer.wrap(byte8Buffer).putDouble(value);
-                    byteArrayOutputStream.write(byte8Buffer);
+                    encodeByteArrayStream.write(byte8Buffer);
                 } else if (type == void.class) {
-                    byteArrayOutputStream.write(CONST_TYPE_VOID_NULL);
-                    byteArrayOutputStream.write(1);
+                    encodeByteArrayStream.write(CONST_TYPE_VOID_NULL);
+                    encodeByteArrayStream.write(1);
                 } else if (type == String.class) {
-                    byteArrayOutputStream.write(CONST_TYPE_STRING);
+                    encodeByteArrayStream.write(CONST_TYPE_STRING);
                     String value = (String) object;
 
                     byte[] bytes = value.getBytes(StandardCharsets.UTF_8);
                     ByteBuffer.wrap(byte4Buffer).putInt(bytes.length);
-                    byteArrayOutputStream.write(byte4Buffer);
-                    byteArrayOutputStream.write(bytes);
+                    encodeByteArrayStream.write(byte4Buffer);
+                    encodeByteArrayStream.write(bytes);
+                } else {
+                    throw new IllegalArgumentException("Unknown literal object type.");
                 }
             }
         }
 
-        return byteArrayOutputStream.toByteArray();
+        return encodeByteArrayStream.toByteArray();
     }
 
-    int pointer;
-    FastStack<OpackValue> baseStack = new FastStack<>();
-    FastStack<Object[]> contextStack = new FastStack<>();
-
-    final Object CONTEXT_NULL_OBJECT = new Object();
-
-
-    public Object parse(byte[] data, ByteBuffer byteBuffer) {
-        byte b = data[pointer++];
+    Object decodeBlock(byte[] data, ByteBuffer byteBuffer) {
+        byte b = data[decodePointer++];
 
         if (b == CONST_TYPE_BOOLEAN) {
-            byte bool = data[pointer++];
+            byte bool = data[decodePointer++];
             return bool == 1;
         } else if (b == CONST_TYPE_BYTE) {
-            return data[pointer++];
+            return data[decodePointer++];
         } else if (b == CONST_TYPE_CHARACTER) {
-            return (char) data[pointer++];
+            return (char) data[decodePointer++];
         } else if (b == CONST_TYPE_SHORT) {
-            short value = byteBuffer.getShort(pointer);
-            pointer += 2;
+            short value = byteBuffer.getShort(decodePointer);
+            decodePointer += 2;
             return value;
         } else if (b == CONST_TYPE_INTEGER) {
-            int value = byteBuffer.getInt(pointer);
-            pointer += 4;
+            int value = byteBuffer.getInt(decodePointer);
+            decodePointer += 4;
             return value;
         } else if (b == CONST_TYPE_FLOAT) {
-            float value = byteBuffer.getFloat(pointer);
-            pointer += 4;
+            float value = byteBuffer.getFloat(decodePointer);
+            decodePointer += 4;
             return value;
         } else if (b == CONST_TYPE_LONG) {
-            long value = byteBuffer.getLong(pointer);
-            pointer += 8;
+            long value = byteBuffer.getLong(decodePointer);
+            decodePointer += 8;
             return value;
         } else if (b == CONST_TYPE_DOUBLE) {
-            double value = byteBuffer.getDouble(pointer);
-            pointer += 8;
+            double value = byteBuffer.getDouble(decodePointer);
+            decodePointer += 8;
             return value;
         } else if (b == CONST_TYPE_VOID_NULL) {
-            byte bool = data[pointer++];
+            byte bool = data[decodePointer++];
             return null;
         } else if (b == CONST_TYPE_STRING) {
-            int length = byteBuffer.getInt(pointer);
-            pointer += 4;
+            int length = byteBuffer.getInt(decodePointer);
+            decodePointer += 4;
             byte[] bytes = new byte[length];
-            byteBuffer.position(pointer).get(bytes, 0, length);
+            byteBuffer.position(decodePointer).get(bytes, 0, length);
             byteBuffer.position(0);
 
-            pointer += length;
+            decodePointer += length;
 
             return new String(bytes, StandardCharsets.UTF_8);
         } else if (b == CONST_TYPE_OPACK_OBJECT) {
-            int size = byteBuffer.getInt(pointer);
-            pointer += 4;
+            int size = byteBuffer.getInt(decodePointer);
+            decodePointer += 4;
             OpackObject opackObject = new OpackObject<>(size);
 
-            contextStack.push(new Object[]{size, 0, CONTEXT_NULL_OBJECT, CONTEXT_NULL_OBJECT});
-            baseStack.push(opackObject);
+            decodeContextStack.push(new Object[]{size, 0, CONTEXT_NULL_OBJECT, CONTEXT_NULL_OBJECT});
+            decodeStack.push(opackObject);
 
-            return opackObject;
+            return CONTEXT_BRANCH_CONTEXT_OBJECT;
         } else if (b == CONST_TYPE_OPACK_ARRAY) {
-            int length = byteBuffer.getInt(pointer);
-            pointer += 4;
+            int length = byteBuffer.getInt(decodePointer);
+            decodePointer += 4;
 
-            byte nativeType = byteBuffer.get(pointer);
-            pointer += 1;
+            byte nativeType = byteBuffer.get(decodePointer);
+            decodePointer += 1;
 
             if (nativeType == CONST_NO_NATIVE_ARRAY) {
                 OpackArray opackArray = new OpackArray<>(length);
 
-                contextStack.push(new Object[]{length, 0});
-                baseStack.push(opackArray);
+                decodeContextStack.push(new Object[]{length, 0});
+                decodeStack.push(opackArray);
 
-                return opackArray;
+                return CONTEXT_BRANCH_CONTEXT_OBJECT;
             } else {
                 if (nativeType == CONST_BYTE_NATIVE_ARRAY) {
                     byte[] array = new byte[length];
-                    byteBuffer.position(pointer).get(array,0, length);
-                    pointer += length;
+                    byteBuffer.position(decodePointer).get(array, 0, length);
+                    decodePointer += length;
 
+                    byteBuffer.position(0);
                     return OpackArray.createWithArrayObject(array);
                 } else if (nativeType == CONST_CHARACTER_NATIVE_ARRAY) {
                     char[] array = new char[length];
-                    byteBuffer.position(pointer).asCharBuffer().get(array,0, length);
-                    pointer += length;
+                    byteBuffer.position(decodePointer).asCharBuffer().get(array, 0, length);
+                    decodePointer += length;
 
+                    byteBuffer.position(0);
                     return OpackArray.createWithArrayObject(array);
                 } else if (nativeType == CONST_SHORT_NATIVE_ARRAY) {
                     short[] array = new short[length];
-                    byteBuffer.position(pointer).asShortBuffer().get(array,0, length);
-                    pointer += length;
+                    byteBuffer.position(decodePointer).asShortBuffer().get(array, 0, length);
+                    decodePointer += length;
 
+                    byteBuffer.position(0);
                     return OpackArray.createWithArrayObject(array);
                 } else if (nativeType == CONST_INTEGER_NATIVE_ARRAY) {
                     int[] array = new int[length];
-                    byteBuffer.position(pointer).asIntBuffer().get(array,0, length);
-                    pointer += length;
+                    byteBuffer.position(decodePointer).asIntBuffer().get(array, 0, length);
+                    decodePointer += length;
 
+                    byteBuffer.position(0);
                     return OpackArray.createWithArrayObject(array);
                 } else if (nativeType == CONST_FLOAT_NATIVE_ARRAY) {
                     float[] array = new float[length];
-                    byteBuffer.position(pointer).asFloatBuffer().get(array,0, length);
-                    pointer += length;
+                    byteBuffer.position(decodePointer).asFloatBuffer().get(array, 0, length);
+                    decodePointer += length;
 
+                    byteBuffer.position(0);
                     return OpackArray.createWithArrayObject(array);
                 } else if (nativeType == CONST_LONG_NATIVE_ARRAY) {
                     long[] array = new long[length];
-                    byteBuffer.position(pointer).asLongBuffer().get(array,0, length);
-                    pointer += length;
+                    byteBuffer.position(decodePointer).asLongBuffer().get(array, 0, length);
+                    decodePointer += length;
 
+                    byteBuffer.position(0);
                     return OpackArray.createWithArrayObject(array);
                 } else if (nativeType == CONST_DOUBLE_NATIVE_ARRAY) {
                     double[] array = new double[length];
-                    byteBuffer.position(pointer).asDoubleBuffer().get(array,0, length);
-                    pointer += length;
+                    byteBuffer.position(decodePointer).asDoubleBuffer().get(array, 0, length);
+                    decodePointer += length;
 
+                    byteBuffer.position(0);
                     return OpackArray.createWithArrayObject(array);
+                } else {
+                    throw new IllegalStateException("Unknown native type, got " + nativeType);
                 }
-                byteBuffer.position(0);
             }
-
         }
 
-        throw new Error("S");
+        throw new IllegalStateException("Unknown block header binary, got " + b);
     }
 
     @Override
     protected OpackValue doDecode(byte[] data) {
         ByteBuffer byteBuffer = ByteBuffer.wrap(data);
-        baseStack.reset();
-        contextStack.reset();
 
-        pointer = 0;
+        this.decodeStack.reset();
+        this.decodeContextStack.reset();
+        this.decodePointer = 0;
 
-        OpackValue root = (OpackValue) parse(data, byteBuffer);
+        decodeBlock(data, byteBuffer);
+        OpackValue rootValue = this.decodeStack.peek();
 
-        while (!baseStack.isEmpty()) {
-            OpackValue opackValue = (OpackValue) baseStack.peek();
-            Object[] context = contextStack.peek();
+        while (!this.decodeStack.isEmpty()) {
+            OpackValue opackValue = this.decodeStack.peek();
+            Object[] context = this.decodeContextStack.peek();
+
             Integer size = (Integer) context[0];
             Integer offset = (Integer) context[1];
-//            System.out.println(" ---------- Read");
-//            System.out.println("   O :  " + opackValue);
-//            System.out.println("   I :  " + seekIndex);
-//            System.out.println("   S :  " + size);
+
+            boolean bypass = false;
+            int index = offset;
 
             if (opackValue instanceof OpackObject) {
                 OpackObject opackObject = (OpackObject) opackValue;
 
-                boolean bypass = false;
-                int index = offset;
-                for (index = offset; index < size; index++) {
+                for (; index < size; index++) {
                     Object key = context[2];
                     Object value = context[3];
 
                     if (key == CONTEXT_NULL_OBJECT) {
-                        key = parse(data, byteBuffer);
-                        context[2] = key;
-                        if (key instanceof OpackValue) {
+                        key = decodeBlock(data, byteBuffer);
+                        if (key == CONTEXT_BRANCH_CONTEXT_OBJECT) {
+                            context[2] = this.decodeStack.peek();
                             bypass = true;
                             break;
+                        } else {
+                            context[2] = key;
                         }
                     }
+
                     if (value == CONTEXT_NULL_OBJECT) {
-                        value = parse(data, byteBuffer);
-                        context[3] = value;
-                        if (value instanceof OpackValue) {
+                        value = decodeBlock(data, byteBuffer);
+                        if (value == CONTEXT_BRANCH_CONTEXT_OBJECT) {
+                            context[3] = this.decodeStack.peek();
                             bypass = true;
                             break;
+                        } else {
+                            context[3] = value;
                         }
                     }
 
@@ -408,37 +442,34 @@ public class DenseCodec extends OpackCodec<byte[]> {
                     context[2] = CONTEXT_NULL_OBJECT;
                     context[3] = CONTEXT_NULL_OBJECT;
                 }
-
-                if (!bypass) {
-                    baseStack.pop();
-                    contextStack.pop();
-                } else {
-                    context[1] = index;
-                }
             } else if (opackValue instanceof OpackArray) {
                 OpackArray opackArray = (OpackArray) opackValue;
 
-                boolean bypass = false;
-                int index = offset;
-                for (index = offset; index < size; index++) {
-                    Object value = parse(data, byteBuffer);
-                    opackArray.add(value);
+                for (; index < size; index++) {
+                    Object value = decodeBlock(data, byteBuffer);
 
-                    if (value instanceof OpackValue) {
+                    if (value == CONTEXT_BRANCH_CONTEXT_OBJECT) {
+                        index++;
+                        opackArray.add(this.decodeStack.peek());
+
                         bypass = true;
                         break;
+                    } else {
+                        opackArray.add(value);
                     }
                 }
+            } else {
+                throw new IllegalArgumentException("Unknown opack value type. got " + opackValue.getClass());
+            }
 
-                if (!bypass) {
-                    baseStack.pop();
-                    contextStack.pop();
-                } else {
-                    context[1] = index + 1;
-                }
+            if (!bypass) {
+                this.decodeStack.pop();
+                this.decodeContextStack.pop();
+            } else {
+                context[1] = index;
             }
         }
 
-        return root;
+        return rootValue;
     }
 }

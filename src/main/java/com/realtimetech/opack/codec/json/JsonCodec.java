@@ -110,6 +110,8 @@ public final class JsonCodec extends OpackCodec<String> {
     final StringWriter decodeStringWriter;
 
     JsonCodec(Builder builder) {
+        super();
+
         this.allowOpackValueToKeyValue = builder.allowOpackValueToKeyValue;
         this.prettyFormat = builder.prettyFormat;
 

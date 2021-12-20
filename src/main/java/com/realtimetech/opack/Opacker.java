@@ -312,7 +312,7 @@ public class Opacker {
 
         Opacker opacker = new Opacker();
         JsonCodec jsonCodec = new JsonCodec.Builder().setPrettyFormat(false).create();
-        DenseCodec denseCodec = new DenseCodec();
+        DenseCodec denseCodec = new DenseCodec.Builder().create();
         Example originalExample = new Example();
         long exampleSize = opacker.serialize(originalExample).toString().length();
 
