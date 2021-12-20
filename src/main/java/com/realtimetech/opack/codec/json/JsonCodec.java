@@ -25,7 +25,7 @@ public final class JsonCodec extends OpackCodec<String> {
             this.allowOpackValueToKeyValue = false;
             this.prettyFormat = false;
 
-            this.encodeStringBufferSize = 1024 * 4;
+            this.encodeStringBufferSize = 1024;
             this.encodeStackInitialSize = 128;
             this.decodeStackInitialSize = 128;
         }

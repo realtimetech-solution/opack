@@ -1,6 +1,7 @@
 package com.realtimetech.opack.codec.dense;
 
 import com.realtimetech.opack.codec.OpackCodec;
+import com.realtimetech.opack.codec.json.JsonCodec;
 import com.realtimetech.opack.util.OpackArrayConverter;
 import com.realtimetech.opack.util.ReflectionUtil;
 import com.realtimetech.opack.util.structure.FastStack;
@@ -18,7 +19,22 @@ import java.util.List;
 
 public class DenseCodec extends OpackCodec<byte[]> {
     public final static class Builder {
+        int encodeStackInitialSize;
+        int decodeStackInitialSize;
+
         public Builder() {
+            this.encodeStackInitialSize = 128;
+            this.decodeStackInitialSize = 128;
+        }
+
+        public DenseCodec.Builder setEncodeStackInitialSize(int encodeStackInitialSize) {
+            this.encodeStackInitialSize = encodeStackInitialSize;
+            return this;
+        }
+
+        public DenseCodec.Builder setDecodeStackInitialSize(int decodeStackInitialSize) {
+            this.decodeStackInitialSize = decodeStackInitialSize;
+            return this;
         }
 
         public DenseCodec create() {
@@ -67,11 +83,11 @@ public class DenseCodec extends OpackCodec<byte[]> {
         super();
 
         this.encodeByteArrayStream = new ByteArrayOutputStream();
-        this.encodeStack = new FastStack<>();
+        this.encodeStack = new FastStack<>(builder.encodeStackInitialSize);
 
         this.decodePointer = 0;
-        this.decodeStack = new FastStack<>();
-        this.decodeContextStack = new FastStack<>();
+        this.decodeStack = new FastStack<>(builder.decodeStackInitialSize);
+        this.decodeContextStack = new FastStack<>(builder.decodeStackInitialSize);
 
         this.byte8Buffer = new byte[8];
         this.byte4Buffer = new byte[4];
