@@ -1,6 +1,6 @@
 package com.realtimetech.opack.util;
 
-import com.realtimetech.opack.util.structure.PinnedList;
+import com.realtimetech.opack.util.structure.PrimitiveList;
 import com.realtimetech.opack.value.OpackArray;
 import com.realtimetech.opack.value.OpackValue;
 
@@ -23,6 +23,10 @@ public class OpackArrayConverter {
         OPACK_ARRAY_GETTER_METHOD.setAccessible(true);
     }
 
+    public static List<?> getOpackArrayList(OpackArray opackArray) throws InvocationTargetException, IllegalAccessException {
+        return (List<?>) OPACK_ARRAY_GETTER_METHOD.invoke(opackArray);
+    }
+
     public static Object convertToArray(Class<?> componentType, OpackArray opackArray) throws InvocationTargetException, IllegalAccessException {
         if (!OpackValue.isAllowType(componentType)) {
             throw new IllegalArgumentException(componentType + " type is not allowed");
@@ -30,11 +34,11 @@ public class OpackArrayConverter {
 
         List<?> list = (List<?>) OPACK_ARRAY_GETTER_METHOD.invoke(opackArray);
 
-        if (list instanceof PinnedList) {
+        if (list instanceof PrimitiveList) {
             /*
                 Optimize code for pinned list
              */
-            Object object = ((PinnedList<?>) list).getArrayObject();
+            Object object = ((PrimitiveList<?>) list).getArrayObject();
             Class<?> arrayType = object.getClass();
 
             if (arrayType.getComponentType() != componentType) {

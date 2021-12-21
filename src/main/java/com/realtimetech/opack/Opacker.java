@@ -1,5 +1,6 @@
 package com.realtimetech.opack;
 
+import com.realtimetech.opack.codec.dense.DenseCodec;
 import com.realtimetech.opack.codec.json.JsonCodec;
 import com.realtimetech.opack.compile.ClassInfo;
 import com.realtimetech.opack.compile.InfoCompiler;
@@ -14,11 +15,9 @@ import com.realtimetech.opack.value.OpackObject;
 import com.realtimetech.opack.value.OpackValue;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
-import java.nio.file.Files;
 
 public class Opacker {
 //        this.objectStack = new FastStack<>();

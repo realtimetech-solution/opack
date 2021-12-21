@@ -15,13 +15,18 @@ public class ReflectionUtil {
     static final Map<Class<?>, Class<?>> PRIMITIVES_WRAPPERS_MAP = Collections.unmodifiableMap(new HashMap<Class<?>, Class<?>>() {
         {
             put(boolean.class, Boolean.class);
+
             put(byte.class, Byte.class);
             put(char.class, Character.class);
-            put(double.class, Double.class);
-            put(float.class, Float.class);
-            put(int.class, Integer.class);
-            put(long.class, Long.class);
+
             put(short.class, Short.class);
+
+            put(int.class, Integer.class);
+            put(float.class, Float.class);
+
+            put(double.class, Double.class);
+            put(long.class, Long.class);
+
             put(void.class, Void.class);
         }
     });

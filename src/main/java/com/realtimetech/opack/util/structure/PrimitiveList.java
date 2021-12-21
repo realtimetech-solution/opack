@@ -6,10 +6,10 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.reflect.Array;
 import java.util.*;
 
-public class PinnedList<E> implements List<E> {
+public class PrimitiveList<E> implements List<E> {
     final Object arrayObject;
 
-    public PinnedList(Object arrayObject) {
+    public PrimitiveList(Object arrayObject) {
         if (!arrayObject.getClass().isArray()) {
             throw new IllegalArgumentException(arrayObject + " is not array object.");
         }
@@ -66,12 +66,12 @@ public class PinnedList<E> implements List<E> {
 
     @Override
     public boolean add(E e) {
-        throw new UnsupportedOperationException("PinnedList can't modify element.");
+        throw new UnsupportedOperationException("PrimitiveList can't modify element.");
     }
 
     @Override
     public boolean remove(Object o) {
-        throw new UnsupportedOperationException("PinnedList can't modify element.");
+        throw new UnsupportedOperationException("PrimitiveList can't modify element.");
     }
 
     @Override
@@ -87,27 +87,27 @@ public class PinnedList<E> implements List<E> {
 
     @Override
     public boolean addAll(@NotNull Collection<? extends E> c) {
-        throw new UnsupportedOperationException("PinnedList can't modify element.");
+        throw new UnsupportedOperationException("PrimitiveList can't modify element.");
     }
 
     @Override
     public boolean addAll(int index, @NotNull Collection<? extends E> c) {
-        throw new UnsupportedOperationException("PinnedList can't modify element.");
+        throw new UnsupportedOperationException("PrimitiveList can't modify element.");
     }
 
     @Override
     public boolean removeAll(@NotNull Collection<?> c) {
-        throw new UnsupportedOperationException("PinnedList can't modify element.");
+        throw new UnsupportedOperationException("PrimitiveList can't modify element.");
     }
 
     @Override
     public boolean retainAll(@NotNull Collection<?> c) {
-        throw new UnsupportedOperationException("PinnedList can't modify element.");
+        throw new UnsupportedOperationException("PrimitiveList can't modify element.");
     }
 
     @Override
     public void clear() {
-        throw new UnsupportedOperationException("PinnedList can't modify element.");
+        throw new UnsupportedOperationException("PrimitiveList can't modify element.");
     }
 
     @Override
@@ -117,17 +117,17 @@ public class PinnedList<E> implements List<E> {
 
     @Override
     public E set(int index, E element) {
-        throw new UnsupportedOperationException("PinnedList can't modify element.");
+        throw new UnsupportedOperationException("PrimitiveList can't modify element.");
     }
 
     @Override
     public void add(int index, E element) {
-        throw new UnsupportedOperationException("PinnedList can't modify element.");
+        throw new UnsupportedOperationException("PrimitiveList can't modify element.");
     }
 
     @Override
     public E remove(int index) {
-        throw new UnsupportedOperationException("PinnedList can't modify element.");
+        throw new UnsupportedOperationException("PrimitiveList can't modify element.");
     }
 
     @Override

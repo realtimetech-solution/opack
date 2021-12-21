@@ -2,6 +2,7 @@ package com.realtimetech.opack.codec.json;
 
 import com.realtimetech.opack.codec.OpackCodec;
 import com.realtimetech.opack.exception.DecodeException;
+import com.realtimetech.opack.exception.EncodeException;
 import com.realtimetech.opack.util.ReflectionUtil;
 import com.realtimetech.opack.util.StringWriter;
 import com.realtimetech.opack.util.structure.FastStack;
@@ -24,7 +25,7 @@ public final class JsonCodec extends OpackCodec<String> {
             this.allowOpackValueToKeyValue = false;
             this.prettyFormat = false;
 
-            this.encodeStringBufferSize = 1024 * 4;
+            this.encodeStringBufferSize = 1024;
             this.encodeStackInitialSize = 128;
             this.decodeStackInitialSize = 128;
         }
@@ -63,6 +64,10 @@ public final class JsonCodec extends OpackCodec<String> {
     private static final char[] CONST_U2028 = "\\u2028".toCharArray();
     private static final char[] CONST_U2029 = "\\u2029".toCharArray();
 
+    private static final char[] CONST_PRETTY_LINE_CHARACTER = new char[]{'\r', '\n'};
+    private static final char[] CONST_PRETTY_INDENT_CHARACTER = new char[]{' ', ' ', ' ', ' '};
+    private static final char[] CONST_PRETTY_SPACE_CHARACTER = new char[]{' '};
+
     private static final char[] CONST_NULL_CHARACTER = new char[]{'n', 'u', 'l', 'l'};
 
     private static final char CONST_SEPARATOR_CHARACTER = ',';
@@ -93,7 +98,8 @@ public final class JsonCodec extends OpackCodec<String> {
         CONST_REPLACEMENT_CHARACTERS['\f'] = new char[]{'\\', 'f'};
     }
 
-    final Builder builder;
+    final boolean allowOpackValueToKeyValue;
+    final boolean prettyFormat;
 
     final StringWriter encodeLiteralStringWriter;
     final StringWriter encodeStringWriter;
@@ -104,26 +110,34 @@ public final class JsonCodec extends OpackCodec<String> {
     final StringWriter decodeStringWriter;
 
     JsonCodec(Builder builder) {
-        this.builder = builder;
+        super();
 
-        this.encodeLiteralStringWriter = new StringWriter(this.builder.encodeStringBufferSize);
-        this.encodeStringWriter = new StringWriter(this.builder.encodeStringBufferSize);
-        this.encodeStack = new FastStack<Object>(this.builder.encodeStackInitialSize);
+        this.allowOpackValueToKeyValue = builder.allowOpackValueToKeyValue;
+        this.prettyFormat = builder.prettyFormat;
 
-        this.decodeBaseStack = new FastStack<Integer>(this.builder.decodeStackInitialSize);
-        this.decodeValueStack = new FastStack<Object>(this.builder.decodeStackInitialSize);
+        this.encodeLiteralStringWriter = new StringWriter(builder.encodeStringBufferSize);
+        this.encodeStringWriter = new StringWriter(builder.encodeStringBufferSize);
+        this.encodeStack = new FastStack<Object>(builder.encodeStackInitialSize);
+
+        this.decodeBaseStack = new FastStack<Integer>(builder.decodeStackInitialSize);
+        this.decodeValueStack = new FastStack<Object>(builder.decodeStackInitialSize);
         this.decodeStringWriter = new StringWriter();
     }
 
-    boolean encodeLiteral(StringWriter stringWriter, FastStack<Object> opackStack, Object object) {
+    boolean encodeLiteral(StringWriter stringWriter, Object object) {
+        if (object == null) {
+            stringWriter.write(CONST_NULL_CHARACTER);
+            return true;
+        }
+
         Class<?> type = object.getClass();
 
         if (type == OpackObject.class) {
-            opackStack.push(object);
+            this.encodeStack.push(object);
 
             return false;
         } else if (type == OpackArray.class) {
-            opackStack.push(object);
+            this.encodeStack.push(object);
 
             return false;
         } else if (type == String.class) {
@@ -164,7 +178,7 @@ public final class JsonCodec extends OpackCodec<String> {
             stringWriter.write(CONST_STRING_CLOSE_CHARACTER);
         } else {
             if (!OpackValue.isAllowType(type)) {
-                // Unknown Type Exception
+                throw new IllegalArgumentException(type + " is not allow to json encode.");
             }
 
             Class<?> numberType = type;
@@ -176,13 +190,13 @@ public final class JsonCodec extends OpackCodec<String> {
             // Asserts
             if (numberType == Double.class) {
                 Double doubleValue = (Double) object;
-                if (Double.isNaN(doubleValue) || Double.isInfinite(doubleValue) || Double.isFinite(doubleValue)) {
-                    // Throw not allowed double value
+                if (Double.isNaN(doubleValue) || Double.isInfinite(doubleValue) || !Double.isFinite(doubleValue)) {
+                    throw new ArithmeticException("Json format allow only finite value.");
                 }
             } else if (numberType == Float.class) {
                 Float floatValue = (Float) object;
-                if (Float.isNaN(floatValue) || Float.isInfinite(floatValue) || Float.isFinite(floatValue)) {
-                    // Throw not allowed double value
+                if (Float.isNaN(floatValue) || Float.isInfinite(floatValue) || !Float.isFinite(floatValue)) {
+                    throw new ArithmeticException("Json format allow only finite value.");
                 }
             }
 
@@ -198,30 +212,77 @@ public final class JsonCodec extends OpackCodec<String> {
         this.encodeStringWriter.reset();
         this.encodeStack.reset();
 
+        FastStack<Integer> prettyIndentStack = null;
+
+        if (this.prettyFormat) {
+            prettyIndentStack = new FastStack<>();
+            prettyIndentStack.push(0);
+        }
+
         this.encodeStack.push(opackValue);
+
 
         while (!this.encodeStack.isEmpty()) {
             Object object = this.encodeStack.pop();
 
-            Class<?> type = object.getClass();
+            Class<?> type = object == null ? null : object.getClass();
             if (type == char[].class) {
                 this.encodeStringWriter.write((char[]) object);
             } else if (type == OpackObject.class) {
                 OpackObject opackObject = (OpackObject) object;
+                int currentIndent = -1;
+                if (this.prettyFormat) {
+                    currentIndent = prettyIndentStack.pop();
+                }
 
                 this.encodeStringWriter.write(CONST_OBJECT_OPEN_CHARACTER);
                 this.encodeStack.push(CONST_OBJECT_CLOSE_CHARACTER);
+                if (this.prettyFormat && currentIndent != -1) {
+                    this.encodeStringWriter.write(CONST_PRETTY_LINE_CHARACTER);
+                    for (int i = 0; i < currentIndent; i++) {
+                        this.encodeStack.push(CONST_PRETTY_INDENT_CHARACTER);
+                    }
+                    this.encodeStack.push(CONST_PRETTY_LINE_CHARACTER);
+                }
+
                 int count = 0;
                 for (Object key : opackObject.keySet()) {
                     Object value = opackObject.get(key);
 
                     if (count != 0) {
+                        if (this.prettyFormat) {
+                            if (currentIndent != -1) {
+                                this.encodeStack.push(CONST_PRETTY_LINE_CHARACTER);
+                            } else {
+                                this.encodeStack.push(CONST_PRETTY_SPACE_CHARACTER);
+                            }
+                        }
                         this.encodeStack.push(CONST_SEPARATOR_CHARACTER);
                     }
 
+                    if (!this.allowOpackValueToKeyValue && key instanceof OpackValue) {
+                        throw new IllegalArgumentException("Json not allow object type key.");
+                    }
+
+                    if (this.prettyFormat) {
+                        if (value instanceof OpackObject) {
+                            prettyIndentStack.push(currentIndent == -1 ? -1 : currentIndent + 1);
+                        }
+                        if (key instanceof OpackObject) {
+                            prettyIndentStack.push(currentIndent == -1 ? -1 : currentIndent + 1);
+                        }
+                    }
                     this.encodeStack.push(value);
+                    if (this.prettyFormat) {
+                        this.encodeStack.push(CONST_PRETTY_SPACE_CHARACTER);
+                    }
                     this.encodeStack.push(CONST_OBJECT_MAP_CHARACTER);
                     this.encodeStack.push(key);
+                    if (this.prettyFormat && currentIndent != -1) {
+                        for (int i = 0; i < currentIndent + 1; i++) {
+                            this.encodeStack.push(CONST_PRETTY_INDENT_CHARACTER);
+                        }
+                    }
 
                     count++;
                 }
@@ -237,17 +298,29 @@ public final class JsonCodec extends OpackCodec<String> {
                 for (int index = 0; index < size; index++) {
                     Object value = opackArray.get(index);
 
-                    if (!this.encodeLiteral(this.encodeLiteralStringWriter, this.encodeStack, value)) {
+                    if (!this.encodeLiteral(this.encodeLiteralStringWriter, value)) {
+                        if (this.prettyFormat) {
+                            if (value instanceof OpackObject) {
+                                prettyIndentStack.push(-1);
+                            }
+                        }
+
                         this.encodeStack.push(this.encodeLiteralStringWriter.toCharArray());
                         this.encodeStack.swap(this.encodeStack.getSize() - 1, this.encodeStack.getSize() - 2);
                         if (index != size - 1) {
                             this.encodeStack.push(CONST_SEPARATOR_CHARACTER);
+                            if (this.prettyFormat) {
+                                this.encodeStack.push(CONST_PRETTY_SPACE_CHARACTER);
+                            }
                         }
 
                         this.encodeLiteralStringWriter.reset();
                     } else {
                         if (index != size - 1) {
                             this.encodeLiteralStringWriter.write(CONST_SEPARATOR_CHARACTER);
+                            if (this.prettyFormat) {
+                                this.encodeLiteralStringWriter.write(CONST_PRETTY_SPACE_CHARACTER);
+                            }
                         }
                     }
                 }
@@ -260,7 +333,7 @@ public final class JsonCodec extends OpackCodec<String> {
                 this.encodeStack.push(CONST_ARRAY_CLOSE_CHARACTER);
                 this.encodeStack.reverse(reverseStart, this.encodeStack.getSize() - 1);
             } else {
-                this.encodeLiteral(this.encodeStringWriter, this.encodeStack, object);
+                this.encodeLiteral(this.encodeStringWriter, object);
             }
         }
 
@@ -352,6 +425,8 @@ public final class JsonCodec extends OpackCodec<String> {
                 }
 
                 case ' ':
+                case '\r':
+                case '\n':
                 case '\t': {
                     // Skip no-meaning character
                     break;
