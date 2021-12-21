@@ -107,13 +107,13 @@ public class DenseCodec extends OpackCodec<byte[]> {
                 continue;
             }
 
-            Class<?> type = object.getClass();
+            Class<?> objectClass = object.getClass();
 
-            if (ReflectionUtil.isWrapperClass(type)) {
-                type = ReflectionUtil.getPrimitiveClassOfWrapperClass(type);
+            if (ReflectionUtil.isWrapperClass(objectClass)) {
+                objectClass = ReflectionUtil.getPrimitiveClassOfWrapperClass(objectClass);
             }
 
-            if (type == OpackObject.class) {
+            if (objectClass == OpackObject.class) {
                 OpackObject opackObject = (OpackObject) object;
                 int size = opackObject.size();
 
@@ -126,7 +126,7 @@ public class DenseCodec extends OpackCodec<byte[]> {
                     this.encodeStack.push(value);
                     this.encodeStack.push(key);
                 }
-            } else if (type == OpackArray.class) {
+            } else if (objectClass == OpackArray.class) {
                 OpackArray opackArray = (OpackArray) object;
                 int length = opackArray.length();
 
@@ -218,46 +218,46 @@ public class DenseCodec extends OpackCodec<byte[]> {
                     throw new IllegalStateException("Can't access OpackArray native list object.");
                 }
             } else {
-                if (type == boolean.class) {
+                if (objectClass == boolean.class) {
                     encodeByteArrayStream.write(CONST_TYPE_BOOLEAN);
                     encodeByteArrayStream.write((boolean) object ? 1 : 0);
-                } else if (type == byte.class) {
+                } else if (objectClass == byte.class) {
                     encodeByteArrayStream.write(CONST_TYPE_BYTE);
                     encodeByteArrayStream.write((byte) object);
-                } else if (type == char.class) {
+                } else if (objectClass == char.class) {
                     encodeByteArrayStream.write(CONST_TYPE_CHARACTER);
                     encodeByteArrayStream.write((char) object);
-                } else if (type == short.class) {
+                } else if (objectClass == short.class) {
                     encodeByteArrayStream.write(CONST_TYPE_SHORT);
                     short value = (short) object;
 
                     ByteBuffer.wrap(byte2Buffer).putShort(value);
                     encodeByteArrayStream.write(byte2Buffer);
-                } else if (type == int.class) {
+                } else if (objectClass == int.class) {
                     encodeByteArrayStream.write(CONST_TYPE_INTEGER);
                     int value = (int) object;
 
                     ByteBuffer.wrap(byte4Buffer).putInt(value);
                     encodeByteArrayStream.write(byte4Buffer);
-                } else if (type == float.class) {
+                } else if (objectClass == float.class) {
                     encodeByteArrayStream.write(CONST_TYPE_FLOAT);
                     float value = (float) object;
 
                     ByteBuffer.wrap(byte4Buffer).putFloat(value);
                     encodeByteArrayStream.write(byte4Buffer);
-                } else if (type == long.class) {
+                } else if (objectClass == long.class) {
                     encodeByteArrayStream.write(CONST_TYPE_LONG);
                     long value = (long) object;
 
                     ByteBuffer.wrap(byte8Buffer).putDouble(value);
                     encodeByteArrayStream.write(byte8Buffer);
-                } else if (type == double.class) {
+                } else if (objectClass == double.class) {
                     encodeByteArrayStream.write(CONST_TYPE_DOUBLE);
                     double value = (double) object;
 
                     ByteBuffer.wrap(byte8Buffer).putDouble(value);
                     encodeByteArrayStream.write(byte8Buffer);
-                } else if (type == String.class) {
+                } else if (objectClass == String.class) {
                     encodeByteArrayStream.write(CONST_TYPE_STRING);
                     String value = (String) object;
 

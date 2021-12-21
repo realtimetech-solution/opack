@@ -98,53 +98,53 @@ public class ReflectionUtil {
         return null;
     }
 
-    public static Object cast(Class<?> type, Object object) {
-        if (ReflectionUtil.isPrimitiveClass(type)) {
-            type = ReflectionUtil.getWrapperClassOfPrimitiveClass(type);
+    public static Object cast(Class<?> typeClass, Object object) {
+        if (ReflectionUtil.isPrimitiveClass(typeClass)) {
+            typeClass = ReflectionUtil.getWrapperClassOfPrimitiveClass(typeClass);
         }
-        if (ReflectionUtil.isWrapperClass(type)) {
+        if (ReflectionUtil.isWrapperClass(typeClass)) {
             Class<?> objectType = object.getClass();
 
             if (objectType == Long.class) {
                 Long value = (Long) object;
 
-                if (type == Integer.class) {
+                if (typeClass == Integer.class) {
                     return value.intValue();
-                } else if (type == Short.class) {
+                } else if (typeClass == Short.class) {
                     return value.shortValue();
-                } else if (type == Character.class) {
+                } else if (typeClass == Character.class) {
                     return (char) value.intValue();
-                } else if (type == Byte.class) {
+                } else if (typeClass == Byte.class) {
                     return value.byteValue();
                 }
             } else if (objectType == Integer.class) {
                 Integer value = (Integer) object;
 
-                if (type == Short.class) {
+                if (typeClass == Short.class) {
                     return value.shortValue();
-                } else if (type == Character.class) {
+                } else if (typeClass == Character.class) {
                     return (char) value.intValue();
-                } else if (type == Byte.class) {
+                } else if (typeClass == Byte.class) {
                     return value.byteValue();
                 }
             } else if (objectType == Short.class) {
                 Short value = (Short) object;
 
-                if (type == Character.class) {
+                if (typeClass == Character.class) {
                     return (char) value.intValue();
-                } else if (type == Byte.class) {
+                } else if (typeClass == Byte.class) {
                     return value.byteValue();
                 }
             } else if (objectType == Character.class) {
                 Character value = (Character) object;
 
-                if (type == Byte.class) {
+                if (typeClass == Byte.class) {
                     return (byte) value.charValue();
                 }
             } else if (objectType == Double.class) {
                 Double value = (Double) object;
 
-                if (type == Float.class) {
+                if (typeClass == Float.class) {
                     return value.floatValue();
                 }
             }
@@ -152,7 +152,7 @@ public class ReflectionUtil {
             return object;
         }
 
-        return type.cast(object);
+        return typeClass.cast(object);
     }
 
     public static Object getArrayItem(Object array, int index) {
@@ -214,70 +214,70 @@ public class ReflectionUtil {
         return newArray;
     }
 
-    static void addAccessibleFields(List<Field> fieldList, Class<?> clazz) {
-        Class<?> superClass = clazz.getSuperclass();
+    static void addAccessibleFields(List<Field> fieldList, Class<?> targetClass) {
+        Class<?> superClass = targetClass.getSuperclass();
 
         if (superClass != null && superClass != Object.class) {
-            ReflectionUtil.addAccessibleFields(fieldList, clazz.getSuperclass());
+            ReflectionUtil.addAccessibleFields(fieldList, targetClass.getSuperclass());
         }
 
-        for (Field field : clazz.getDeclaredFields()) {
-            if (!fieldList.contains(field) && !Modifier.isStatic(field.getModifiers())) {
+        for (Field field : targetClass.getDeclaredFields()) {
+            if (!fieldList.contains(field) && !Modifier.isStatic(field.getModifiers()) && !Modifier.isTransient(field.getModifiers())) {
                 fieldList.add(field);
             }
         }
     }
 
-    public static Field[] getAccessibleFields(Class<?> clazz) {
+    public static Field[] getAccessibleFields(Class<?> targetClass) {
         List<Field> fields = new LinkedList<>();
-        ReflectionUtil.addAccessibleFields(fields, clazz);
+        ReflectionUtil.addAccessibleFields(fields, targetClass);
 
         return fields.toArray(new Field[fields.size()]);
     }
 
-    public static int getArrayDimension(Class<?> clazz) {
-        if (!clazz.isArray()) {
-            throw new IllegalArgumentException(clazz + " is not array class.");
+    public static int getArrayDimension(Class<?> typeClass) {
+        if (!typeClass.isArray()) {
+            throw new IllegalArgumentException(typeClass + " is not array class.");
         }
 
         int count = 0;
 
         while (true) {
-            Class<?> type = clazz.getComponentType();
+            Class<?> componentClass = typeClass.getComponentType();
 
-            if (type == null) {
+            if (componentClass == null) {
                 break;
             } else {
                 count++;
-                clazz = type;
+                typeClass = componentClass;
             }
         }
 
         return count;
     }
 
-    public static Class<?> getArrayLastComponentType(Class<?> clazz) {
-        if (!clazz.isArray()) {
-            throw new IllegalArgumentException(clazz + " is not array class.");
+    public static Class<?> getArrayLastComponentType(Class<?> typeClass) {
+        if (!typeClass.isArray()) {
+            throw new IllegalArgumentException(typeClass + " is not array class.");
         }
 
-        Class<?> last = clazz;
+        Class<?> lastClass = typeClass;
 
         while (true) {
-            Class<?> type = last.getComponentType();
+            Class<?> componentClass = lastClass.getComponentType();
 
-            if (type == null) {
+            if (componentClass == null) {
                 break;
             } else {
-                last = type;
+                lastClass = componentClass;
             }
         }
 
-        return last;
+        return lastClass;
     }
 
-    public static @NotNull boolean isWrapperClass(Class<?> clazz) {
-        return WRAPPERS_PRIMITIVES_MAP.containsKey(clazz);
+    public static @NotNull boolean isWrapperClass(Class<?> typeClass) {
+        return WRAPPERS_PRIMITIVES_MAP.containsKey(typeClass);
     }
 
     public static @NotNull Class<?> getPrimitiveClassOfWrapperClass(@NotNull Class<?> wrapperClass) {
@@ -290,8 +290,8 @@ public class ReflectionUtil {
         return primitiveClass;
     }
 
-    public static @NotNull boolean isPrimitiveClass(Class<?> clazz) {
-        return PRIMITIVES_WRAPPERS_MAP.containsKey(clazz);
+    public static @NotNull boolean isPrimitiveClass(Class<?> typeClass) {
+        return PRIMITIVES_WRAPPERS_MAP.containsKey(typeClass);
     }
 
     public static @NotNull Class<?> getWrapperClassOfPrimitiveClass(@NotNull Class<?> primitiveClass) {
@@ -316,40 +316,40 @@ public class ReflectionUtil {
         return toClass.isAssignableFrom(fromClass);
     }
 
-    public static <T> @NotNull T createInstanceUnsafe(@NotNull Class<T> clazz) throws InvocationTargetException, IllegalAccessException, InstantiationException {
-        int modifiers = clazz.getModifiers();
+    public static <T> @NotNull T createInstanceUnsafe(@NotNull Class<T> instanceClass) throws InvocationTargetException, IllegalAccessException, InstantiationException {
+        int modifiers = instanceClass.getModifiers();
 
         if (Modifier.isInterface(modifiers)) {
-            throw new InstantiationException("Interface can't be instantiated, got " + clazz.getSimpleName() + " interface.");
+            throw new InstantiationException("Interface can't be instantiated, got " + instanceClass.getSimpleName() + " interface.");
         }
 
         if (Modifier.isAbstract(modifiers)) {
-            throw new InstantiationException("Abstract class can't be instantiated, got " + clazz.getSimpleName() + " abstract class.");
+            throw new InstantiationException("Abstract class can't be instantiated, got " + instanceClass.getSimpleName() + " abstract class.");
         }
 
-        return ReflectionUtil.ALLOCATOR.allocate(clazz);
+        return ReflectionUtil.ALLOCATOR.allocate(instanceClass);
     }
 
-    public static <T> @NotNull T createInstance(@NotNull Class<T> clazz, Object @NotNull ... objects) throws InvocationTargetException, InstantiationException, IllegalAccessException {
-        int modifiers = clazz.getModifiers();
+    public static <T> @NotNull T createInstance(@NotNull Class<T> instanceClass, Object @NotNull ... objects) throws InvocationTargetException, InstantiationException, IllegalAccessException {
+        int modifiers = instanceClass.getModifiers();
 
         if (Modifier.isInterface(modifiers)) {
-            throw new InstantiationException("Interface can't be instantiated, got " + clazz.getSimpleName() + " interface.");
+            throw new InstantiationException("Interface can't be instantiated, got " + instanceClass.getSimpleName() + " interface.");
         }
 
         if (Modifier.isAbstract(modifiers)) {
-            throw new InstantiationException("Abstract class can't be instantiated, got " + clazz.getSimpleName() + " abstract class.");
+            throw new InstantiationException("Abstract class can't be instantiated, got " + instanceClass.getSimpleName() + " abstract class.");
         }
 
-        Constructor<?>[] constructors = clazz.getDeclaredConstructors();
-        Class<?>[] types = new Class[objects.length];
+        Constructor<?>[] constructors = instanceClass.getDeclaredConstructors();
+        Class<?>[] classes = new Class[objects.length];
 
         for (int index = 0; index < objects.length; index++) {
-            types[index] = objects[index].getClass();
+            classes[index] = objects[index].getClass();
         }
 
         for (Constructor<?> constructor : constructors) {
-            if (constructor.getDeclaringClass() == clazz) {
+            if (constructor.getDeclaringClass() == instanceClass) {
                 int parameterCount = constructor.getParameterCount();
                 Class<?>[] parameterTypes = constructor.getParameterTypes();
 
@@ -357,7 +357,7 @@ public class ReflectionUtil {
                     boolean matched = true;
 
                     for (int index = 0; index < parameterCount; index++) {
-                        if (!ReflectionUtil.checkClassCastable(types[index], parameterTypes[index])) {
+                        if (!ReflectionUtil.checkClassCastable(classes[index], parameterTypes[index])) {
                             matched = false;
                             break;
                         }
@@ -372,6 +372,6 @@ public class ReflectionUtil {
             }
         }
 
-        throw new IllegalArgumentException(clazz.getSimpleName() + " class doesn't have matched constructor.");
+        throw new IllegalArgumentException(instanceClass.getSimpleName() + " class doesn't have matched constructor.");
     }
 }

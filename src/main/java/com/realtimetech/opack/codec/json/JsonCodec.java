@@ -1,8 +1,6 @@
 package com.realtimetech.opack.codec.json;
 
 import com.realtimetech.opack.codec.OpackCodec;
-import com.realtimetech.opack.exception.DecodeException;
-import com.realtimetech.opack.exception.EncodeException;
 import com.realtimetech.opack.util.ReflectionUtil;
 import com.realtimetech.opack.util.StringWriter;
 import com.realtimetech.opack.util.structure.FastStack;
@@ -130,17 +128,17 @@ public final class JsonCodec extends OpackCodec<String> {
             return true;
         }
 
-        Class<?> type = object.getClass();
+        Class<?> objectClass = object.getClass();
 
-        if (type == OpackObject.class) {
+        if (objectClass == OpackObject.class) {
             this.encodeStack.push(object);
 
             return false;
-        } else if (type == OpackArray.class) {
+        } else if (objectClass == OpackArray.class) {
             this.encodeStack.push(object);
 
             return false;
-        } else if (type == String.class) {
+        } else if (objectClass == String.class) {
             String string = (String) object;
             char[] charArray = string.toCharArray();
 
@@ -177,14 +175,14 @@ public final class JsonCodec extends OpackCodec<String> {
 
             stringWriter.write(CONST_STRING_CLOSE_CHARACTER);
         } else {
-            if (!OpackValue.isAllowType(type)) {
-                throw new IllegalArgumentException(type + " is not allow to json encode.");
+            if (!OpackValue.isAllowType(objectClass)) {
+                throw new IllegalArgumentException(objectClass + " is not allow to json encode.");
             }
 
-            Class<?> numberType = type;
+            Class<?> numberType = objectClass;
 
-            if (ReflectionUtil.isPrimitiveClass(type)) {
-                numberType = ReflectionUtil.getWrapperClassOfPrimitiveClass(type);
+            if (ReflectionUtil.isPrimitiveClass(objectClass)) {
+                numberType = ReflectionUtil.getWrapperClassOfPrimitiveClass(objectClass);
             }
 
             // Asserts
@@ -225,10 +223,10 @@ public final class JsonCodec extends OpackCodec<String> {
         while (!this.encodeStack.isEmpty()) {
             Object object = this.encodeStack.pop();
 
-            Class<?> type = object == null ? null : object.getClass();
-            if (type == char[].class) {
+            Class<?> objectClass = object == null ? null : object.getClass();
+            if (objectClass == char[].class) {
                 this.encodeStringWriter.write((char[]) object);
-            } else if (type == OpackObject.class) {
+            } else if (objectClass == OpackObject.class) {
                 OpackObject opackObject = (OpackObject) object;
                 int currentIndent = -1;
                 if (this.prettyFormat) {
@@ -286,7 +284,7 @@ public final class JsonCodec extends OpackCodec<String> {
 
                     count++;
                 }
-            } else if (type == OpackArray.class) {
+            } else if (objectClass == OpackArray.class) {
                 OpackArray opackArray = (OpackArray) object;
                 this.encodeLiteralStringWriter.reset();
 
@@ -394,11 +392,11 @@ public final class JsonCodec extends OpackCodec<String> {
                     int baseIndex = this.decodeBaseStack.peek();
                     int valueSize = this.decodeValueStack.getSize() - baseIndex - 1;
                     Object object = this.decodeValueStack.get(baseIndex);
-                    Class<?> type = object.getClass();
+                    Class<?> objectClass = object.getClass();
 
                     switch (currentChar) {
                         case ',': {
-                            if (type == OpackObject.class) {
+                            if (objectClass == OpackObject.class) {
                                 if (valueSize != 0) {
                                     throw new IOException("There must be a pair of Key and Value. at " + pointer + "(" + currentChar + ")");
                                 }
@@ -407,12 +405,12 @@ public final class JsonCodec extends OpackCodec<String> {
                             break;
                         }
                         case ':': {
-                            if (type == OpackObject.class) {
+                            if (objectClass == OpackObject.class) {
                                 if (valueSize != 1) {
                                     throw new IOException("There is a colon without a key. at " + pointer + "(" + currentChar + ")");
                                 }
                             }
-                            if (type == OpackArray.class) {
+                            if (objectClass == OpackArray.class) {
                                 throw new IOException("Array type cannot contain colons. at " + pointer + "(" + currentChar + ")");
                             }
 
@@ -548,9 +546,9 @@ public final class JsonCodec extends OpackCodec<String> {
                 int baseIndex = this.decodeBaseStack.peek();
                 int valueSize = this.decodeValueStack.getSize() - baseIndex - 1;
                 Object object = this.decodeValueStack.get(baseIndex);
-                Class<?> type = object.getClass();
+                Class<?> objectClass = object.getClass();
 
-                if (type == OpackObject.class) {
+                if (objectClass == OpackObject.class) {
                     if (valueSize == 2) {
                         OpackObject opackObject = (OpackObject) object;
 
@@ -559,7 +557,7 @@ public final class JsonCodec extends OpackCodec<String> {
 
                         opackObject.put(key, value);
                     }
-                } else if (type == OpackArray.class) {
+                } else if (objectClass == OpackArray.class) {
                     if (valueSize == 1) {
                         OpackArray opackArray = (OpackArray) object;
                         Object value = this.decodeValueStack.pop();
@@ -567,7 +565,7 @@ public final class JsonCodec extends OpackCodec<String> {
                         opackArray.add(value);
                     }
                 } else {
-                    throw new IOException("Caught corrupted stack, got " + type.getSimpleName());
+                    throw new IOException("Caught corrupted stack, got " + objectClass.getSimpleName());
                 }
             }
         }

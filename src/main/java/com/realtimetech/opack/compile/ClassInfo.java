@@ -9,7 +9,7 @@ public class ClassInfo {
     public static class FieldInfo {
         final Field field;
         final String name;
-        final Class<?> type;
+        final Class<?> typeClass;
 
         final Transformer transformer;
         final Class<?> explicitType;
@@ -17,7 +17,7 @@ public class ClassInfo {
         public FieldInfo(@NotNull Field field, Transformer transformer, Class<?> explicitType) {
             this.field = field;
             this.name = this.field.getName();
-            this.type = explicitType == null ? this.field.getType() : explicitType;
+            this.typeClass = explicitType == null ? this.field.getType() : explicitType;
 
             this.transformer = transformer;
             this.explicitType = explicitType;
@@ -27,8 +27,8 @@ public class ClassInfo {
             return name;
         }
 
-        public Class<?> getType() {
-            return type;
+        public Class<?> getTypeClass() {
+            return typeClass;
         }
 
         public Field getField() {
@@ -41,6 +41,20 @@ public class ClassInfo {
 
         public Class<?> getExplicitType() {
             return explicitType;
+        }
+
+        public void set(Object object, Object value) throws IllegalAccessException {
+            if (!this.field.canAccess(object)) {
+                this.field.setAccessible(true);
+            }
+            this.field.set(object, value);
+        }
+
+        public Object get(Object object) throws IllegalAccessException {
+            if (!this.field.canAccess(object)) {
+                this.field.setAccessible(true);
+            }
+            return this.field.get(object);
         }
     }
 

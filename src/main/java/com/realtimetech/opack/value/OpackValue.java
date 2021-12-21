@@ -5,17 +5,17 @@ import com.realtimetech.opack.util.ReflectionUtil;
 import java.util.Objects;
 
 public abstract class OpackValue<T> {
-    public static void assertAllowType(Class<?> clazz) {
-        if (!OpackValue.isAllowType(clazz)) {
-            throw new IllegalArgumentException(clazz.getName() + " is not allowed type, allow only primitive type or String or OpackValues or null");
+    public static void assertAllowType(Class<?> typeClass) {
+        if (!OpackValue.isAllowType(typeClass)) {
+            throw new IllegalArgumentException(typeClass.getName() + " is not allowed type, allow only primitive type or String or OpackValues or null");
         }
     }
 
-    public static boolean isAllowType(Class<?> clazz) {
-        return ReflectionUtil.isWrapperClass(clazz) ||
-                ReflectionUtil.isPrimitiveClass(clazz) ||
-                (clazz == String.class) ||
-                (OpackValue.class.isAssignableFrom(clazz));
+    public static boolean isAllowType(Class<?> typeClass) {
+        return ReflectionUtil.isWrapperClass(typeClass) ||
+                ReflectionUtil.isPrimitiveClass(typeClass) ||
+                (typeClass == String.class) ||
+                (OpackValue.class.isAssignableFrom(typeClass));
     }
 
     private T value;
@@ -52,11 +52,10 @@ public abstract class OpackValue<T> {
         return Objects.equals(value, that.value);
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(value);
-    }
-
+//    public final String test(){
+//        return super.toString();
+//    }
+//
     @Override
     public final String toString() {
         return this.getClass().getSimpleName() + "(" + this.toString(get()) + ")";

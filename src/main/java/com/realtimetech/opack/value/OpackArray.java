@@ -7,9 +7,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 
 public final class OpackArray<E> extends OpackValue<List<E>> {
-    public static boolean isAllowArrayType(Class<?> clazz) {
-        if (clazz.isArray()) {
-            Class<?> componentType = ReflectionUtil.getArrayLastComponentType(clazz);
+    public static boolean isAllowArrayType(Class<?> typeClass) {
+        if (typeClass.isArray()) {
+            Class<?> componentType = ReflectionUtil.getArrayLastComponentType(typeClass);
 
             if (ReflectionUtil.isPrimitiveClass(componentType)) {
                 return true;

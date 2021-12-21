@@ -16,7 +16,7 @@ public class StringTransformer implements Transformer {
     }
 
     @Override
-    public Object deserialize(Opacker opacker, Object value) {
+    public Object deserialize(Opacker opacker, Class<?> goalType, Object value) {
         if (value instanceof String) {
             return ((String) value).getBytes(StandardCharsets.UTF_8);
         }

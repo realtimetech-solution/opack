@@ -37,6 +37,14 @@ public final class OpackObject<K, V> extends OpackValue<HashMap<K, V>> {
         return this.get().put(key, value);
     }
 
+    public boolean containsKey(Object object) {
+        return this.get().containsKey(object);
+    }
+
+    public boolean containsValue(Object object) {
+        return this.get().containsValue(object);
+    }
+
     public Set<K> keySet(){
         return this.get().keySet();
     }

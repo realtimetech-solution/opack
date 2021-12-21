@@ -1,9 +1,12 @@
 package com.realtimetech.opack;
 
+import com.realtimetech.opack.annotation.ExplicitType;
 import com.realtimetech.opack.compile.ClassInfo;
 import com.realtimetech.opack.compile.InfoCompiler;
 import com.realtimetech.opack.exception.*;
 import com.realtimetech.opack.transformer.Transformer;
+import com.realtimetech.opack.transformer.impl.NoWrapListTransformer;
+import com.realtimetech.opack.transformer.impl.WrapListTransformer;
 import com.realtimetech.opack.util.structure.FastStack;
 import com.realtimetech.opack.util.OpackArrayConverter;
 import com.realtimetech.opack.util.ReflectionUtil;
@@ -14,15 +17,20 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Opacker {
     public static class Builder {
         int valueStackInitialSize;
         int contextStackInitialSize;
 
+        boolean allowListTransformWithTypeWrap;
+
         public Builder() {
             this.valueStackInitialSize = 512;
             this.contextStackInitialSize = 128;
+            this.allowListTransformWithTypeWrap = false;
         }
 
         public Builder setValueStackInitialSize(int valueStackInitialSize) {
@@ -35,7 +43,12 @@ public class Opacker {
             return this;
         }
 
-        public Opacker create() {
+        public Builder setAllowListTransformWithTypeWrap(boolean allowListTransformWithTypeWrap) {
+            this.allowListTransformWithTypeWrap = allowListTransformWithTypeWrap;
+            return this;
+        }
+
+        public Opacker create() throws InstantiationException {
             return new Opacker(this);
         }
     }
@@ -52,7 +65,7 @@ public class Opacker {
 
     @NotNull State state;
 
-    Opacker(Builder builder) {
+    Opacker(Builder builder) throws InstantiationException {
         this.infoCompiler = new InfoCompiler(this);
 
         this.objectStack = new FastStack<>(builder.contextStackInitialSize);
@@ -60,6 +73,12 @@ public class Opacker {
         this.valueStack = new FastStack<>(builder.valueStackInitialSize);
 
         this.state = State.NONE;
+
+        if (builder.allowListTransformWithTypeWrap) {
+            this.infoCompiler.registerPredefinedTransformer(List.class, WrapListTransformer.class, true);
+        } else {
+            this.infoCompiler.registerPredefinedTransformer(List.class, NoWrapListTransformer.class, true);
+        }
     }
 
     public synchronized OpackValue serialize(Object object) throws SerializeException {
@@ -80,19 +99,21 @@ public class Opacker {
         return value;
     }
 
-    Object prepareObjectSerialize(Class<?> clazz, Object object) throws SerializeException {
-        if (clazz == null || object == null) {
+    Object prepareObjectSerialize(Class<?> baseClass, Object object) throws SerializeException {
+        if (baseClass == null || object == null) {
             return null;
         }
 
         try {
-            ClassInfo classInfo = this.infoCompiler.get(clazz);
+            Class<?> firstObjectType = object.getClass();
+            ClassInfo classInfo = this.infoCompiler.get(baseClass);
 
             for (Transformer transformer : classInfo.getTransformers()) {
                 object = transformer.serialize(this, object);
             }
 
             Class<?> objectType = object.getClass();
+
             /*
                 Early stopping
              */
@@ -100,7 +121,7 @@ public class Opacker {
                 /*
                     If directly pass opack value, deep clone
                  */
-                if (object instanceof OpackValue) {
+                if (OpackValue.class.isAssignableFrom(firstObjectType)) {
                     object = ((OpackValue) object).clone();
                 }
 
@@ -131,7 +152,7 @@ public class Opacker {
 
             return opackValue;
         } catch (CompileException exception) {
-            throw new SerializeException("Can't compile " + clazz.getName() + " class information", exception);
+            throw new SerializeException("Can't compile " + baseClass.getName() + " class information", exception);
         }
     }
 
@@ -156,15 +177,14 @@ public class Opacker {
                 for (ClassInfo.FieldInfo fieldInfo : classInfo.getFields()) {
                     try {
                         Object element = fieldInfo.getField().get(object);
-                        Class<?> type = fieldInfo.getType();
+                        Class<?> fieldClass = fieldInfo.getTypeClass();
 
                         if (fieldInfo.getTransformer() != null) {
                             element = fieldInfo.getTransformer().serialize(this, element);
-                            type = element.getClass();
+                            fieldClass = element.getClass();
                         }
 
-                        Object serializedValue = this.prepareObjectSerialize(type, element);
-
+                        Object serializedValue = this.prepareObjectSerialize(fieldClass, element);
                         opackObject.put(fieldInfo.getName(), serializedValue);
                     } catch (IllegalAccessException exception) {
                         throw new SerializeException("Can't get " + fieldInfo.getName() + " field data in " + classInfo.getTargetClass().getSimpleName(), exception);
@@ -192,22 +212,22 @@ public class Opacker {
         return value;
     }
 
-    public synchronized Object prepareObjectDeserialize(Class<?> clazz, Object object) throws DeserializeException {
-        if (clazz == null || object == null) {
+    public synchronized Object prepareObjectDeserialize(Class<?> goalClass, Object object) throws DeserializeException {
+        if (goalClass == null || object == null) {
             return null;
         }
 
         try {
-            ClassInfo classInfo = this.infoCompiler.get(clazz);
+            ClassInfo classInfo = this.infoCompiler.get(goalClass);
 
             for (Transformer transformer : classInfo.getTransformers()) {
-                object = transformer.deserialize(this, object);
+                object = transformer.deserialize(this, goalClass, object);
             }
 
             /*
                 Early stopping
              */
-            if (OpackValue.isAllowType(clazz)) {
+            if (OpackValue.isAllowType(goalClass)) {
                 /*
                     If directly pass opack value, deep clone
                  */
@@ -220,12 +240,12 @@ public class Opacker {
             /*
                 Optimize algorithm for big array
              */
-            if (OpackArray.isAllowArrayType(clazz)) {
-                int dimensions = ReflectionUtil.getArrayDimension(clazz);
+            if (OpackArray.isAllowArrayType(goalClass)) {
+                int dimensions = ReflectionUtil.getArrayDimension(goalClass);
 
                 if (dimensions == 1 && object instanceof OpackArray) {
                     OpackArray opackArray = (OpackArray) object;
-                    Class<?> componentType = clazz.getComponentType();
+                    Class<?> componentType = goalClass.getComponentType();
 
                     try {
                         return OpackArrayConverter.convertToArray(componentType, opackArray);
@@ -240,11 +260,11 @@ public class Opacker {
                 OpackValue opackValue = (OpackValue) object;
                 Object targetObject;
 
-                if (clazz.isArray()) {
+                if (goalClass.isArray()) {
                     if (object instanceof OpackArray) {
                         OpackArray opackArray = (OpackArray) object;
 
-                        targetObject = Array.newInstance(clazz.getComponentType(), opackArray.length());
+                        targetObject = Array.newInstance(goalClass.getComponentType(), opackArray.length());
                     } else {
                         throw new DeserializeException("Target class is array. but, object is not OpackArray");
                     }
@@ -253,7 +273,7 @@ public class Opacker {
                         OpackObject opackObject = (OpackObject) object;
 
                         try {
-                            targetObject = ReflectionUtil.createInstanceUnsafe(clazz);
+                            targetObject = ReflectionUtil.createInstanceUnsafe(goalClass);
                         } catch (InvocationTargetException | IllegalAccessException | InstantiationException exception) {
                             throw new DeserializeException("Can't create instance using unsafe method", exception);
                         }
@@ -267,13 +287,13 @@ public class Opacker {
                 this.classInfoStack.push(classInfo);
 
                 return targetObject;
-            } else if (object.getClass() == clazz) {
+            } else if (object.getClass() == goalClass) {
                 return object;
             } else {
                 throw new DeserializeException("Found object, stack corruption");
             }
         } catch (CompileException exception) {
-            throw new DeserializeException("Can't compile " + clazz.getName() + " class information", exception);
+            throw new DeserializeException("Can't compile " + goalClass.getName() + " class information", exception);
         }
     }
 
@@ -299,16 +319,16 @@ public class Opacker {
                 for (ClassInfo.FieldInfo fieldInfo : classInfo.getFields()) {
                     try {
                         Object element = opackObject.get(fieldInfo.getField().getName());
-                        Class<?> type = fieldInfo.getType();
-                        Class<?> fieldType = fieldInfo.getField().getType();
+                        Class<?> fieldClass = fieldInfo.getTypeClass();
+                        Class<?> actualFieldClass = fieldInfo.getField().getType();
 
                         if (fieldInfo.getTransformer() != null) {
-                            element = fieldInfo.getTransformer().deserialize(this, element);
+                            element = fieldInfo.getTransformer().deserialize(this, actualFieldClass, element);
                         }
 
-                        Object deserializedValue = this.prepareObjectDeserialize(type, element);
+                        Object deserializedValue = this.prepareObjectDeserialize(fieldClass, element);
 
-                        fieldInfo.getField().set(object, ReflectionUtil.cast(fieldType, deserializedValue));
+                        fieldInfo.getField().set(object, ReflectionUtil.cast(actualFieldClass, deserializedValue));
                     } catch (IllegalAccessException exception) {
                         throw new DeserializeException("Can't set " + fieldInfo.getName() + " field in " + classInfo.getTargetClass().getSimpleName(), exception);
                     } catch (IllegalArgumentException exception) {
@@ -320,6 +340,30 @@ public class Opacker {
                     }
                 }
             }
+        }
+    }
+
+    static class Test {
+        @ExplicitType(type = ArrayList.class)
+        private List<TinyTest> list;
+
+        public Test() {
+            this.list = new ArrayList<>();
+        }
+
+        public List<TinyTest> getList() {
+            return list;
+        }
+    }
+    static class TinyTest {
+        private int a;
+
+        public TinyTest(int a) {
+            this.a = a;
+        }
+
+        public int getA() {
+            return a;
         }
     }
 }

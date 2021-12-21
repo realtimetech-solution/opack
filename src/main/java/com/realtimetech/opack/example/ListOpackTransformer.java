@@ -14,7 +14,7 @@ public class ListOpackTransformer implements Transformer {
     }
 
     @Override
-    public Object deserialize(Opacker opacker, Object value) {
+    public Object deserialize(Opacker opacker, Class<?> goalType, Object value) {
         return null;
     }
 }
