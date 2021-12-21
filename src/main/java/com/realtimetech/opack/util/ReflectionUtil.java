@@ -276,8 +276,8 @@ public class ReflectionUtil {
         return lastClass;
     }
 
-    public static @NotNull boolean isWrapperClass(Class<?> typeClass) {
-        return WRAPPERS_PRIMITIVES_MAP.containsKey(typeClass);
+    public static @NotNull boolean isWrapperClass(Class<?> clazz) {
+        return WRAPPERS_PRIMITIVES_MAP.containsKey(clazz);
     }
 
     public static @NotNull Class<?> getPrimitiveClassOfWrapperClass(@NotNull Class<?> wrapperClass) {
@@ -290,8 +290,8 @@ public class ReflectionUtil {
         return primitiveClass;
     }
 
-    public static @NotNull boolean isPrimitiveClass(Class<?> typeClass) {
-        return PRIMITIVES_WRAPPERS_MAP.containsKey(typeClass);
+    public static @NotNull boolean isPrimitiveClass(Class<?> clazz) {
+        return PRIMITIVES_WRAPPERS_MAP.containsKey(clazz);
     }
 
     public static @NotNull Class<?> getWrapperClassOfPrimitiveClass(@NotNull Class<?> primitiveClass) {

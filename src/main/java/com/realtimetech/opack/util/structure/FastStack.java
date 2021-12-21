@@ -70,13 +70,13 @@ public class FastStack<T> {
         return this.objects[index];
     }
 
-    public @NotNull void swap(int index1, int index2) {
+    public void swap(int index1, int index2) {
         T temp = this.objects[index1];
         this.objects[index1] = this.objects[index2];
         this.objects[index2] = temp;
     }
 
-    public @NotNull void reverse(int start, int end) {
+    public void reverse(int start, int end) {
         int length = (end - start + 1) / 2;
         for (int index = 0; index < length; index++) {
             T temp = this.objects[start + index];

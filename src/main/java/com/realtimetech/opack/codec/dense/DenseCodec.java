@@ -91,7 +91,6 @@ public class DenseCodec extends OpackCodec<byte[]> {
         this.byte8Buffer = new byte[8];
         this.byte4Buffer = new byte[4];
         this.byte2Buffer = new byte[2];
-
     }
 
     @Override
@@ -215,7 +214,7 @@ public class DenseCodec extends OpackCodec<byte[]> {
                         }
                     }
                 } catch (InvocationTargetException | IllegalAccessException e) {
-                    throw new IllegalStateException("Can't access OpackArray native list object.");
+                    throw new IllegalStateException("Failed to access the OpackArray native list object.");
                 }
             } else {
                 if (objectClass == boolean.class) {
@@ -266,7 +265,7 @@ public class DenseCodec extends OpackCodec<byte[]> {
                     encodeByteArrayStream.write(byte4Buffer);
                     encodeByteArrayStream.write(bytes);
                 } else {
-                    throw new IllegalArgumentException("Unknown literal object type.");
+                    throw new IllegalArgumentException(type + " is not allowed in dense format. (unknown literal object type)");
                 }
             }
         }
@@ -390,12 +389,12 @@ public class DenseCodec extends OpackCodec<byte[]> {
                     byteBuffer.position(0);
                     return OpackArray.createWithArrayObject(array);
                 } else {
-                    throw new IllegalStateException("Unknown native type, got " + nativeType);
+                    throw new IllegalStateException(nativeType + " is not allowed in dense format. (unknown native type)");
                 }
             }
         }
 
-        throw new IllegalStateException("Unknown block header binary, got " + b);
+        throw new IllegalStateException(b + " is not registered block header binary in dense codec. (unknown block header)");
     }
 
     @Override
@@ -469,7 +468,7 @@ public class DenseCodec extends OpackCodec<byte[]> {
                     }
                 }
             } else {
-                throw new IllegalArgumentException("Unknown opack value type. got " + opackValue.getClass());
+                throw new IllegalArgumentException(opackValue.getClass() +" is not a type of opack value. (Unknown opack value type)");
             }
 
             if (!bypass) {

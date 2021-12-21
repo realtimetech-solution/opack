@@ -328,7 +328,7 @@ public class Opacker {
 
                         Object deserializedValue = this.prepareObjectDeserialize(fieldClass, element);
 
-                        fieldInfo.getField().set(object, ReflectionUtil.cast(actualFieldClass, deserializedValue));
+                        fieldInfo.getField().set(object, ReflectionUtil.cast(fieldType, deserializedValue));
                     } catch (IllegalAccessException exception) {
                         throw new DeserializeException("Can't set " + fieldInfo.getName() + " field in " + classInfo.getTargetClass().getSimpleName(), exception);
                     } catch (IllegalArgumentException exception) {

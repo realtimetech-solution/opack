@@ -175,8 +175,8 @@ public final class JsonCodec extends OpackCodec<String> {
 
             stringWriter.write(CONST_STRING_CLOSE_CHARACTER);
         } else {
-            if (!OpackValue.isAllowType(objectClass)) {
-                throw new IllegalArgumentException(objectClass + " is not allow to json encode.");
+            if (!OpackValue.isAllowType(type)) {
+                throw new IllegalArgumentException(type + " is not allow to json encode.");
             }
 
             Class<?> numberType = objectClass;
@@ -410,7 +410,7 @@ public final class JsonCodec extends OpackCodec<String> {
                                     throw new IOException("There is a colon without a key. at " + pointer + "(" + currentChar + ")");
                                 }
                             }
-                            if (objectClass == OpackArray.class) {
+                            if (type == OpackArray.class) {
                                 throw new IOException("Array type cannot contain colons. at " + pointer + "(" + currentChar + ")");
                             }
 
