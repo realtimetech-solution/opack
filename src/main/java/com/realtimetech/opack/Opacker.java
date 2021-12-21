@@ -309,14 +309,8 @@ public class Opacker {
                         Object deserializedValue = this.prepareObjectDeserialize(type, element);
 
                         fieldInfo.getField().set(object, ReflectionUtil.cast(fieldType, deserializedValue));
-                    } catch (IllegalAccessException exception) {
+                    } catch (IllegalAccessException | IllegalArgumentException exception) {
                         throw new DeserializeException("Can't set " + fieldInfo.getName() + " field in " + classInfo.getTargetClass().getSimpleName(), exception);
-                    } catch (IllegalArgumentException exception) {
-                        //Exception in thread "main" java.lang.IllegalArgumentException: Can not set static int field com.realtimetech.opack.util.ReflectionUtil.a to java.lang.Long
-                        //	at java.base/jdk.internal.reflect.UnsafeFieldAccessorImpl.throwSetIllegalArgumentException(UnsafeFieldAccessorImpl.java:167)
-                        //	at java.base/jdk.internal.reflect.UnsafeFieldAccessorImpl.throwSetIllegalArgumentException(UnsafeFieldAccessorImpl.java:171)
-                        //	at java.base/jdk.internal.reflect.UnsafeStaticIntegerFieldAccessorImpl.set(UnsafeStaticIntegerFieldAccessorImpl.java:96)
-                        throw new DeserializeException(exception);
                     }
                 }
             }
