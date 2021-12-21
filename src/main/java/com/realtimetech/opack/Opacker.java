@@ -21,8 +21,30 @@ import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 
 public class Opacker {
+//        this.objectStack = new FastStack<>();
+//        this.valueStack = new FastStack<>();
+//        this.classInfoStack = new FastStack<>();
     public static class Builder {
+        boolean allowOpackValueToKeyValue;
+        boolean prettyFormat;
 
+        int valueStackInitialSize;
+        int encodeStringBufferSize;
+        int decodeStackInitialSize;
+
+        public Builder() {
+            this.allowOpackValueToKeyValue = false;
+            this.prettyFormat = false;
+
+            this.encodeStringBufferSize = 1024 * 4;
+//            this.encodeStackInitialSize = 128;
+            this.decodeStackInitialSize = 128;
+        }
+
+
+        public Opacker create() {
+            return new Opacker(this);
+        }
     }
 
     public enum State {
@@ -37,7 +59,7 @@ public class Opacker {
 
     @NotNull State state;
 
-    Opacker() {
+    Opacker(Builder builder) {
         this.infoCompiler = new InfoCompiler(this);
 
         this.objectStack = new FastStack<>();

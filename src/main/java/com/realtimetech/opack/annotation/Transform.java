@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
         ElementType.TYPE,
         ElementType.FIELD,
 })
-public @interface Transform {
+public @interface   Transform {
     @NotNull Class<? extends Transformer> transformer();
 
     @NotNull boolean inheritable() default false;

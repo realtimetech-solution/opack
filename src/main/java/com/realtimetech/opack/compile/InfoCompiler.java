@@ -22,6 +22,7 @@ public class InfoCompiler {
     final @NotNull TransformerFactory transformerFactory;
 
     final @NotNull HashMap<Class<?>, ClassInfo> classInfoMap;
+    final @NotNull HashMap<Class<?>, List<PredefinedTransformer>> predefinedTransformerMap;
 
     public InfoCompiler(@NotNull Opacker opacker) {
         this.opacker = opacker;
@@ -29,6 +30,49 @@ public class InfoCompiler {
         this.transformerFactory = new TransformerFactory(opacker);
 
         this.classInfoMap = new HashMap<>();
+        this.predefinedTransformerMap = new HashMap<>();
+    }
+
+    public PredefinedTransformer[] getPredefinedTransformers(Class<?> classType) {
+        List<PredefinedTransformer> predefinedTransformers = this.predefinedTransformerMap.get(classType);
+
+        if (predefinedTransformers == null) {
+            return new PredefinedTransformer[0];
+        }
+
+        return predefinedTransformers.toArray(new PredefinedTransformer[predefinedTransformers.size()]);
+    }
+
+    public boolean registerPredefinedTransformer(Class<?> classType, PredefinedTransformer predefinedTransformer) {
+        if (!this.predefinedTransformerMap.containsKey(classType)) {
+            this.predefinedTransformerMap.put(classType, new LinkedList<>());
+        }
+
+        List<PredefinedTransformer> predefinedTransformers = this.predefinedTransformerMap.get(classType);
+
+        if (predefinedTransformers.contains(predefinedTransformer)) {
+            return false;
+        }
+
+        predefinedTransformers.add(predefinedTransformer);
+
+        return true;
+    }
+
+    public boolean unregisterPredefinedTransformer(Class<?> classType, PredefinedTransformer predefinedTransformer) {
+        List<PredefinedTransformer> predefinedTransformers = this.predefinedTransformerMap.get(classType);
+
+        if (predefinedTransformers == null) {
+            return false;
+        }
+
+        if (!predefinedTransformers.contains(predefinedTransformer)) {
+            return false;
+        }
+
+        predefinedTransformers.remove(predefinedTransformer);
+
+        return true;
     }
 
     void addTransformer(List<Transformer> transformers, AnnotatedElement annotatedElement, boolean root) throws CompileException {
@@ -42,6 +86,22 @@ public class InfoCompiler {
 
             for (Class<?> interfaceClass : clazz.getInterfaces()) {
                 this.addTransformer(transformers, interfaceClass, false);
+            }
+        }
+
+        if (annotatedElement instanceof Class) {
+            Class<?> clazz = (Class<?>) annotatedElement;
+
+            if (this.predefinedTransformerMap.containsKey(clazz)) {
+                List<PredefinedTransformer> predefinedTransformers = this.predefinedTransformerMap.get(clazz);
+
+                if (predefinedTransformers != null) {
+                    for (PredefinedTransformer predefinedTransformer : predefinedTransformers) {
+                        if (root || predefinedTransformer.isInheritable()) {
+                            transformers.add(predefinedTransformer.getTransformer());
+                        }
+                    }
+                }
             }
         }
 
