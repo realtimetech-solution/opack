@@ -265,7 +265,7 @@ public class DenseCodec extends OpackCodec<byte[]> {
                     encodeByteArrayStream.write(byte4Buffer);
                     encodeByteArrayStream.write(bytes);
                 } else {
-                    throw new IllegalArgumentException(type + " is not allowed in dense format. (unknown literal object type)");
+                    throw new IllegalArgumentException(objectClass + " is not allowed in dense format. (unknown literal object type)");
                 }
             }
         }

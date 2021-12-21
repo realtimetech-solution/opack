@@ -323,12 +323,12 @@ public class Opacker {
                         Class<?> actualFieldClass = fieldInfo.getField().getType();
 
                         if (fieldInfo.getTransformer() != null) {
-                            element = fieldInfo.getTransformer().deserialize(this, actualFieldClass, element);
+                            element = fieldInfo.getTransformer().deserialize(this, fieldClass, element);
                         }
 
                         Object deserializedValue = this.prepareObjectDeserialize(fieldClass, element);
 
-                        fieldInfo.getField().set(object, ReflectionUtil.cast(fieldType, deserializedValue));
+                        fieldInfo.getField().set(object, ReflectionUtil.cast(actualFieldClass, deserializedValue));
                     } catch (IllegalAccessException exception) {
                         throw new DeserializeException("Can't set " + fieldInfo.getName() + " field in " + classInfo.getTargetClass().getSimpleName(), exception);
                     } catch (IllegalArgumentException exception) {
@@ -340,30 +340,6 @@ public class Opacker {
                     }
                 }
             }
-        }
-    }
-
-    static class Test {
-        @ExplicitType(type = ArrayList.class)
-        private List<TinyTest> list;
-
-        public Test() {
-            this.list = new ArrayList<>();
-        }
-
-        public List<TinyTest> getList() {
-            return list;
-        }
-    }
-    static class TinyTest {
-        private int a;
-
-        public TinyTest(int a) {
-            this.a = a;
-        }
-
-        public int getA() {
-            return a;
         }
     }
 }
