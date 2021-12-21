@@ -1,10 +1,7 @@
 package com.realtimetech.opack;
 
-import com.realtimetech.opack.codec.dense.DenseCodec;
-import com.realtimetech.opack.codec.json.JsonCodec;
 import com.realtimetech.opack.compile.ClassInfo;
 import com.realtimetech.opack.compile.InfoCompiler;
-import com.realtimetech.opack.example.Example;
 import com.realtimetech.opack.exception.*;
 import com.realtimetech.opack.transformer.Transformer;
 import com.realtimetech.opack.util.structure.FastStack;
@@ -15,31 +12,28 @@ import com.realtimetech.opack.value.OpackObject;
 import com.realtimetech.opack.value.OpackValue;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 
 public class Opacker {
-//        this.objectStack = new FastStack<>();
-//        this.valueStack = new FastStack<>();
-//        this.classInfoStack = new FastStack<>();
     public static class Builder {
-        boolean allowOpackValueToKeyValue;
-        boolean prettyFormat;
-
         int valueStackInitialSize;
-        int encodeStringBufferSize;
-        int decodeStackInitialSize;
+        int contextStackInitialSize;
 
         public Builder() {
-            this.allowOpackValueToKeyValue = false;
-            this.prettyFormat = false;
-
-            this.encodeStringBufferSize = 1024 * 4;
-//            this.encodeStackInitialSize = 128;
-            this.decodeStackInitialSize = 128;
+            this.valueStackInitialSize = 512;
+            this.contextStackInitialSize = 128;
         }
 
+        public Builder setValueStackInitialSize(int valueStackInitialSize) {
+            this.valueStackInitialSize = valueStackInitialSize;
+            return this;
+        }
+
+        public Builder setContextStackInitialSize(int contextStackInitialSize) {
+            this.contextStackInitialSize = contextStackInitialSize;
+            return this;
+        }
 
         public Opacker create() {
             return new Opacker(this);
@@ -53,17 +47,17 @@ public class Opacker {
     final @NotNull InfoCompiler infoCompiler;
 
     final @NotNull FastStack<Object> objectStack;
-    final @NotNull FastStack<OpackValue> valueStack;
     final @NotNull FastStack<ClassInfo> classInfoStack;
+    final @NotNull FastStack<OpackValue> valueStack;
 
     @NotNull State state;
 
     Opacker(Builder builder) {
         this.infoCompiler = new InfoCompiler(this);
 
-        this.objectStack = new FastStack<>();
-        this.valueStack = new FastStack<>();
-        this.classInfoStack = new FastStack<>();
+        this.objectStack = new FastStack<>(builder.contextStackInitialSize);
+        this.classInfoStack = new FastStack<>(builder.contextStackInitialSize);
+        this.valueStack = new FastStack<>(builder.valueStackInitialSize);
 
         this.state = State.NONE;
     }

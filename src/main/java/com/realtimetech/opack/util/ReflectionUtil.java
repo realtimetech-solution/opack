@@ -26,8 +26,6 @@ public class ReflectionUtil {
 
             put(double.class, Double.class);
             put(long.class, Long.class);
-
-            put(void.class, Void.class);
         }
     });
     static final Map<Class<?>, Class<?>> WRAPPERS_PRIMITIVES_MAP = Collections.unmodifiableMap(new HashMap<Class<?>, Class<?>>() {

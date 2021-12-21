@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.EmptyStackException;
 
 public class FastStack<T> {
-    private int raiseSize;
+    private int blockSize;
 
     private T[] objects;
 
@@ -20,21 +20,21 @@ public class FastStack<T> {
         this(10);
     }
 
-    public FastStack(int raiseSize) {
-        this.raiseSize = raiseSize;
+    public FastStack(int blockSize) {
+        this.blockSize = blockSize;
         this.currentIndex = -1;
         this.startIndex = 0;
         this.scope = 0;
 
-        this.raiseArrays();
+        this.growArray();
     }
 
-    private void raiseArrays() {
+    private void growArray() {
         this.scope++;
 
         T[] oldObjects = this.objects;
 
-        this.currentSize = this.scope * this.raiseSize;
+        this.currentSize = this.scope * this.blockSize;
         this.objects = (T[]) new Object[this.currentSize];
 
         if (oldObjects != null) {
@@ -46,7 +46,7 @@ public class FastStack<T> {
 
     public @NotNull T push(@NotNull T object) {
         if (this.currentIndex + 2 >= this.currentSize) {
-            raiseArrays();
+            growArray();
         }
 
         this.currentIndex++;

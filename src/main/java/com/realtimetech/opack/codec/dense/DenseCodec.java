@@ -1,7 +1,6 @@
 package com.realtimetech.opack.codec.dense;
 
 import com.realtimetech.opack.codec.OpackCodec;
-import com.realtimetech.opack.codec.json.JsonCodec;
 import com.realtimetech.opack.util.OpackArrayConverter;
 import com.realtimetech.opack.util.ReflectionUtil;
 import com.realtimetech.opack.util.structure.FastStack;
@@ -27,12 +26,12 @@ public class DenseCodec extends OpackCodec<byte[]> {
             this.decodeStackInitialSize = 128;
         }
 
-        public DenseCodec.Builder setEncodeStackInitialSize(int encodeStackInitialSize) {
+        public Builder setEncodeStackInitialSize(int encodeStackInitialSize) {
             this.encodeStackInitialSize = encodeStackInitialSize;
             return this;
         }
 
-        public DenseCodec.Builder setDecodeStackInitialSize(int decodeStackInitialSize) {
+        public Builder setDecodeStackInitialSize(int decodeStackInitialSize) {
             this.decodeStackInitialSize = decodeStackInitialSize;
             return this;
         }
@@ -53,7 +52,7 @@ public class DenseCodec extends OpackCodec<byte[]> {
     private static final byte CONST_TYPE_FLOAT = 0x15;
     private static final byte CONST_TYPE_LONG = 0x16;
     private static final byte CONST_TYPE_DOUBLE = 0x17;
-    private static final byte CONST_TYPE_VOID_NULL = 0x18;
+    private static final byte CONST_TYPE_NULL = 0x18;
     private static final byte CONST_TYPE_STRING = 0x19;
 
     private static final byte CONST_BYTE_NATIVE_ARRAY = 0x21;
@@ -104,8 +103,7 @@ public class DenseCodec extends OpackCodec<byte[]> {
             Object object = this.encodeStack.pop();
 
             if (object == null) {
-                this.encodeByteArrayStream.write(CONST_TYPE_VOID_NULL);
-                this.encodeByteArrayStream.write(0);
+                this.encodeByteArrayStream.write(CONST_TYPE_NULL);
                 continue;
             }
 
@@ -259,9 +257,6 @@ public class DenseCodec extends OpackCodec<byte[]> {
 
                     ByteBuffer.wrap(byte8Buffer).putDouble(value);
                     encodeByteArrayStream.write(byte8Buffer);
-                } else if (type == void.class) {
-                    encodeByteArrayStream.write(CONST_TYPE_VOID_NULL);
-                    encodeByteArrayStream.write(1);
                 } else if (type == String.class) {
                     encodeByteArrayStream.write(CONST_TYPE_STRING);
                     String value = (String) object;
@@ -309,8 +304,7 @@ public class DenseCodec extends OpackCodec<byte[]> {
             double value = byteBuffer.getDouble(decodePointer);
             decodePointer += 8;
             return value;
-        } else if (b == CONST_TYPE_VOID_NULL) {
-            byte bool = data[decodePointer++];
+        } else if (b == CONST_TYPE_NULL) {
             return null;
         } else if (b == CONST_TYPE_STRING) {
             int length = byteBuffer.getInt(decodePointer);
