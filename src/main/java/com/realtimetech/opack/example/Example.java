@@ -10,9 +10,7 @@ import com.realtimetech.opack.value.OpackValue;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 public class Example {
     public String validationObject(Example collectObject) throws IllegalArgumentException, IllegalAccessException {
@@ -159,11 +157,10 @@ public class Example {
     private OpackArray[] opackArrayArray;
 
 
-//        @ExplicitType(type = ArrayList.class)
-//        public List<String> stringLinkedList;
+    @ExplicitType(type = ArrayList.class)
+    public List<String> stringArrayList;
 
-//        @Transform(transformer = ListOpackTransformer.class)
-//        public List<OpackValue> stringLinkedList;
+    public LinkedList<DataObject> objectLinkedList;
 
 
     public Example() {
@@ -206,9 +203,9 @@ public class Example {
             }
         }
 
-        bigByteArray = new byte[1024 * 1024];
+        bigByteArray = new byte[1];
         RANDOM.nextBytes(bigByteArray);
-        bigByteArrayArray = new byte[1024][];
+        bigByteArrayArray = new byte[1][];
         for(int i = 0; i < bigByteArrayArray.length; i++){
             bigByteArrayArray[i] = new byte[RANDOM.nextInt(512) + 512];
             RANDOM.nextBytes(bigByteArrayArray[i]);
@@ -255,6 +252,15 @@ public class Example {
             opackArrayArray[i] = new OpackArray();
             opackArrayArray[i].add(i);
         }
+
+        stringArrayList = new ArrayList<>();
+        stringArrayList.add("A");
+        stringArrayList.add("B");
+        stringArrayList.add("C");
+
+        objectLinkedList = new LinkedList<>();
+        objectLinkedList.add(new DataObject());
+        objectLinkedList.add(new DataObject());
     }
 
     public String getStringValue() {
@@ -319,5 +325,17 @@ public class Example {
 
     public OpackArray[] getOpackArrayArray() {
         return opackArrayArray;
+    }
+
+    public byte[][] getBigByteArrayArray() {
+        return bigByteArrayArray;
+    }
+
+    public List<String> getStringArrayList() {
+        return stringArrayList;
+    }
+
+    public LinkedList<DataObject> getObjectLinkedList() {
+        return objectLinkedList;
     }
 }

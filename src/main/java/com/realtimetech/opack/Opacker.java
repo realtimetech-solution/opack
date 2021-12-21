@@ -1,8 +1,10 @@
 package com.realtimetech.opack;
 
-import com.realtimetech.opack.annotation.ExplicitType;
+import com.realtimetech.opack.codec.dense.DenseCodec;
+import com.realtimetech.opack.codec.json.JsonCodec;
 import com.realtimetech.opack.compile.ClassInfo;
 import com.realtimetech.opack.compile.InfoCompiler;
+import com.realtimetech.opack.example.Example;
 import com.realtimetech.opack.exception.*;
 import com.realtimetech.opack.transformer.Transformer;
 import com.realtimetech.opack.transformer.impl.NoWrapListTransformer;
@@ -15,9 +17,9 @@ import com.realtimetech.opack.value.OpackObject;
 import com.realtimetech.opack.value.OpackValue;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class Opacker {
@@ -176,7 +178,7 @@ public class Opacker {
                 OpackObject opackObject = (OpackObject) opackValue;
                 for (ClassInfo.FieldInfo fieldInfo : classInfo.getFields()) {
                     try {
-                        Object element = fieldInfo.getField().get(object);
+                        Object element = fieldInfo.get(object);
                         Class<?> fieldClass = fieldInfo.getTypeClass();
 
                         if (fieldInfo.getTransformer() != null) {
@@ -328,7 +330,7 @@ public class Opacker {
 
                         Object deserializedValue = this.prepareObjectDeserialize(fieldClass, element);
 
-                        fieldInfo.getField().set(object, ReflectionUtil.cast(actualFieldClass, deserializedValue));
+                        fieldInfo.set(object, ReflectionUtil.cast(actualFieldClass, deserializedValue));
                     } catch (IllegalAccessException exception) {
                         throw new DeserializeException("Can't set " + fieldInfo.getName() + " field in " + classInfo.getTargetClass().getSimpleName(), exception);
                     } catch (IllegalArgumentException exception) {
@@ -341,5 +343,39 @@ public class Opacker {
                 }
             }
         }
+    }
+
+    public static void main(String[] args) throws SerializeException, DeserializeException, IllegalAccessException, InterruptedException, IOException, EncodeException, DecodeException, InstantiationException {
+//                Thread.sleep(1024 * 12);
+
+        Opacker opacker = new Opacker.Builder().setAllowListTransformWithTypeWrap(true).create();
+        JsonCodec jsonCodec = new JsonCodec.Builder().create();
+        DenseCodec denseCodec = new DenseCodec.Builder().create();
+        Example originalExample = new Example();
+        long exampleSize = opacker.serialize(originalExample).toString().length();
+
+//        String jsonString = jsonCodec.encode(opacker.serialize(originalExample));
+//        long size = 0;
+//        long start = System.currentTimeMillis();
+//        for (int i = 0; i < 12; i++) {
+//            OpackValue serializedExample = opacker.serialize(originalExample);
+//            byte[] bytes = denseCodec.encode(serializedExample);
+//            size += exampleSize;
+//            OpackValue decodedValue = denseCodec.decode(bytes);
+//            Example deserializedExample = opacker.deserialize(Example.class, decodedValue);
+//        }
+//        long end = System.currentTimeMillis();
+//        float speed = (float)size / (float)(end - start);
+//        System.out.println(((speed * 1000) / 1024 / 1024) + "mb/s");
+
+        OpackValue serializedExample = opacker.serialize(originalExample);
+        String bytes = jsonCodec.encode(serializedExample);
+        OpackValue decodedValue = jsonCodec.decode(bytes);
+        Example deserializedExample = opacker.deserialize(Example.class, decodedValue);
+
+        String bool = originalExample.validationObject(deserializedExample);
+        if (bool != null)
+            System.out.println("Wrong " + bool);
+
     }
 }
