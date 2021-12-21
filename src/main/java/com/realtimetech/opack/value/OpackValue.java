@@ -45,6 +45,11 @@ public abstract class OpackValue<T> {
     abstract String toString(T value);
 
     @Override
+    public int hashCode() {
+        return value.hashCode();
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -52,10 +57,6 @@ public abstract class OpackValue<T> {
         return Objects.equals(value, that.value);
     }
 
-//    public final String test(){
-//        return super.toString();
-//    }
-//
     @Override
     public final String toString() {
         return this.getClass().getSimpleName() + "(" + this.toString(get()) + ")";
