@@ -468,7 +468,7 @@ public class DenseCodec extends OpackCodec<byte[]> {
                     }
                 }
             } else {
-                throw new IllegalArgumentException(opackValue.getClass() +" is not a type of opack value. (Unknown opack value type)");
+                throw new IllegalArgumentException(opackValue.getClass() +" is not a type of opack value. (unknown opack value type)");
             }
 
             if (!bypass) {

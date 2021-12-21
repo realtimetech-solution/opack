@@ -276,7 +276,7 @@ public class ReflectionUtil {
         return lastClass;
     }
 
-    public static @NotNull boolean isWrapperClass(Class<?> clazz) {
+    public static boolean isWrapperClass(Class<?> clazz) {
         return WRAPPERS_PRIMITIVES_MAP.containsKey(clazz);
     }
 
@@ -290,7 +290,7 @@ public class ReflectionUtil {
         return primitiveClass;
     }
 
-    public static @NotNull boolean isPrimitiveClass(Class<?> clazz) {
+    public static boolean isPrimitiveClass(Class<?> clazz) {
         return PRIMITIVES_WRAPPERS_MAP.containsKey(clazz);
     }
 
