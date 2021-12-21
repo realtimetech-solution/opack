@@ -176,7 +176,7 @@ public final class JsonCodec extends OpackCodec<String> {
             stringWriter.write(CONST_STRING_CLOSE_CHARACTER);
         } else {
             if (!OpackValue.isAllowType(objectClass)) {
-                throw new IllegalArgumentException(objectClass + " is not allow to json encode.");
+                throw new IllegalArgumentException(objectClass + " is not allowed in json format.");
             }
 
             Class<?> numberType = objectClass;
@@ -189,12 +189,12 @@ public final class JsonCodec extends OpackCodec<String> {
             if (numberType == Double.class) {
                 Double doubleValue = (Double) object;
                 if (Double.isNaN(doubleValue) || Double.isInfinite(doubleValue) || !Double.isFinite(doubleValue)) {
-                    throw new ArithmeticException("Json format allow only finite value.");
+                    throw new ArithmeticException("Only finite values are allowed in json format.");
                 }
             } else if (numberType == Float.class) {
                 Float floatValue = (Float) object;
                 if (Float.isNaN(floatValue) || Float.isInfinite(floatValue) || !Float.isFinite(floatValue)) {
-                    throw new ArithmeticException("Json format allow only finite value.");
+                    throw new ArithmeticException("Only finite values are allowed in json format.");
                 }
             }
 
@@ -259,7 +259,7 @@ public final class JsonCodec extends OpackCodec<String> {
                     }
 
                     if (!this.allowOpackValueToKeyValue && key instanceof OpackValue) {
-                        throw new IllegalArgumentException("Json not allow object type key.");
+                        throw new IllegalArgumentException("Object type keys are not allowed in json format.");
                     }
 
                     if (this.prettyFormat) {
@@ -375,7 +375,7 @@ public final class JsonCodec extends OpackCodec<String> {
                 case '}':
                 case ']': {
                     if (this.decodeValueStack.getSize() - 1 != this.decodeBaseStack.peek()) {
-                        throw new IOException("Expected literal value but got close syntax character at " + pointer + "(" + currentChar + ")");
+                        throw new IOException("Expected literal value, but got close syntax character at " + pointer + "(" + currentChar + ")");
                     }
 
                     this.decodeBaseStack.pop();
@@ -386,7 +386,7 @@ public final class JsonCodec extends OpackCodec<String> {
                 case ',':
                 case ':': {
                     if (literalMode) {
-                        throw new IOException("Expected literal value but got syntax character at " + pointer + "(" + currentChar + ")");
+                        throw new IOException("Expected literal value, but got syntax character at " + pointer + "(" + currentChar + ")");
                     }
 
                     int baseIndex = this.decodeBaseStack.peek();
@@ -398,7 +398,7 @@ public final class JsonCodec extends OpackCodec<String> {
                         case ',': {
                             if (objectClass == OpackObject.class) {
                                 if (valueSize != 0) {
-                                    throw new IOException("There must be a pair of Key and Value. at " + pointer + "(" + currentChar + ")");
+                                    throw new IOException("The map type cannot contain items that do not exist. at " + pointer + "(" + currentChar + ")");
                                 }
                             }
 
@@ -407,11 +407,11 @@ public final class JsonCodec extends OpackCodec<String> {
                         case ':': {
                             if (objectClass == OpackObject.class) {
                                 if (valueSize != 1) {
-                                    throw new IOException("There is a colon without a key. at " + pointer + "(" + currentChar + ")");
+                                    throw new IOException("The map item must have a key. at " + pointer + "(" + currentChar + ")");
                                 }
                             }
                             if (objectClass == OpackArray.class) {
-                                throw new IOException("Array type cannot contain colons. at " + pointer + "(" + currentChar + ")");
+                                throw new IOException("The array type cannot contain colons. at " + pointer + "(" + currentChar + ")");
                             }
 
                             break;
