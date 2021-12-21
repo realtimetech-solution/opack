@@ -170,7 +170,7 @@ public class Opacker {
 
                 for (int index = 0; index < length; index++) {
                     Object element = ReflectionUtil.getArrayItem(object, index);
-                    Object serializedValue = this.prepareObjectSerialize(element.getClass(), element);
+                    Object serializedValue = this.prepareObjectSerialize(element == null ? null : element.getClass(), element);
 
                     opackArray.add(serializedValue);
                 }

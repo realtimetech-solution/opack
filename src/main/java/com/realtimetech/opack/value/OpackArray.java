@@ -120,7 +120,7 @@ public final class OpackArray<E> extends OpackValue<List<E>> {
                 stringBuffer.append(',');
             }
 
-            stringBuffer.append(element.toString());
+            stringBuffer.append(element == null ? "null" : element.toString());
         }
 
         stringBuffer.append(']');

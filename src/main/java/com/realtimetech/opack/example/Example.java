@@ -165,10 +165,12 @@ public class Example {
 
     public Example() {
         stringValue = "Hello, World";
-        stringArray = new String[10];
+        stringArray = new String[11];
         for(int i = 0; i < stringArray.length; i++){
             stringArray[i] = "stringArray, " + i;
         }
+        stringArray[5] = null;
+
         stringArrayArray = new String[RANDOM.nextInt(10) + 2][];
         for(int i = 0; i < stringArrayArray.length; i++){
             stringArrayArray[i] = new String[RANDOM.nextInt(10) + 2];
