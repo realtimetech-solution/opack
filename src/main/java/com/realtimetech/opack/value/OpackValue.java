@@ -40,7 +40,7 @@ public abstract class OpackValue<T> {
                 (OpackValue.class.isAssignableFrom(typeClass));
     }
 
-    private T value;
+    private volatile T value;
 
     abstract T createLazyValue();
 
@@ -62,7 +62,7 @@ public abstract class OpackValue<T> {
         }
     }
 
-    public abstract OpackValue clone();
+    public abstract OpackValue<T> clone();
 
     abstract String toString(T value);
 

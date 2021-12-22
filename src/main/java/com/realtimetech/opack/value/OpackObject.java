@@ -22,8 +22,6 @@
 
 package com.realtimetech.opack.value;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Set;
@@ -45,11 +43,11 @@ public final class OpackObject<K, V> extends OpackValue<HashMap<K, V>> {
         return this.get().size();
     }
 
-    public V get(@NotNull K key) {
+    public V get(K key) {
         return this.get().get(key);
     }
 
-    public V put(@NotNull K key, @NotNull V value) {
+    public V put(K key, V value) {
         if (key != null)
             OpackValue.assertAllowType(key.getClass());
 
@@ -67,11 +65,11 @@ public final class OpackObject<K, V> extends OpackValue<HashMap<K, V>> {
         return this.get().containsValue(object);
     }
 
-    public Set<K> keySet(){
+    public Set<K> keySet() {
         return this.get().keySet();
     }
 
-    public Collection<V> values(){
+    public Collection<V> values() {
         return this.get().values();
     }
 
@@ -81,18 +79,18 @@ public final class OpackObject<K, V> extends OpackValue<HashMap<K, V>> {
     }
 
     @Override
-    public OpackValue clone() {
-        OpackObject<K, V> opackObject = new OpackObject<K, V>(this.size());
+    public OpackObject<K, V> clone() {
+        OpackObject<K, V> opackObject = new OpackObject<>(this.size());
 
         for (K key : this.get().keySet()) {
             V value = this.get(key);
 
             if (key instanceof OpackValue) {
-                key = (K) ((OpackValue) key).clone();
+                key = (K) ((OpackValue<?>) key).clone();
             }
 
             if (value instanceof OpackValue) {
-                value = (V) ((OpackValue) value).clone();
+                value = (V) ((OpackValue<?>) value).clone();
             }
 
             opackObject.put(key, value);

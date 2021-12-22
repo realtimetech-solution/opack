@@ -93,7 +93,7 @@ public class DenseCodec extends OpackCodec<byte[]> {
     final FastStack<Object> encodeStack;
 
     int decodePointer;
-    final FastStack<OpackValue> decodeStack;
+    final FastStack<OpackValue<?>> decodeStack;
     final FastStack<Object[]> decodeContextStack;
 
     final byte[] byte8Buffer;
@@ -116,7 +116,7 @@ public class DenseCodec extends OpackCodec<byte[]> {
     }
 
     @Override
-    protected byte[] doEncode(OpackValue opackValue) throws IOException {
+    protected byte[] doEncode(OpackValue<?> opackValue) throws IOException {
         this.encodeStack.push(opackValue);
         this.encodeByteArrayStream.reset();
 
@@ -135,7 +135,7 @@ public class DenseCodec extends OpackCodec<byte[]> {
             }
 
             if (objectClass == OpackObject.class) {
-                OpackObject opackObject = (OpackObject) object;
+                OpackObject<Object, Object> opackObject = (OpackObject<Object, Object>) object;
                 int size = opackObject.size();
 
                 this.encodeByteArrayStream.write(CONST_TYPE_OPACK_OBJECT);
@@ -148,7 +148,7 @@ public class DenseCodec extends OpackCodec<byte[]> {
                     this.encodeStack.push(key);
                 }
             } else if (objectClass == OpackArray.class) {
-                OpackArray opackArray = (OpackArray) object;
+                OpackArray<Object> opackArray = (OpackArray<Object>) object;
                 int length = opackArray.length();
 
                 try {
@@ -340,7 +340,7 @@ public class DenseCodec extends OpackCodec<byte[]> {
         } else if (b == CONST_TYPE_OPACK_OBJECT) {
             int size = byteBuffer.getInt(decodePointer);
             decodePointer += 4;
-            OpackObject opackObject = new OpackObject<>(size);
+            OpackObject<Object, Object> opackObject = new OpackObject<>(size);
 
             decodeContextStack.push(new Object[]{size, 0, CONTEXT_NULL_OBJECT, CONTEXT_NULL_OBJECT});
             decodeStack.push(opackObject);
@@ -354,7 +354,7 @@ public class DenseCodec extends OpackCodec<byte[]> {
             decodePointer += 1;
 
             if (nativeType == CONST_NO_NATIVE_ARRAY) {
-                OpackArray opackArray = new OpackArray<>(length);
+                OpackArray<Object> opackArray = new OpackArray<>(length);
 
                 decodeContextStack.push(new Object[]{length, 0});
                 decodeStack.push(opackArray);
@@ -420,7 +420,7 @@ public class DenseCodec extends OpackCodec<byte[]> {
     }
 
     @Override
-    protected OpackValue doDecode(byte[] data) {
+    protected OpackValue<?> doDecode(byte[] data) {
         ByteBuffer byteBuffer = ByteBuffer.wrap(data);
 
         this.decodeStack.reset();
@@ -428,10 +428,10 @@ public class DenseCodec extends OpackCodec<byte[]> {
         this.decodePointer = 0;
 
         decodeBlock(data, byteBuffer);
-        OpackValue rootValue = this.decodeStack.peek();
+        OpackValue<?> rootValue = this.decodeStack.peek();
 
         while (!this.decodeStack.isEmpty()) {
-            OpackValue opackValue = this.decodeStack.peek();
+            OpackValue<?> opackValue = this.decodeStack.peek();
             Object[] context = this.decodeContextStack.peek();
 
             Integer size = (Integer) context[0];
@@ -441,7 +441,7 @@ public class DenseCodec extends OpackCodec<byte[]> {
             int index = offset;
 
             if (opackValue instanceof OpackObject) {
-                OpackObject opackObject = (OpackObject) opackValue;
+                OpackObject<Object, Object> opackObject = (OpackObject<Object, Object>) opackValue;
 
                 for (; index < size; index++) {
                     Object key = context[2];
@@ -474,7 +474,7 @@ public class DenseCodec extends OpackCodec<byte[]> {
                     context[3] = CONTEXT_NULL_OBJECT;
                 }
             } else if (opackValue instanceof OpackArray) {
-                OpackArray opackArray = (OpackArray) opackValue;
+                OpackArray<Object> opackArray = (OpackArray<Object>) opackValue;
 
                 for (; index < size; index++) {
                     Object value = decodeBlock(data, byteBuffer);

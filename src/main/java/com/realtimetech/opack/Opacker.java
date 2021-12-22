@@ -22,24 +22,22 @@
 
 package com.realtimetech.opack;
 
-import com.realtimetech.opack.codec.dense.DenseCodec;
-import com.realtimetech.opack.codec.json.JsonCodec;
 import com.realtimetech.opack.compile.ClassInfo;
 import com.realtimetech.opack.compile.InfoCompiler;
-import com.realtimetech.opack.example.Example;
-import com.realtimetech.opack.exception.*;
+import com.realtimetech.opack.exception.CompileException;
+import com.realtimetech.opack.exception.DeserializeException;
+import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.transformer.Transformer;
 import com.realtimetech.opack.transformer.impl.NoWrapListTransformer;
 import com.realtimetech.opack.transformer.impl.WrapListTransformer;
-import com.realtimetech.opack.util.structure.FastStack;
 import com.realtimetech.opack.util.OpackArrayConverter;
 import com.realtimetech.opack.util.ReflectionUtil;
+import com.realtimetech.opack.util.structure.FastStack;
 import com.realtimetech.opack.value.OpackArray;
 import com.realtimetech.opack.value.OpackObject;
 import com.realtimetech.opack.value.OpackValue;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
@@ -85,7 +83,7 @@ public class Opacker {
 
     final @NotNull FastStack<Object> objectStack;
     final @NotNull FastStack<ClassInfo> classInfoStack;
-    final @NotNull FastStack<OpackValue> valueStack;
+    final @NotNull FastStack<OpackValue<?>> valueStack;
 
     @NotNull State state;
 
@@ -105,11 +103,11 @@ public class Opacker {
         }
     }
 
-    public synchronized OpackValue serialize(Object object) throws SerializeException {
+    public synchronized OpackValue<?> serialize(Object object) throws SerializeException {
         if (this.state == State.DESERIALIZE)
             throw new SerializeException("Opacker is deserializing");
 
-        OpackValue value = (OpackValue) this.prepareObjectSerialize(object.getClass(), object);
+        OpackValue<?> value = (OpackValue<?>) this.prepareObjectSerialize(object.getClass(), object);
 
         if (this.state == State.NONE) {
             try {
@@ -146,7 +144,7 @@ public class Opacker {
                     If directly pass opack value, deep clone
                  */
                 if (OpackValue.class.isAssignableFrom(firstObjectType)) {
-                    object = ((OpackValue) object).clone();
+                    object = ((OpackValue<?>) object).clone();
                 }
 
                 return object;
@@ -162,12 +160,12 @@ public class Opacker {
             }
 
 
-            OpackValue opackValue = null;
+            OpackValue<?> opackValue;
 
             if (objectType.isArray()) {
-                opackValue = new OpackArray(Array.getLength(object));
+                opackValue = new OpackArray<>(Array.getLength(object));
             } else {
-                opackValue = new OpackObject();
+                opackValue = new OpackObject<>();
             }
 
             this.objectStack.push(object);
@@ -183,11 +181,11 @@ public class Opacker {
     void executeSerializeStack() throws SerializeException {
         while (!this.objectStack.isEmpty()) {
             Object object = this.objectStack.pop();
-            OpackValue opackValue = this.valueStack.pop();
+            OpackValue<?> opackValue = this.valueStack.pop();
             ClassInfo classInfo = this.classInfoStack.pop();
 
             if (opackValue instanceof OpackArray) {
-                OpackArray opackArray = (OpackArray) opackValue;
+                OpackArray<Object> opackArray = (OpackArray<Object>) opackValue;
                 int length = Array.getLength(object);
 
                 for (int index = 0; index < length; index++) {
@@ -197,7 +195,7 @@ public class Opacker {
                     opackArray.add(serializedValue);
                 }
             } else if (opackValue instanceof OpackObject) {
-                OpackObject opackObject = (OpackObject) opackValue;
+                OpackObject<Object, Object> opackObject = (OpackObject<Object, Object>) opackValue;
                 for (ClassInfo.FieldInfo fieldInfo : classInfo.getFields()) {
                     try {
                         Object element = fieldInfo.get(object);
@@ -218,11 +216,11 @@ public class Opacker {
         }
     }
 
-    public synchronized <T> T deserialize(Class<T> targetClass, OpackValue opackValue) throws DeserializeException {
+    public synchronized <T> T deserialize(Class<T> targetClass, OpackValue<?> opackValue) throws DeserializeException {
         if (this.state == State.SERIALIZE)
             throw new DeserializeException("Opacker is serializing");
 
-        T value = (T) this.prepareObjectDeserialize(targetClass, opackValue);
+        T value = targetClass.cast(this.prepareObjectDeserialize(targetClass, opackValue));
 
         if (this.state == State.NONE) {
             try {
@@ -256,7 +254,7 @@ public class Opacker {
                     If directly pass opack value, deep clone
                  */
                 if (object instanceof OpackValue) {
-                    object = ((OpackValue) object).clone();
+                    object = ((OpackValue<?>) object).clone();
                 }
                 return object;
             }
@@ -268,7 +266,7 @@ public class Opacker {
                 int dimensions = ReflectionUtil.getArrayDimension(goalClass);
 
                 if (dimensions == 1 && object instanceof OpackArray) {
-                    OpackArray opackArray = (OpackArray) object;
+                    OpackArray<?> opackArray = (OpackArray<?>) object;
                     Class<?> componentType = goalClass.getComponentType();
 
                     try {
@@ -281,12 +279,12 @@ public class Opacker {
 
 
             if (object instanceof OpackValue) {
-                OpackValue opackValue = (OpackValue) object;
+                OpackValue<?> opackValue = (OpackValue<?>) object;
                 Object targetObject;
 
                 if (goalClass.isArray()) {
                     if (object instanceof OpackArray) {
-                        OpackArray opackArray = (OpackArray) object;
+                        OpackArray<?> opackArray = (OpackArray<?>) object;
 
                         targetObject = Array.newInstance(goalClass.getComponentType(), opackArray.length());
                     } else {
@@ -294,7 +292,7 @@ public class Opacker {
                     }
                 } else {
                     if (object instanceof OpackObject) {
-                        OpackObject opackObject = (OpackObject) object;
+                        OpackObject<?, ?> opackObject = (OpackObject<?, ?>) object;
 
                         try {
                             targetObject = ReflectionUtil.createInstanceUnsafe(goalClass);
@@ -324,11 +322,11 @@ public class Opacker {
     void executeDeserializeStack() throws DeserializeException {
         while (!this.objectStack.isEmpty()) {
             Object object = this.objectStack.pop();
-            OpackValue opackValue = this.valueStack.pop();
+            OpackValue<?> opackValue = this.valueStack.pop();
             ClassInfo classInfo = this.classInfoStack.pop();
 
             if (opackValue instanceof OpackArray) {
-                OpackArray opackArray = (OpackArray) opackValue;
+                OpackArray<Object> opackArray = (OpackArray<Object>) opackValue;
                 Class<?> componentType = object.getClass().getComponentType();
                 int length = opackArray.length();
 
@@ -339,7 +337,7 @@ public class Opacker {
                     ReflectionUtil.setArrayItem(object, index, ReflectionUtil.cast(componentType, deserializedValue));
                 }
             } else if (opackValue instanceof OpackObject) {
-                OpackObject opackObject = (OpackObject) opackValue;
+                OpackObject<Object, Object> opackObject = (OpackObject<Object, Object>) opackValue;
                 for (ClassInfo.FieldInfo fieldInfo : classInfo.getFields()) {
                     try {
                         Object element = opackObject.get(fieldInfo.getField().getName());
@@ -359,39 +357,5 @@ public class Opacker {
                 }
             }
         }
-    }
-
-    public static void main(String[] args) throws SerializeException, DeserializeException, IllegalAccessException, InterruptedException, IOException, EncodeException, DecodeException, InstantiationException {
-//                Thread.sleep(1024 * 12);
-
-        Opacker opacker = new Opacker.Builder().setAllowListTransformWithTypeWrap(true).create();
-        JsonCodec jsonCodec = new JsonCodec.Builder().create();
-        DenseCodec denseCodec = new DenseCodec.Builder().create();
-        Example originalExample = new Example();
-        long exampleSize = opacker.serialize(originalExample).toString().length();
-
-//        String jsonString = jsonCodec.encode(opacker.serialize(originalExample));
-//        long size = 0;
-//        long start = System.currentTimeMillis();
-//        for (int i = 0; i < 12; i++) {
-//            OpackValue serializedExample = opacker.serialize(originalExample);
-//            byte[] bytes = denseCodec.encode(serializedExample);
-//            size += exampleSize;
-//            OpackValue decodedValue = denseCodec.decode(bytes);
-//            Example deserializedExample = opacker.deserialize(Example.class, decodedValue);
-//        }
-//        long end = System.currentTimeMillis();
-//        float speed = (float)size / (float)(end - start);
-//        System.out.println(((speed * 1000) / 1024 / 1024) + "mb/s");
-
-        OpackValue serializedExample = opacker.serialize(originalExample);
-        String bytes = jsonCodec.encode(serializedExample);
-        OpackValue decodedValue = jsonCodec.decode(bytes);
-        Example deserializedExample = opacker.deserialize(Example.class, decodedValue);
-
-        String bool = originalExample.validationObject(deserializedExample);
-        if (bool != null)
-            System.out.println("Wrong " + bool);
-
     }
 }

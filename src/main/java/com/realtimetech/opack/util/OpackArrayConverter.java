@@ -35,7 +35,7 @@ public class OpackArrayConverter {
     static final Method OPACK_ARRAY_GETTER_METHOD;
 
     static {
-        Method method = null;
+        Method method;
         try {
             method = OpackValue.class.getDeclaredMethod("get");
         } catch (NoSuchMethodException e) {
@@ -45,11 +45,11 @@ public class OpackArrayConverter {
         OPACK_ARRAY_GETTER_METHOD.setAccessible(true);
     }
 
-    public static List<?> getOpackArrayList(OpackArray opackArray) throws InvocationTargetException, IllegalAccessException {
+    public static List<?> getOpackArrayList(OpackArray<?> opackArray) throws InvocationTargetException, IllegalAccessException {
         return (List<?>) OPACK_ARRAY_GETTER_METHOD.invoke(opackArray);
     }
 
-    public static Object convertToArray(Class<?> componentType, OpackArray opackArray) throws InvocationTargetException, IllegalAccessException {
+    public static Object convertToArray(Class<?> componentType, OpackArray<?> opackArray) throws InvocationTargetException, IllegalAccessException {
         if (!OpackValue.isAllowType(componentType)) {
             throw new IllegalArgumentException(componentType + " type is not allowed");
         }
@@ -60,8 +60,12 @@ public class OpackArrayConverter {
             /*
                 Optimize code for pinned list
              */
-            Object object = ((PrimitiveList<?>) list).getArrayObject();
+            Object object = ((PrimitiveList) list).getArrayObject();
             Class<?> arrayType = object.getClass();
+
+            if(!arrayType.isArray()){
+                throw new IllegalArgumentException("PrimitiveList array object is not array type");
+            }
 
             if (arrayType.getComponentType() != componentType) {
                 throw new IllegalArgumentException("Array component type is " + arrayType + " but got " + componentType + " type");
@@ -80,7 +84,7 @@ public class OpackArrayConverter {
             Object object = opackArray.get(i);
 
             if (object instanceof OpackValue) {
-                object = ((OpackValue) object).clone();
+                object = ((OpackValue<?>) object).clone();
             }
 
             ReflectionUtil.setArrayItem(array, i, ReflectionUtil.cast(componentType, object));

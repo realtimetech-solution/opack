@@ -107,7 +107,7 @@ public final class JsonCodec extends OpackCodec<String> {
     static {
         CONST_REPLACEMENT_CHARACTERS = new char[128][];
         for (int i = 0; i <= 0x1f; i++) {
-            CONST_REPLACEMENT_CHARACTERS[i] = String.format("\\u%04x", (int) i).toCharArray();
+            CONST_REPLACEMENT_CHARACTERS[i] = String.format("\\u%04x", i).toCharArray();
         }
         CONST_REPLACEMENT_CHARACTERS['"'] = new char[]{'\\', '\"'};
         CONST_REPLACEMENT_CHARACTERS['\\'] = new char[]{'\\', '\\'};
@@ -137,10 +137,10 @@ public final class JsonCodec extends OpackCodec<String> {
 
         this.encodeLiteralStringWriter = new StringWriter(builder.encodeStringBufferSize);
         this.encodeStringWriter = new StringWriter(builder.encodeStringBufferSize);
-        this.encodeStack = new FastStack<Object>(builder.encodeStackInitialSize);
+        this.encodeStack = new FastStack<>(builder.encodeStackInitialSize);
 
-        this.decodeBaseStack = new FastStack<Integer>(builder.decodeStackInitialSize);
-        this.decodeValueStack = new FastStack<Object>(builder.decodeStackInitialSize);
+        this.decodeBaseStack = new FastStack<>(builder.decodeStackInitialSize);
+        this.decodeValueStack = new FastStack<>(builder.decodeStackInitialSize);
         this.decodeStringWriter = new StringWriter();
     }
 
@@ -227,7 +227,7 @@ public final class JsonCodec extends OpackCodec<String> {
     }
 
     @Override
-    protected String doEncode(OpackValue opackValue) throws IOException {
+    protected String doEncode(OpackValue<?> opackValue) {
         this.encodeLiteralStringWriter.reset();
         this.encodeStringWriter.reset();
         this.encodeStack.reset();
@@ -249,7 +249,7 @@ public final class JsonCodec extends OpackCodec<String> {
             if (objectClass == char[].class) {
                 this.encodeStringWriter.write((char[]) object);
             } else if (objectClass == OpackObject.class) {
-                OpackObject opackObject = (OpackObject) object;
+                OpackObject<Object, Object> opackObject = (OpackObject<Object, Object>) object;
                 int currentIndent = -1;
                 if (this.prettyFormat) {
                     currentIndent = prettyIndentStack.pop();
@@ -307,7 +307,7 @@ public final class JsonCodec extends OpackCodec<String> {
                     count++;
                 }
             } else if (objectClass == OpackArray.class) {
-                OpackArray opackArray = (OpackArray) object;
+                OpackArray<Object> opackArray = (OpackArray<Object>) object;
                 this.encodeLiteralStringWriter.reset();
 
                 this.encodeStringWriter.write(CONST_ARRAY_OPEN_CHARACTER);
@@ -361,7 +361,7 @@ public final class JsonCodec extends OpackCodec<String> {
     }
 
     @Override
-    protected OpackValue doDecode(String data) throws IOException {
+    protected OpackValue<?> doDecode(String data) throws IOException {
         this.decodeBaseStack.reset();
         this.decodeValueStack.reset();
         this.decodeStringWriter.reset();
@@ -572,7 +572,7 @@ public final class JsonCodec extends OpackCodec<String> {
 
                 if (objectClass == OpackObject.class) {
                     if (valueSize == 2) {
-                        OpackObject opackObject = (OpackObject) object;
+                        OpackObject<Object, Object> opackObject = (OpackObject<Object, Object>) object;
 
                         Object value = this.decodeValueStack.pop();
                         Object key = this.decodeValueStack.pop();
@@ -581,7 +581,7 @@ public final class JsonCodec extends OpackCodec<String> {
                     }
                 } else if (objectClass == OpackArray.class) {
                     if (valueSize == 1) {
-                        OpackArray opackArray = (OpackArray) object;
+                        OpackArray<Object> opackArray = (OpackArray<Object>) object;
                         Object value = this.decodeValueStack.pop();
 
                         opackArray.add(value);
@@ -592,6 +592,6 @@ public final class JsonCodec extends OpackCodec<String> {
             }
         }
 
-        return (OpackValue) this.decodeValueStack.get(0);
+        return (OpackValue<?>) this.decodeValueStack.get(0);
     }
 }

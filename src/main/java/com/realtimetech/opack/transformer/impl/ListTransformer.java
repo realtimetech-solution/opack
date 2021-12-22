@@ -47,16 +47,16 @@ public abstract class ListTransformer implements Transformer {
     public Object serialize(Opacker opacker, Object value) throws SerializeException {
         if (value instanceof List) {
             List<?> list = (List<?>) value;
-            OpackArray opackArray = new OpackArray(list.size());
+            OpackArray<Object> opackArray = new OpackArray<>(list.size());
 
             for (Object object : list) {
                 if (object == null || OpackValue.isAllowType(object.getClass())) {
                     opackArray.add(object);
                 } else {
-                    OpackValue opackValue = opacker.serialize(object);
+                    OpackValue<?> opackValue = opacker.serialize(object);
 
                     if (this.wrapWithType) {
-                        OpackObject opackObject = new OpackObject();
+                        OpackObject<Object, Object> opackObject = new OpackObject<>();
                         opackObject.put("type", object.getClass().getName());
                         opackObject.put("value", opackValue);
 
@@ -76,7 +76,7 @@ public abstract class ListTransformer implements Transformer {
     @Override
     public Object deserialize(Opacker opacker, Class<?> goalType, Object value) throws DeserializeException {
         if (value instanceof OpackArray) {
-            OpackArray opackArray = (OpackArray) value;
+            OpackArray<Object> opackArray = (OpackArray<Object>) value;
             if (List.class.isAssignableFrom(goalType)) {
                 try {
                     List<Object> list = (List<Object>) ReflectionUtil.createInstance(goalType);
@@ -86,7 +86,7 @@ public abstract class ListTransformer implements Transformer {
 
                         if (this.wrapWithType) {
                             if (element instanceof OpackObject) {
-                                OpackObject opackObject = (OpackObject) element;
+                                OpackObject<Object, Object> opackObject = (OpackObject<Object, Object>) element;
 
                                 if (opackObject.containsKey("type") && opackObject.containsKey("value")) {
                                     String type = (String) opackObject.get("type");
@@ -95,7 +95,7 @@ public abstract class ListTransformer implements Transformer {
                                     Class<?> objectType = Class.forName(type);
 
                                     if (object instanceof OpackValue) {
-                                        list.add(opacker.deserialize(objectType, (OpackValue) object));
+                                        list.add(opacker.deserialize(objectType, (OpackValue<?>) object));
                                         continue;
                                     }
                                 }

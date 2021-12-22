@@ -34,17 +34,18 @@ import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+@SuppressWarnings("ALL")
 public class Example {
     public String validationObject(Example collectObject) throws IllegalArgumentException, IllegalAccessException {
         for (Field field : collectObject.getClass().getDeclaredFields()) {
             if (!field.isAnnotationPresent(Ignore.class)) {
                 Object originalObject = field.get(this);
                 Object targetObject = field.get(collectObject);
-                try{
+                try {
                     if (!validation(originalObject, targetObject)) {
                         return field.getName();
                     }
-                }catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                     return field.getName();
                 }
@@ -55,12 +56,16 @@ public class Example {
     }
 
     private boolean validation(Object originalObject, Object targetObject) {
-        if (originalObject == null && targetObject == null) {
-            return true;
+        if (originalObject == null || targetObject == null) {
+            if (originalObject == null && targetObject == null) {
+                return true;
+            }
+
+            return false;
         }
 
         if (originalObject.getClass() == targetObject.getClass()) {
-            if (originalObject.getClass().isArray() && targetObject.getClass().isArray()) {
+            if (originalObject.getClass().isArray()) {
                 int originalLength = Array.getLength(originalObject);
                 int targetLength = Array.getLength(targetObject);
 
@@ -69,9 +74,13 @@ public class Example {
                         Object originalElementObject = Array.get(originalObject, index);
                         Object targetElementObject = Array.get(targetObject, index);
 
-                        if(originalElementObject == null && targetElementObject == null){
-                            continue;
+                        if (originalElementObject == null || targetElementObject == null) {
+                            if (originalElementObject == null && targetElementObject == null) {
+                                continue;
+                            }
+                            return false;
                         }
+
                         if (originalElementObject.getClass() != targetElementObject.getClass()) {
                             return false;
                         }
@@ -133,7 +142,7 @@ public class Example {
 //                    return false;
 //                }
 
-                if(originalTest.getIntegerValue() != null && targetTest.getIntegerValue() == null) {
+                if (originalTest.getIntegerValue() != null && targetTest.getIntegerValue() == null) {
                     return false;
                 }
 
@@ -146,6 +155,7 @@ public class Example {
         } else {
             return false;
         }
+
         return true;
     }
 
@@ -188,41 +198,41 @@ public class Example {
     public Example() {
         stringValue = "Hello, World";
         stringArray = new String[11];
-        for(int i = 0; i < stringArray.length; i++){
+        for (int i = 0; i < stringArray.length; i++) {
             stringArray[i] = "stringArray, " + i;
         }
         stringArray[5] = null;
 
         stringArrayArray = new String[RANDOM.nextInt(10) + 2][];
-        for(int i = 0; i < stringArrayArray.length; i++){
+        for (int i = 0; i < stringArrayArray.length; i++) {
             stringArrayArray[i] = new String[RANDOM.nextInt(10) + 2];
-            for(int j = 0; j < stringArrayArray[i].length; j++){
+            for (int j = 0; j < stringArrayArray[i].length; j++) {
                 stringArrayArray[i][j] = "stringArrayArray, " + j;
             }
         }
 
         integerValue = RANDOM.nextInt();
         integerArray = new Integer[10];
-        for(int i = 0; i < integerArray.length; i++){
+        for (int i = 0; i < integerArray.length; i++) {
             integerArray[i] = RANDOM.nextInt();
         }
         integerArrayArray = new Integer[RANDOM.nextInt(10) + 2][];
-        for(int i = 0; i < integerArrayArray.length; i++){
+        for (int i = 0; i < integerArrayArray.length; i++) {
             integerArrayArray[i] = new Integer[RANDOM.nextInt(10) + 2];
-            for(int j = 0; j < integerArrayArray[i].length; j++){
+            for (int j = 0; j < integerArrayArray[i].length; j++) {
                 integerArrayArray[i][j] = RANDOM.nextInt();
             }
         }
 
         object = new DataObject();
         objectArray = new DataObject[10];
-        for(int i = 0; i < objectArray.length; i++){
+        for (int i = 0; i < objectArray.length; i++) {
             objectArray[i] = new DataObject();
         }
         objectArrayArray = new DataObject[RANDOM.nextInt(10) + 2][];
-        for(int i = 0; i < objectArrayArray.length; i++){
+        for (int i = 0; i < objectArrayArray.length; i++) {
             objectArrayArray[i] = new DataObject[RANDOM.nextInt(10) + 2];
-            for(int j = 0; j < objectArrayArray[i].length; j++){
+            for (int j = 0; j < objectArrayArray[i].length; j++) {
                 objectArrayArray[i][j] = new DataObject();
             }
         }
@@ -230,12 +240,12 @@ public class Example {
         bigByteArray = new byte[1];
         RANDOM.nextBytes(bigByteArray);
         bigByteArrayArray = new byte[1][];
-        for(int i = 0; i < bigByteArrayArray.length; i++){
+        for (int i = 0; i < bigByteArrayArray.length; i++) {
             bigByteArrayArray[i] = new byte[RANDOM.nextInt(512) + 512];
             RANDOM.nextBytes(bigByteArrayArray[i]);
         }
 
-        transformByteArray = new String("also accessible via reflection. But only generics-related info is only available for the class in general - not for specific instances of the class. To make a concrete example:").getBytes(StandardCharsets.UTF_8);
+        transformByteArray = "also accessible via reflection. But only generics-related info is only available for the class in general - not for specific instances of the class. To make a concrete example:".getBytes(StandardCharsets.UTF_8);
 
         opackArray = new OpackArray();
         {
@@ -261,18 +271,18 @@ public class Example {
         }
 
         opackValue = new OpackArray();
-        ((OpackArray)opackValue).add("A");
-        ((OpackArray)opackValue).add("B");
-        ((OpackArray)opackValue).add("C");
+        ((OpackArray) opackValue).add("A");
+        ((OpackArray) opackValue).add("B");
+        ((OpackArray) opackValue).add("C");
 
         opackObjectArray = new OpackObject[5];
-        for(int i = 0; i < opackObjectArray.length; i++){
+        for (int i = 0; i < opackObjectArray.length; i++) {
             opackObjectArray[i] = new OpackObject();
             opackObjectArray[i].put("index" + i, RANDOM.nextInt());
         }
 
         opackArrayArray = new OpackArray[5];
-        for(int i = 0; i < opackArrayArray.length; i++){
+        for (int i = 0; i < opackArrayArray.length; i++) {
             opackArrayArray[i] = new OpackArray();
             opackArrayArray[i].add(i);
         }

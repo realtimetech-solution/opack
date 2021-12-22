@@ -62,7 +62,7 @@ public class InfoCompiler {
             return new PredefinedTransformer[0];
         }
 
-        return predefinedTransformers.toArray(new PredefinedTransformer[predefinedTransformers.size()]);
+        return predefinedTransformers.toArray(new PredefinedTransformer[0]);
     }
 
     public boolean registerPredefinedTransformer(@NotNull Class<?> classType, @NotNull Class<? extends Transformer> transformer) throws InstantiationException {
@@ -160,7 +160,7 @@ public class InfoCompiler {
     Transformer[] getTransformer(AnnotatedElement annotatedElement) throws CompileException {
         List<Transformer> transformers = new LinkedList<>();
         this.addTransformer(transformers, annotatedElement, true);
-        return transformers.toArray(new Transformer[transformers.size()]);
+        return transformers.toArray(new Transformer[0]);
     }
 
     Class<?> getExplicitType(AnnotatedElement annotatedElement) {
@@ -196,7 +196,7 @@ public class InfoCompiler {
             transformers = this.getTransformer(compileClass);
         }
 
-        return new ClassInfo(compileClass, transformers, fieldInfos.toArray(new ClassInfo.FieldInfo[fieldInfos.size()]));
+        return new ClassInfo(compileClass, transformers, fieldInfos.toArray(new ClassInfo.FieldInfo[0]));
     }
 
     public @NotNull ClassInfo get(@NotNull Class<?> targetClass) throws CompileException {

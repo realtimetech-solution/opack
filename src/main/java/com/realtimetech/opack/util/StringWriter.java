@@ -23,7 +23,7 @@
 package com.realtimetech.opack.util;
 
 public class StringWriter {
-	private int blockSize;
+	private final int blockSize;
 
 	private char[] chars;
 
@@ -75,15 +75,12 @@ public class StringWriter {
 	}
 
 	public void write(char[] src, int offset, int length) {
-		int size = length;
-		int need = this.currentIndex + size;
+		int need = this.currentIndex + length;
 		if (need >= this.currentSize) {
 			growArray(need);
 		}
 
-		for (int index = 1; index <= size; index++) {
-			this.chars[this.currentIndex + index] = src[offset + index - 1];
-		}
+		System.arraycopy(src, offset, this.chars, this.currentIndex + 1, length);
 
 		this.currentIndex = need;
 	}

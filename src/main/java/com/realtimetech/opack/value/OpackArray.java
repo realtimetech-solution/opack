@@ -33,16 +33,14 @@ public final class OpackArray<E> extends OpackValue<List<E>> {
         if (typeClass.isArray()) {
             Class<?> componentType = ReflectionUtil.getArrayLastComponentType(typeClass);
 
-            if (ReflectionUtil.isPrimitiveClass(componentType)) {
-                return true;
-            }
+            return ReflectionUtil.isPrimitiveClass(componentType);
         }
 
         return false;
     }
 
-    public static OpackArray createWithArrayObject(@NotNull Object arrayObject){
-        return new OpackArray(arrayObject);
+    public static OpackArray<?> createWithArrayObject(@NotNull Object arrayObject){
+        return new OpackArray<>(arrayObject);
     }
 
     OpackArray(@NotNull Object arrayObject) {
@@ -58,7 +56,7 @@ public final class OpackArray<E> extends OpackValue<List<E>> {
             throw new IllegalArgumentException(arrayObject + " array element is not allowed type, allow only primitive type or String or OpackValues or null");
         }
 
-        this.set(new PrimitiveList(arrayObject));
+        this.set((List<E>) new PrimitiveList(arrayObject));
     }
 
     public OpackArray(E @NotNull [] array) {
@@ -98,7 +96,7 @@ public final class OpackArray<E> extends OpackValue<List<E>> {
         }
     }
 
-    public E set(int index, @NotNull E value) {
+    public E set(int index, E value) {
         if (value != null)
             OpackValue.assertAllowType(value.getClass());
 
@@ -107,7 +105,7 @@ public final class OpackArray<E> extends OpackValue<List<E>> {
         return this.get().set(index, value);
     }
 
-    public boolean add(@NotNull E value) {
+    public boolean add(E value) {
         if (value != null)
             OpackValue.assertAllowType(value.getClass());
 
@@ -130,35 +128,35 @@ public final class OpackArray<E> extends OpackValue<List<E>> {
 
     @Override
     String toString(List<E> value) {
-        StringBuffer stringBuffer = new StringBuffer();
+        StringBuilder stringBuilder = new StringBuilder();
 
-        stringBuffer.append('[');
+        stringBuilder.append('[');
 
         boolean first = true;
         for (E element : value) {
             if (first){
                 first = false;
             }else{
-                stringBuffer.append(',');
+                stringBuilder.append(',');
             }
 
-            stringBuffer.append(element == null ? "null" : element.toString());
+            stringBuilder.append(element == null ? "null" : element.toString());
         }
 
-        stringBuffer.append(']');
+        stringBuilder.append(']');
 
-        return stringBuffer.toString();
+        return stringBuilder.toString();
     }
 
     @Override
-    public OpackValue clone() {
-        OpackArray<E> opackArray = new OpackArray<E>(this.length());
+    public OpackArray<E> clone() {
+        OpackArray<E> opackArray = new OpackArray<>(this.length());
 
         for (int index = 0; index < this.length(); index++) {
             E object = this.get(index);
 
             if (object instanceof OpackValue) {
-                object = (E) ((OpackValue) object).clone();
+                object = (E) ((OpackValue<?>) object).clone();
             }
 
             opackArray.add(object);

@@ -28,7 +28,7 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.reflect.Array;
 import java.util.*;
 
-public class PrimitiveList<E> implements List<E> {
+public class PrimitiveList implements List<Object> {
     final Object arrayObject;
 
     public PrimitiveList(Object arrayObject) {
@@ -58,15 +58,13 @@ public class PrimitiveList<E> implements List<E> {
         return this.indexOf(o) != -1;
     }
 
-    @NotNull
     @Override
-    public Iterator<E> iterator() {
-        return (Iterator<E>) Arrays.asList(toArray()).iterator();
+    public @NotNull Iterator<Object> iterator() {
+        return Arrays.asList(toArray()).iterator();
     }
 
-    @NotNull
     @Override
-    public Object[] toArray() {
+    public Object @NotNull [] toArray() {
         Object[] objects = new Object[this.size()];
 
         for (int i = 0; i < objects.length; i++) {
@@ -76,18 +74,19 @@ public class PrimitiveList<E> implements List<E> {
         return objects;
     }
 
-    @NotNull
     @Override
-    public <T> T[] toArray(@NotNull T[] array) {
+    public <T> T @NotNull [] toArray(T @NotNull [] array) {
+        T[] arrayObject = (T[]) Array.newInstance(array.getClass().getComponentType(),  this.size());
+
         for (int i = 0; i < array.length; i++) {
-            array[i] = (T) this.get(i);
+            arrayObject[i] = (T) this.get(i);
         }
 
-        return array;
+        return arrayObject;
     }
 
     @Override
-    public boolean add(E e) {
+    public boolean add(Object e) {
         throw new UnsupportedOperationException("PrimitiveList can't modify element.");
     }
 
@@ -108,12 +107,12 @@ public class PrimitiveList<E> implements List<E> {
     }
 
     @Override
-    public boolean addAll(@NotNull Collection<? extends E> c) {
+    public boolean addAll(@NotNull Collection<? extends Object> c) {
         throw new UnsupportedOperationException("PrimitiveList can't modify element.");
     }
 
     @Override
-    public boolean addAll(int index, @NotNull Collection<? extends E> c) {
+    public boolean addAll(int index, @NotNull Collection<? extends Object> c) {
         throw new UnsupportedOperationException("PrimitiveList can't modify element.");
     }
 
@@ -133,22 +132,22 @@ public class PrimitiveList<E> implements List<E> {
     }
 
     @Override
-    public E get(int index) {
-        return (E) ReflectionUtil.getArrayItem(this.arrayObject, index);
+    public Object get(int index) {
+        return ReflectionUtil.getArrayItem(this.arrayObject, index);
     }
 
     @Override
-    public E set(int index, E element) {
+    public Object set(int index, Object element) {
         throw new UnsupportedOperationException("PrimitiveList can't modify element.");
     }
 
     @Override
-    public void add(int index, E element) {
+    public void add(int index, Object element) {
         throw new UnsupportedOperationException("PrimitiveList can't modify element.");
     }
 
     @Override
-    public E remove(int index) {
+    public Object remove(int index) {
         throw new UnsupportedOperationException("PrimitiveList can't modify element.");
     }
 
@@ -176,19 +175,19 @@ public class PrimitiveList<E> implements List<E> {
 
     @NotNull
     @Override
-    public ListIterator<E> listIterator() {
-        return (ListIterator<E>) Arrays.asList(toArray()).listIterator();
+    public ListIterator<Object> listIterator() {
+        return Arrays.asList(toArray()).listIterator();
     }
 
     @NotNull
     @Override
-    public ListIterator<E> listIterator(int index) {
-        return (ListIterator<E>) Arrays.asList(toArray()).listIterator(index);
+    public ListIterator<Object> listIterator(int index) {
+        return Arrays.asList(toArray()).listIterator(index);
     }
 
     @NotNull
     @Override
-    public List<E> subList(int fromIndex, int toIndex) {
-        return (List<E>) Arrays.asList(toArray()).subList(fromIndex, toIndex);
+    public List<Object> subList(int fromIndex, int toIndex) {
+        return Arrays.asList(toArray()).subList(fromIndex, toIndex);
     }
 }

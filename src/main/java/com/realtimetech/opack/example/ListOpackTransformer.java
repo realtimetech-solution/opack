@@ -24,10 +24,6 @@ package com.realtimetech.opack.example;
 
 import com.realtimetech.opack.Opacker;
 import com.realtimetech.opack.transformer.Transformer;
-import com.realtimetech.opack.value.OpackArray;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class ListOpackTransformer implements Transformer {
     @Override

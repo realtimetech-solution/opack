@@ -51,9 +51,7 @@ public class TransformerFactory {
                     try {
                         // Create instance using Transformer(Opacker) constructor
                         try {
-                            if (instance == null) {
-                                instance = ReflectionUtil.createInstance(transformerClass, this.opacker);
-                            }
+                            instance = ReflectionUtil.createInstance(transformerClass, this.opacker);
                         } catch (IllegalArgumentException exception) {
                             // Ok, let's find no parameter constructor
                         }
@@ -82,6 +80,6 @@ public class TransformerFactory {
             }
         }
 
-        return (T) this.transformerMap.get(transformerClass);
+        return transformerClass.cast(this.transformerMap.get(transformerClass));
     }
 }

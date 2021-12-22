@@ -31,26 +31,25 @@ import java.util.*;
 
 public class ReflectionUtil {
     private static abstract class Allocator {
-        abstract <T> T allocate(Class<T> c) throws InvocationTargetException, IllegalAccessException;
+        abstract <T> T allocate(Class<T> typeClass) throws InvocationTargetException, IllegalAccessException;
     }
 
-    static final Map<Class<?>, Class<?>> PRIMITIVES_WRAPPERS_MAP = Collections.unmodifiableMap(new HashMap<Class<?>, Class<?>>() {
-        {
-            put(boolean.class, Boolean.class);
+    static final Map<Class<?>, Class<?>> PRIMITIVES_WRAPPERS_MAP = Map.of(
+            boolean.class, Boolean.class,
 
-            put(byte.class, Byte.class);
-            put(char.class, Character.class);
+            byte.class, Byte.class,
+            char.class, Character.class,
 
-            put(short.class, Short.class);
+            short.class, Short.class,
 
-            put(int.class, Integer.class);
-            put(float.class, Float.class);
+            int.class, Integer.class,
+            float.class, Float.class,
 
-            put(double.class, Double.class);
-            put(long.class, Long.class);
-        }
-    });
-    static final Map<Class<?>, Class<?>> WRAPPERS_PRIMITIVES_MAP = Collections.unmodifiableMap(new HashMap<Class<?>, Class<?>>() {
+            double.class, Double.class,
+            long.class, Long.class
+    );
+
+    static final Map<Class<?>, Class<?>> WRAPPERS_PRIMITIVES_MAP = Collections.unmodifiableMap(new HashMap<>() {
         {
             for (Class<?> primitiveType : PRIMITIVES_WRAPPERS_MAP.keySet()) {
                 Class<?> wrapperType = PRIMITIVES_WRAPPERS_MAP.get(primitiveType);
@@ -80,8 +79,8 @@ public class ReflectionUtil {
             final Method allocateMethod = unsafeClass.getMethod("allocateInstance", Class.class);
             return new Allocator() {
                 @Override
-                public <T> T allocate(Class<T> c) throws InvocationTargetException, IllegalAccessException {
-                    return (T) allocateMethod.invoke(unsafeObject, c);
+                public <T> T allocate(Class<T> typeClass) throws InvocationTargetException, IllegalAccessException {
+                    return typeClass.cast(allocateMethod.invoke(unsafeObject, typeClass));
                 }
             };
         } catch (Exception exception) {
@@ -97,8 +96,8 @@ public class ReflectionUtil {
             allocateMethod.setAccessible(true);
             return new Allocator() {
                 @Override
-                public <T> T allocate(Class<T> c) throws InvocationTargetException, IllegalAccessException {
-                    return (T) allocateMethod.invoke(null, c, constructorId);
+                public <T> T allocate(Class<T> typeClass) throws InvocationTargetException, IllegalAccessException {
+                    return typeClass.cast(allocateMethod.invoke(null, typeClass, constructorId));
                 }
             };
         } catch (Exception exception) {
@@ -110,8 +109,8 @@ public class ReflectionUtil {
             allocateMethod.setAccessible(true);
             return new Allocator() {
                 @Override
-                public <T> T allocate(Class<T> c) throws InvocationTargetException, IllegalAccessException {
-                    return (T) allocateMethod.invoke(null, c, Object.class);
+                public <T> T allocate(Class<T> typeClass) throws InvocationTargetException, IllegalAccessException {
+                    return typeClass.cast(allocateMethod.invoke(null, typeClass, Object.class));
                 }
             };
         } catch (Exception exception) {
@@ -254,7 +253,7 @@ public class ReflectionUtil {
         List<Field> fields = new LinkedList<>();
         ReflectionUtil.addAccessibleFields(fields, targetClass);
 
-        return fields.toArray(new Field[fields.size()]);
+        return fields.toArray(new Field[0]);
     }
 
     public static int getArrayDimension(Class<?> typeClass) {
@@ -388,7 +387,7 @@ public class ReflectionUtil {
                     if (matched) {
                         constructor.setAccessible(true);
 
-                        return (T) constructor.newInstance(objects);
+                        return instanceClass.cast(constructor.newInstance(objects));
                     }
                 }
             }
