@@ -29,11 +29,11 @@ import com.realtimetech.opack.value.OpackValue;
 import java.io.IOException;
 
 public abstract class OpackCodec<D> {
-    protected abstract D doEncode(OpackValue<?> opackValue) throws IOException;
+    protected abstract D doEncode(OpackValue opackValue) throws IOException;
 
-    protected abstract OpackValue<?> doDecode(D data) throws IOException;
+    protected abstract OpackValue doDecode(D data) throws IOException;
 
-    public synchronized D encode(OpackValue<?> opackValue) throws EncodeException {
+    public synchronized D encode(OpackValue opackValue) throws EncodeException {
         try {
             return this.doEncode(opackValue);
         } catch (Exception exception) {
@@ -41,7 +41,7 @@ public abstract class OpackCodec<D> {
         }
     }
 
-    public synchronized OpackValue<?> decode(D data) throws DecodeException {
+    public synchronized OpackValue decode(D data) throws DecodeException {
         try {
             return this.doDecode(data);
         } catch (Exception exception) {

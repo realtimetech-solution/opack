@@ -24,19 +24,51 @@ package com.realtimetech.opack.value;
 
 import com.realtimetech.opack.util.ReflectionUtil;
 
-public interface OpackValue {
-    public static void assertAllowType(Class<?> typeClass) {
-        if (!OpackValue.isAllowType(typeClass)) {
-            throw new IllegalArgumentException(typeClass.getName() + " is not allowed type, allow only primitive type or String or OpackValues or null");
+import java.util.Objects;
+
+abstract class AbstractOpackValue<T> implements OpackValue{
+    private volatile T value;
+
+    abstract T createLazyValue();
+
+    T get() {
+        if (this.value == null) {
+            synchronized (this) {
+                if (this.value == null) {
+                    this.value = createLazyValue();
+                }
+            }
+        }
+
+        return this.value;
+    }
+
+    void set(T value) {
+        synchronized (this) {
+            this.value = value;
         }
     }
 
-    public static boolean isAllowType(Class<?> typeClass) {
-        return ReflectionUtil.isWrapperClass(typeClass) ||
-                ReflectionUtil.isPrimitiveClass(typeClass) ||
-                (typeClass == String.class) ||
-                (AbstractOpackValue.class.isAssignableFrom(typeClass));
+    abstract String toString(T value);
+
+    @Override
+    public int hashCode() {
+        return value.hashCode();
     }
 
-    public OpackValue clone();
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AbstractOpackValue<?> that = (AbstractOpackValue<?>) o;
+        return Objects.equals(value, that.value);
+    }
+
+    @Override
+    public abstract OpackValue clone();
+
+    @Override
+    public final String toString() {
+        return this.getClass().getSimpleName() + "(" + this.toString(get()) + ")";
+    }
 }

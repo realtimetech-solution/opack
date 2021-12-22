@@ -237,9 +237,9 @@ public class Example {
             }
         }
 
-        bigByteArray = new byte[1];
+        bigByteArray = new byte[1024 * 1024];
         RANDOM.nextBytes(bigByteArray);
-        bigByteArrayArray = new byte[1][];
+        bigByteArrayArray = new byte[1024][];
         for (int i = 0; i < bigByteArrayArray.length; i++) {
             bigByteArrayArray[i] = new byte[RANDOM.nextInt(512) + 512];
             RANDOM.nextBytes(bigByteArrayArray[i]);

@@ -227,7 +227,7 @@ public final class JsonCodec extends OpackCodec<String> {
     }
 
     @Override
-    protected String doEncode(OpackValue<?> opackValue) {
+    protected String doEncode(OpackValue opackValue) {
         this.encodeLiteralStringWriter.reset();
         this.encodeStringWriter.reset();
         this.encodeStack.reset();
@@ -361,7 +361,7 @@ public final class JsonCodec extends OpackCodec<String> {
     }
 
     @Override
-    protected OpackValue<?> doDecode(String data) throws IOException {
+    protected OpackValue doDecode(String data) throws IOException {
         this.decodeBaseStack.reset();
         this.decodeValueStack.reset();
         this.decodeStringWriter.reset();
@@ -592,6 +592,6 @@ public final class JsonCodec extends OpackCodec<String> {
             }
         }
 
-        return (OpackValue<?>) this.decodeValueStack.get(0);
+        return (OpackValue) this.decodeValueStack.get(0);
     }
 }

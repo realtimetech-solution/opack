@@ -53,7 +53,7 @@ public abstract class ListTransformer implements Transformer {
                 if (object == null || OpackValue.isAllowType(object.getClass())) {
                     opackArray.add(object);
                 } else {
-                    OpackValue<?> opackValue = opacker.serialize(object);
+                    OpackValue opackValue = opacker.serialize(object);
 
                     if (this.wrapWithType) {
                         OpackObject<Object, Object> opackObject = new OpackObject<>();
@@ -95,7 +95,7 @@ public abstract class ListTransformer implements Transformer {
                                     Class<?> objectType = Class.forName(type);
 
                                     if (object instanceof OpackValue) {
-                                        list.add(opacker.deserialize(objectType, (OpackValue<?>) object));
+                                        list.add(opacker.deserialize(objectType, (OpackValue) object));
                                         continue;
                                     }
                                 }

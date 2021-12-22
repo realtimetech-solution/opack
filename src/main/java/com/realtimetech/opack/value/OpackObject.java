@@ -26,7 +26,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Set;
 
-public final class OpackObject<K, V> extends OpackValue<HashMap<K, V>> {
+public final class OpackObject<K, V> extends AbstractOpackValue<HashMap<K, V>> {
     public OpackObject(int initialCapacity) {
         this.set(new HashMap<>(initialCapacity));
     }
@@ -86,11 +86,11 @@ public final class OpackObject<K, V> extends OpackValue<HashMap<K, V>> {
             V value = this.get(key);
 
             if (key instanceof OpackValue) {
-                key = (K) ((OpackValue<?>) key).clone();
+                key = (K) ((OpackValue) key).clone();
             }
 
             if (value instanceof OpackValue) {
-                value = (V) ((OpackValue<?>) value).clone();
+                value = (V) ((OpackValue) value).clone();
             }
 
             opackObject.put(key, value);

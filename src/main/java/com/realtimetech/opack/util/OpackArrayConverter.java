@@ -84,7 +84,7 @@ public class OpackArrayConverter {
             Object object = opackArray.get(i);
 
             if (object instanceof OpackValue) {
-                object = ((OpackValue<?>) object).clone();
+                object = ((OpackValue) object).clone();
             }
 
             ReflectionUtil.setArrayItem(array, i, ReflectionUtil.cast(componentType, object));

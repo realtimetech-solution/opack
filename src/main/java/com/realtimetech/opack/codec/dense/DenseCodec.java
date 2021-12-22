@@ -93,7 +93,7 @@ public class DenseCodec extends OpackCodec<byte[]> {
     final FastStack<Object> encodeStack;
 
     int decodePointer;
-    final FastStack<OpackValue<?>> decodeStack;
+    final FastStack<OpackValue> decodeStack;
     final FastStack<Object[]> decodeContextStack;
 
     final byte[] byte8Buffer;
@@ -116,7 +116,7 @@ public class DenseCodec extends OpackCodec<byte[]> {
     }
 
     @Override
-    protected byte[] doEncode(OpackValue<?> opackValue) throws IOException {
+    protected byte[] doEncode(OpackValue opackValue) throws IOException {
         this.encodeStack.push(opackValue);
         this.encodeByteArrayStream.reset();
 
@@ -420,7 +420,7 @@ public class DenseCodec extends OpackCodec<byte[]> {
     }
 
     @Override
-    protected OpackValue<?> doDecode(byte[] data) {
+    protected OpackValue doDecode(byte[] data) {
         ByteBuffer byteBuffer = ByteBuffer.wrap(data);
 
         this.decodeStack.reset();
@@ -428,10 +428,10 @@ public class DenseCodec extends OpackCodec<byte[]> {
         this.decodePointer = 0;
 
         decodeBlock(data, byteBuffer);
-        OpackValue<?> rootValue = this.decodeStack.peek();
+        OpackValue rootValue = this.decodeStack.peek();
 
         while (!this.decodeStack.isEmpty()) {
-            OpackValue<?> opackValue = this.decodeStack.peek();
+            OpackValue opackValue = this.decodeStack.peek();
             Object[] context = this.decodeContextStack.peek();
 
             Integer size = (Integer) context[0];

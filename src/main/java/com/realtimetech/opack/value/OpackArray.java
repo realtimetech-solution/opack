@@ -28,7 +28,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-public final class OpackArray<E> extends OpackValue<List<E>> {
+public final class OpackArray<E> extends AbstractOpackValue<List<E>> {
     public static boolean isAllowArrayType(Class<?> typeClass) {
         if (typeClass.isArray()) {
             Class<?> componentType = ReflectionUtil.getArrayLastComponentType(typeClass);
@@ -156,7 +156,7 @@ public final class OpackArray<E> extends OpackValue<List<E>> {
             E object = this.get(index);
 
             if (object instanceof OpackValue) {
-                object = (E) ((OpackValue<?>) object).clone();
+                object = (E) ((OpackValue) object).clone();
             }
 
             opackArray.add(object);
