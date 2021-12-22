@@ -76,7 +76,7 @@ public class PrimitiveList implements List<Object> {
 
     @Override
     public <T> T @NotNull [] toArray(T @NotNull [] array) {
-        T[] arrayObject = (T[]) Array.newInstance(array.getClass().getComponentType(),  this.size());
+        T[] arrayObject = (T[]) Array.newInstance(array.getClass().getComponentType(), this.size());
 
         for (int i = 0; i < array.length; i++) {
             arrayObject[i] = (T) this.get(i);
@@ -171,6 +171,48 @@ public class PrimitiveList implements List<Object> {
         }
 
         return -1;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null) return false;
+        if (!(object instanceof List)) {
+            return false;
+        }
+
+        List list = (List) object;
+
+        if (list.size() != this.size()){
+            return false;
+        }
+
+        for (int i = 0; i < this.size(); i++) {
+            Object element = this.get(i);
+            Object target = list.get(i);
+
+            if (element == null || target == null) {
+                if (element != target) {
+                    return false;
+                }
+            }
+
+            if (!element.equals(target)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hashCode = 1;
+        for (int i = 0; i < size(); i++) {
+            Object element = this.get(i);
+            hashCode = 31 * hashCode + (element == null ? 0 : element.hashCode());
+        }
+        return hashCode;
     }
 
     @NotNull

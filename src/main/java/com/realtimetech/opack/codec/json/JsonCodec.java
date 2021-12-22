@@ -35,6 +35,7 @@ import java.io.IOException;
 public final class JsonCodec extends OpackCodec<String> {
     public final static class Builder {
         boolean allowOpackValueToKeyValue;
+        boolean convertCharacterToString;
         boolean prettyFormat;
 
         int encodeStackInitialSize;
@@ -43,6 +44,7 @@ public final class JsonCodec extends OpackCodec<String> {
 
         public Builder() {
             this.allowOpackValueToKeyValue = false;
+            this.convertCharacterToString = false;
             this.prettyFormat = false;
 
             this.encodeStringBufferSize = 1024;
@@ -90,17 +92,17 @@ public final class JsonCodec extends OpackCodec<String> {
 
     private static final char[] CONST_NULL_CHARACTER = new char[]{'n', 'u', 'l', 'l'};
 
-    private static final char CONST_SEPARATOR_CHARACTER = ',';
+    private static final char[] CONST_SEPARATOR_CHARACTER = new char[]{','};
 
-    private static final char CONST_OBJECT_OPEN_CHARACTER = '{';
-    private static final char CONST_OBJECT_MAP_CHARACTER = ':';
-    private static final char CONST_OBJECT_CLOSE_CHARACTER = '}';
+    private static final char[] CONST_OBJECT_OPEN_CHARACTER = new char[]{'{'};
+    private static final char[] CONST_OBJECT_MAP_CHARACTER = new char[]{':'};
+    private static final char[] CONST_OBJECT_CLOSE_CHARACTER = new char[]{'}'};
 
-    private static final char CONST_ARRAY_OPEN_CHARACTER = '[';
-    private static final char CONST_ARRAY_CLOSE_CHARACTER = ']';
+    private static final char[] CONST_ARRAY_OPEN_CHARACTER = new char[]{'['};
+    private static final char[] CONST_ARRAY_CLOSE_CHARACTER = new char[]{']'};
 
-    private static final char CONST_STRING_OPEN_CHARACTER = '\"';
-    private static final char CONST_STRING_CLOSE_CHARACTER = '\"';
+    private static final char[] CONST_STRING_OPEN_CHARACTER = new char[]{'\"'};
+    private static final char[] CONST_STRING_CLOSE_CHARACTER = new char[]{'\"'};
 
     private static final char[][] CONST_REPLACEMENT_CHARACTERS;
 
@@ -119,6 +121,7 @@ public final class JsonCodec extends OpackCodec<String> {
     }
 
     final boolean allowOpackValueToKeyValue;
+    final boolean convertCharacterToString;
     final boolean prettyFormat;
 
     final StringWriter encodeLiteralStringWriter;
@@ -133,6 +136,7 @@ public final class JsonCodec extends OpackCodec<String> {
         super();
 
         this.allowOpackValueToKeyValue = builder.allowOpackValueToKeyValue;
+        this.convertCharacterToString = builder.convertCharacterToString;
         this.prettyFormat = builder.prettyFormat;
 
         this.encodeLiteralStringWriter = new StringWriter(builder.encodeStringBufferSize);
@@ -220,7 +224,18 @@ public final class JsonCodec extends OpackCodec<String> {
                 }
             }
 
-            stringWriter.write(object.toString().toCharArray());
+            if (numberType == Character.class) {
+                if (convertCharacterToString) {
+                    stringWriter.write(CONST_STRING_OPEN_CHARACTER);
+                    stringWriter.write(object.toString().toCharArray());
+                    stringWriter.write(CONST_STRING_CLOSE_CHARACTER);
+                } else {
+                    int convertToInt = ((char) object);
+                    stringWriter.write(((Integer) convertToInt).toString().toCharArray());
+                }
+            } else {
+                stringWriter.write(object.toString().toCharArray());
+            }
         }
 
         return true;

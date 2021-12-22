@@ -334,7 +334,7 @@ public class Opacker {
                     Object element = opackArray.get(index);
                     Object deserializedValue = this.prepareObjectDeserialize(componentType, element);
 
-                    ReflectionUtil.setArrayItem(object, index, ReflectionUtil.cast(componentType, deserializedValue));
+                    ReflectionUtil.setArrayItem(object, index, deserializedValue == null ? null : ReflectionUtil.cast(componentType, deserializedValue));
                 }
             } else if (opackValue instanceof OpackObject) {
                 OpackObject<Object, Object> opackObject = (OpackObject<Object, Object>) opackValue;
@@ -350,7 +350,7 @@ public class Opacker {
 
                         Object deserializedValue = this.prepareObjectDeserialize(fieldClass, element);
 
-                        fieldInfo.set(object, ReflectionUtil.cast(actualFieldClass, deserializedValue));
+                        fieldInfo.set(object, deserializedValue == null ? null : ReflectionUtil.cast(actualFieldClass, deserializedValue));
                     } catch (IllegalAccessException | IllegalArgumentException exception) {
                         throw new DeserializeException("Can't set " + fieldInfo.getName() + " field in " + classInfo.getTargetClass().getSimpleName(), exception);
                     }

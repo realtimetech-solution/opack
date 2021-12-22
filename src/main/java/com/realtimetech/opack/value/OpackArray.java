@@ -39,7 +39,7 @@ public final class OpackArray<E> extends AbstractOpackValue<List<E>> {
         return false;
     }
 
-    public static OpackArray<?> createWithArrayObject(@NotNull Object arrayObject){
+    public static OpackArray<?> createWithArrayObject(@NotNull Object arrayObject) {
         return new OpackArray<>(arrayObject);
     }
 
@@ -134,9 +134,9 @@ public final class OpackArray<E> extends AbstractOpackValue<List<E>> {
 
         boolean first = true;
         for (E element : value) {
-            if (first){
+            if (first) {
                 first = false;
-            }else{
+            } else {
                 stringBuilder.append(',');
             }
 
@@ -163,5 +163,20 @@ public final class OpackArray<E> extends AbstractOpackValue<List<E>> {
         }
 
         return opackArray;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+
+        OpackArray<?> opackArray = (OpackArray<?>) object;
+
+        return opackArray.get().equals(this.get());
+    }
+
+    @Override
+    public int hashCode() {
+        return this.get().hashCode();
     }
 }

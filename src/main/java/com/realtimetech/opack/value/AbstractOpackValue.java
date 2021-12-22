@@ -51,18 +51,9 @@ abstract class AbstractOpackValue<T> implements OpackValue{
 
     abstract String toString(T value);
 
-    @Override
-    public int hashCode() {
-        return value.hashCode();
-    }
+    public abstract boolean equals(Object object);
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        AbstractOpackValue<?> that = (AbstractOpackValue<?>) o;
-        return Objects.equals(value, that.value);
-    }
+    public abstract int hashCode();
 
     @Override
     public abstract OpackValue clone();

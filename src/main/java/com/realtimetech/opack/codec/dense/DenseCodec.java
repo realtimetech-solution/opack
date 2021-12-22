@@ -173,7 +173,7 @@ public class DenseCodec extends OpackCodec<byte[]> {
                         } else if (arrayType == char[].class) {
                             encodeByteArrayStream.write(CONST_CHARACTER_NATIVE_ARRAY);
                             char[] array = (char[]) arrayObject;
-                            ByteBuffer byteBuffer = ByteBuffer.allocate(array.length);
+                            ByteBuffer byteBuffer = ByteBuffer.allocate(array.length * 2);
                             CharBuffer typeBuffer = byteBuffer.asCharBuffer();
                             typeBuffer.put(array);
 
@@ -247,7 +247,9 @@ public class DenseCodec extends OpackCodec<byte[]> {
                     encodeByteArrayStream.write((byte) object);
                 } else if (objectClass == char.class) {
                     encodeByteArrayStream.write(CONST_TYPE_CHARACTER);
-                    encodeByteArrayStream.write((char) object);
+
+                    ByteBuffer.wrap(byte2Buffer).putChar((char) object);
+                    encodeByteArrayStream.write(byte2Buffer);
                 } else if (objectClass == short.class) {
                     encodeByteArrayStream.write(CONST_TYPE_SHORT);
                     short value = (short) object;
@@ -270,7 +272,7 @@ public class DenseCodec extends OpackCodec<byte[]> {
                     encodeByteArrayStream.write(CONST_TYPE_LONG);
                     long value = (long) object;
 
-                    ByteBuffer.wrap(byte8Buffer).putDouble(value);
+                    ByteBuffer.wrap(byte8Buffer).putLong(value);
                     encodeByteArrayStream.write(byte8Buffer);
                 } else if (objectClass == double.class) {
                     encodeByteArrayStream.write(CONST_TYPE_DOUBLE);
@@ -304,7 +306,9 @@ public class DenseCodec extends OpackCodec<byte[]> {
         } else if (b == CONST_TYPE_BYTE) {
             return data[decodePointer++];
         } else if (b == CONST_TYPE_CHARACTER) {
-            return (char) data[decodePointer++];
+            char value = byteBuffer.getChar(decodePointer);
+            decodePointer += 2;
+            return value;
         } else if (b == CONST_TYPE_SHORT) {
             short value = byteBuffer.getShort(decodePointer);
             decodePointer += 2;

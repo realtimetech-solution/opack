@@ -106,4 +106,19 @@ public final class OpackObject<K, V> extends AbstractOpackValue<HashMap<K, V>> {
 
         return opackObject;
     }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+
+        OpackObject<?, ?> opackObject = (OpackObject<?, ?>) object;
+
+        return opackObject.get().equals(this.get());
+    }
+
+    @Override
+    public int hashCode() {
+        return this.get().hashCode();
+    }
 }
