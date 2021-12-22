@@ -30,7 +30,7 @@ import com.realtimetech.opack.value.OpackValue;
 import org.junit.jupiter.api.Test;
 
 public class StringArrayTest {
-    static class StringArrayClass {
+    public static class StringArrayClass {
         private String[] stringArrayValue;
 
         public StringArrayClass() {

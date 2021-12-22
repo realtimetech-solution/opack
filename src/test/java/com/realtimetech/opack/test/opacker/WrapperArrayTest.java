@@ -31,62 +31,62 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
-public class PrimitiveArrayTest {
+public class WrapperArrayTest {
     static final Random RANDOM = new Random();
 
     public static class PrimitiveArrayClass {
-        private boolean[] booleanArrayValue;
+        private Boolean[] booleanArrayValue;
 
-        private byte[] byteArrayValue;
-        private char[] charArrayValue;
+        private Byte[] byteArrayValue;
+        private Character[] charArrayValue;
 
-        private short[] shortArrayValue;
+        private Short[] shortArrayValue;
 
-        private int[] intArrayValue;
-        private float[] floatArrayValue;
+        private Integer[] intArrayValue;
+        private Float[] floatArrayValue;
 
-        private double[] doubleArrayValue;
-        private long[] longArrayValue;
+        private Double[] doubleArrayValue;
+        private Long[] longArrayValue;
 
         public PrimitiveArrayClass() {
             int length = RANDOM.nextInt(5) + 5;
 
-            this.booleanArrayValue = new boolean[length];
+            this.booleanArrayValue = new Boolean[length];
             for(int index = 0; index < length; index++){
                 this.booleanArrayValue[index] = RANDOM.nextBoolean();
             }
 
-            this.byteArrayValue = new byte[length];
+            this.byteArrayValue = new Byte[length];
             for(int index = 0; index < length; index++){
                 this.byteArrayValue[index] = (byte) RANDOM.nextInt();
             }
 
-            this.charArrayValue = new char[length];
+            this.charArrayValue = new Character[length];
             for(int index = 0; index < length; index++){
                 this.charArrayValue[index] = (char) RANDOM.nextInt();
             }
 
-            this.shortArrayValue = new short[length];
+            this.shortArrayValue = new Short[length];
             for(int index = 0; index < length; index++){
                 this.shortArrayValue[index] = (short) RANDOM.nextInt();
             }
 
-            this.intArrayValue = new int[length];
+            this.intArrayValue = new Integer[length];
             for(int index = 0; index < length; index++){
                 this.intArrayValue[index] = RANDOM.nextInt();
             }
 
-            this.floatArrayValue = new float[length];
+            this.floatArrayValue = new Float[length];
             for(int index = 0; index < length; index++){
                 this.floatArrayValue[index] = RANDOM.nextFloat();
             }
 
-            this.doubleArrayValue = new double[length];
+            this.doubleArrayValue = new Double[length];
             for(int index = 0; index < length; index++){
                 this.doubleArrayValue[index] = RANDOM.nextDouble();
             }
 
-            this.longArrayValue = new long[length];
+            this.longArrayValue = new Long[length];
             for(int index = 0; index < length; index++){
                 this.longArrayValue[index] = RANDOM.nextLong();
             }

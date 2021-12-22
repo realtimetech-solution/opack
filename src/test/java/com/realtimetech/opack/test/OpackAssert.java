@@ -23,6 +23,8 @@
 package com.realtimetech.opack.test;
 
 import com.realtimetech.opack.annotation.Ignore;
+import com.realtimetech.opack.util.ReflectionUtil;
+import com.realtimetech.opack.value.OpackValue;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -108,6 +110,8 @@ public class OpackAssert {
                         if (originalElementObject.getClass() != targetElementObject.getClass()) {
                             OpackAssert.throwException("element", originalElementObject, targetElementObject);
                         }
+
+                        OpackAssert.assertSingleValue(originalElementObject, targetElementObject);
                     }
                 } else {
                     OpackAssert.throwException("length", originalLength, targetLength);
@@ -124,7 +128,7 @@ public class OpackAssert {
                             Object originalValueObject = originalMap.get(originalKeyObject);
                             Object targetValueObject = targetMap.get(originalKeyObject);
 
-                            OpackAssert.assertObject(originalValueObject, targetValueObject);
+                            OpackAssert.assertSingleValue(originalValueObject, targetValueObject);
                         } else {
                             OpackAssert.throwExceptionNotContains(originalKeyObject);
                         }
@@ -140,10 +144,14 @@ public class OpackAssert {
 
                 if (originalLength == targetLength) {
                     for (int i = 0; i < originalList.size(); i++) {
-                        OpackAssert.assertObject(originalList.get(i), targetList.get(i));
+                        OpackAssert.assertSingleValue(originalList.get(i), targetList.get(i));
                     }
                 } else {
                     OpackAssert.throwException("length", originalLength, targetLength);
+                }
+            } else if (OpackValue.isAllowType(originalObject.getClass())) {
+                if (!originalObject.equals(targetObject)) {
+                    OpackAssert.throwException(originalObject, targetObject);
                 }
             } else {
                 OpackAssert.assertObject(originalObject, targetObject);

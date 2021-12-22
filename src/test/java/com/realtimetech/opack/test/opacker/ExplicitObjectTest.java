@@ -23,28 +23,48 @@
 package com.realtimetech.opack.test.opacker;
 
 import com.realtimetech.opack.Opacker;
+import com.realtimetech.opack.annotation.ExplicitType;
 import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.test.OpackAssert;
 import com.realtimetech.opack.value.OpackValue;
 import org.junit.jupiter.api.Test;
 
-public class StringTest {
-    public static class StringClass {
-        private String stringValue;
+import java.lang.reflect.Array;
+import java.util.Random;
 
-        public StringClass() {
-            this.stringValue = "Hello, World!";
+public class ExplicitObjectTest {
+    static final Random RANDOM = new Random();
+
+    public static class ExplicitObjectClass {
+        private Object nullValue;
+
+        @ExplicitType(type = ObjectTest.SubObjectClass[].class)
+        private Object subObjectArrayValue;
+
+        @ExplicitType(type = ObjectTest.SubObjectClass.class)
+        private Object subObjectWithExplicitValue;
+
+        public ExplicitObjectClass() {
+            this.nullValue = null;
+            int length = RANDOM.nextInt(5) + 5;
+
+            this.subObjectArrayValue = new ObjectTest.SubObjectClass[length];
+            for (int index = 0; index < length; index++) {
+                Array.set(this.subObjectArrayValue, index, new ObjectTest.SubObjectClass());
+            }
+
+            this.subObjectWithExplicitValue = new ObjectTest.SubObjectClass();
         }
     }
 
     @Test
     public void test() throws InstantiationException, SerializeException, DeserializeException, OpackAssert.AssertException {
         Opacker opacker = new Opacker.Builder().create();
-        StringArrayTest.StringArrayClass originalObject = new StringArrayTest.StringArrayClass();
+        ExplicitObjectClass originalObject = new ExplicitObjectClass();
 
         OpackValue serialized = opacker.serialize(originalObject);
-        StringArrayTest.StringArrayClass deserialized = opacker.deserialize(StringArrayTest.StringArrayClass.class, serialized);
+        ExplicitObjectClass deserialized = opacker.deserialize(ExplicitObjectClass.class, serialized);
 
         OpackAssert.assertEquals(originalObject, deserialized);
     }

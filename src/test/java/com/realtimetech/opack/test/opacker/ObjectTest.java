@@ -29,23 +29,50 @@ import com.realtimetech.opack.test.OpackAssert;
 import com.realtimetech.opack.value.OpackValue;
 import org.junit.jupiter.api.Test;
 
-public class StringTest {
-    public static class StringClass {
-        private String stringValue;
+import java.util.Random;
 
-        public StringClass() {
-            this.stringValue = "Hello, World!";
+public class ObjectTest {
+    static final Random RANDOM = new Random();
+
+    public static class SubObjectClass {
+        private Object nullValue;
+
+        private String stringValue;
+        private int intValue;
+        private Integer integerValue;
+
+        public SubObjectClass() {
+            this.nullValue = null;
+
+            this.stringValue = "sub_object_string_value" + System.currentTimeMillis();
+            this.intValue = RANDOM.nextInt();
+            this.integerValue = RANDOM.nextInt();
+        }
+    }
+
+    public static class ObjectClass {
+        private Object nullValue;
+
+        private SubObjectClass subObjectValue1;
+        private SubObjectClass subObjectValue2;
+
+        public ObjectClass() {
+            this.nullValue = null;
+
+            this.subObjectValue1 = new SubObjectClass();
+            this.subObjectValue2 = new SubObjectClass();
         }
     }
 
     @Test
     public void test() throws InstantiationException, SerializeException, DeserializeException, OpackAssert.AssertException {
         Opacker opacker = new Opacker.Builder().create();
-        StringArrayTest.StringArrayClass originalObject = new StringArrayTest.StringArrayClass();
+        ObjectClass originalObject = new ObjectClass();
 
         OpackValue serialized = opacker.serialize(originalObject);
-        StringArrayTest.StringArrayClass deserialized = opacker.deserialize(StringArrayTest.StringArrayClass.class, serialized);
+        ObjectClass deserialized = opacker.deserialize(ObjectClass.class, serialized);
 
         OpackAssert.assertEquals(originalObject, deserialized);
     }
+
 }

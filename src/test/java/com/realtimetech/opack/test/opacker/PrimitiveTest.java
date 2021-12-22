@@ -35,7 +35,7 @@ import java.util.Random;
 public class PrimitiveTest {
     static final Random RANDOM = new Random();
 
-    static class PrimitiveClass {
+    public static class PrimitiveClass {
         private boolean booleanValue;
 
         private byte byteValue;
@@ -62,38 +62,6 @@ public class PrimitiveTest {
 
             this.doubleValue = RANDOM.nextDouble();
             this.longValue = RANDOM.nextLong();
-        }
-
-        public boolean getBooleanValue() {
-            return booleanValue;
-        }
-
-        public byte getByteValue() {
-            return byteValue;
-        }
-
-        public char getCharValue() {
-            return charValue;
-        }
-
-        public short getShortValue() {
-            return shortValue;
-        }
-
-        public int getIntValue() {
-            return intValue;
-        }
-
-        public float getFloatValue() {
-            return floatValue;
-        }
-
-        public double getDoubleValue() {
-            return doubleValue;
-        }
-
-        public long getLongValue() {
-            return longValue;
         }
     }
 

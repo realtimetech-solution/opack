@@ -23,28 +23,48 @@
 package com.realtimetech.opack.test.opacker;
 
 import com.realtimetech.opack.Opacker;
+import com.realtimetech.opack.annotation.ExplicitType;
 import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.test.OpackAssert;
 import com.realtimetech.opack.value.OpackValue;
 import org.junit.jupiter.api.Test;
 
-public class StringTest {
-    public static class StringClass {
-        private String stringValue;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
-        public StringClass() {
-            this.stringValue = "Hello, World!";
+public class ListTest {
+    public static class ListClass {
+        private LinkedList<String> linkedListValue;
+
+        @ExplicitType(type = ArrayList.class)
+        private List<String> arrayListValue;
+
+        public ListClass() {
+            this.linkedListValue = new LinkedList<>();
+            this.linkedListValue.add("linked_list_value_1");
+            this.linkedListValue.add("linked_list_value_2");
+            this.linkedListValue.add("linked_list_value_3");
+            this.linkedListValue.add("linked_list_value_4");
+            this.linkedListValue.add("linked_list_value_5");
+
+            this.arrayListValue = new ArrayList<>();
+            this.arrayListValue.add("array_list_value_1");
+            this.arrayListValue.add("array_list_value_2");
+            this.arrayListValue.add("array_list_value_3");
+            this.arrayListValue.add("array_list_value_4");
+            this.arrayListValue.add("array_list_value_5");
         }
     }
 
     @Test
     public void test() throws InstantiationException, SerializeException, DeserializeException, OpackAssert.AssertException {
         Opacker opacker = new Opacker.Builder().create();
-        StringArrayTest.StringArrayClass originalObject = new StringArrayTest.StringArrayClass();
+        ListClass originalObject = new ListClass();
 
         OpackValue serialized = opacker.serialize(originalObject);
-        StringArrayTest.StringArrayClass deserialized = opacker.deserialize(StringArrayTest.StringArrayClass.class, serialized);
+        ListClass deserialized = opacker.deserialize(ListClass.class, serialized);
 
         OpackAssert.assertEquals(originalObject, deserialized);
     }
