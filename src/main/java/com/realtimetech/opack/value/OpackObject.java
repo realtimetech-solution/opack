@@ -57,6 +57,14 @@ public final class OpackObject<K, V> extends AbstractOpackValue<HashMap<K, V>> {
         return this.get().put(key, value);
     }
 
+
+    public V remove(K key) {
+        if (key != null)
+            OpackValue.assertAllowType(key.getClass());
+
+        return this.get().remove(key);
+    }
+
     public boolean containsKey(Object object) {
         return this.get().containsKey(object);
     }
