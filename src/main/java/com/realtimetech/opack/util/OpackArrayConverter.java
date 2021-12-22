@@ -37,8 +37,8 @@ public class OpackArrayConverter {
     static {
         Method method;
         try {
-            method = OpackValue.class.getDeclaredMethod("get");
-        } catch (NoSuchMethodException e) {
+            method = Class.forName("com.realtimetech.opack.value.AbstractOpackValue").getDeclaredMethod("get");
+        } catch (NoSuchMethodException | ClassNotFoundException e) {
             throw new ExceptionInInitializerError("Not found getter method in OpackArray");
         }
         OPACK_ARRAY_GETTER_METHOD = method;
