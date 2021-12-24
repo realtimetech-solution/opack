@@ -1,2 +1,2 @@
 # opack
-Fast object or data serialize and deserialize library
+A object serialize and deserialize, encode and decode library
