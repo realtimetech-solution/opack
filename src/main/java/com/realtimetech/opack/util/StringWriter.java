@@ -40,7 +40,7 @@ public class StringWriter {
     }
 
     /**
-     * Constructs a StringWriter with block size.
+     * Constructs a StringWriter with block size. (The capacity of this StringWriter increases with the block size)
      *
      * @param blockSize the block size
      */
@@ -54,7 +54,7 @@ public class StringWriter {
     }
 
     /**
-     * Increase capacity by needSize.
+     * Increase capacity by needSize. (The final capacity : current size + needSize + blockSize)
      *
      * @param needSize the size to increase
      */
