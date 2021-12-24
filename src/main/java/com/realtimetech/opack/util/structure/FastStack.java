@@ -38,10 +38,18 @@ public class FastStack<T> {
 
     private int startIndex;
 
+    /**
+     * Calls {@code new StringWriter(1024)}
+     */
     public FastStack() {
         this(10);
     }
 
+    /**
+     * Constructs a FastStack with block size. (The capacity of this stack increases with the block size)
+     *
+     * @param blockSize the block size
+     */
     public FastStack(int blockSize) {
         this.blockSize = blockSize;
         this.currentIndex = -1;
@@ -51,6 +59,9 @@ public class FastStack<T> {
         this.growArray();
     }
 
+    /**
+     * Increase the stack size by the block size.
+     */
     private void growArray() {
         this.scope++;
 
@@ -64,6 +75,10 @@ public class FastStack<T> {
         }
     }
 
+    /**
+     * @param object the element to push
+     * @return pushed element
+     */
     public T push(T object) {
         if (this.currentIndex + 2 >= this.currentSize) {
             growArray();
@@ -75,14 +90,26 @@ public class FastStack<T> {
         return object;
     }
 
+    /**
+     * @return element array
+     */
     public @NotNull T @NotNull [] getArray() {
         return objects;
     }
 
+    /**
+     * @return true if this stack is empty
+     */
     public boolean isEmpty() {
         return this.currentIndex == -1;
     }
 
+    /**
+     * Returns the element at the specified position in this Stack.
+     *
+     * @param index the index of the element to return
+     * @return the found element
+     */
     public @NotNull T get(int index) {
         if (this.currentIndex == -1)
             throw new EmptyStackException();
@@ -90,12 +117,24 @@ public class FastStack<T> {
         return this.objects[index];
     }
 
+    /**
+     * Swap position of A element and B element.
+     *
+     * @param index1 the index of the element to swap
+     * @param index2 the index of the element to swap
+     */
     public void swap(int index1, int index2) {
         T temp = this.objects[index1];
         this.objects[index1] = this.objects[index2];
         this.objects[index2] = temp;
     }
 
+    /**
+     * Reverse the position of elements in a specific range.
+     *
+     * @param start the start index of the range
+     * @param end   the end index of the range
+     */
     public void reverse(int start, int end) {
         int length = (end - start + 1) / 2;
         for (int index = 0; index < length; index++) {
@@ -105,6 +144,11 @@ public class FastStack<T> {
         }
     }
 
+    /**
+     * Returns the element at the top of this stack without removing it from the stack.
+     *
+     * @return the element at the top of this stack
+     */
     public @NotNull T peek() {
         if (this.currentIndex == -1)
             throw new EmptyStackException();
@@ -112,6 +156,11 @@ public class FastStack<T> {
         return this.objects[this.currentIndex];
     }
 
+    /**
+     * Returns the element at the top of this stack and removes it.
+     *
+     * @return The object at the top of this stack
+     */
     public T pop() {
         if (this.currentIndex == -1)
             throw new EmptyStackException();
@@ -124,6 +173,11 @@ public class FastStack<T> {
         return object;
     }
 
+    /**
+     * Shifts this stack to right.
+     *
+     * @return the element at the bottom before shifting
+     */
     public T shift() {
         if (this.currentIndex == -1)
             throw new EmptyStackException();
@@ -131,11 +185,19 @@ public class FastStack<T> {
         return this.objects[this.startIndex++];
     }
 
+    /**
+     * Reset this stack.
+     */
     public void reset() {
         this.currentIndex = -1;
         this.startIndex = 0;
     }
 
+    /**
+     * Returns the number of elements in this stack.
+     *
+     * @return the number of elements
+     */
     public int getSize() {
         return this.currentIndex + 1;
     }

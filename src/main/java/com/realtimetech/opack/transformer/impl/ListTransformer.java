@@ -37,12 +37,28 @@ import java.util.List;
 public abstract class ListTransformer implements Transformer {
     final boolean wrapWithType;
 
+    /**
+     * Constructs a ListTransformer
+     */
     public ListTransformer() {
         this.wrapWithType = this.allowWrapWithType();
     }
 
+    /**
+     * Returns whether the types of each element are also serialized.
+     *
+     * @return whether the types of each element are also serialized.
+     */
     protected abstract boolean allowWrapWithType();
 
+    /**
+     * Serializes the list to {@link OpackArray OpackArray}.
+     *
+     * @param opacker the opacker
+     * @param value   the value to serialize
+     * @return the serialized value
+     * @throws SerializeException if a problem occurs during serializing
+     */
     @Override
     public Object serialize(Opacker opacker, Object value) throws SerializeException {
         if (value instanceof List) {
@@ -73,6 +89,15 @@ public abstract class ListTransformer implements Transformer {
         return value;
     }
 
+    /**
+     * Deserializes the {@link OpackArray OpackArray} to {@link List list}.
+     *
+     * @param opacker  the opacker
+     * @param goalType the class of list to be deserialized
+     * @param value    the opack value to deserialize
+     * @return deserialized value
+     * @throws DeserializeException if a problem occurs during deserializing
+     */
     @Override
     public Object deserialize(Opacker opacker, Class<?> goalType, Object value) throws DeserializeException {
         if (value instanceof OpackArray) {

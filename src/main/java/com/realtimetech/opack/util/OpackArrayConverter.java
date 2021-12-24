@@ -39,16 +39,34 @@ public class OpackArrayConverter {
         try {
             method = Class.forName("com.realtimetech.opack.value.AbstractOpackValue").getDeclaredMethod("get");
         } catch (NoSuchMethodException | ClassNotFoundException e) {
-            throw new ExceptionInInitializerError("Not found getter method in OpackArray");
+            throw new ExceptionInInitializerError("No getter method found in OpackArray");
         }
         OPACK_ARRAY_GETTER_METHOD = method;
         OPACK_ARRAY_GETTER_METHOD.setAccessible(true);
     }
 
+    /**
+     * Returns the underlying list of opack array.
+     *
+     * @param opackArray the opack array to be targeted
+     * @return the underlying list
+     * @throws InvocationTargetException if exception occurs during invoke opack array getter method
+     * @throws IllegalAccessException if the getter method object in opack array is enforcing Java language access control and cannot access that method
+     */
     public static List<?> getOpackArrayList(OpackArray<?> opackArray) throws InvocationTargetException, IllegalAccessException {
         return (List<?>) OPACK_ARRAY_GETTER_METHOD.invoke(opackArray);
     }
 
+    /**
+     * Convert the opack array to array.
+     *
+     * @param componentType the component type of array
+     * @param opackArray the opack array to convert
+     * @return the converted array
+     * @throws InvocationTargetException if exception occurs during invoke opack array getter method
+     * @throws IllegalAccessException if the getter method object in opack array is enforcing Java language access control and cannot access that method.
+     * @throws IllegalArgumentException if component type is now allowed or invalid
+     */
     public static Object convertToArray(Class<?> componentType, OpackArray<?> opackArray) throws InvocationTargetException, IllegalAccessException {
         if (!OpackValue.isAllowType(componentType)) {
             throw new IllegalArgumentException(componentType + " type is not allowed");

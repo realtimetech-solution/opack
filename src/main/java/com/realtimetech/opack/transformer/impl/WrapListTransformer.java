@@ -22,7 +22,7 @@
 
 package com.realtimetech.opack.transformer.impl;
 
-public class WrapListTransformer extends ListTransformer{
+public class WrapListTransformer extends ListTransformer {
     @Override
     protected boolean allowWrapWithType() {
         return true;

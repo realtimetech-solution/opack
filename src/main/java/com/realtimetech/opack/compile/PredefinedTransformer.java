@@ -29,6 +29,12 @@ public class PredefinedTransformer {
     final Transformer transformer;
     final boolean inheritable;
 
+    /**
+     * Constructs the PredefinedTransformer.
+     *
+     * @param transformer the transformer
+     * @param inheritable whether the transformer is inheritable
+     */
     public PredefinedTransformer(@NotNull Transformer transformer, boolean inheritable) {
         this.transformer = transformer;
         this.inheritable = inheritable;

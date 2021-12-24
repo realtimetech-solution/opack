@@ -28,16 +28,20 @@ import com.realtimetech.opack.exception.SerializeException;
 
 public interface Transformer {
     /**
+     * Serialize specific value to opack value.
      *
-     * @param value
-     * @return
+     * @param value the value to serialize
+     * @return opack value
+     * @throws SerializeException if a problem occurs during serializing
      */
     public Object serialize(Opacker opacker, Object value) throws SerializeException;
 
     /**
+     * Deserialize opack value.
      *
-     * @param value
-     * @return
+     * @param value the opack value to deserialize
+     * @return deserialized value
+     * @throws DeserializeException if a problem occurs during deserializing
      */
     public Object deserialize(Opacker opacker, Class<?> goalType, Object value) throws DeserializeException;
 }

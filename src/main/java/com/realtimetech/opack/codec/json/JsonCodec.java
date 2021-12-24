@@ -77,10 +77,14 @@ public final class JsonCodec extends OpackCodec<String> {
             return this;
         }
 
+        /**
+         * Create the {@link JsonCodec JsonCodec}.
+         *
+         * @return created json codec
+         */
         public JsonCodec create() {
             return new JsonCodec(this);
         }
-
     }
 
     private static final char[] CONST_U2028 = "\\u2028".toCharArray();
@@ -132,6 +136,11 @@ public final class JsonCodec extends OpackCodec<String> {
     final FastStack<Object> decodeValueStack;
     final StringWriter decodeStringWriter;
 
+    /**
+     * Constructs the JsonCodec with the builder of JsonCodec.
+     *
+     * @param builder the builder of JsonCodec
+     */
     JsonCodec(Builder builder) {
         super();
 
@@ -148,6 +157,15 @@ public final class JsonCodec extends OpackCodec<String> {
         this.decodeStringWriter = new StringWriter();
     }
 
+    /**
+     * Encodes the literal object.
+     *
+     * @param stringWriter the string writer for writing encoded object
+     * @param object       the object to encode
+     * @return whether object is encoded
+     * @throws IllegalArgumentException if the type of data to be encoded is not allowed in json format
+     * @throws ArithmeticException      if the data to be encoded is infinite
+     */
     boolean encodeLiteral(StringWriter stringWriter, Object object) {
         if (object == null) {
             stringWriter.write(CONST_NULL_CHARACTER);
@@ -241,6 +259,13 @@ public final class JsonCodec extends OpackCodec<String> {
         return true;
     }
 
+    /**
+     * Encodes the OpackValue to json string.
+     *
+     * @param opackValue the OpackValue to encode
+     * @return json string
+     * @throws IllegalArgumentException if the type of data to be encoded is not allowed in json format
+     */
     @Override
     protected String doEncode(OpackValue opackValue) {
         this.encodeLiteralStringWriter.reset();
@@ -375,6 +400,13 @@ public final class JsonCodec extends OpackCodec<String> {
         return this.encodeStringWriter.toString();
     }
 
+    /**
+     * Decodes the json string to {@link OpackValue OpackValue}.
+     *
+     * @param data the json string to decode
+     * @return OpackValue
+     * @throws IOException if there is a syntax problem with the json string; if the json string has a unicode whose unknown pattern
+     */
     @Override
     protected OpackValue doDecode(String data) throws IOException {
         this.decodeBaseStack.reset();
@@ -568,7 +600,7 @@ public final class JsonCodec extends OpackCodec<String> {
                             pointer = pointer + 3;
                             stackMerge = true;
                         } else {
-                            throw new IOException("Parsed unknown character at " + pointer + "(" + currentChar + ")");
+                            throw new IOException("This value is not an opack value. Unknown value at " + pointer + "(" + currentChar + ")");
                         }
                     } else {
                         throw new IOException("Parsed unknown character at " + pointer + "(" + currentChar + ")");

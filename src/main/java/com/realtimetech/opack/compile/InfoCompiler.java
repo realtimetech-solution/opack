@@ -46,6 +46,11 @@ public class InfoCompiler {
     final @NotNull HashMap<Class<?>, ClassInfo> classInfoMap;
     final @NotNull HashMap<Class<?>, List<PredefinedTransformer>> predefinedTransformerMap;
 
+    /**
+     * Constructs an InfoCompiler with the opacker.
+     *
+     * @param opacker the opacker
+     */
     public InfoCompiler(@NotNull Opacker opacker) {
         this.opacker = opacker;
 
@@ -55,6 +60,12 @@ public class InfoCompiler {
         this.predefinedTransformerMap = new HashMap<>();
     }
 
+    /**
+     * Returns predefined transformers targeting a specific class type.
+     *
+     * @param classType the class type to be the target
+     * @return found predefined transformers
+     */
     public PredefinedTransformer[] getPredefinedTransformers(Class<?> classType) {
         List<PredefinedTransformer> predefinedTransformers = this.predefinedTransformerMap.get(classType);
 
@@ -65,10 +76,27 @@ public class InfoCompiler {
         return predefinedTransformers.toArray(new PredefinedTransformer[0]);
     }
 
-    public boolean registerPredefinedTransformer(@NotNull Class<?> classType, @NotNull Class<? extends Transformer> transformer) throws InstantiationException {
-        return this.registerPredefinedTransformer(classType, transformer, false);
+    /**
+     * Calls {@code registerPredefinedTransformer(classType, transformerClass, false);}
+     *
+     * @param classType        the class type to be the target
+     * @param transformerClass the predefined transformer class to register
+     * @return whether the predefined transformer registration is successful
+     * @throws InstantiationException if transformer class object cannot be instantiated
+     */
+    public boolean registerPredefinedTransformer(@NotNull Class<?> classType, @NotNull Class<? extends Transformer> transformerClass) throws InstantiationException {
+        return this.registerPredefinedTransformer(classType, transformerClass, false);
     }
 
+    /**
+     * Register a predefined transformer targeting the specific class type.
+     *
+     * @param classType        the class type to be the target
+     * @param transformerClass the predefined transformer to register
+     * @param inheritable      whether transformer is inheritable
+     * @return whether the predefined transformer registration is successful
+     * @throws InstantiationException if transformer class object cannot be instantiated
+     */
     public synchronized boolean registerPredefinedTransformer(@NotNull Class<?> classType, @NotNull Class<? extends Transformer> transformerClass, boolean inheritable) throws InstantiationException {
         if (!this.predefinedTransformerMap.containsKey(classType)) {
             this.predefinedTransformerMap.put(classType, new LinkedList<>());
@@ -88,6 +116,13 @@ public class InfoCompiler {
         return true;
     }
 
+    /**
+     * Unregister a predefined transformer targeting the specific class type.
+     *
+     * @param classType        the targeted class type
+     * @param transformerClass the predefined transformer to unregister
+     * @return whether the cancellation of predefined transformer registration is successful
+     */
     public synchronized boolean unregisterPredefinedTransformer(@NotNull Class<?> classType, @NotNull Class<? extends Transformer> transformerClass) {
         List<PredefinedTransformer> predefinedTransformers = this.predefinedTransformerMap.get(classType);
 
@@ -103,7 +138,7 @@ public class InfoCompiler {
             }
         }
 
-        if(targetPredefinedTransformer == null){
+        if (targetPredefinedTransformer == null) {
             return false;
         }
 
@@ -112,6 +147,14 @@ public class InfoCompiler {
         return true;
     }
 
+    /**
+     * Add transformers for the element to the transformer list.
+     *
+     * @param transformers     the transformer list to add
+     * @param annotatedElement the element to be targeted
+     * @param root             whether the element is not super class (whether the element is the root)
+     * @throws CompileException if transformer class object cannot be instantiated
+     */
     void addTransformer(List<Transformer> transformers, AnnotatedElement annotatedElement, boolean root) throws CompileException {
         if (annotatedElement instanceof Class) {
             Class<?> elementClass = (Class<?>) annotatedElement;
@@ -157,12 +200,25 @@ public class InfoCompiler {
         }
     }
 
+    /**
+     * Returns transformers registered through {@link Transform Transform} annotation.
+     *
+     * @param annotatedElement the element that annotated {@link Transform Transform}
+     * @return transformers
+     * @throws CompileException if transformer class object cannot be instantiated
+     */
     Transformer[] getTransformer(AnnotatedElement annotatedElement) throws CompileException {
         List<Transformer> transformers = new LinkedList<>();
         this.addTransformer(transformers, annotatedElement, true);
         return transformers.toArray(new Transformer[0]);
     }
 
+    /**
+     * Returns the explicit type of specific element registered through {@link ExplicitType ExplicitType}.
+     *
+     * @param annotatedElement the element that annotated {@link ExplicitType ExplicitType}
+     * @return explicit type
+     */
     Class<?> getExplicitType(AnnotatedElement annotatedElement) {
         if (annotatedElement.isAnnotationPresent(ExplicitType.class)) {
             ExplicitType explicit = annotatedElement.getAnnotation(ExplicitType.class);
@@ -172,6 +228,13 @@ public class InfoCompiler {
         return null;
     }
 
+    /**
+     * Compile the class into {@link ClassInfo ClassInfo}.
+     *
+     * @param compileClass the class to compile
+     * @return compiled class info
+     * @throws CompileException if a problem occurs during compiling a class into {@link ClassInfo ClassInfo}
+     */
     @NotNull ClassInfo compile(@NotNull Class<?> compileClass) throws CompileException {
         List<ClassInfo.FieldInfo> fieldInfos = new LinkedList<>();
         Transformer[] transformers = new Transformer[0];
@@ -199,6 +262,13 @@ public class InfoCompiler {
         return new ClassInfo(compileClass, transformers, fieldInfos.toArray(new ClassInfo.FieldInfo[0]));
     }
 
+    /**
+     * Returns ClassInfo for target class.
+     *
+     * @param targetClass the class type to be targeted
+     * @return class info
+     * @throws CompileException if a problem occurs during compiling a class into class info
+     */
     public @NotNull ClassInfo get(@NotNull Class<?> targetClass) throws CompileException {
         if (!this.classInfoMap.containsKey(targetClass)) {
             synchronized (this.classInfoMap) {
