@@ -22,7 +22,10 @@
 
 package com.realtimetech.opack.exception;
 
-public class EncodeException extends Exception{
+/**
+ * Thrown when a problem occurs during encoding.
+ */
+public class EncodeException extends Exception {
     public EncodeException(Throwable cause) {
         super(cause);
     }

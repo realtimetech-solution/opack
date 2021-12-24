@@ -23,82 +23,130 @@
 package com.realtimetech.opack.util;
 
 public class StringWriter {
-	private final int blockSize;
+    private final int blockSize;
 
-	private char[] chars;
+    private char[] chars;
 
-	private int currentIndex;
-	private int scope;
+    private int currentIndex;
+    private int scope;
 
-	private int currentSize;
+    private int currentSize;
 
-	public StringWriter() {
-		this(1024);
-	}
+    /**
+     * Calls {@code new StringWriter(1024)}
+     */
+    public StringWriter() {
+        this(1024);
+    }
 
-	public StringWriter(int blockSize) {
-		this.blockSize = blockSize;
-		this.currentIndex = -1;
-		this.scope = 0;
-		this.currentSize = 0;
+    /**
+     * Constructs a StringWriter with block size.
+     *
+     * @param blockSize the block size
+     */
+    public StringWriter(int blockSize) {
+        this.blockSize = blockSize;
+        this.currentIndex = -1;
+        this.scope = 0;
+        this.currentSize = 0;
 
-		this.growArray(0);
-	}
+        this.growArray(0);
+    }
 
-	private void growArray(int needSize) {
-		this.scope = needSize / blockSize;
+    /**
+     * Increase capacity by needSize.
+     *
+     * @param needSize the size to increase
+     */
+    private void growArray(int needSize) {
+        this.scope = needSize / blockSize;
 
-		char[] oldObjects = this.chars;
+        char[] oldObjects = this.chars;
 
-		this.currentSize = (this.scope + 1) * this.blockSize;
-		this.chars = new char[this.currentSize];
+        this.currentSize = (this.scope + 1) * this.blockSize;
+        this.chars = new char[this.currentSize];
 
-		if (oldObjects != null) {
-			System.arraycopy(oldObjects, 0, this.chars, 0, currentIndex + 1);
-		}
-	}
+        if (oldObjects != null) {
+            System.arraycopy(oldObjects, 0, this.chars, 0, currentIndex + 1);
+        }
+    }
 
-	public void write(char object) {
-		int need = this.currentIndex + 1;
-		if (need >= this.currentSize) {
-			growArray(need);
-		}
+    /**
+     * Writes a single character.
+     *
+     * @param object the character to write
+     */
+    public void write(char object) {
+        int need = this.currentIndex + 1;
+        if (need >= this.currentSize) {
+            growArray(need);
+        }
 
-		this.currentIndex = need;
+        this.currentIndex = need;
 
-		this.chars[this.currentIndex] = object;
-	}
+        this.chars[this.currentIndex] = object;
+    }
 
-	
-	public void write(char[] src) {
-		this.write(src, 0, src.length);
-	}
+    /**
+     * Writes an array of characters.
+     *
+     * @param src the source array to write
+     */
+    public void write(char[] src) {
+        this.write(src, 0, src.length);
+    }
 
-	public void write(char[] src, int offset, int length) {
-		int need = this.currentIndex + length;
-		if (need >= this.currentSize) {
-			growArray(need);
-		}
+    /**
+     * Writes a portion of an array of characters.
+     *
+     * @param src    the source array to write
+     * @param offset the starting position in the source array
+     * @param length the number of characters to write
+     */
+    public void write(char[] src, int offset, int length) {
+        int need = this.currentIndex + length;
+        if (need >= this.currentSize) {
+            growArray(need);
+        }
 
-		System.arraycopy(src, offset, this.chars, this.currentIndex + 1, length);
+        System.arraycopy(src, offset, this.chars, this.currentIndex + 1, length);
 
-		this.currentIndex = need;
-	}
+        this.currentIndex = need;
+    }
 
-	public int getLength() {
-		return this.currentIndex + 1;
-	}
+    /**
+     * Returns the current string length of this string writer.
+     *
+     * @return string length
+     */
+    public int getLength() {
+        return this.currentIndex + 1;
+    }
 
-	public void reset() {
-		this.currentIndex = -1;
-	}
+    /**
+     * Reset this string writer
+     */
+    public void reset() {
+        this.currentIndex = -1;
+    }
 
-	public String toString() {
-		return new String(this.chars, 0, this.currentIndex + 1);
-	}
-	public char[] toCharArray() {
-		char[] charArray = new char[this.currentIndex + 1];
-		System.arraycopy(this.chars, 0, charArray, 0, this.currentIndex + 1);
-		return charArray;
-	}
+    /**
+     * Returns a string created through this string writer.
+     *
+     * @return created string
+     */
+    public String toString() {
+        return new String(this.chars, 0, this.currentIndex + 1);
+    }
+
+    /**
+     * Returns an array containing all the characters in this writer in proper sequence.
+     *
+     * @return an array containing all the characters in this writer in proper sequence
+     */
+    public char[] toCharArray() {
+        char[] charArray = new char[this.currentIndex + 1];
+        System.arraycopy(this.chars, 0, charArray, 0, this.currentIndex + 1);
+        return charArray;
+    }
 }

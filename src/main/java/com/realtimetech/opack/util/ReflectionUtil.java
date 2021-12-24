@@ -31,6 +31,14 @@ import java.util.*;
 
 public class ReflectionUtil {
     private static abstract class Allocator {
+        /**
+         * Create new instance for specific class.
+         *
+         * @param typeClass the class to create
+         * @return created instance
+         * @throws InvocationTargetException if exception occurs in invoked underlying method
+         * @throws IllegalAccessException    if this Method object is enforcing Java language access control and the underlying method is inaccessible
+         */
         abstract <T> T allocate(Class<T> typeClass) throws InvocationTargetException, IllegalAccessException;
     }
 
@@ -68,6 +76,11 @@ public class ReflectionUtil {
         }
     }
 
+    /**
+     * Create new unsafe allocator for JVM, DalvikVM.
+     *
+     * @return created allocator
+     */
     static Allocator createAvailableAllocator() {
         // for JVM
         try {
@@ -119,6 +132,13 @@ public class ReflectionUtil {
         return null;
     }
 
+    /**
+     * Casts an object to the specific class.
+     *
+     * @param typeClass the class to cast
+     * @param object    the object to be cast
+     * @return the object after casting
+     */
     public static Object cast(Class<?> typeClass, Object object) {
         if (ReflectionUtil.isPrimitiveClass(typeClass)) {
             typeClass = ReflectionUtil.getWrapperClassOfPrimitiveClass(typeClass);
@@ -176,6 +196,13 @@ public class ReflectionUtil {
         return typeClass.cast(object);
     }
 
+    /**
+     * Returns the value of the indexed component in the specified array object.
+     *
+     * @param array the array
+     * @param index the index
+     * @return the value of the indexed component in the specified array
+     */
     public static Object getArrayItem(Object array, int index) {
         Class<?> c = array.getClass();
 
@@ -200,6 +227,13 @@ public class ReflectionUtil {
         return ((Object[]) array)[index];
     }
 
+    /**
+     * Sets the value of the indexed component of the specified array object to the specified new value.
+     *
+     * @param array the array
+     * @param index the index
+     * @param value the new value of the indexed component
+     */
     public static void setArrayItem(Object array, int index, Object value) {
         Class<?> c = array.getClass();
 
@@ -224,6 +258,13 @@ public class ReflectionUtil {
         }
     }
 
+    /**
+     * Clones the array object.
+     *
+     * @param object the object to clone
+     * @return cloned array object
+     * @throws IllegalArgumentException if the object is not array object
+     */
     public static Object cloneArray(Object object) {
         if (!object.getClass().isArray()) {
             throw new IllegalArgumentException(object + " is not array object.");
@@ -232,9 +273,16 @@ public class ReflectionUtil {
         int length = Array.getLength(object);
         Object newArray = Array.newInstance(object.getClass().getComponentType(), length);
         System.arraycopy(object, 0, newArray, 0, length);
+
         return newArray;
     }
 
+    /**
+     * Add accessible fields of the target Class to the field List.
+     *
+     * @param fieldList   the field list to be added
+     * @param targetClass the target class
+     */
     static void addAccessibleFields(List<Field> fieldList, Class<?> targetClass) {
         Class<?> superClass = targetClass.getSuperclass();
 
@@ -249,6 +297,12 @@ public class ReflectionUtil {
         }
     }
 
+    /**
+     * Returns accessible fields of target class.
+     *
+     * @param targetClass the target class
+     * @return accessible fields
+     */
     public static Field[] getAccessibleFields(Class<?> targetClass) {
         List<Field> fields = new LinkedList<>();
         ReflectionUtil.addAccessibleFields(fields, targetClass);
@@ -256,6 +310,13 @@ public class ReflectionUtil {
         return fields.toArray(new Field[0]);
     }
 
+    /**
+     * Returns the dimension of the array through the class object of the array object.
+     *
+     * @param typeClass the class of the target array object
+     * @return dimension
+     * @throws IllegalArgumentException if the class is not the class of the array object
+     */
     public static int getArrayDimension(Class<?> typeClass) {
         if (!typeClass.isArray()) {
             throw new IllegalArgumentException(typeClass + " is not array class.");
@@ -277,6 +338,12 @@ public class ReflectionUtil {
         return count;
     }
 
+    /**
+     * Returns the underlying component type of the array through the class object of the array object.
+     *
+     * @param typeClass the class of the array object
+     * @return component type
+     */
     public static Class<?> getArrayLastComponentType(Class<?> typeClass) {
         if (!typeClass.isArray()) {
             throw new IllegalArgumentException(typeClass + " is not array class.");
@@ -297,24 +364,46 @@ public class ReflectionUtil {
         return lastClass;
     }
 
+    /**
+     * @param clazz the target class
+     * @return whether the target class is wrapper class
+     */
     public static boolean isWrapperClass(Class<?> clazz) {
         return WRAPPERS_PRIMITIVES_MAP.containsKey(clazz);
     }
 
+    /**
+     * Returns the primitive class corresponding to the wrapper class.
+     *
+     * @param wrapperClass the wrapper class
+     * @return primitive class
+     * @throws IllegalArgumentException if target class is not wrapper class
+     */
     public static @NotNull Class<?> getPrimitiveClassOfWrapperClass(@NotNull Class<?> wrapperClass) {
         Class<?> primitiveClass = WRAPPERS_PRIMITIVES_MAP.getOrDefault(wrapperClass, null);
 
         if (primitiveClass == null) {
-            throw new IllegalArgumentException(wrapperClass + " is not primitive class.");
+            throw new IllegalArgumentException(wrapperClass + " is not wrapper class.");
         }
 
         return primitiveClass;
     }
 
+    /**
+     * @param clazz the target class
+     * @return whether the target class is primitive class
+     */
     public static boolean isPrimitiveClass(Class<?> clazz) {
         return PRIMITIVES_WRAPPERS_MAP.containsKey(clazz);
     }
 
+    /**
+     * Returns the wrapper class corresponding to the primitive class.
+     *
+     * @param primitiveClass the primitive class
+     * @return wrapper class
+     * @throws IllegalArgumentException if target class is not primitive class
+     */
     public static @NotNull Class<?> getWrapperClassOfPrimitiveClass(@NotNull Class<?> primitiveClass) {
         Class<?> wrapperClass = PRIMITIVES_WRAPPERS_MAP.getOrDefault(primitiveClass, null);
 
@@ -325,6 +414,13 @@ public class ReflectionUtil {
         return wrapperClass;
     }
 
+    /**
+     * Returns whether casting from the source class to the destination class is possible.
+     *
+     * @param fromClass the source class
+     * @param toClass   the destination class
+     * @return whether casting is possible
+     */
     public static boolean checkClassCastable(@NotNull Class<?> fromClass, @NotNull Class<?> toClass) {
         if (fromClass.isPrimitive()) {
             fromClass = ReflectionUtil.getWrapperClassOfPrimitiveClass(fromClass);
@@ -337,6 +433,15 @@ public class ReflectionUtil {
         return toClass.isAssignableFrom(fromClass);
     }
 
+    /**
+     * Create a new instance of the class with unsafe allocator.
+     *
+     * @param instanceClass the class to create instance
+     * @return created instance
+     * @throws InvocationTargetException if exception occurs in invoked underlying method
+     * @throws IllegalAccessException    if the method object is enforcing Java language access control and the underlying method is inaccessible
+     * @throws InstantiationException    if the class object represents an abstract class, an interface
+     */
     public static <T> @NotNull T createInstanceUnsafe(@NotNull Class<T> instanceClass) throws InvocationTargetException, IllegalAccessException, InstantiationException {
         int modifiers = instanceClass.getModifiers();
 
@@ -351,6 +456,17 @@ public class ReflectionUtil {
         return ReflectionUtil.ALLOCATOR.allocate(instanceClass);
     }
 
+    /**
+     * Create a new instance of the class through constructor.
+     *
+     * @param instanceClass the class to create instance
+     * @param objects       the argument of the constructor
+     * @return created instance
+     * @throws IllegalArgumentException  if the class doesn't have matched constructor
+     * @throws InvocationTargetException if exception occurs in invoked underlying method
+     * @throws IllegalAccessException    if the method object is enforcing Java language access control and the underlying method is inaccessible
+     * @throws InstantiationException    if the class object represents an abstract class, an interface
+     */
     public static <T> @NotNull T createInstance(@NotNull Class<T> instanceClass, Object @NotNull ... objects) throws InvocationTargetException, InstantiationException, IllegalAccessException {
         int modifiers = instanceClass.getModifiers();
 

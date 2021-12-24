@@ -22,7 +22,10 @@
 
 package com.realtimetech.opack.exception;
 
-public class DecodeException extends Exception{
+/**
+ * Thrown when a problem occurs during decoding.
+ */
+public class DecodeException extends Exception {
     public DecodeException(Throwable cause) {
         super(cause);
     }

@@ -38,7 +38,7 @@ import java.nio.*;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-public class DenseCodec extends OpackCodec<byte[]> {
+public final class DenseCodec extends OpackCodec<byte[]> {
     public final static class Builder {
         int encodeStackInitialSize;
         int decodeStackInitialSize;
@@ -100,6 +100,11 @@ public class DenseCodec extends OpackCodec<byte[]> {
     final byte[] byte4Buffer;
     final byte[] byte2Buffer;
 
+    /**
+     * Constructs the DenseCodec with the builder of DenseCodec.
+     *
+     * @param builder the builder of DenseCodec
+     */
     DenseCodec(Builder builder) {
         super();
 
@@ -115,6 +120,14 @@ public class DenseCodec extends OpackCodec<byte[]> {
         this.byte2Buffer = new byte[2];
     }
 
+    /**
+     * Encodes the OpackValue to byte array through dense codec.
+     *
+     * @param opackValue the OpackValue to encode
+     * @return encoded byte array
+     * @throws IOException              if an I/O error occurs when writing to byte stream
+     * @throws IllegalArgumentException if the type of data to be encoded is not allowed in dense format
+     */
     @Override
     protected byte[] doEncode(OpackValue opackValue) throws IOException {
         this.encodeStack.push(opackValue);
@@ -236,7 +249,7 @@ public class DenseCodec extends OpackCodec<byte[]> {
                         }
                     }
                 } catch (InvocationTargetException | IllegalAccessException e) {
-                    throw new IllegalStateException("Failed to access the OpackArray native list object.");
+                    throw new IllegalStateException("Failed to access the native list object in OpackArray");
                 }
             } else {
                 if (objectClass == boolean.class) {
@@ -297,6 +310,15 @@ public class DenseCodec extends OpackCodec<byte[]> {
         return encodeByteArrayStream.toByteArray();
     }
 
+    /**
+     * Decodes one block to OpackValue, (basic block protocol: header(1 byte), data (variable))
+     * If data of block to be decoded is OpackObject or OpackArray(excluding primitive array), returns CONTEXT_BRANCH_CONTEXT_OBJECT for linear decoding.
+     *
+     * @param data       the data to decode
+     * @param byteBuffer the byte buffer that wraps the data
+     * @return opack value or CONTEXT_BRANCH_CONTEXT_OBJECT
+     * @throws IllegalArgumentException if the type of data to be decoded is not allowed in dense format; if unknown block header is parsed
+     */
     Object decodeBlock(byte[] data, ByteBuffer byteBuffer) {
         byte b = data[decodePointer++];
 
@@ -415,14 +437,21 @@ public class DenseCodec extends OpackCodec<byte[]> {
                     byteBuffer.position(0);
                     return OpackArray.createWithArrayObject(array);
                 } else {
-                    throw new IllegalStateException(nativeType + " is not allowed in dense format. (unknown native type)");
+                    throw new IllegalArgumentException(nativeType + " is not allowed in dense format. (unknown native type)");
                 }
             }
         }
 
-        throw new IllegalStateException(b + " is not registered block header binary in dense codec. (unknown block header)");
+        throw new IllegalArgumentException(b + " is not registered block header binary in dense codec. (unknown block header)");
     }
 
+    /**
+     * Decodes the byte array encoded through the dense codec to OpackValue.
+     *
+     * @param data the data to decode
+     * @return opack value
+     * @throws IllegalArgumentException if the decoded value is not a opack value
+     */
     @Override
     protected OpackValue doDecode(byte[] data) {
         ByteBuffer byteBuffer = ByteBuffer.wrap(data);
@@ -494,7 +523,7 @@ public class DenseCodec extends OpackCodec<byte[]> {
                     }
                 }
             } else {
-                throw new IllegalArgumentException(opackValue.getClass() +" is not a type of opack value. (unknown opack value type)");
+                throw new IllegalArgumentException(opackValue.getClass() + " is not a type of opack value. (unknown opack value type)");
             }
 
             if (!bypass) {

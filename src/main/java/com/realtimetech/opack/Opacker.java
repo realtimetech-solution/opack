@@ -70,6 +70,12 @@ public class Opacker {
             return this;
         }
 
+        /**
+         * Create the Opacker through this builder.
+         *
+         * @return created opacker
+         * @throws InstantiationException if the predefined transformer cannot be instanced
+         */
         public Opacker create() throws InstantiationException {
             return new Opacker(this);
         }
@@ -87,6 +93,12 @@ public class Opacker {
 
     @NotNull State state;
 
+    /**
+     * Constructs the Opacker with the builder of Opacker.
+     *
+     * @param builder the builder of Opacker
+     * @throws InstantiationException if the predefined transformer cannot be instanced
+     */
     Opacker(Builder builder) throws InstantiationException {
         this.infoCompiler = new InfoCompiler(this);
 
@@ -103,6 +115,13 @@ public class Opacker {
         }
     }
 
+    /**
+     * Serializes the object to opack value.
+     *
+     * @param object the object to be serialized
+     * @return opack value
+     * @throws SerializeException if a problem occurs during serializing; if this opacker is deserializing
+     */
     public synchronized OpackValue serialize(Object object) throws SerializeException {
         if (this.state == State.DESERIALIZE)
             throw new SerializeException("Opacker is deserializing");
@@ -121,6 +140,14 @@ public class Opacker {
         return value;
     }
 
+    /**
+     * Store information needed for serialization in stacks.
+     *
+     * @param baseClass the class of object to be serialized
+     * @param object    the object to be serialized
+     * @return prepared opack value
+     * @throws SerializeException if a problem occurs during serializing; if the baseClass cannot be compiled into {@link ClassInfo ClassInfo}
+     */
     Object prepareObjectSerialize(Class<?> baseClass, Object object) throws SerializeException {
         if (baseClass == null || object == null) {
             return null;
@@ -178,6 +205,11 @@ public class Opacker {
         }
     }
 
+    /**
+     * Serialize the elements of each opack value in the stack. (OpackObject: fields, OpackArray element : array elements)
+     *
+     * @throws SerializeException if a problem occurs during serializing; if the field in the class of instance to be serialized is not accessible
+     */
     void executeSerializeStack() throws SerializeException {
         while (!this.objectStack.isEmpty()) {
             Object object = this.objectStack.pop();
@@ -216,6 +248,14 @@ public class Opacker {
         }
     }
 
+    /**
+     * Deserializes the opack value to object of the target class.
+     *
+     * @param targetClass the target class
+     * @param opackValue  the opack value to be deserialized
+     * @return deserialized object
+     * @throws DeserializeException if a problem occurs during deserializing; if this opacker is serializing
+     */
     public synchronized <T> T deserialize(Class<T> targetClass, OpackValue opackValue) throws DeserializeException {
         if (this.state == State.SERIALIZE)
             throw new DeserializeException("Opacker is serializing");
@@ -234,6 +274,14 @@ public class Opacker {
         return value;
     }
 
+    /**
+     * Store information needed for deserialization in stacks.
+     *
+     * @param goalClass the class of object to be deserialized
+     * @param object    the object to be deserialized
+     * @return prepared object
+     * @throws DeserializeException if a problem occurs during deserializing
+     */
     public synchronized Object prepareObjectDeserialize(Class<?> goalClass, Object object) throws DeserializeException {
         if (goalClass == null || object == null) {
             return null;
@@ -319,6 +367,11 @@ public class Opacker {
         }
     }
 
+    /**
+     * Deserialize the elements of each opack value in the stack. (OpackObject: fields, OpackArray element : array elements)
+     *
+     * @throws DeserializeException if a problem occurs during deserializing; if the field in the class of instance to be deserialized is not accessible
+     */
     void executeDeserializeStack() throws DeserializeException {
         while (!this.objectStack.isEmpty()) {
             Object object = this.objectStack.pop();

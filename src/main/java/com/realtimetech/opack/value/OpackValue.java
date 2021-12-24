@@ -25,12 +25,24 @@ package com.realtimetech.opack.value;
 import com.realtimetech.opack.util.ReflectionUtil;
 
 public interface OpackValue {
+    /**
+     * Assert the specific class is allowed type in opack value.
+     *
+     * @param typeClass the target class
+     * @throws IllegalArgumentException if the class is not allowed type
+     */
     public static void assertAllowType(Class<?> typeClass) {
         if (!OpackValue.isAllowType(typeClass)) {
             throw new IllegalArgumentException(typeClass.getName() + " is not allowed type, allow only primitive type or String or OpackValues or null");
         }
     }
 
+    /**
+     * Return whether the specific class is allowed type in opack value.
+     *
+     * @param typeClass the target class
+     * @return whether class is allowed type
+     */
     public static boolean isAllowType(Class<?> typeClass) {
         return ReflectionUtil.isWrapperClass(typeClass) ||
                 ReflectionUtil.isPrimitiveClass(typeClass) ||
@@ -38,5 +50,10 @@ public interface OpackValue {
                 (AbstractOpackValue.class.isAssignableFrom(typeClass));
     }
 
+    /**
+     * Clone this opack value.
+     *
+     * @return cloned opack value
+     */
     public OpackValue clone();
 }

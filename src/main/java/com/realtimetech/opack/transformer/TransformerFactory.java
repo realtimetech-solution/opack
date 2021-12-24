@@ -36,12 +36,24 @@ public class TransformerFactory {
     @NotNull
     final HashMap<Class<? extends Transformer>, Transformer> transformerMap;
 
+    /**
+     * Constructs a TransformerFactory with the opacker.
+     *
+     * @param opacker the opacker
+     */
     public TransformerFactory(@NotNull Opacker opacker) {
         this.opacker = opacker;
 
         this.transformerMap = new HashMap<>();
     }
 
+    /**
+     * Returns instance for transformer class.
+     *
+     * @param transformerClass the transformer class to create new transformer
+     * @return transformer instance
+     * @throws InstantiationException if transformer class object cannot be instantiated; if the constructor is not in the transformer class
+     */
     public <T extends Transformer> T get(@NotNull Class<T> transformerClass) throws InstantiationException {
         if (!this.transformerMap.containsKey(transformerClass)) {
             synchronized (this.transformerMap) {

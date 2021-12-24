@@ -22,6 +22,9 @@
 
 package com.realtimetech.opack.exception;
 
+/**
+ * Thrown when a problem occurs during serializing.
+ */
 public class SerializeException extends Exception {
     public SerializeException(String message, Throwable cause) {
         super(message, cause);

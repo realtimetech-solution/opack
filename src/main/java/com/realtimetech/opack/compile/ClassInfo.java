@@ -65,6 +65,13 @@ public class ClassInfo {
             return explicitType;
         }
 
+        /**
+         * Sets the field of the object to a specified value.
+         *
+         * @param object the object whose field should be modified
+         * @param value  the new value for the field of object being modified
+         * @throws IllegalAccessException if this Field object is enforcing Java language access control and the underlying field is either inaccessible or final
+         */
         public void set(Object object, Object value) throws IllegalAccessException {
             if (!this.field.canAccess(object)) {
                 this.field.setAccessible(true);
@@ -72,6 +79,13 @@ public class ClassInfo {
             this.field.set(object, value);
         }
 
+        /**
+         * Returns the field value extracted from the object.
+         *
+         * @param object the object to extract the field value
+         * @return field value
+         * @throws IllegalAccessException if this Field object is enforcing Java language access control and the underlying field is inaccessible.
+         */
         public Object get(Object object) throws IllegalAccessException {
             if (!this.field.canAccess(object)) {
                 this.field.setAccessible(true);

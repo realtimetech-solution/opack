@@ -29,10 +29,16 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Fields annotated with @ExplicitType(type=xxxx.class) will serialize and deserialize to explicit type instead of fields type.
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({
         ElementType.FIELD,
 })
 public @interface ExplicitType {
+    /**
+     * @return the explicit type
+     */
     @NotNull Class<?> type();
 }
