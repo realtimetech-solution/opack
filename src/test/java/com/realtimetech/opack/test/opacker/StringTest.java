@@ -33,10 +33,16 @@ public class StringTest {
     public static class StringClass {
         private String stringValue;
 
+        private String unicodeStringValue;
+
+        private String jsonStringValue;
+
         private String stringNullValue;
 
         public StringClass() {
             this.stringValue = "Hello, World!";
+            this.unicodeStringValue = "\u0161 and \u003d is Unicode Character";
+            this.jsonStringValue = "{what} [if] {is} [to:o] {b,o,r,i,n,g}";
             this.stringNullValue = null;
         }
     }

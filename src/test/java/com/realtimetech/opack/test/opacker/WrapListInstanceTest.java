@@ -34,7 +34,7 @@ import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class WrapListTransformerTest {
+public class WrapListInstanceTest {
     static final Random RANDOM = new Random();
 
     public static class WrapListClass {
@@ -69,7 +69,7 @@ public class WrapListTransformerTest {
     }
 
     private void common(boolean allowListTransformWithTypeWrap) throws InstantiationException, SerializeException, DeserializeException, OpackAssert.AssertException {
-        Opacker opacker = new Opacker.Builder().setAllowListTransformWithTypeWrap(allowListTransformWithTypeWrap).create();
+        Opacker opacker = new Opacker.Builder().setEnableWrapListInstanceType(allowListTransformWithTypeWrap).create();
         WrapListClass originalObject = new WrapListClass();
 
         OpackValue serialized = opacker.serialize(originalObject);
