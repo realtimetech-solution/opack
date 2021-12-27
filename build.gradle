@@ -61,7 +61,7 @@ uploadArchives {
             }
 
             pom.project {
-                name 'Example Application'
+                name 'opack'
                 packaging 'jar'
                 description 'A object serialize and deserialize, encode and decode library'
                 url 'https://github.com/realtimetech-solution/opack'

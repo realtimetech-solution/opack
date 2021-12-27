@@ -36,10 +36,9 @@ public class WrapperTest {
 
     public static class WrapperClass {
         private Boolean booleanValue;
-
         private Byte byteValue;
-        private Character characterValue;
 
+        private Character characterValue;
         private Short shortValue;
 
         private Integer integerValue;
@@ -48,19 +47,35 @@ public class WrapperTest {
         private Double doubleValue;
         private Long longValue;
 
+        private Boolean booleanNullValue;
+        private Byte byteNullValue;
+
+        private Character characterNullValue;
+        private Short shortNullValue;
+
+        private Integer integerNullValue;
+        private Float floatNullValue;
+        private Double doubleNullValue;
+        private Long longNullValue;
+
         public WrapperClass() {
             this.booleanValue = RANDOM.nextBoolean();
-
             this.byteValue = (byte) RANDOM.nextInt();
             this.characterValue = (char) RANDOM.nextInt();
-
             this.shortValue = (short) RANDOM.nextInt();
-
             this.integerValue = RANDOM.nextInt();
             this.floatValue = RANDOM.nextFloat();
-
             this.doubleValue = RANDOM.nextDouble();
             this.longValue = RANDOM.nextLong();
+
+            this.booleanNullValue = null;
+            this.byteNullValue = null;
+            this.characterNullValue = null;
+            this.shortNullValue = null;
+            this.integerNullValue = null;
+            this.floatNullValue = null;
+            this.doubleNullValue = null;
+            this.longNullValue = null;
         }
     }
 

@@ -24,15 +24,12 @@ package com.realtimetech.opack.test.codec;
 
 import com.realtimetech.opack.Opacker;
 import com.realtimetech.opack.codec.dense.DenseCodec;
-import com.realtimetech.opack.codec.json.JsonCodec;
 import com.realtimetech.opack.exception.DecodeException;
 import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.EncodeException;
 import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.test.OpackAssert;
 import com.realtimetech.opack.test.opacker.ComplexTest;
-import com.realtimetech.opack.test.opacker.WrapperTest;
-import com.realtimetech.opack.value.OpackArray;
 import com.realtimetech.opack.value.OpackObject;
 import com.realtimetech.opack.value.OpackValue;
 import org.junit.jupiter.api.Assertions;
@@ -72,6 +69,6 @@ public class DenseTest {
         OpackValue decoded = denseCodec.decode(encoded);
         ComplexTest.ComplexClass deserialized = opacker.deserialize(ComplexTest.ComplexClass.class, decoded);
 
-        OpackAssert.assertEquals(originalObject,deserialized);
+        OpackAssert.assertEquals(originalObject, deserialized);
     }
 }

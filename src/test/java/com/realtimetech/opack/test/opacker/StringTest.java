@@ -33,8 +33,11 @@ public class StringTest {
     public static class StringClass {
         private String stringValue;
 
+        private String stringNullValue;
+
         public StringClass() {
             this.stringValue = "Hello, World!";
+            this.stringNullValue = null;
         }
     }
 
