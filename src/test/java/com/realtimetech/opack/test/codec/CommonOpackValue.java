@@ -55,6 +55,8 @@ public class CommonOpackValue {
             opackObject.put("object" + i, sample);
         }
 
+        opackObject.put("unicode", "\u0000\u0001\u0302\u0777\u0000");
+
         return opackObject;
     }
 }

@@ -30,7 +30,6 @@ import com.realtimetech.opack.exception.EncodeException;
 import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.test.OpackAssert;
 import com.realtimetech.opack.test.opacker.ComplexTest;
-import com.realtimetech.opack.test.opacker.WrapperTest;
 import com.realtimetech.opack.value.OpackObject;
 import com.realtimetech.opack.value.OpackValue;
 import org.junit.jupiter.api.Assertions;
@@ -41,6 +40,7 @@ public class JsonTest {
     public void object_to_string_to_object() throws DecodeException, EncodeException {
         String targetData = "" +
                 "{\n" +
+                "\t\"unicode\": \"\\u003d is = and \\u0041 is A\",\n" +
                 "\t\"users\": [\n" +
                 "\t\t{\n" +
                 "\t\t\t\"index\": 1,\n" +
@@ -66,7 +66,10 @@ public class JsonTest {
         JsonCodec jsonCodec = new JsonCodec.Builder().create();
 
         OpackValue opackValue1 = jsonCodec.decode(targetData);
+        Assertions.assertEquals("\u003d is = and \u0041 is A", ((OpackObject) opackValue1).get("unicode"));
+
         String middle = jsonCodec.encode(opackValue1);
+        System.out.println(middle);
         OpackValue opackValue2 = jsonCodec.decode(middle);
 
         Assertions.assertEquals(opackValue1, opackValue2);
@@ -79,8 +82,13 @@ public class JsonTest {
         JsonCodec jsonCodec = new JsonCodec.Builder().create();
 
         String json1 = jsonCodec.encode(opackValue);
+        Assertions.assertTrue(json1.contains("\"unicode\":\"\\u0000\\u0001̂ݷ\\u0000\""));
+
         OpackValue opackValue1 = jsonCodec.decode(json1);
+
         String json2 = jsonCodec.encode(opackValue1);
+        Assertions.assertTrue(json2.contains("\"unicode\":\"\\u0000\\u0001̂ݷ\\u0000\""));
+
         OpackValue opackValue2 = jsonCodec.decode(json2);
 
         Assertions.assertEquals(opackValue1, opackValue2);

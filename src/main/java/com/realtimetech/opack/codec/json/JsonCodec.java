@@ -112,7 +112,7 @@ public final class JsonCodec extends OpackCodec<String> {
 
     static {
         CONST_REPLACEMENT_CHARACTERS = new char[128][];
-        for (int i = 0; i <= 0x1f; i++) {
+        for (int i = 0; i <= 0x1F; i++) {
             CONST_REPLACEMENT_CHARACTERS[i] = String.format("\\u%04x", i).toCharArray();
         }
         CONST_REPLACEMENT_CHARACTERS['"'] = new char[]{'\\', '\"'};
@@ -195,7 +195,7 @@ public final class JsonCodec extends OpackCodec<String> {
                 char character = charArray[index];
                 char[] replacement = null;
 
-                if (character < 128) {
+                if (character < CONST_REPLACEMENT_CHARACTERS.length) {
                     replacement = CONST_REPLACEMENT_CHARACTERS[character];
                 } else if (character == '\u2028') {
                     replacement = CONST_U2028;
@@ -514,7 +514,6 @@ public final class JsonCodec extends OpackCodec<String> {
                                     stackMerge = true;
                                     break;
                                 } else if (literalChar == '\\') {
-                                    pointer++;
                                     char nextChar = charArray[pointer++];
 
                                     switch (nextChar) {
@@ -526,7 +525,7 @@ public final class JsonCodec extends OpackCodec<String> {
                                             break;
                                         case 'u':
                                             char result = 0;
-                                            for (int i = 0; i < 5; i++) {
+                                            for (int i = 0; i < 4; i++) {
                                                 char unicode = charArray[pointer++];
                                                 result <<= 4;
                                                 if (unicode >= '0' && unicode <= '9') {
