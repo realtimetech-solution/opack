@@ -29,6 +29,12 @@ group 'io.github.realtimetech-solution'
 archivesBaseName = "opack"
 version = "0.0.1"
 
+compileJava.options.encoding = 'UTF-8'
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
 task javadocJar(type: Jar) {
     classifier = 'javadoc'
     from javadoc
