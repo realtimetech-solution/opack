@@ -38,7 +38,10 @@ public class StringArrayTest {
                     "Hello, World!",
                     "RealtimeTech",
                     "Object Packager",
-                    "Opack"
+                    "Opack",
+                    "Allow",
+                    null,
+                    "!"
             };
         }
     }

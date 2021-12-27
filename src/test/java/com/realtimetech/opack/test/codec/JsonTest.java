@@ -103,10 +103,9 @@ public class JsonTest {
         ComplexTest.ComplexClass originalObject = new ComplexTest.ComplexClass();
         OpackValue serialized = opacker.serialize(originalObject);
         String encoded = jsonCodec.encode(serialized);
-
         OpackValue decoded = jsonCodec.decode(encoded);
         ComplexTest.ComplexClass deserialized = opacker.deserialize(ComplexTest.ComplexClass.class, decoded);
 
-        OpackAssert.assertEquals(originalObject,deserialized);
+        OpackAssert.assertEquals(originalObject, deserialized);
     }
 }
