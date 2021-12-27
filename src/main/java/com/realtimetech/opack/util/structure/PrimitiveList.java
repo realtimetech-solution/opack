@@ -368,7 +368,7 @@ public class PrimitiveList implements List<Object> {
      * @param fromIndex low endpoint (inclusive) of the subList
      * @param toIndex   high endpoint (exclusive) of the subList
      * @return a view of the specified range within this list
-     * @throws IndexOutOfBoundsException for an illegal endpoint index value (fromIndex < 0 || toIndex > size || fromIndex > toIndex)
+     * @throws IndexOutOfBoundsException for an illegal endpoint index value {@code fromIndex < 0 || toIndex > size || fromIndex > toIndex}
      */
     @NotNull
     @Override
