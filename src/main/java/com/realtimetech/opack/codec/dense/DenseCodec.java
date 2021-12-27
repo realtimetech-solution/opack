@@ -397,42 +397,43 @@ public final class DenseCodec extends OpackCodec<byte[]> {
                 } else if (nativeType == CONST_CHARACTER_NATIVE_ARRAY) {
                     char[] array = new char[length];
                     byteBuffer.position(decodePointer).asCharBuffer().get(array, 0, length);
-                    decodePointer += length;
+                    decodePointer += length * 2;
 
                     byteBuffer.position(0);
                     return OpackArray.createWithArrayObject(array);
                 } else if (nativeType == CONST_SHORT_NATIVE_ARRAY) {
                     short[] array = new short[length];
                     byteBuffer.position(decodePointer).asShortBuffer().get(array, 0, length);
-                    decodePointer += length;
+                    decodePointer += length * 2;
 
                     byteBuffer.position(0);
                     return OpackArray.createWithArrayObject(array);
                 } else if (nativeType == CONST_INTEGER_NATIVE_ARRAY) {
                     int[] array = new int[length];
                     byteBuffer.position(decodePointer).asIntBuffer().get(array, 0, length);
-                    decodePointer += length;
+                    decodePointer += length * 4;
 
+                    System.out.println(length);
                     byteBuffer.position(0);
                     return OpackArray.createWithArrayObject(array);
                 } else if (nativeType == CONST_FLOAT_NATIVE_ARRAY) {
                     float[] array = new float[length];
                     byteBuffer.position(decodePointer).asFloatBuffer().get(array, 0, length);
-                    decodePointer += length;
+                    decodePointer += length * 4;
 
                     byteBuffer.position(0);
                     return OpackArray.createWithArrayObject(array);
                 } else if (nativeType == CONST_LONG_NATIVE_ARRAY) {
                     long[] array = new long[length];
                     byteBuffer.position(decodePointer).asLongBuffer().get(array, 0, length);
-                    decodePointer += length;
+                    decodePointer += length * 8;
 
                     byteBuffer.position(0);
                     return OpackArray.createWithArrayObject(array);
                 } else if (nativeType == CONST_DOUBLE_NATIVE_ARRAY) {
                     double[] array = new double[length];
                     byteBuffer.position(decodePointer).asDoubleBuffer().get(array, 0, length);
-                    decodePointer += length;
+                    decodePointer += length * 8;
 
                     byteBuffer.position(0);
                     return OpackArray.createWithArrayObject(array);
