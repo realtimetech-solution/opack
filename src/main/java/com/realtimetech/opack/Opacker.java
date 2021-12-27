@@ -47,12 +47,12 @@ public class Opacker {
         int valueStackInitialSize;
         int contextStackInitialSize;
 
-        boolean enableWrapListInstanceType;
+        boolean enableWrapListElementType;
 
         public Builder() {
             this.valueStackInitialSize = 512;
             this.contextStackInitialSize = 128;
-            this.enableWrapListInstanceType = false;
+            this.enableWrapListElementType = false;
         }
 
         public Builder setValueStackInitialSize(int valueStackInitialSize) {
@@ -65,8 +65,8 @@ public class Opacker {
             return this;
         }
 
-        public Builder setEnableWrapListInstanceType(boolean enableWrapListInstanceType) {
-            this.enableWrapListInstanceType = enableWrapListInstanceType;
+        public Builder setEnableWrapListElementType(boolean enableWrapListElementType) {
+            this.enableWrapListElementType = enableWrapListElementType;
             return this;
         }
 
@@ -108,7 +108,7 @@ public class Opacker {
 
         this.state = State.NONE;
 
-        if (builder.enableWrapListInstanceType) {
+        if (builder.enableWrapListElementType) {
             this.infoCompiler.registerPredefinedTransformer(List.class, WrapListTransformer.class, true);
         } else {
             this.infoCompiler.registerPredefinedTransformer(List.class, NoWrapListTransformer.class, true);

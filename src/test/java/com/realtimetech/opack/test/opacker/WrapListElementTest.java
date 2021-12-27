@@ -27,14 +27,13 @@ import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.test.OpackAssert;
 import com.realtimetech.opack.value.OpackValue;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.LinkedList;
 import java.util.Random;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
-public class WrapListInstanceTest {
+public class WrapListElementTest {
     static final Random RANDOM = new Random();
 
     public static class WrapListClass {
@@ -65,11 +64,13 @@ public class WrapListInstanceTest {
 
     @Test
     public void testWithNoWrapListTransformer() {
-        assertThrows(OpackAssert.AssertException.class, () -> this.common(false));
+        Assertions.assertThrows(OpackAssert.AssertException.class, () -> {
+            this.common(false);
+        });
     }
 
     private void common(boolean allowListTransformWithTypeWrap) throws InstantiationException, SerializeException, DeserializeException, OpackAssert.AssertException {
-        Opacker opacker = new Opacker.Builder().setEnableWrapListInstanceType(allowListTransformWithTypeWrap).create();
+        Opacker opacker = new Opacker.Builder().setEnableWrapListElementType(allowListTransformWithTypeWrap).create();
         WrapListClass originalObject = new WrapListClass();
 
         OpackValue serialized = opacker.serialize(originalObject);
