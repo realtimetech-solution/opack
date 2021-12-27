@@ -69,7 +69,6 @@ public class JsonTest {
         Assertions.assertEquals("\u003d is = and \u0041 is A", ((OpackObject) opackValue1).get("unicode"));
 
         String middle = jsonCodec.encode(opackValue1);
-        System.out.println(middle);
         OpackValue opackValue2 = jsonCodec.decode(middle);
 
         Assertions.assertEquals(opackValue1, opackValue2);
