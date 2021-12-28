@@ -23,15 +23,12 @@
 package com.realtimetech.opack.test.opacker;
 
 import com.realtimetech.opack.Opacker;
-import com.realtimetech.opack.annotation.ExplicitType;
 import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.test.OpackAssert;
 import com.realtimetech.opack.value.OpackValue;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Array;
-import java.util.List;
 import java.util.Random;
 
 public class ComplexTest {
@@ -41,11 +38,17 @@ public class ComplexTest {
         private WrapperTest.WrapperClass wrapperClassValue;
         private WrapperTest.WrapperClass[] wrapperClassArrayValue;
 
+        private WrapperArrayTest.WrapperArrayClass wrapperArrayClassValue;
+        private WrapperArrayTest.WrapperArrayClass[] wrapperArrayClassArrayValue;
+
         private StringTest.StringClass stringClassValue;
         private StringTest.StringClass[] stringClassArrayValue;
 
         private PrimitiveTest.PrimitiveClass primitiveClassValue;
         private PrimitiveTest.PrimitiveClass[] primitiveClassArrayValue;
+
+        private PrimitiveArrayTest.PrimitiveArrayClass primitiveArrayClassValue;
+        private PrimitiveArrayTest.PrimitiveArrayClass[] primitiveArrayClassArrayValue;
 
         private ObjectTest.ObjectClass objectClassValue;
         private ObjectTest.ObjectClass[] objectClassArrayValue;
@@ -71,6 +74,12 @@ public class ComplexTest {
                 this.wrapperClassArrayValue[index] = new WrapperTest.WrapperClass();
             }
 
+            this.wrapperArrayClassValue = new WrapperArrayTest.WrapperArrayClass();
+            this.wrapperArrayClassArrayValue = new WrapperArrayTest.WrapperArrayClass[length];
+            for (int index = 0; index < length; index++) {
+                this.wrapperArrayClassArrayValue[index] = new WrapperArrayTest.WrapperArrayClass();
+            }
+
             this.stringClassValue = new StringTest.StringClass();
             this.stringClassArrayValue = new StringTest.StringClass[length];
             for (int index = 0; index < length; index++) {
@@ -81,6 +90,12 @@ public class ComplexTest {
             this.primitiveClassArrayValue = new PrimitiveTest.PrimitiveClass[length];
             for (int index = 0; index < length; index++) {
                 this.primitiveClassArrayValue[index] = new PrimitiveTest.PrimitiveClass();
+            }
+
+            this.primitiveArrayClassValue = new PrimitiveArrayTest.PrimitiveArrayClass();
+            this.primitiveArrayClassArrayValue = new PrimitiveArrayTest.PrimitiveArrayClass[length];
+            for (int index = 0; index < length; index++) {
+                this.primitiveArrayClassArrayValue[index] = new PrimitiveArrayTest.PrimitiveArrayClass();
             }
 
             this.objectClassValue = new ObjectTest.ObjectClass();
