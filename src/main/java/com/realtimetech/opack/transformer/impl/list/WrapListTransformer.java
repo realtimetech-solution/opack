@@ -20,29 +20,11 @@
  * limitations under the License.
  */
 
-package com.realtimetech.opack.transformer;
+package com.realtimetech.opack.transformer.impl.list;
 
-import com.realtimetech.opack.Opacker;
-import com.realtimetech.opack.exception.DeserializeException;
-import com.realtimetech.opack.exception.SerializeException;
-
-public interface Transformer {
-    /**
-     * Serialize specific value to opack value.
-     *
-     * @param value the value to serialize
-     * @return opack value
-     * @throws SerializeException if a problem occurs during serializing
-     */
-    public Object serialize(Opacker opacker, Object value) throws SerializeException;
-
-    /**
-     * Deserialize opack value.
-     *
-     * @param value    the opack value to deserialize
-     * @param goalClass the goal type to deserialize
-     * @return deserialized value
-     * @throws DeserializeException if a problem occurs during deserializing
-     */
-    public Object deserialize(Opacker opacker, Class<?> goalClass, Object value) throws DeserializeException;
+public class WrapListTransformer extends ListTransformer {
+    @Override
+    protected boolean allowWrapWithType() {
+        return true;
+    }
 }

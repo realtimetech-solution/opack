@@ -219,30 +219,30 @@ public final class JsonCodec extends OpackCodec<String> {
 
             stringWriter.write(CONST_STRING_CLOSE_CHARACTER);
         } else {
-            if (!OpackValue.isAllowType(objectClass)) {
+            if (!OpackValue.isAllowClass(objectClass)) {
                 throw new IllegalArgumentException(objectClass + " is not allowed in json format.");
             }
 
-            Class<?> numberType = objectClass;
+            Class<?> numberClass = objectClass;
 
             if (ReflectionUtil.isPrimitiveClass(objectClass)) {
-                numberType = ReflectionUtil.getWrapperClassOfPrimitiveClass(objectClass);
+                numberClass = ReflectionUtil.getWrapperClassOfPrimitiveClass(objectClass);
             }
 
             // Asserts
-            if (numberType == Double.class) {
+            if (numberClass == Double.class) {
                 Double doubleValue = (Double) object;
                 if (Double.isNaN(doubleValue) || Double.isInfinite(doubleValue) || !Double.isFinite(doubleValue)) {
                     throw new ArithmeticException("Only finite values are allowed in json format.");
                 }
-            } else if (numberType == Float.class) {
+            } else if (numberClass == Float.class) {
                 Float floatValue = (Float) object;
                 if (Float.isNaN(floatValue) || Float.isInfinite(floatValue) || !Float.isFinite(floatValue)) {
                     throw new ArithmeticException("Only finite values are allowed in json format.");
                 }
             }
 
-            if (numberType == Character.class) {
+            if (numberClass == Character.class) {
                 if (convertCharacterToString) {
                     stringWriter.write(CONST_STRING_OPEN_CHARACTER);
                     stringWriter.write(object.toString().toCharArray());

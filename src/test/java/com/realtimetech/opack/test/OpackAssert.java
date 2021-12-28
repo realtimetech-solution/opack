@@ -23,7 +23,6 @@
 package com.realtimetech.opack.test;
 
 import com.realtimetech.opack.annotation.Ignore;
-import com.realtimetech.opack.util.ReflectionUtil;
 import com.realtimetech.opack.value.OpackValue;
 
 import java.lang.reflect.Array;
@@ -149,7 +148,11 @@ public class OpackAssert {
                 } else {
                     OpackAssert.throwException("length", originalLength, targetLength);
                 }
-            } else if (OpackValue.isAllowType(originalObject.getClass())) {
+            } else if (originalObject.getClass().isEnum() && targetObject.getClass().isEnum()) {
+                if (!originalObject.equals(targetObject)) {
+                    OpackAssert.throwException(originalObject, targetObject);
+                }
+            } else if (OpackValue.isAllowClass(originalObject.getClass())) {
                 if (!originalObject.equals(targetObject)) {
                     OpackAssert.throwException(originalObject, targetObject);
                 }

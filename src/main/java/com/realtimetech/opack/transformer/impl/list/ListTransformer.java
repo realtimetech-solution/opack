@@ -20,7 +20,7 @@
  * limitations under the License.
  */
 
-package com.realtimetech.opack.transformer.impl;
+package com.realtimetech.opack.transformer.impl.list;
 
 import com.realtimetech.opack.Opacker;
 import com.realtimetech.opack.exception.DeserializeException;
@@ -66,7 +66,7 @@ public abstract class ListTransformer implements Transformer {
             OpackArray<Object> opackArray = new OpackArray<>(list.size());
 
             for (Object object : list) {
-                if (object == null || OpackValue.isAllowType(object.getClass())) {
+                if (object == null || OpackValue.isAllowClass(object.getClass())) {
                     opackArray.add(object);
                 } else {
                     OpackValue opackValue = opacker.serialize(object);
@@ -93,18 +93,18 @@ public abstract class ListTransformer implements Transformer {
      * Deserializes the {@link OpackArray OpackArray} to {@link List list}.
      *
      * @param opacker  the opacker
-     * @param goalType the class of list to be deserialized
+     * @param goalClass the class of list to be deserialized
      * @param value    the opack value to deserialize
      * @return deserialized value
      * @throws DeserializeException if a problem occurs during deserializing
      */
     @Override
-    public Object deserialize(Opacker opacker, Class<?> goalType, Object value) throws DeserializeException {
+    public Object deserialize(Opacker opacker, Class<?> goalClass, Object value) throws DeserializeException {
         if (value instanceof OpackArray) {
             OpackArray<Object> opackArray = (OpackArray<Object>) value;
-            if (List.class.isAssignableFrom(goalType)) {
+            if (List.class.isAssignableFrom(goalClass)) {
                 try {
-                    List<Object> list = (List<Object>) ReflectionUtil.createInstance(goalType);
+                    List<Object> list = (List<Object>) ReflectionUtil.createInstance(goalClass);
 
                     for (int index = 0; index < opackArray.length(); index++) {
                         Object element = opackArray.get(index);
@@ -117,10 +117,10 @@ public abstract class ListTransformer implements Transformer {
                                     String type = (String) opackObject.get("type");
                                     Object object = opackObject.get("value");
 
-                                    Class<?> objectType = Class.forName(type);
+                                    Class<?> objectClass = Class.forName(type);
 
                                     if (object instanceof OpackValue) {
-                                        list.add(opacker.deserialize(objectType, (OpackValue) object));
+                                        list.add(opacker.deserialize(objectClass, (OpackValue) object));
                                         continue;
                                     }
                                 }

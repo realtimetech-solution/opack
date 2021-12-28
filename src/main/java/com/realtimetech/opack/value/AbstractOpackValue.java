@@ -22,6 +22,8 @@
 
 package com.realtimetech.opack.value;
 
+import java.util.Map;
+
 abstract class AbstractOpackValue<T> implements OpackValue {
     private volatile T value;
 

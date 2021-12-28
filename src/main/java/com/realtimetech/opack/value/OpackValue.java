@@ -31,8 +31,8 @@ public interface OpackValue {
      * @param typeClass the target class
      * @throws IllegalArgumentException if the class is not allowed type
      */
-    public static void assertAllowType(Class<?> typeClass) {
-        if (!OpackValue.isAllowType(typeClass)) {
+    public static void assertAllowClass(Class<?> typeClass) {
+        if (!OpackValue.isAllowClass(typeClass)) {
             throw new IllegalArgumentException(typeClass.getName() + " is not allowed type, allow only primitive type or String or OpackValues or null");
         }
     }
@@ -43,7 +43,7 @@ public interface OpackValue {
      * @param typeClass the target class
      * @return whether class is allowed type
      */
-    public static boolean isAllowType(Class<?> typeClass) {
+    public static boolean isAllowClass(Class<?> typeClass) {
         return ReflectionUtil.isWrapperClass(typeClass) ||
                 ReflectionUtil.isPrimitiveClass(typeClass) ||
                 (typeClass == String.class) ||

@@ -176,14 +176,14 @@ public final class DenseCodec extends OpackCodec<byte[]> {
                     if (opackArrayList instanceof PrimitiveList) {
                         PrimitiveList primitiveList = (PrimitiveList) opackArrayList;
                         Object arrayObject = primitiveList.getArrayObject();
-                        Class<?> arrayType = arrayObject.getClass();
+                        Class<?> arrayClass = arrayObject.getClass();
 
-                        if (arrayType == byte[].class) {
+                        if (arrayClass == byte[].class) {
                             encodeByteArrayStream.write(CONST_BYTE_NATIVE_ARRAY);
                             byte[] array = (byte[]) arrayObject;
                             encodeByteArrayStream.write(array);
                             optimized = true;
-                        } else if (arrayType == char[].class) {
+                        } else if (arrayClass == char[].class) {
                             encodeByteArrayStream.write(CONST_CHARACTER_NATIVE_ARRAY);
                             char[] array = (char[]) arrayObject;
                             ByteBuffer byteBuffer = ByteBuffer.allocate(array.length * 2);
@@ -192,7 +192,7 @@ public final class DenseCodec extends OpackCodec<byte[]> {
 
                             encodeByteArrayStream.write(byteBuffer.array());
                             optimized = true;
-                        } else if (arrayType == short[].class) {
+                        } else if (arrayClass == short[].class) {
                             encodeByteArrayStream.write(CONST_SHORT_NATIVE_ARRAY);
                             short[] array = (short[]) arrayObject;
                             ByteBuffer byteBuffer = ByteBuffer.allocate(array.length * 2);
@@ -201,7 +201,7 @@ public final class DenseCodec extends OpackCodec<byte[]> {
 
                             encodeByteArrayStream.write(byteBuffer.array());
                             optimized = true;
-                        } else if (arrayType == int[].class) {
+                        } else if (arrayClass == int[].class) {
                             encodeByteArrayStream.write(CONST_INTEGER_NATIVE_ARRAY);
                             int[] array = (int[]) arrayObject;
                             ByteBuffer byteBuffer = ByteBuffer.allocate(array.length * 4);
@@ -210,7 +210,7 @@ public final class DenseCodec extends OpackCodec<byte[]> {
 
                             encodeByteArrayStream.write(byteBuffer.array());
                             optimized = true;
-                        } else if (arrayType == float[].class) {
+                        } else if (arrayClass == float[].class) {
                             encodeByteArrayStream.write(CONST_FLOAT_NATIVE_ARRAY);
                             float[] array = (float[]) arrayObject;
                             ByteBuffer byteBuffer = ByteBuffer.allocate(array.length * 4);
@@ -219,7 +219,7 @@ public final class DenseCodec extends OpackCodec<byte[]> {
 
                             encodeByteArrayStream.write(byteBuffer.array());
                             optimized = true;
-                        } else if (arrayType == long[].class) {
+                        } else if (arrayClass == long[].class) {
                             encodeByteArrayStream.write(CONST_LONG_NATIVE_ARRAY);
                             long[] array = (long[]) arrayObject;
                             ByteBuffer byteBuffer = ByteBuffer.allocate(array.length * 8);
@@ -228,7 +228,7 @@ public final class DenseCodec extends OpackCodec<byte[]> {
 
                             encodeByteArrayStream.write(byteBuffer.array());
                             optimized = true;
-                        } else if (arrayType == double[].class) {
+                        } else if (arrayClass == double[].class) {
                             encodeByteArrayStream.write(CONST_DOUBLE_NATIVE_ARRAY);
                             double[] array = (double[]) arrayObject;
                             ByteBuffer byteBuffer = ByteBuffer.allocate(array.length * 8);

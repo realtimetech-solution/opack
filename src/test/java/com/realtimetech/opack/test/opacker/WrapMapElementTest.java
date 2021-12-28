@@ -26,69 +26,49 @@ import com.realtimetech.opack.Opacker;
 import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.test.OpackAssert;
+import com.realtimetech.opack.value.OpackObject;
 import com.realtimetech.opack.value.OpackValue;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.LinkedList;
-import java.util.Objects;
+import java.util.HashMap;
 import java.util.Random;
 
-public class WrapListElementTest {
+public class WrapMapElementTest {
     static final Random RANDOM = new Random();
 
-    public static class WrapListClass {
-        private LinkedList<Object> wrappedTypeList;
+    public static class WrapMapClass {
+        private HashMap<Object, Object> wrappedTypeMap;
 
-        public WrapListClass() {
-            this.wrappedTypeList = new LinkedList<>();
-            this.wrappedTypeList.add(null);
-            this.wrappedTypeList.add("test 1");
-            this.wrappedTypeList.add(new TestElement());
-        }
-    }
+        public WrapMapClass() {
+            this.wrappedTypeMap = new HashMap<>();
 
-    public static class TestElement {
-        private int intValue;
-        private String stringValue;
+            this.wrappedTypeMap.put("null_value", null);
+            this.wrappedTypeMap.put(null, "null_key");
 
-        public TestElement() {
-            this.intValue = RANDOM.nextInt();
-            this.stringValue = RANDOM.nextInt() + "";
-        }
-
-        @Override
-        public boolean equals(Object object) {
-            if (this == object) return true;
-            if (object == null || getClass() != object.getClass()) return false;
-            TestElement that = (TestElement) object;
-            return intValue == that.intValue && Objects.equals(stringValue, that.stringValue);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(intValue, stringValue);
+            this.wrappedTypeMap.put("object_value", new WrapListElementTest.TestElement());
+            this.wrappedTypeMap.put(new WrapListElementTest.TestElement(), "object_key");
         }
     }
 
     @Test
-    public void testWithWrapListTransformer() throws InstantiationException, SerializeException, DeserializeException, OpackAssert.AssertException {
+    public void testWithWrapMapTransformer() throws InstantiationException, SerializeException, DeserializeException, OpackAssert.AssertException {
         this.common(true);
     }
 
     @Test
-    public void testWithNoWrapListTransformer() {
+    public void testWithNoWrapMapTransformer() {
         Assertions.assertThrows(OpackAssert.AssertException.class, () -> {
             this.common(false);
         });
     }
 
-    private void common(boolean enableWrapListElementType) throws InstantiationException, SerializeException, DeserializeException, OpackAssert.AssertException {
-        Opacker opacker = new Opacker.Builder().setEnableWrapListElementType(enableWrapListElementType).create();
-        WrapListClass originalObject = new WrapListClass();
+    private void common(boolean enableWrapMapElementType) throws InstantiationException, SerializeException, DeserializeException, OpackAssert.AssertException {
+        Opacker opacker = new Opacker.Builder().setEnableWrapMapElementType(enableWrapMapElementType).create();
+        WrapMapClass originalObject = new WrapMapClass();
 
         OpackValue serialized = opacker.serialize(originalObject);
-        WrapListClass deserialized = opacker.deserialize(WrapListClass.class, serialized);
+        WrapMapClass deserialized = opacker.deserialize(WrapMapClass.class, serialized);
 
         OpackAssert.assertEquals(originalObject, deserialized);
     }

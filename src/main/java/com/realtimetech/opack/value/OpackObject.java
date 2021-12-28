@@ -24,6 +24,7 @@ package com.realtimetech.opack.value;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 public final class OpackObject<K, V> extends AbstractOpackValue<HashMap<K, V>> {
@@ -82,10 +83,10 @@ public final class OpackObject<K, V> extends AbstractOpackValue<HashMap<K, V>> {
      */
     public V put(K key, V value) {
         if (key != null)
-            OpackValue.assertAllowType(key.getClass());
+            OpackValue.assertAllowClass(key.getClass());
 
         if (value != null)
-            OpackValue.assertAllowType(value.getClass());
+            OpackValue.assertAllowClass(value.getClass());
 
         return this.get().put(key, value);
     }
@@ -98,7 +99,7 @@ public final class OpackObject<K, V> extends AbstractOpackValue<HashMap<K, V>> {
      */
     public V remove(K key) {
         if (key != null)
-            OpackValue.assertAllowType(key.getClass());
+            OpackValue.assertAllowClass(key.getClass());
 
         return this.get().remove(key);
     }
@@ -130,6 +131,16 @@ public final class OpackObject<K, V> extends AbstractOpackValue<HashMap<K, V>> {
      */
     public Set<K> keySet() {
         return this.get().keySet();
+    }
+
+
+    /**
+     * Returns a {@link Set Set} view of the key and value pair in this opack object.
+     *
+     * @return a set view of the key and value pair in this map
+     */
+    public Set<Map.Entry<K, V>> entrySet() {
+        return this.get().entrySet();
     }
 
     /**
