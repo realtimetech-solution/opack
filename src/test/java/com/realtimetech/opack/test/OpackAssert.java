@@ -124,17 +124,6 @@ public class OpackAssert {
 
                 if (originalLength == targetLength) {
                     for (Object originalKeyObject : originalMap.keySet()) {
-//                        if(originalKeyObject != null){
-//                            System.out.println("Search " + originalKeyObject.hashCode() + " = " + targetMap.get(originalKeyObject));
-//                            for(Object key : targetMap.keySet()){
-//                                if(key != null){
-//                                    System.out.println("  " + key.hashCode());
-//                                    if(key.hashCode() == originalKeyObject.hashCode()){
-//                                        System.out.println("  Hit " + key.equals(originalKeyObject));
-//                                    }
-//                                }
-//                            }
-//                        }
                         if (targetMap.containsKey(originalKeyObject)) {
                             Object originalValueObject = originalMap.get(originalKeyObject);
                             Object targetValueObject = targetMap.get(originalKeyObject);
