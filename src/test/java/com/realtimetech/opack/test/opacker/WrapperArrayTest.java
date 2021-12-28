@@ -34,7 +34,7 @@ import java.util.Random;
 public class WrapperArrayTest {
     static final Random RANDOM = new Random();
 
-    public static class PrimitiveArrayClass {
+    public static class WrapperArrayClass {
         private Boolean[] booleanArrayValue;
         private Byte[] byteArrayValue;
 
@@ -47,7 +47,7 @@ public class WrapperArrayTest {
         private Double[] doubleArrayValue;
         private Long[] longArrayValue;
 
-        public PrimitiveArrayClass() {
+        public WrapperArrayClass() {
             int length = RANDOM.nextInt(5) + 5;
 
             this.booleanArrayValue = new Boolean[length];
@@ -103,10 +103,10 @@ public class WrapperArrayTest {
     @Test
     public void test() throws InstantiationException, SerializeException, DeserializeException, OpackAssert.AssertException {
         Opacker opacker = new Opacker.Builder().create();
-        PrimitiveArrayClass originalObject = new PrimitiveArrayClass();
+        WrapperArrayClass originalObject = new WrapperArrayClass();
 
         OpackValue serialized = opacker.serialize(originalObject);
-        PrimitiveArrayClass deserialized = opacker.deserialize(PrimitiveArrayClass.class, serialized);
+        WrapperArrayClass deserialized = opacker.deserialize(WrapperArrayClass.class, serialized);
 
         OpackAssert.assertEquals(originalObject, deserialized);
     }

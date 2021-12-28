@@ -413,7 +413,6 @@ public final class DenseCodec extends OpackCodec<byte[]> {
                     byteBuffer.position(decodePointer).asIntBuffer().get(array, 0, length);
                     decodePointer += length * 4;
 
-                    System.out.println(length);
                     byteBuffer.position(0);
                     return OpackArray.createWithArrayObject(array);
                 } else if (nativeType == CONST_FLOAT_NATIVE_ARRAY) {
