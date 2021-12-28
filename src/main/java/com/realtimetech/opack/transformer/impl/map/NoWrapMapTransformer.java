@@ -20,9 +20,9 @@
  * limitations under the License.
  */
 
-package com.realtimetech.opack.transformer.impl;
+package com.realtimetech.opack.transformer.impl.map;
 
-public class NoWrapListTransformer extends ListTransformer {
+public class NoWrapMapTransformer extends MapTransformer{
     @Override
     protected boolean allowWrapWithType() {
         return false;

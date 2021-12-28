@@ -28,8 +28,10 @@ import com.realtimetech.opack.exception.CompileException;
 import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.transformer.Transformer;
-import com.realtimetech.opack.transformer.impl.NoWrapListTransformer;
-import com.realtimetech.opack.transformer.impl.WrapListTransformer;
+import com.realtimetech.opack.transformer.impl.list.NoWrapListTransformer;
+import com.realtimetech.opack.transformer.impl.list.WrapListTransformer;
+import com.realtimetech.opack.transformer.impl.map.NoWrapMapTransformer;
+import com.realtimetech.opack.transformer.impl.map.WrapMapTransformer;
 import com.realtimetech.opack.util.OpackArrayConverter;
 import com.realtimetech.opack.util.ReflectionUtil;
 import com.realtimetech.opack.util.structure.FastStack;
@@ -41,6 +43,7 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import java.util.Map;
 
 public class Opacker {
     public static class Builder {
@@ -48,11 +51,18 @@ public class Opacker {
         int contextStackInitialSize;
 
         boolean enableWrapListElementType;
+        boolean enableWrapMapElementType;
+
+        boolean convertEnumToOrdinal;
 
         public Builder() {
             this.valueStackInitialSize = 512;
             this.contextStackInitialSize = 128;
+
             this.enableWrapListElementType = false;
+            this.enableWrapMapElementType = false;
+
+            this.convertEnumToOrdinal = false;
         }
 
         public Builder setValueStackInitialSize(int valueStackInitialSize) {
@@ -67,6 +77,16 @@ public class Opacker {
 
         public Builder setEnableWrapListElementType(boolean enableWrapListElementType) {
             this.enableWrapListElementType = enableWrapListElementType;
+            return this;
+        }
+
+        public Builder setEnableWrapMapElementType(boolean enableWrapMapElementType) {
+            this.enableWrapMapElementType = enableWrapMapElementType;
+            return this;
+        }
+
+        public Builder setConvertEnumToOrdinal(boolean convertEnumToOrdinal) {
+            this.convertEnumToOrdinal = convertEnumToOrdinal;
             return this;
         }
 
@@ -91,6 +111,8 @@ public class Opacker {
     final @NotNull FastStack<ClassInfo> classInfoStack;
     final @NotNull FastStack<OpackValue> valueStack;
 
+    final @NotNull boolean convertEnumToOrdinal;
+
     @NotNull State state;
 
     /**
@@ -113,7 +135,16 @@ public class Opacker {
         } else {
             this.infoCompiler.registerPredefinedTransformer(List.class, NoWrapListTransformer.class, true);
         }
+
+        if (builder.enableWrapMapElementType) {
+            this.infoCompiler.registerPredefinedTransformer(Map.class, WrapMapTransformer.class, true);
+        } else {
+            this.infoCompiler.registerPredefinedTransformer(Map.class, NoWrapMapTransformer.class, true);
+        }
+
+        this.convertEnumToOrdinal = builder.convertEnumToOrdinal;
     }
+
 
     /**
      * Serializes the object to opack value.
@@ -126,15 +157,15 @@ public class Opacker {
         if (this.state == State.DESERIALIZE)
             throw new SerializeException("Opacker is deserializing");
 
+        int separatorStack = this.objectStack.getSize();
         OpackValue value = (OpackValue) this.prepareObjectSerialize(object.getClass(), object);
 
-        if (this.state == State.NONE) {
-            try {
-                this.state = State.SERIALIZE;
-                this.executeSerializeStack();
-            } finally {
-                this.state = State.NONE;
-            }
+        State lastState = this.state;
+        try {
+            this.state = State.SERIALIZE;
+            this.executeSerializeStack(separatorStack);
+        } finally {
+            this.state = lastState;
         }
 
         return value;
@@ -170,12 +201,32 @@ public class Opacker {
                 /*
                     If directly pass opack value, deep clone
                  */
-                if (OpackValue.class.isAssignableFrom(firstObjectType)) {
+                if (OpackValue.class.isAssignableFrom(firstObjectType) && firstObjectType == objectType) {
                     object = ((OpackValue) object).clone();
                 }
 
                 return object;
             }
+
+            /*
+                Enum converting
+             */
+            if (objectType.isEnum()) {
+                if (this.convertEnumToOrdinal) {
+                    Object[] enums = objectType.getEnumConstants();
+
+                    for (int i = 0; i < enums.length; i++) {
+                        if (enums[i] == object) {
+                            return i;
+                        }
+                    }
+
+                    return -1;
+                } else {
+                    return object.toString();
+                }
+            }
+
             /*
                 Optimize algorithm for big array
              */
@@ -210,8 +261,8 @@ public class Opacker {
      *
      * @throws SerializeException if a problem occurs during serializing; if the field in the class of instance to be serialized is not accessible
      */
-    void executeSerializeStack() throws SerializeException {
-        while (!this.objectStack.isEmpty()) {
+    void executeSerializeStack(int endOfStack) throws SerializeException {
+        while (this.objectStack.getSize() > endOfStack) {
             Object object = this.objectStack.pop();
             OpackValue opackValue = this.valueStack.pop();
             ClassInfo classInfo = this.classInfoStack.pop();
@@ -260,15 +311,15 @@ public class Opacker {
         if (this.state == State.SERIALIZE)
             throw new DeserializeException("Opacker is serializing");
 
+        int separatorStack = this.objectStack.getSize();
         T value = targetClass.cast(this.prepareObjectDeserialize(targetClass, opackValue));
 
-        if (this.state == State.NONE) {
-            try {
-                this.state = State.DESERIALIZE;
-                this.executeDeserializeStack();
-            } finally {
-                this.state = State.NONE;
-            }
+        State lastState = this.state;
+        try {
+            this.state = State.DESERIALIZE;
+            this.executeDeserializeStack(0);
+        } finally {
+            this.state = lastState;
         }
 
         return value;
@@ -305,6 +356,17 @@ public class Opacker {
                     object = ((OpackValue) object).clone();
                 }
                 return object;
+            }
+
+            /*
+                Enum converting
+             */
+            if (goalClass.isEnum()) {
+                if (this.convertEnumToOrdinal) {
+                    return goalClass.getEnumConstants()[(int) ReflectionUtil.cast(Integer.class, object)];
+                } else {
+                    return Enum.valueOf((Class<? extends Enum>) goalClass, object.toString());
+                }
             }
 
             /*
@@ -372,8 +434,8 @@ public class Opacker {
      *
      * @throws DeserializeException if a problem occurs during deserializing; if the field in the class of instance to be deserialized is not accessible
      */
-    void executeDeserializeStack() throws DeserializeException {
-        while (!this.objectStack.isEmpty()) {
+    void executeDeserializeStack(int endOfStack) throws DeserializeException {
+        while (this.objectStack.getSize() > endOfStack) {
             Object object = this.objectStack.pop();
             OpackValue opackValue = this.valueStack.pop();
             ClassInfo classInfo = this.classInfoStack.pop();
