@@ -45,8 +45,8 @@ public class FieldTransformTest {
         }
 
         @Override
-        public Object deserialize(Opacker opacker, Class<?> goalType, Object value) throws DeserializeException {
-            if (value instanceof String && goalType == byte[].class) {
+        public Object deserialize(Opacker opacker, Class<?> goalClass, Object value) throws DeserializeException {
+            if (value instanceof String && goalClass == byte[].class) {
                 return ((String) value).getBytes(StandardCharsets.UTF_8);
             }
 

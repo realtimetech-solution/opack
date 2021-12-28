@@ -31,7 +31,7 @@ public class ClassInfo {
     public static class FieldInfo {
         final Field field;
         final String name;
-        final Class<?> typeClass;
+        final Class<?> type;
 
         final Transformer transformer;
         final Class<?> explicitType;
@@ -39,7 +39,7 @@ public class ClassInfo {
         public FieldInfo(@NotNull Field field, Transformer transformer, Class<?> explicitType) {
             this.field = field;
             this.name = this.field.getName();
-            this.typeClass = explicitType == null ? this.field.getType() : explicitType;
+            this.type = explicitType == null ? this.field.getType() : explicitType;
 
             this.transformer = transformer;
             this.explicitType = explicitType;
@@ -49,8 +49,8 @@ public class ClassInfo {
             return name;
         }
 
-        public Class<?> getTypeClass() {
-            return typeClass;
+        public Class<?> getType() {
+            return type;
         }
 
         public Field getField() {

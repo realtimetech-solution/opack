@@ -81,7 +81,7 @@ public abstract class MapTransformer implements Transformer {
     }
 
     Object serializeObject(Opacker opacker, Object object) throws SerializeException {
-        if (object != null && !OpackValue.isAllowType(object.getClass())) {
+        if (object != null && !OpackValue.isAllowClass(object.getClass())) {
             OpackValue opackValue = opacker.serialize(object);
 
             if (this.wrapWithType) {
@@ -101,18 +101,18 @@ public abstract class MapTransformer implements Transformer {
      * Deserializes the {@link OpackObject OpackObject} to {@link Map map}.
      *
      * @param opacker  the opacker
-     * @param goalType the class of map to be deserialized
+     * @param goalClass the class of map to be deserialized
      * @param value    the opack value to deserialize
      * @return deserialized value
      * @throws DeserializeException if a problem occurs during deserializing
      */
     @Override
-    public Object deserialize(Opacker opacker, Class<?> goalType, Object value) throws DeserializeException {
+    public Object deserialize(Opacker opacker, Class<?> goalClass, Object value) throws DeserializeException {
         if (value instanceof OpackObject) {
             OpackObject<Object, Object> opackObject = (OpackObject<Object, Object>) value;
-            if (Map.class.isAssignableFrom(goalType)) {
+            if (Map.class.isAssignableFrom(goalClass)) {
                 try {
-                    Map<Object, Object> map = (Map<Object, Object>) ReflectionUtil.createInstance(goalType);
+                    Map<Object, Object> map = (Map<Object, Object>) ReflectionUtil.createInstance(goalClass);
 
                     for (Map.Entry<Object, Object> element : opackObject.entrySet()) {
                         Object keyObject = element.getKey();

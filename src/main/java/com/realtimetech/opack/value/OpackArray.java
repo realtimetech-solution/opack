@@ -35,7 +35,7 @@ public final class OpackArray<E> extends AbstractOpackValue<List<E>> {
      * @param typeClass the class of array object
      * @return true if component type for the class of array object is primitive class
      */
-    public static boolean isAllowArrayType(Class<?> typeClass) {
+    public static boolean isAllowArrayComponentType(Class<?> typeClass) {
         if (typeClass.isArray()) {
             Class<?> componentType = ReflectionUtil.getArrayLastComponentType(typeClass);
 
@@ -71,7 +71,7 @@ public final class OpackArray<E> extends AbstractOpackValue<List<E>> {
             throw new IllegalArgumentException(arrayObject + " must have 1 dimension");
         }
 
-        if (!OpackArray.isAllowArrayType(arrayObject.getClass())) {
+        if (!OpackArray.isAllowArrayComponentType(arrayObject.getClass())) {
             throw new IllegalArgumentException(arrayObject + " array element is not allowed type, allow only primitive type or String or OpackValues or null");
         }
 
@@ -100,7 +100,7 @@ public final class OpackArray<E> extends AbstractOpackValue<List<E>> {
 
         for (E element : collection) {
             if (element != null)
-                OpackValue.assertAllowType(element.getClass());
+                OpackValue.assertAllowClass(element.getClass());
 
             list.add(element);
         }
@@ -153,7 +153,7 @@ public final class OpackArray<E> extends AbstractOpackValue<List<E>> {
      */
     public E set(int index, E value) {
         if (value != null)
-            OpackValue.assertAllowType(value.getClass());
+            OpackValue.assertAllowClass(value.getClass());
 
         this.unpinList();
 
@@ -169,7 +169,7 @@ public final class OpackArray<E> extends AbstractOpackValue<List<E>> {
      */
     public boolean add(E value) {
         if (value != null)
-            OpackValue.assertAllowType(value.getClass());
+            OpackValue.assertAllowClass(value.getClass());
 
         this.unpinList();
 

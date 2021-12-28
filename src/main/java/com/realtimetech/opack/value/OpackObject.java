@@ -83,10 +83,10 @@ public final class OpackObject<K, V> extends AbstractOpackValue<HashMap<K, V>> {
      */
     public V put(K key, V value) {
         if (key != null)
-            OpackValue.assertAllowType(key.getClass());
+            OpackValue.assertAllowClass(key.getClass());
 
         if (value != null)
-            OpackValue.assertAllowType(value.getClass());
+            OpackValue.assertAllowClass(value.getClass());
 
         return this.get().put(key, value);
     }
@@ -99,7 +99,7 @@ public final class OpackObject<K, V> extends AbstractOpackValue<HashMap<K, V>> {
      */
     public V remove(K key) {
         if (key != null)
-            OpackValue.assertAllowType(key.getClass());
+            OpackValue.assertAllowClass(key.getClass());
 
         return this.get().remove(key);
     }

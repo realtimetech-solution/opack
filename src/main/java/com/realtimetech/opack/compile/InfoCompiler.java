@@ -61,13 +61,13 @@ public class InfoCompiler {
     }
 
     /**
-     * Returns predefined transformers targeting a specific class type.
+     * Returns predefined transformers targeting a specific class.
      *
-     * @param classType the class type to be the target
+     * @param typeClass the class to be the target
      * @return found predefined transformers
      */
-    public PredefinedTransformer[] getPredefinedTransformers(Class<?> classType) {
-        List<PredefinedTransformer> predefinedTransformers = this.predefinedTransformerMap.get(classType);
+    public PredefinedTransformer[] getPredefinedTransformers(Class<?> typeClass) {
+        List<PredefinedTransformer> predefinedTransformers = this.predefinedTransformerMap.get(typeClass);
 
         if (predefinedTransformers == null) {
             return new PredefinedTransformer[0];
@@ -77,32 +77,32 @@ public class InfoCompiler {
     }
 
     /**
-     * Calls {@code registerPredefinedTransformer(classType, transformerClass, false);}
+     * Calls {@code registerPredefinedTransformer(typeClass, transformerClass, false);}
      *
-     * @param classType        the class type to be the target
+     * @param typeClass        the class to be the target
      * @param transformerClass the predefined transformer class to register
      * @return whether the predefined transformer registration is successful
      * @throws InstantiationException if transformer class object cannot be instantiated
      */
-    public boolean registerPredefinedTransformer(@NotNull Class<?> classType, @NotNull Class<? extends Transformer> transformerClass) throws InstantiationException {
-        return this.registerPredefinedTransformer(classType, transformerClass, false);
+    public boolean registerPredefinedTransformer(@NotNull Class<?> typeClass, @NotNull Class<? extends Transformer> transformerClass) throws InstantiationException {
+        return this.registerPredefinedTransformer(typeClass, transformerClass, false);
     }
 
     /**
-     * Register a predefined transformer targeting the specific class type.
+     * Register a predefined transformer targeting the specific class.
      *
-     * @param classType        the class type to be the target
+     * @param typeClass        the class to be the target
      * @param transformerClass the predefined transformer to register
      * @param inheritable      whether transformer is inheritable
      * @return whether the predefined transformer registration is successful
      * @throws InstantiationException if transformer class object cannot be instantiated
      */
-    public synchronized boolean registerPredefinedTransformer(@NotNull Class<?> classType, @NotNull Class<? extends Transformer> transformerClass, boolean inheritable) throws InstantiationException {
-        if (!this.predefinedTransformerMap.containsKey(classType)) {
-            this.predefinedTransformerMap.put(classType, new LinkedList<>());
+    public synchronized boolean registerPredefinedTransformer(@NotNull Class<?> typeClass, @NotNull Class<? extends Transformer> transformerClass, boolean inheritable) throws InstantiationException {
+        if (!this.predefinedTransformerMap.containsKey(typeClass)) {
+            this.predefinedTransformerMap.put(typeClass, new LinkedList<>());
         }
 
-        List<PredefinedTransformer> predefinedTransformers = this.predefinedTransformerMap.get(classType);
+        List<PredefinedTransformer> predefinedTransformers = this.predefinedTransformerMap.get(typeClass);
 
         for (PredefinedTransformer predefinedTransformer : predefinedTransformers) {
             if (predefinedTransformer.getTransformer().getClass() == transformerClass) {
@@ -117,14 +117,14 @@ public class InfoCompiler {
     }
 
     /**
-     * Unregister a predefined transformer targeting the specific class type.
+     * Unregister a predefined transformer targeting the specific class.
      *
-     * @param classType        the targeted class type
+     * @param typeClass        the targeted type class
      * @param transformerClass the predefined transformer to unregister
      * @return whether the cancellation of predefined transformer registration is successful
      */
-    public synchronized boolean unregisterPredefinedTransformer(@NotNull Class<?> classType, @NotNull Class<? extends Transformer> transformerClass) {
-        List<PredefinedTransformer> predefinedTransformers = this.predefinedTransformerMap.get(classType);
+    public synchronized boolean unregisterPredefinedTransformer(@NotNull Class<?> typeClass, @NotNull Class<? extends Transformer> transformerClass) {
+        List<PredefinedTransformer> predefinedTransformers = this.predefinedTransformerMap.get(typeClass);
 
         if (predefinedTransformers == null) {
             return false;
@@ -265,21 +265,21 @@ public class InfoCompiler {
     /**
      * Returns ClassInfo for target class.
      *
-     * @param targetClass the class type to be targeted
+     * @param compileClass the class to be targeted
      * @return class info
      * @throws CompileException if a problem occurs during compiling a class into class info
      */
-    public @NotNull ClassInfo get(@NotNull Class<?> targetClass) throws CompileException {
-        if (!this.classInfoMap.containsKey(targetClass)) {
+    public @NotNull ClassInfo get(@NotNull Class<?> compileClass) throws CompileException {
+        if (!this.classInfoMap.containsKey(compileClass)) {
             synchronized (this.classInfoMap) {
-                if (!this.classInfoMap.containsKey(targetClass)) {
-                    ClassInfo classInfo = this.compile(targetClass);
+                if (!this.classInfoMap.containsKey(compileClass)) {
+                    ClassInfo classInfo = this.compile(compileClass);
 
-                    this.classInfoMap.put(targetClass, classInfo);
+                    this.classInfoMap.put(compileClass, classInfo);
                 }
             }
         }
 
-        return this.classInfoMap.get(targetClass);
+        return this.classInfoMap.get(compileClass);
     }
 }
