@@ -52,7 +52,7 @@ public class WrapMapElementTest {
     }
 
     @Test
-    public void testWithWrapMapTransformer() throws InstantiationException, SerializeException, DeserializeException, OpackAssert.AssertException {
+    public void testWithWrapMapTransformer() throws SerializeException, DeserializeException, OpackAssert.AssertException {
         this.common(true);
     }
 
@@ -63,7 +63,7 @@ public class WrapMapElementTest {
         });
     }
 
-    private void common(boolean enableWrapMapElementType) throws InstantiationException, SerializeException, DeserializeException, OpackAssert.AssertException {
+    private void common(boolean enableWrapMapElementType) throws SerializeException, DeserializeException, OpackAssert.AssertException {
         Opacker opacker = new Opacker.Builder().setEnableWrapMapElementType(enableWrapMapElementType).create();
         WrapMapClass originalObject = new WrapMapClass();
 

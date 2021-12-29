@@ -72,7 +72,7 @@ public class WrapListElementTest {
     }
 
     @Test
-    public void testWithWrapListTransformer() throws InstantiationException, SerializeException, DeserializeException, OpackAssert.AssertException {
+    public void testWithWrapListTransformer() throws SerializeException, DeserializeException, OpackAssert.AssertException {
         this.common(true);
     }
 
@@ -83,7 +83,7 @@ public class WrapListElementTest {
         });
     }
 
-    private void common(boolean enableWrapListElementType) throws InstantiationException, SerializeException, DeserializeException, OpackAssert.AssertException {
+    private void common(boolean enableWrapListElementType) throws SerializeException, DeserializeException, OpackAssert.AssertException {
         Opacker opacker = new Opacker.Builder().setEnableWrapListElementType(enableWrapListElementType).create();
         WrapListClass originalObject = new WrapListClass();
 

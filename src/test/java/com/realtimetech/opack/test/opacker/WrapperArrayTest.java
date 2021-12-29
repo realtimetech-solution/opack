@@ -101,7 +101,7 @@ public class WrapperArrayTest {
     }
 
     @Test
-    public void test() throws InstantiationException, SerializeException, DeserializeException, OpackAssert.AssertException {
+    public void test() throws SerializeException, DeserializeException, OpackAssert.AssertException {
         Opacker opacker = new Opacker.Builder().create();
         WrapperArrayClass originalObject = new WrapperArrayClass();
 
