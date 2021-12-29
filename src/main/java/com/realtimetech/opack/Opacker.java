@@ -145,7 +145,6 @@ public class Opacker {
         this.convertEnumToOrdinal = builder.convertEnumToOrdinal;
     }
 
-
     /**
      * Serializes the object to opack value.
      *
@@ -174,34 +173,34 @@ public class Opacker {
     /**
      * Store information needed for serialization in stacks.
      *
-     * @param baseClass     the class of object to be serialized
-     * @param originalClass the class of original object
+     * @param baseType     the class of object to be serialized
+     * @param originalType the class of original object
      * @param object        the object to be serialized
      * @return prepared opack value
-     * @throws SerializeException if a problem occurs during serializing; if the baseClass cannot be compiled into {@link ClassInfo ClassInfo}
+     * @throws SerializeException if a problem occurs during serializing; if the baseType cannot be compiled into {@link ClassInfo ClassInfo}
      */
-    Object prepareObjectSerialize(Class<?> baseClass, Class<?> originalClass, Object object) throws SerializeException {
-        if (baseClass == null || originalClass == null || object == null) {
+    Object prepareObjectSerialize(Class<?> baseType, Class<?> originalType, Object object) throws SerializeException {
+        if (baseType == null || originalType == null || object == null) {
             return null;
         }
 
         try {
-            ClassInfo classInfo = this.infoCompiler.get(baseClass);
+            ClassInfo classInfo = this.infoCompiler.get(baseType);
 
             for (Transformer transformer : classInfo.getTransformers()) {
                 object = transformer.serialize(this, object);
             }
 
-            Class<?> objectClass = object.getClass();
+            Class<?> objectType = object.getClass();
 
             /*
                 Early stopping
              */
-            if (OpackValue.isAllowClass(objectClass)) {
+            if (OpackValue.isAllowType(objectType)) {
                 /*
                     If directly pass opack value, deep clone
                  */
-                if (OpackValue.class.isAssignableFrom(originalClass)) {
+                if (OpackValue.class.isAssignableFrom(originalType)) {
                     if (object instanceof OpackValue) {
                         object = ((OpackValue) object).clone();
                     }
@@ -213,9 +212,9 @@ public class Opacker {
             /*
                 Enum converting
              */
-            if (objectClass.isEnum()) {
+            if (objectType.isEnum()) {
                 if (this.convertEnumToOrdinal) {
-                    Object[] enums = objectClass.getEnumConstants();
+                    Object[] enums = objectType.getEnumConstants();
 
                     for (int i = 0; i < enums.length; i++) {
                         if (enums[i] == object) {
@@ -232,8 +231,8 @@ public class Opacker {
             /*
                 Optimize algorithm for big array
              */
-            if (OpackArray.isAllowArrayComponentType(objectClass)) {
-                int dimensions = ReflectionUtil.getArrayDimension(objectClass);
+            if (OpackArray.isAllowArray(objectType)) {
+                int dimensions = ReflectionUtil.getArrayDimension(objectType);
                 if (dimensions == 1) {
                     return OpackArray.createWithArrayObject(ReflectionUtil.cloneArray(object));
                 }
@@ -242,7 +241,7 @@ public class Opacker {
 
             OpackValue opackValue;
 
-            if (objectClass.isArray()) {
+            if (objectType.isArray()) {
                 opackValue = new OpackArray<>(Array.getLength(object));
             } else {
                 opackValue = new OpackObject<>();
@@ -254,7 +253,7 @@ public class Opacker {
 
             return opackValue;
         } catch (CompileException exception) {
-            throw new SerializeException("Can't compile " + baseClass.getName() + " class information", exception);
+            throw new SerializeException("Can't compile " + baseType.getName() + " class information", exception);
         }
     }
 
@@ -275,9 +274,9 @@ public class Opacker {
 
                 for (int index = 0; index < length; index++) {
                     Object element = ReflectionUtil.getArrayItem(object, index);
-                    Class<?> elementClass = element == null ? null : element.getClass();
+                    Class<?> elementType = element == null ? null : element.getClass();
 
-                    Object serializedValue = this.prepareObjectSerialize(elementClass, elementClass, element);
+                    Object serializedValue = this.prepareObjectSerialize(elementType, elementType, element);
 
                     opackArray.add(serializedValue);
                 }
@@ -287,14 +286,14 @@ public class Opacker {
                     try {
                         Object element = fieldInfo.get(object);
                         Class<?> fieldType = fieldInfo.getType();
-                        Class<?> originalClass = element == null ? null : element.getClass();
+                        Class<?> originalType = element == null ? null : element.getClass();
 
                         if (fieldInfo.getTransformer() != null) {
                             element = fieldInfo.getTransformer().serialize(this, element);
                             fieldType = element.getClass();
                         }
 
-                        Object serializedValue = this.prepareObjectSerialize(fieldType, originalClass, element);
+                        Object serializedValue = this.prepareObjectSerialize(fieldType, originalType, element);
                         opackObject.put(fieldInfo.getName(), serializedValue);
                     } catch (IllegalAccessException exception) {
                         throw new SerializeException("Can't get " + fieldInfo.getName() + " field data in " + classInfo.getTargetClass().getSimpleName(), exception);
@@ -307,22 +306,22 @@ public class Opacker {
     /**
      * Deserializes the opack value to object of the target class.
      *
-     * @param targetClass the target class
+     * @param type the target class
      * @param opackValue  the opack value to be deserialized
      * @return deserialized object
      * @throws DeserializeException if a problem occurs during deserializing; if this opacker is serializing
      */
-    public synchronized <T> T deserialize(Class<T> targetClass, OpackValue opackValue) throws DeserializeException {
+    public synchronized <T> T deserialize(Class<T> type, OpackValue opackValue) throws DeserializeException {
         if (this.state == State.SERIALIZE)
             throw new DeserializeException("Opacker is serializing");
 
         int separatorStack = this.objectStack.getSize();
-        T value = targetClass.cast(this.prepareObjectDeserialize(targetClass, opackValue));
+        T value = type.cast(this.prepareObjectDeserialize(type, opackValue));
 
         State lastState = this.state;
         try {
             this.state = State.DESERIALIZE;
-            this.executeDeserializeStack(0);
+            this.executeDeserializeStack(separatorStack);
         } finally {
             this.state = lastState;
         }
@@ -333,27 +332,27 @@ public class Opacker {
     /**
      * Store information needed for deserialization in stacks.
      *
-     * @param goalClass the class of object to be deserialized
+     * @param goalType the class of object to be deserialized
      * @param object    the object to be deserialized
      * @return prepared object
      * @throws DeserializeException if a problem occurs during deserializing
      */
-    public synchronized Object prepareObjectDeserialize(Class<?> goalClass, Object object) throws DeserializeException {
-        if (goalClass == null || object == null) {
+    public synchronized Object prepareObjectDeserialize(Class<?> goalType, Object object) throws DeserializeException {
+        if (goalType == null || object == null) {
             return null;
         }
 
         try {
-            ClassInfo classInfo = this.infoCompiler.get(goalClass);
+            ClassInfo classInfo = this.infoCompiler.get(goalType);
 
             for (Transformer transformer : classInfo.getTransformers()) {
-                object = transformer.deserialize(this, goalClass, object);
+                object = transformer.deserialize(this, goalType, object);
             }
 
             /*
                 Early stopping
              */
-            if (OpackValue.isAllowClass(goalClass)) {
+            if (OpackValue.isAllowType(goalType)) {
                 /*
                     If directly pass opack value, deep clone
                  */
@@ -366,23 +365,23 @@ public class Opacker {
             /*
                 Enum converting
              */
-            if (goalClass.isEnum()) {
+            if (goalType.isEnum()) {
                 if (this.convertEnumToOrdinal) {
-                    return goalClass.getEnumConstants()[(int) ReflectionUtil.cast(Integer.class, object)];
+                    return goalType.getEnumConstants()[(int) ReflectionUtil.cast(Integer.class, object)];
                 } else {
-                    return Enum.valueOf((Class<? extends Enum>) goalClass, object.toString());
+                    return Enum.valueOf((Class<? extends Enum>) goalType, object.toString());
                 }
             }
 
             /*
                 Optimize algorithm for big array
              */
-            if (OpackArray.isAllowArrayComponentType(goalClass)) {
-                int dimensions = ReflectionUtil.getArrayDimension(goalClass);
+            if (OpackArray.isAllowArray(goalType)) {
+                int dimensions = ReflectionUtil.getArrayDimension(goalType);
 
                 if (dimensions == 1 && object instanceof OpackArray) {
                     OpackArray<?> opackArray = (OpackArray<?>) object;
-                    Class<?> componentType = goalClass.getComponentType();
+                    Class<?> componentType = goalType.getComponentType();
 
                     try {
                         return OpackArrayConverter.convertToArray(componentType, opackArray);
@@ -397,11 +396,11 @@ public class Opacker {
                 OpackValue opackValue = (OpackValue) object;
                 Object targetObject;
 
-                if (goalClass.isArray()) {
+                if (goalType.isArray()) {
                     if (object instanceof OpackArray) {
                         OpackArray<?> opackArray = (OpackArray<?>) object;
 
-                        targetObject = Array.newInstance(goalClass.getComponentType(), opackArray.length());
+                        targetObject = Array.newInstance(goalType.getComponentType(), opackArray.length());
                     } else {
                         throw new DeserializeException("Target class is array. but, object is not OpackArray");
                     }
@@ -410,7 +409,7 @@ public class Opacker {
                         OpackObject<?, ?> opackObject = (OpackObject<?, ?>) object;
 
                         try {
-                            targetObject = ReflectionUtil.createInstanceUnsafe(goalClass);
+                            targetObject = ReflectionUtil.createInstanceUnsafe(goalType);
                         } catch (InvocationTargetException | IllegalAccessException | InstantiationException exception) {
                             throw new DeserializeException("Can't create instance using unsafe method", exception);
                         }
@@ -424,13 +423,13 @@ public class Opacker {
                 this.classInfoStack.push(classInfo);
 
                 return targetObject;
-            } else if (object.getClass() == goalClass) {
+            } else if (object.getClass() == goalType) {
                 return object;
             } else {
                 throw new DeserializeException("Found object, stack corruption");
             }
         } catch (CompileException exception) {
-            throw new DeserializeException("Can't compile " + goalClass.getName() + " class information", exception);
+            throw new DeserializeException("Can't compile " + goalType.getName() + " class information", exception);
         }
     }
 
@@ -462,7 +461,7 @@ public class Opacker {
                     try {
                         Object element = opackObject.get(fieldInfo.getField().getName());
                         Class<?> fieldType = fieldInfo.getType();
-                        Class<?> actualFieldClass = fieldInfo.getField().getType();
+                        Class<?> actualFieldType = fieldInfo.getField().getType();
 
                         if (fieldInfo.getTransformer() != null) {
                             element = fieldInfo.getTransformer().deserialize(this, fieldType, element);
@@ -470,7 +469,7 @@ public class Opacker {
 
                         Object deserializedValue = this.prepareObjectDeserialize(fieldType, element);
 
-                        fieldInfo.set(object, deserializedValue == null ? null : ReflectionUtil.cast(actualFieldClass, deserializedValue));
+                        fieldInfo.set(object, deserializedValue == null ? null : ReflectionUtil.cast(actualFieldType, deserializedValue));
                     } catch (IllegalAccessException | IllegalArgumentException exception) {
                         throw new DeserializeException("Can't set " + fieldInfo.getName() + " field in " + classInfo.getTargetClass().getSimpleName(), exception);
                     }

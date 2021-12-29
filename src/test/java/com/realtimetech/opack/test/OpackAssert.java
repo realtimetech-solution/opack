@@ -152,7 +152,7 @@ public class OpackAssert {
                 if (!originalObject.equals(targetObject)) {
                     OpackAssert.throwException(originalObject, targetObject);
                 }
-            } else if (OpackValue.isAllowClass(originalObject.getClass())) {
+            } else if (OpackValue.isAllowType(originalObject.getClass())) {
                 if (!originalObject.equals(targetObject)) {
                     OpackAssert.throwException(originalObject, targetObject);
                 }

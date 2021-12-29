@@ -55,10 +55,10 @@ public class ClassTransformTest {
         }
 
         @Override
-        public Object deserialize(Opacker opacker, Class<?> goalClass, Object value) throws DeserializeException {
-            if (value instanceof String && ClassTransformInheritable.class.isAssignableFrom(goalClass)) {
+        public Object deserialize(Opacker opacker, Class<?> goalType, Object value) throws DeserializeException {
+            if (value instanceof String && ClassTransformInheritable.class.isAssignableFrom(goalType)) {
                 try {
-                    ClassTransformInheritable classTransformInheritable = (ClassTransformInheritable) ReflectionUtil.createInstanceUnsafe(goalClass);
+                    ClassTransformInheritable classTransformInheritable = (ClassTransformInheritable) ReflectionUtil.createInstanceUnsafe(goalType);
                     classTransformInheritable.setBytes(((String) value).getBytes(StandardCharsets.UTF_8));
                     return classTransformInheritable;
                 } catch (InvocationTargetException | IllegalAccessException | InstantiationException exception) {
@@ -66,9 +66,9 @@ public class ClassTransformTest {
                 }
             }
 
-            if (value instanceof String && ClassTransformNoInheritable.class.isAssignableFrom(goalClass)) {
+            if (value instanceof String && ClassTransformNoInheritable.class.isAssignableFrom(goalType)) {
                 try {
-                    ClassTransformNoInheritable classTransformNoInheritable = (ClassTransformNoInheritable) ReflectionUtil.createInstanceUnsafe(goalClass);
+                    ClassTransformNoInheritable classTransformNoInheritable = (ClassTransformNoInheritable) ReflectionUtil.createInstanceUnsafe(goalType);
                     classTransformNoInheritable.setBytes(((String) value).getBytes(StandardCharsets.UTF_8));
                     return classTransformNoInheritable;
                 } catch (InvocationTargetException | IllegalAccessException | InstantiationException exception) {

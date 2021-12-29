@@ -28,26 +28,26 @@ public interface OpackValue {
     /**
      * Assert the specific class is allowed type in opack value.
      *
-     * @param typeClass the target class
+     * @param type the target class
      * @throws IllegalArgumentException if the class is not allowed type
      */
-    public static void assertAllowClass(Class<?> typeClass) {
-        if (!OpackValue.isAllowClass(typeClass)) {
-            throw new IllegalArgumentException(typeClass.getName() + " is not allowed type, allow only primitive type or String or OpackValues or null");
+    public static void assertAllowType(Class<?> type) {
+        if (!OpackValue.isAllowType(type)) {
+            throw new IllegalArgumentException(type.getName() + " is not allowed type, allow only primitive type or String or OpackValues or null");
         }
     }
 
     /**
      * Return whether the specific class is allowed type in opack value.
      *
-     * @param typeClass the target class
+     * @param type the target class
      * @return whether class is allowed type
      */
-    public static boolean isAllowClass(Class<?> typeClass) {
-        return ReflectionUtil.isWrapperClass(typeClass) ||
-                ReflectionUtil.isPrimitiveClass(typeClass) ||
-                (typeClass == String.class) ||
-                (AbstractOpackValue.class.isAssignableFrom(typeClass));
+    public static boolean isAllowType(Class<?> type) {
+        return ReflectionUtil.isWrapperType(type) ||
+                ReflectionUtil.isPrimitiveType(type) ||
+                (type == String.class) ||
+                (AbstractOpackValue.class.isAssignableFrom(type));
     }
 
     /**
