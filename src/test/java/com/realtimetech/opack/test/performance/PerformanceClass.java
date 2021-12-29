@@ -105,5 +105,4 @@ public class PerformanceClass {
             this.objectClassArrayValue[index] = new ObjectTest.ObjectClass();
         }
     }
-
 }

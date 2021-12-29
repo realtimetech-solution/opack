@@ -49,7 +49,7 @@ public class GsonPerformanceTest {
         Opacker opacker = new Opacker.Builder().create();
         JsonCodec jsonCodec = new JsonCodec.Builder().create();
 
-        int loop = 16_384;
+        int loop = 256;
         PerformanceClass.ExceptionRunnable kryoRunnable = () -> {
             JsonElement serialize = gson.toJsonTree(performanceClass);
             String encode = serialize.toString();

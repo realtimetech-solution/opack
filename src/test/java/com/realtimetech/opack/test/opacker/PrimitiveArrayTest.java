@@ -49,7 +49,7 @@ public class PrimitiveArrayTest {
         private long[] longArrayValue;
 
         public PrimitiveArrayClass() {
-            int length = RANDOM.nextInt(5) + 5;
+            int length = RANDOM.nextInt(1024) + 512;
 
             this.booleanArrayValue = new boolean[length];
             for(int index = 0; index < length; index++){

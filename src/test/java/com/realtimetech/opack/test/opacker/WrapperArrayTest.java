@@ -48,7 +48,7 @@ public class WrapperArrayTest {
         private Long[] longArrayValue;
 
         public WrapperArrayClass() {
-            int length = RANDOM.nextInt(5) + 5;
+            int length = RANDOM.nextInt(1024) + 512;
 
             this.booleanArrayValue = new Boolean[length];
             for(int index = 0; index < length; index++){

@@ -87,9 +87,9 @@ public class KryoPerformanceTest {
         Opacker opacker = new Opacker.Builder().create();
         DenseCodec denseCodec = new DenseCodec.Builder().create();
 
-        int loop = 65_536;
+        int loop = 512;
         PerformanceClass.ExceptionRunnable kryoRunnable = () -> {
-            ByteBufferOutput byteBufferOutput = new ByteBufferOutput(4096 * 2);
+            ByteBufferOutput byteBufferOutput = new ByteBufferOutput(4096 * 256);
             kryo.writeObject(byteBufferOutput, performanceClass);
             byte[] encode = byteBufferOutput.toBytes();
             PerformanceClass deserialize = kryo.readObject(new ByteBufferInput(encode), PerformanceClass.class);
