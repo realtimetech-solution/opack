@@ -68,7 +68,7 @@ public class OpackArrayConverter {
      * @throws IllegalArgumentException if component type is now allowed or invalid
      */
     public static Object convertToArray(Class<?> componentType, OpackArray<?> opackArray) throws InvocationTargetException, IllegalAccessException {
-        if (!OpackValue.isAllowClass(componentType)) {
+        if (!OpackValue.isAllowType(componentType)) {
             throw new IllegalArgumentException(componentType + " type is not allowed");
         }
 

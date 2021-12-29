@@ -20,13 +20,13 @@
  * limitations under the License.
  */
 
-package com.realtimetech.opack.compile;
+package com.realtimetech.opack.bake;
 
 import com.realtimetech.opack.Opacker;
 import com.realtimetech.opack.annotation.ExplicitType;
 import com.realtimetech.opack.annotation.Ignore;
 import com.realtimetech.opack.annotation.Transform;
-import com.realtimetech.opack.exception.CompileException;
+import com.realtimetech.opack.exception.BakeException;
 import com.realtimetech.opack.transformer.Transformer;
 import com.realtimetech.opack.transformer.TransformerFactory;
 import com.realtimetech.opack.util.ReflectionUtil;
@@ -38,36 +38,60 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-public class InfoCompiler {
+public class TypeBaker {
+    static class PredefinedTransformer {
+        final Transformer transformer;
+        final boolean inheritable;
+
+        /**
+         * Constructs the PredefinedTransformer.
+         *
+         * @param transformer the transformer
+         * @param inheritable whether the transformer is inheritable
+         */
+        public PredefinedTransformer(@NotNull Transformer transformer, boolean inheritable) {
+            this.transformer = transformer;
+            this.inheritable = inheritable;
+        }
+
+        public Transformer getTransformer() {
+            return transformer;
+        }
+
+        public boolean isInheritable() {
+            return inheritable;
+        }
+    }
+
     final @NotNull Opacker opacker;
 
     final @NotNull TransformerFactory transformerFactory;
 
-    final @NotNull HashMap<Class<?>, ClassInfo> classInfoMap;
+    final @NotNull HashMap<Class<?>, BakedType> backedTypeMap;
     final @NotNull HashMap<Class<?>, List<PredefinedTransformer>> predefinedTransformerMap;
 
     /**
-     * Constructs an InfoCompiler with the opacker.
+     * Constructs an TypeBaker with the opacker.
      *
      * @param opacker the opacker
      */
-    public InfoCompiler(@NotNull Opacker opacker) {
+    public TypeBaker(@NotNull Opacker opacker) {
         this.opacker = opacker;
 
         this.transformerFactory = new TransformerFactory(opacker);
 
-        this.classInfoMap = new HashMap<>();
+        this.backedTypeMap = new HashMap<>();
         this.predefinedTransformerMap = new HashMap<>();
     }
 
     /**
      * Returns predefined transformers targeting a specific class.
      *
-     * @param typeClass the class to be the target
+     * @param type the class to be the target
      * @return found predefined transformers
      */
-    public PredefinedTransformer[] getPredefinedTransformers(Class<?> typeClass) {
-        List<PredefinedTransformer> predefinedTransformers = this.predefinedTransformerMap.get(typeClass);
+    public PredefinedTransformer[] getPredefinedTransformers(Class<?> type) {
+        List<PredefinedTransformer> predefinedTransformers = this.predefinedTransformerMap.get(type);
 
         if (predefinedTransformers == null) {
             return new PredefinedTransformer[0];
@@ -77,40 +101,40 @@ public class InfoCompiler {
     }
 
     /**
-     * Calls {@code registerPredefinedTransformer(typeClass, transformerClass, false);}
+     * Calls {@code registerPredefinedTransformer(type, transformerClass, false);}
      *
-     * @param typeClass        the class to be the target
-     * @param transformerClass the predefined transformer class to register
+     * @param type            the class to be the target
+     * @param transformerType the predefined transformer class to register
      * @return whether the predefined transformer registration is successful
      * @throws InstantiationException if transformer class object cannot be instantiated
      */
-    public boolean registerPredefinedTransformer(@NotNull Class<?> typeClass, @NotNull Class<? extends Transformer> transformerClass) throws InstantiationException {
-        return this.registerPredefinedTransformer(typeClass, transformerClass, false);
+    public boolean registerPredefinedTransformer(@NotNull Class<?> type, @NotNull Class<? extends Transformer> transformerType) throws InstantiationException {
+        return this.registerPredefinedTransformer(type, transformerType, false);
     }
 
     /**
      * Register a predefined transformer targeting the specific class.
      *
-     * @param typeClass        the class to be the target
-     * @param transformerClass the predefined transformer to register
+     * @param type        the class to be the target
+     * @param transformerType the predefined transformer to register
      * @param inheritable      whether transformer is inheritable
      * @return whether the predefined transformer registration is successful
      * @throws InstantiationException if transformer class object cannot be instantiated
      */
-    public synchronized boolean registerPredefinedTransformer(@NotNull Class<?> typeClass, @NotNull Class<? extends Transformer> transformerClass, boolean inheritable) throws InstantiationException {
-        if (!this.predefinedTransformerMap.containsKey(typeClass)) {
-            this.predefinedTransformerMap.put(typeClass, new LinkedList<>());
+    public synchronized boolean registerPredefinedTransformer(@NotNull Class<?> type, @NotNull Class<? extends Transformer> transformerType, boolean inheritable) throws InstantiationException {
+        if (!this.predefinedTransformerMap.containsKey(type)) {
+            this.predefinedTransformerMap.put(type, new LinkedList<>());
         }
 
-        List<PredefinedTransformer> predefinedTransformers = this.predefinedTransformerMap.get(typeClass);
+        List<PredefinedTransformer> predefinedTransformers = this.predefinedTransformerMap.get(type);
 
         for (PredefinedTransformer predefinedTransformer : predefinedTransformers) {
-            if (predefinedTransformer.getTransformer().getClass() == transformerClass) {
+            if (predefinedTransformer.getTransformer().getClass() == transformerType) {
                 return false;
             }
         }
 
-        Transformer transformer = this.transformerFactory.get(transformerClass);
+        Transformer transformer = this.transformerFactory.get(transformerType);
         predefinedTransformers.add(new PredefinedTransformer(transformer, inheritable));
 
         return true;
@@ -119,12 +143,12 @@ public class InfoCompiler {
     /**
      * Unregister a predefined transformer targeting the specific class.
      *
-     * @param typeClass        the targeted type class
-     * @param transformerClass the predefined transformer to unregister
+     * @param type        the targeted type class
+     * @param transformerType the predefined transformer to unregister
      * @return whether the cancellation of predefined transformer registration is successful
      */
-    public synchronized boolean unregisterPredefinedTransformer(@NotNull Class<?> typeClass, @NotNull Class<? extends Transformer> transformerClass) {
-        List<PredefinedTransformer> predefinedTransformers = this.predefinedTransformerMap.get(typeClass);
+    public synchronized boolean unregisterPredefinedTransformer(@NotNull Class<?> type, @NotNull Class<? extends Transformer> transformerType) {
+        List<PredefinedTransformer> predefinedTransformers = this.predefinedTransformerMap.get(type);
 
         if (predefinedTransformers == null) {
             return false;
@@ -132,7 +156,7 @@ public class InfoCompiler {
 
         PredefinedTransformer targetPredefinedTransformer = null;
         for (PredefinedTransformer predefinedTransformer : predefinedTransformers) {
-            if (predefinedTransformer.getTransformer().getClass() == transformerClass) {
+            if (predefinedTransformer.getTransformer().getClass() == transformerType) {
                 targetPredefinedTransformer = predefinedTransformer;
                 break;
             }
@@ -153,27 +177,27 @@ public class InfoCompiler {
      * @param transformers     the transformer list to add
      * @param annotatedElement the element to be targeted
      * @param root             whether the element is not super class (whether the element is the root)
-     * @throws CompileException if transformer class object cannot be instantiated
+     * @throws BakeException if transformer class object cannot be instantiated
      */
-    void addTransformer(List<Transformer> transformers, AnnotatedElement annotatedElement, boolean root) throws CompileException {
+    void addTransformer(List<Transformer> transformers, AnnotatedElement annotatedElement, boolean root) throws BakeException {
         if (annotatedElement instanceof Class) {
-            Class<?> elementClass = (Class<?>) annotatedElement;
-            Class<?> superClass = elementClass.getSuperclass();
+            Class<?> elementType = (Class<?>) annotatedElement;
+            Class<?> superType = elementType.getSuperclass();
 
-            if (superClass != null && superClass != Object.class) {
-                this.addTransformer(transformers, superClass, false);
+            if (superType != null && superType != Object.class) {
+                this.addTransformer(transformers, superType, false);
             }
 
-            for (Class<?> interfaceClass : elementClass.getInterfaces()) {
+            for (Class<?> interfaceClass : elementType.getInterfaces()) {
                 this.addTransformer(transformers, interfaceClass, false);
             }
         }
 
         if (annotatedElement instanceof Class) {
-            Class<?> elementClass = (Class<?>) annotatedElement;
+            Class<?> elementType = (Class<?>) annotatedElement;
 
-            if (this.predefinedTransformerMap.containsKey(elementClass)) {
-                List<PredefinedTransformer> predefinedTransformers = this.predefinedTransformerMap.get(elementClass);
+            if (this.predefinedTransformerMap.containsKey(elementType)) {
+                List<PredefinedTransformer> predefinedTransformers = this.predefinedTransformerMap.get(elementType);
 
                 if (predefinedTransformers != null) {
                     for (PredefinedTransformer predefinedTransformer : predefinedTransformers) {
@@ -189,12 +213,12 @@ public class InfoCompiler {
             Transform transform = annotatedElement.getAnnotation(Transform.class);
 
             if (root || transform.inheritable()) {
-                Class<Transformer> transformerInterfaceClass = (Class<Transformer>) transform.transformer();
+                Class<Transformer> transformerType = (Class<Transformer>) transform.transformer();
 
                 try {
-                    transformers.add(this.transformerFactory.get(transformerInterfaceClass));
+                    transformers.add(this.transformerFactory.get(transformerType));
                 } catch (InstantiationException e) {
-                    throw new CompileException(e);
+                    throw new BakeException(e);
                 }
             }
         }
@@ -205,9 +229,9 @@ public class InfoCompiler {
      *
      * @param annotatedElement the element that annotated {@link Transform Transform}
      * @return transformers
-     * @throws CompileException if transformer class object cannot be instantiated
+     * @throws BakeException if transformer class object cannot be instantiated
      */
-    Transformer[] getTransformer(AnnotatedElement annotatedElement) throws CompileException {
+    Transformer[] getTransformer(AnnotatedElement annotatedElement) throws BakeException {
         List<Transformer> transformers = new LinkedList<>();
         this.addTransformer(transformers, annotatedElement, true);
         return transformers.toArray(new Transformer[0]);
@@ -229,22 +253,22 @@ public class InfoCompiler {
     }
 
     /**
-     * Compile the class into {@link ClassInfo ClassInfo}.
+     * Compile the class into {@link BakedType BakedType}.
      *
-     * @param compileClass the class to compile
-     * @return compiled class info
-     * @throws CompileException if a problem occurs during compiling a class into {@link ClassInfo ClassInfo}
+     * @param bakeType the type to bake
+     * @return baked type info
+     * @throws BakeException if a problem occurs during baking a class into {@link BakedType BakedType}
      */
-    @NotNull ClassInfo compile(@NotNull Class<?> compileClass) throws CompileException {
-        List<ClassInfo.FieldInfo> fieldInfos = new LinkedList<>();
+    @NotNull BakedType bake(@NotNull Class<?> bakeType) throws BakeException {
+        List<BakedType.Property> properties = new LinkedList<>();
         Transformer[] transformers = new Transformer[0];
 
-        if (!compileClass.isArray() &&
-                compileClass != String.class &&
-                !ReflectionUtil.isPrimitiveClass(compileClass) &&
-                !ReflectionUtil.isWrapperClass(compileClass)) {
+        if (!bakeType.isArray() &&
+                bakeType != String.class &&
+                !ReflectionUtil.isPrimitiveType(bakeType) &&
+                !ReflectionUtil.isWrapperType(bakeType)) {
 
-            Field[] fields = ReflectionUtil.getAccessibleFields(compileClass);
+            Field[] fields = ReflectionUtil.getAccessibleFields(bakeType);
             for (Field field : fields) {
                 if (field.isAnnotationPresent(Ignore.class)) {
                     continue;
@@ -253,33 +277,33 @@ public class InfoCompiler {
                 Transformer[] fieldTransformers = this.getTransformer(field);
                 Class<?> explicitType = this.getExplicitType(field);
 
-                fieldInfos.add(new ClassInfo.FieldInfo(field, fieldTransformers.length > 0 ? fieldTransformers[0] : null, explicitType));
+                properties.add(new BakedType.Property(field, fieldTransformers.length > 0 ? fieldTransformers[0] : null, explicitType));
             }
 
-            transformers = this.getTransformer(compileClass);
+            transformers = this.getTransformer(bakeType);
         }
 
-        return new ClassInfo(compileClass, transformers, fieldInfos.toArray(new ClassInfo.FieldInfo[0]));
+        return new BakedType(bakeType, transformers, properties.toArray(new BakedType.Property[0]));
     }
 
     /**
-     * Returns ClassInfo for target class.
+     * Returns BakedType for target class.
      *
-     * @param compileClass the class to be targeted
+     * @param bakeType the class to be baked
      * @return class info
-     * @throws CompileException if a problem occurs during compiling a class into class info
+     * @throws BakeException if a problem occurs during baking a class into class info
      */
-    public @NotNull ClassInfo get(@NotNull Class<?> compileClass) throws CompileException {
-        if (!this.classInfoMap.containsKey(compileClass)) {
-            synchronized (this.classInfoMap) {
-                if (!this.classInfoMap.containsKey(compileClass)) {
-                    ClassInfo classInfo = this.compile(compileClass);
+    public @NotNull BakedType get(@NotNull Class<?> bakeType) throws BakeException {
+        if (!this.backedTypeMap.containsKey(bakeType)) {
+            synchronized (this.backedTypeMap) {
+                if (!this.backedTypeMap.containsKey(bakeType)) {
+                    BakedType bakedType = this.bake(bakeType);
 
-                    this.classInfoMap.put(compileClass, classInfo);
+                    this.backedTypeMap.put(bakeType, bakedType);
                 }
             }
         }
 
-        return this.classInfoMap.get(compileClass);
+        return this.backedTypeMap.get(bakeType);
     }
 }

@@ -135,57 +135,57 @@ public class ReflectionUtil {
     /**
      * Casts an object to the specific class.
      *
-     * @param typeClass the class to cast
+     * @param type the class to cast
      * @param object    the object to be cast
      * @return the object after casting
      */
-    public static Object cast(Class<?> typeClass, Object object) {
-        if (ReflectionUtil.isPrimitiveClass(typeClass)) {
-            typeClass = ReflectionUtil.getWrapperClassOfPrimitiveClass(typeClass);
+    public static Object cast(Class<?> type, Object object) {
+        if (ReflectionUtil.isPrimitiveType(type)) {
+            type = ReflectionUtil.convertPrimitiveTypeToWrapperType(type);
         }
-        if (ReflectionUtil.isWrapperClass(typeClass)) {
+        if (ReflectionUtil.isWrapperType(type)) {
             Class<?> objectType = object.getClass();
 
             if (objectType == Long.class) {
                 Long value = (Long) object;
 
-                if (typeClass == Integer.class) {
+                if (type == Integer.class) {
                     return value.intValue();
-                } else if (typeClass == Short.class) {
+                } else if (type == Short.class) {
                     return value.shortValue();
-                } else if (typeClass == Character.class) {
+                } else if (type == Character.class) {
                     return (char) value.intValue();
-                } else if (typeClass == Byte.class) {
+                } else if (type == Byte.class) {
                     return value.byteValue();
                 }
             } else if (objectType == Integer.class) {
                 Integer value = (Integer) object;
 
-                if (typeClass == Short.class) {
+                if (type == Short.class) {
                     return value.shortValue();
-                } else if (typeClass == Character.class) {
+                } else if (type == Character.class) {
                     return (char) value.intValue();
-                } else if (typeClass == Byte.class) {
+                } else if (type == Byte.class) {
                     return value.byteValue();
                 }
             } else if (objectType == Short.class) {
                 Short value = (Short) object;
 
-                if (typeClass == Character.class) {
+                if (type == Character.class) {
                     return (char) value.intValue();
-                } else if (typeClass == Byte.class) {
+                } else if (type == Byte.class) {
                     return value.byteValue();
                 }
             } else if (objectType == Character.class) {
                 Character value = (Character) object;
 
-                if (typeClass == Byte.class) {
+                if (type == Byte.class) {
                     return (byte) value.charValue();
                 }
             } else if (objectType == Double.class) {
                 Double value = (Double) object;
 
-                if (typeClass == Float.class) {
+                if (type == Float.class) {
                     return value.floatValue();
                 }
             }
@@ -193,13 +193,13 @@ public class ReflectionUtil {
             return object;
         }
 
-        return typeClass.cast(object);
+        return type.cast(object);
     }
 
     /**
      * Returns the value of the indexed component in the specified array object.
      *
-     * @param array the array
+     * @param array the array object
      * @param index the index
      * @return the value of the indexed component in the specified array
      */
@@ -230,7 +230,7 @@ public class ReflectionUtil {
     /**
      * Sets the value of the indexed component of the specified array object to the specified new value.
      *
-     * @param array the array
+     * @param array the array object
      * @param index the index
      * @param value the new value of the indexed component
      */
@@ -261,18 +261,18 @@ public class ReflectionUtil {
     /**
      * Clones the array object.
      *
-     * @param object the object to clone
+     * @param array the object to clone
      * @return cloned array object
      * @throws IllegalArgumentException if the object is not array object
      */
-    public static Object cloneArray(Object object) {
-        if (!object.getClass().isArray()) {
-            throw new IllegalArgumentException(object + " is not array object.");
+    public static Object cloneArray(Object array) {
+        if (!array.getClass().isArray()) {
+            throw new IllegalArgumentException(array + " is not array object.");
         }
 
-        int length = Array.getLength(object);
-        Object newArray = Array.newInstance(object.getClass().getComponentType(), length);
-        System.arraycopy(object, 0, newArray, 0, length);
+        int length = Array.getLength(array);
+        Object newArray = Array.newInstance(array.getClass().getComponentType(), length);
+        System.arraycopy(array, 0, newArray, 0, length);
 
         return newArray;
     }
@@ -281,16 +281,16 @@ public class ReflectionUtil {
      * Add accessible fields of the target Class to the field List.
      *
      * @param fieldList   the field list to be added
-     * @param targetClass the target class
+     * @param type the target class
      */
-    static void addAccessibleFields(List<Field> fieldList, Class<?> targetClass) {
-        Class<?> superClass = targetClass.getSuperclass();
+    static void addAccessibleFields(List<Field> fieldList, Class<?> type) {
+        Class<?> superClass = type.getSuperclass();
 
         if (superClass != null && superClass != Object.class) {
-            ReflectionUtil.addAccessibleFields(fieldList, targetClass.getSuperclass());
+            ReflectionUtil.addAccessibleFields(fieldList, type.getSuperclass());
         }
 
-        for (Field field : targetClass.getDeclaredFields()) {
+        for (Field field : type.getDeclaredFields()) {
             if (!fieldList.contains(field) && !Modifier.isStatic(field.getModifiers()) && !Modifier.isTransient(field.getModifiers())) {
                 fieldList.add(field);
             }
@@ -300,12 +300,12 @@ public class ReflectionUtil {
     /**
      * Returns accessible fields of target class.
      *
-     * @param targetClass the target class
+     * @param type the target class
      * @return accessible fields
      */
-    public static Field[] getAccessibleFields(Class<?> targetClass) {
+    public static Field[] getAccessibleFields(Class<?> type) {
         List<Field> fields = new LinkedList<>();
-        ReflectionUtil.addAccessibleFields(fields, targetClass);
+        ReflectionUtil.addAccessibleFields(fields, type);
 
         return fields.toArray(new Field[0]);
     }
@@ -313,25 +313,25 @@ public class ReflectionUtil {
     /**
      * Returns the dimension of the array through the class object of the array object.
      *
-     * @param typeClass the class of the target array object
+     * @param arrayType the class of the target array object
      * @return dimension
      * @throws IllegalArgumentException if the class is not the class of the array object
      */
-    public static int getArrayDimension(Class<?> typeClass) {
-        if (!typeClass.isArray()) {
-            throw new IllegalArgumentException(typeClass + " is not array class.");
+    public static int getArrayDimension(Class<?> arrayType) {
+        if (!arrayType.isArray()) {
+            throw new IllegalArgumentException(arrayType + " is not array class.");
         }
 
         int count = 0;
 
         while (true) {
-            Class<?> componentClass = typeClass.getComponentType();
+            Class<?> componentClass = arrayType.getComponentType();
 
             if (componentClass == null) {
                 break;
             } else {
                 count++;
-                typeClass = componentClass;
+                arrayType = componentClass;
             }
         }
 
@@ -341,15 +341,15 @@ public class ReflectionUtil {
     /**
      * Returns the underlying component type of the array through the class object of the array object.
      *
-     * @param typeClass the class of the array object
+     * @param arrayType the class of the array object
      * @return component type
      */
-    public static Class<?> getArrayLastComponentType(Class<?> typeClass) {
-        if (!typeClass.isArray()) {
-            throw new IllegalArgumentException(typeClass + " is not array class.");
+    public static Class<?> getArrayLastComponentType(Class<?> arrayType) {
+        if (!arrayType.isArray()) {
+            throw new IllegalArgumentException(arrayType + " is not array class.");
         }
 
-        Class<?> lastClass = typeClass;
+        Class<?> lastClass = arrayType;
 
         while (true) {
             Class<?> componentClass = lastClass.getComponentType();
@@ -365,50 +365,50 @@ public class ReflectionUtil {
     }
 
     /**
-     * @param clazz the target class
+     * @param type the target class
      * @return whether the target class is wrapper class
      */
-    public static boolean isWrapperClass(Class<?> clazz) {
-        return WRAPPERS_PRIMITIVES_MAP.containsKey(clazz);
+    public static boolean isWrapperType(Class<?> type) {
+        return WRAPPERS_PRIMITIVES_MAP.containsKey(type);
     }
 
     /**
      * Returns the primitive class corresponding to the wrapper class.
      *
-     * @param wrapperClass the wrapper class
+     * @param type the wrapper class
      * @return primitive class
      * @throws IllegalArgumentException if target class is not wrapper class
      */
-    public static @NotNull Class<?> getPrimitiveClassOfWrapperClass(@NotNull Class<?> wrapperClass) {
-        Class<?> primitiveClass = WRAPPERS_PRIMITIVES_MAP.getOrDefault(wrapperClass, null);
+    public static @NotNull Class<?> convertWrapperClassToPrimitiveClass(@NotNull Class<?> type) {
+        Class<?> primitiveClass = WRAPPERS_PRIMITIVES_MAP.getOrDefault(type, null);
 
         if (primitiveClass == null) {
-            throw new IllegalArgumentException(wrapperClass + " is not wrapper class.");
+            throw new IllegalArgumentException(type + " is not wrapper class.");
         }
 
         return primitiveClass;
     }
 
     /**
-     * @param clazz the target class
+     * @param type the target class
      * @return whether the target class is primitive class
      */
-    public static boolean isPrimitiveClass(Class<?> clazz) {
-        return PRIMITIVES_WRAPPERS_MAP.containsKey(clazz);
+    public static boolean isPrimitiveType(Class<?> type) {
+        return PRIMITIVES_WRAPPERS_MAP.containsKey(type);
     }
 
     /**
      * Returns the wrapper class corresponding to the primitive class.
      *
-     * @param primitiveClass the primitive class
+     * @param type the primitive class
      * @return wrapper class
      * @throws IllegalArgumentException if target class is not primitive class
      */
-    public static @NotNull Class<?> getWrapperClassOfPrimitiveClass(@NotNull Class<?> primitiveClass) {
-        Class<?> wrapperClass = PRIMITIVES_WRAPPERS_MAP.getOrDefault(primitiveClass, null);
+    public static @NotNull Class<?> convertPrimitiveTypeToWrapperType(@NotNull Class<?> type) {
+        Class<?> wrapperClass = PRIMITIVES_WRAPPERS_MAP.getOrDefault(type, null);
 
         if (wrapperClass == null) {
-            throw new IllegalArgumentException(primitiveClass + " is not primitive class.");
+            throw new IllegalArgumentException(type + " is not primitive class.");
         }
 
         return wrapperClass;
@@ -417,49 +417,49 @@ public class ReflectionUtil {
     /**
      * Returns whether casting from the source class to the destination class is possible.
      *
-     * @param fromClass the source class
-     * @param toClass   the destination class
+     * @param fromType the source class
+     * @param toType   the destination class
      * @return whether casting is possible
      */
-    public static boolean checkClassCastable(@NotNull Class<?> fromClass, @NotNull Class<?> toClass) {
-        if (fromClass.isPrimitive()) {
-            fromClass = ReflectionUtil.getWrapperClassOfPrimitiveClass(fromClass);
+    public static boolean checkCastable(@NotNull Class<?> fromType, @NotNull Class<?> toType) {
+        if (fromType.isPrimitive()) {
+            fromType = ReflectionUtil.convertPrimitiveTypeToWrapperType(fromType);
         }
 
-        if (toClass.isPrimitive()) {
-            toClass = ReflectionUtil.getWrapperClassOfPrimitiveClass(toClass);
+        if (toType.isPrimitive()) {
+            toType = ReflectionUtil.convertPrimitiveTypeToWrapperType(toType);
         }
 
-        return toClass.isAssignableFrom(fromClass);
+        return toType.isAssignableFrom(fromType);
     }
 
     /**
      * Create a new instance of the class with unsafe allocator.
      *
-     * @param instanceClass the class to create instance
+     * @param instanceType the class to create instance
      * @return created instance
      * @throws InvocationTargetException if exception occurs in invoked underlying method
      * @throws IllegalAccessException    if the method object is enforcing Java language access control and the underlying method is inaccessible
      * @throws InstantiationException    if the class object represents an abstract class, an interface
      */
-    public static <T> @NotNull T createInstanceUnsafe(@NotNull Class<T> instanceClass) throws InvocationTargetException, IllegalAccessException, InstantiationException {
-        int modifiers = instanceClass.getModifiers();
+    public static <T> @NotNull T createInstanceUnsafe(@NotNull Class<T> instanceType) throws InvocationTargetException, IllegalAccessException, InstantiationException {
+        int modifiers = instanceType.getModifiers();
 
         if (Modifier.isInterface(modifiers)) {
-            throw new InstantiationException("Interface can't be instantiated, got " + instanceClass.getSimpleName() + " interface.");
+            throw new InstantiationException("Interface can't be instantiated, got " + instanceType.getSimpleName() + " interface.");
         }
 
         if (Modifier.isAbstract(modifiers)) {
-            throw new InstantiationException("Abstract class can't be instantiated, got " + instanceClass.getSimpleName() + " abstract class.");
+            throw new InstantiationException("Abstract class can't be instantiated, got " + instanceType.getSimpleName() + " abstract class.");
         }
 
-        return ReflectionUtil.ALLOCATOR.allocate(instanceClass);
+        return ReflectionUtil.ALLOCATOR.allocate(instanceType);
     }
 
     /**
      * Create a new instance of the class through constructor.
      *
-     * @param instanceClass the class to create instance
+     * @param instanceType the class to create instance
      * @param objects       the argument of the constructor
      * @return created instance
      * @throws IllegalArgumentException  if the class doesn't have matched constructor
@@ -467,18 +467,18 @@ public class ReflectionUtil {
      * @throws IllegalAccessException    if the method object is enforcing Java language access control and the underlying method is inaccessible
      * @throws InstantiationException    if the class object represents an abstract class, an interface
      */
-    public static <T> @NotNull T createInstance(@NotNull Class<T> instanceClass, Object @NotNull ... objects) throws InvocationTargetException, InstantiationException, IllegalAccessException {
-        int modifiers = instanceClass.getModifiers();
+    public static <T> @NotNull T createInstance(@NotNull Class<T> instanceType, Object @NotNull ... objects) throws InvocationTargetException, InstantiationException, IllegalAccessException {
+        int modifiers = instanceType.getModifiers();
 
         if (Modifier.isInterface(modifiers)) {
-            throw new InstantiationException("Interface can't be instantiated, got " + instanceClass.getSimpleName() + " interface.");
+            throw new InstantiationException("Interface can't be instantiated, got " + instanceType.getSimpleName() + " interface.");
         }
 
         if (Modifier.isAbstract(modifiers)) {
-            throw new InstantiationException("Abstract class can't be instantiated, got " + instanceClass.getSimpleName() + " abstract class.");
+            throw new InstantiationException("Abstract class can't be instantiated, got " + instanceType.getSimpleName() + " abstract class.");
         }
 
-        Constructor<?>[] constructors = instanceClass.getDeclaredConstructors();
+        Constructor<?>[] constructors = instanceType.getDeclaredConstructors();
         Class<?>[] classes = new Class[objects.length];
 
         for (int index = 0; index < objects.length; index++) {
@@ -486,7 +486,7 @@ public class ReflectionUtil {
         }
 
         for (Constructor<?> constructor : constructors) {
-            if (constructor.getDeclaringClass() == instanceClass) {
+            if (constructor.getDeclaringClass() == instanceType) {
                 int parameterCount = constructor.getParameterCount();
                 Class<?>[] parameterTypes = constructor.getParameterTypes();
 
@@ -494,7 +494,7 @@ public class ReflectionUtil {
                     boolean matched = true;
 
                     for (int index = 0; index < parameterCount; index++) {
-                        if (!ReflectionUtil.checkClassCastable(classes[index], parameterTypes[index])) {
+                        if (!ReflectionUtil.checkCastable(classes[index], parameterTypes[index])) {
                             matched = false;
                             break;
                         }
@@ -503,12 +503,12 @@ public class ReflectionUtil {
                     if (matched) {
                         constructor.setAccessible(true);
 
-                        return instanceClass.cast(constructor.newInstance(objects));
+                        return instanceType.cast(constructor.newInstance(objects));
                     }
                 }
             }
         }
 
-        throw new IllegalArgumentException(instanceClass.getSimpleName() + " class doesn't have matched constructor.");
+        throw new IllegalArgumentException(instanceType.getSimpleName() + " class doesn't have matched constructor.");
     }
 }

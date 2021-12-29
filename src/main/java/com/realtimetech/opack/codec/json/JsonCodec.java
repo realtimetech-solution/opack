@@ -172,17 +172,17 @@ public final class JsonCodec extends OpackCodec<String> {
             return true;
         }
 
-        Class<?> objectClass = object.getClass();
+        Class<?> objectType = object.getClass();
 
-        if (objectClass == OpackObject.class) {
+        if (objectType == OpackObject.class) {
             this.encodeStack.push(object);
 
             return false;
-        } else if (objectClass == OpackArray.class) {
+        } else if (objectType == OpackArray.class) {
             this.encodeStack.push(object);
 
             return false;
-        } else if (objectClass == String.class) {
+        } else if (objectType == String.class) {
             String string = (String) object;
             char[] charArray = string.toCharArray();
 
@@ -219,30 +219,30 @@ public final class JsonCodec extends OpackCodec<String> {
 
             stringWriter.write(CONST_STRING_CLOSE_CHARACTER);
         } else {
-            if (!OpackValue.isAllowClass(objectClass)) {
-                throw new IllegalArgumentException(objectClass + " is not allowed in json format.");
+            if (!OpackValue.isAllowType(objectType)) {
+                throw new IllegalArgumentException(objectType + " is not allowed in json format.");
             }
 
-            Class<?> numberClass = objectClass;
+            Class<?> numberType = objectType;
 
-            if (ReflectionUtil.isPrimitiveClass(objectClass)) {
-                numberClass = ReflectionUtil.getWrapperClassOfPrimitiveClass(objectClass);
+            if (ReflectionUtil.isPrimitiveType(objectType)) {
+                numberType = ReflectionUtil.convertPrimitiveTypeToWrapperType(objectType);
             }
 
             // Asserts
-            if (numberClass == Double.class) {
+            if (numberType == Double.class) {
                 Double doubleValue = (Double) object;
                 if (Double.isNaN(doubleValue) || Double.isInfinite(doubleValue) || !Double.isFinite(doubleValue)) {
                     throw new ArithmeticException("Only finite values are allowed in json format.");
                 }
-            } else if (numberClass == Float.class) {
+            } else if (numberType == Float.class) {
                 Float floatValue = (Float) object;
                 if (Float.isNaN(floatValue) || Float.isInfinite(floatValue) || !Float.isFinite(floatValue)) {
                     throw new ArithmeticException("Only finite values are allowed in json format.");
                 }
             }
 
-            if (numberClass == Character.class) {
+            if (numberType == Character.class) {
                 if (convertCharacterToString) {
                     stringWriter.write(CONST_STRING_OPEN_CHARACTER);
                     stringWriter.write(object.toString().toCharArray());
@@ -285,10 +285,10 @@ public final class JsonCodec extends OpackCodec<String> {
         while (!this.encodeStack.isEmpty()) {
             Object object = this.encodeStack.pop();
 
-            Class<?> objectClass = object == null ? null : object.getClass();
-            if (objectClass == char[].class) {
+            Class<?> objectType = object == null ? null : object.getClass();
+            if (objectType == char[].class) {
                 this.encodeStringWriter.write((char[]) object);
-            } else if (objectClass == OpackObject.class) {
+            } else if (objectType == OpackObject.class) {
                 OpackObject<Object, Object> opackObject = (OpackObject<Object, Object>) object;
                 int currentIndent = -1;
                 if (this.prettyFormat) {
@@ -346,7 +346,7 @@ public final class JsonCodec extends OpackCodec<String> {
 
                     count++;
                 }
-            } else if (objectClass == OpackArray.class) {
+            } else if (objectType == OpackArray.class) {
                 OpackArray<Object> opackArray = (OpackArray<Object>) object;
                 this.encodeLiteralStringWriter.reset();
 
@@ -461,11 +461,11 @@ public final class JsonCodec extends OpackCodec<String> {
                     int baseIndex = this.decodeBaseStack.peek();
                     int valueSize = this.decodeValueStack.getSize() - baseIndex - 1;
                     Object object = this.decodeValueStack.get(baseIndex);
-                    Class<?> objectClass = object.getClass();
+                    Class<?> objectType = object.getClass();
 
                     switch (currentChar) {
                         case ',': {
-                            if (objectClass == OpackObject.class) {
+                            if (objectType == OpackObject.class) {
                                 if (valueSize != 0) {
                                     throw new IOException("The map type cannot contain items that do not exist. at " + pointer + "(" + currentChar + ")");
                                 }
@@ -474,12 +474,12 @@ public final class JsonCodec extends OpackCodec<String> {
                             break;
                         }
                         case ':': {
-                            if (objectClass == OpackObject.class) {
+                            if (objectType == OpackObject.class) {
                                 if (valueSize != 1) {
                                     throw new IOException("The map item must have a key. at " + pointer + "(" + currentChar + ")");
                                 }
                             }
-                            if (objectClass == OpackArray.class) {
+                            if (objectType == OpackArray.class) {
                                 throw new IOException("The array type cannot contain colons. at " + pointer + "(" + currentChar + ")");
                             }
 
@@ -614,9 +614,9 @@ public final class JsonCodec extends OpackCodec<String> {
                 int baseIndex = this.decodeBaseStack.peek();
                 int valueSize = this.decodeValueStack.getSize() - baseIndex - 1;
                 Object object = this.decodeValueStack.get(baseIndex);
-                Class<?> objectClass = object.getClass();
+                Class<?> objectType = object.getClass();
 
-                if (objectClass == OpackObject.class) {
+                if (objectType == OpackObject.class) {
                     if (valueSize == 2) {
                         OpackObject<Object, Object> opackObject = (OpackObject<Object, Object>) object;
 
@@ -625,7 +625,7 @@ public final class JsonCodec extends OpackCodec<String> {
 
                         opackObject.put(key, value);
                     }
-                } else if (objectClass == OpackArray.class) {
+                } else if (objectType == OpackArray.class) {
                     if (valueSize == 1) {
                         OpackArray<Object> opackArray = (OpackArray<Object>) object;
                         Object value = this.decodeValueStack.pop();
@@ -633,7 +633,7 @@ public final class JsonCodec extends OpackCodec<String> {
                         opackArray.add(value);
                     }
                 } else {
-                    throw new IOException("Caught corrupted stack, got " + objectClass.getSimpleName());
+                    throw new IOException("Caught corrupted stack, got " + objectType.getSimpleName());
                 }
             }
         }

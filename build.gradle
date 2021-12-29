@@ -27,7 +27,7 @@ plugins {
 
 group 'io.github.realtimetech-solution'
 archivesBaseName = "opack"
-version = "0.0.3"
+version = "0.0.4"
 
 compileJava.options.encoding = 'UTF-8'
 

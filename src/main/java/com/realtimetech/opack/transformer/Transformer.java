@@ -40,9 +40,9 @@ public interface Transformer {
      * Deserialize opack value.
      *
      * @param value    the opack value to deserialize
-     * @param goalClass the goal type to deserialize
+     * @param goalType the goal type to deserialize
      * @return deserialized value
      * @throws DeserializeException if a problem occurs during deserializing
      */
-    public Object deserialize(Opacker opacker, Class<?> goalClass, Object value) throws DeserializeException;
+    public Object deserialize(Opacker opacker, Class<?> goalType, Object value) throws DeserializeException;
 }

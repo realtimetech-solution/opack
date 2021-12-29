@@ -50,20 +50,20 @@ public class TransformerFactory {
     /**
      * Returns instance for transformer class.
      *
-     * @param transformerClass the transformer class to create new transformer
+     * @param transformerType the transformer class to create new transformer
      * @return transformer instance
      * @throws InstantiationException if transformer class object cannot be instantiated; if the constructor is not in the transformer class
      */
-    public <T extends Transformer> T get(@NotNull Class<T> transformerClass) throws InstantiationException {
-        if (!this.transformerMap.containsKey(transformerClass)) {
+    public <T extends Transformer> T get(@NotNull Class<T> transformerType) throws InstantiationException {
+        if (!this.transformerMap.containsKey(transformerType)) {
             synchronized (this.transformerMap) {
-                if (!this.transformerMap.containsKey(transformerClass)) {
+                if (!this.transformerMap.containsKey(transformerType)) {
                     T instance = null;
 
                     try {
                         // Create instance using Transformer(Opacker) constructor
                         try {
-                            instance = ReflectionUtil.createInstance(transformerClass, this.opacker);
+                            instance = ReflectionUtil.createInstance(transformerType, this.opacker);
                         } catch (IllegalArgumentException exception) {
                             // Ok, let's find no parameter constructor
                         }
@@ -71,27 +71,27 @@ public class TransformerFactory {
                         // Create instance using Transformer() constructor
                         try {
                             if (instance == null) {
-                                instance = ReflectionUtil.createInstance(transformerClass);
+                                instance = ReflectionUtil.createInstance(transformerType);
                             }
                         } catch (IllegalArgumentException exception) {
                             // Ok, let's throw exception
                         }
                     } catch (InvocationTargetException | IllegalAccessException exception) {
-                        InstantiationException instantiationException = new InstantiationException(transformerClass.getSimpleName() + " transformer can't instantiation.");
+                        InstantiationException instantiationException = new InstantiationException(transformerType.getSimpleName() + " transformer can't instantiation.");
                         instantiationException.initCause(exception);
 
                         throw instantiationException;
                     }
 
                     if (instance == null) {
-                        throw new InstantiationException(transformerClass.getSimpleName() + " transformer must be implemented constructor(Opacker) or constructor().");
+                        throw new InstantiationException(transformerType.getSimpleName() + " transformer must be implemented constructor(Opacker) or constructor().");
                     }
 
-                    this.transformerMap.put(transformerClass, instance);
+                    this.transformerMap.put(transformerType, instance);
                 }
             }
         }
 
-        return transformerClass.cast(this.transformerMap.get(transformerClass));
+        return transformerType.cast(this.transformerMap.get(transformerType));
     }
 }

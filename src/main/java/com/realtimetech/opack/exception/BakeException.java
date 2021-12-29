@@ -20,31 +20,13 @@
  * limitations under the License.
  */
 
-package com.realtimetech.opack.compile;
+package com.realtimetech.opack.exception;
 
-import com.realtimetech.opack.transformer.Transformer;
-import org.jetbrains.annotations.NotNull;
-
-public class PredefinedTransformer {
-    final Transformer transformer;
-    final boolean inheritable;
-
-    /**
-     * Constructs the PredefinedTransformer.
-     *
-     * @param transformer the transformer
-     * @param inheritable whether the transformer is inheritable
-     */
-    public PredefinedTransformer(@NotNull Transformer transformer, boolean inheritable) {
-        this.transformer = transformer;
-        this.inheritable = inheritable;
-    }
-
-    public Transformer getTransformer() {
-        return transformer;
-    }
-
-    public boolean isInheritable() {
-        return inheritable;
+/**
+ * Thrown when a problem occurs during baking a class.
+ */
+public class BakeException extends Exception {
+    public BakeException(Throwable cause) {
+        super(cause);
     }
 }

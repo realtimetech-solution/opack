@@ -20,15 +20,15 @@
  * limitations under the License.
  */
 
-package com.realtimetech.opack.compile;
+package com.realtimetech.opack.bake;
 
 import com.realtimetech.opack.transformer.Transformer;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
 
-public class ClassInfo {
-    public static class FieldInfo {
+public class BakedType {
+    public static class Property {
         final Field field;
         final String name;
         final Class<?> type;
@@ -36,7 +36,7 @@ public class ClassInfo {
         final Transformer transformer;
         final Class<?> explicitType;
 
-        public FieldInfo(@NotNull Field field, Transformer transformer, Class<?> explicitType) {
+        public Property(@NotNull Field field, Transformer transformer, Class<?> explicitType) {
             this.field = field;
             this.name = this.field.getName();
             this.type = explicitType == null ? this.field.getType() : explicitType;
@@ -94,25 +94,25 @@ public class ClassInfo {
         }
     }
 
-    final Class<?> targetClass;
+    final Class<?> type;
     final Transformer[] transformers;
-    final FieldInfo[] fields;
+    final Property[] fields;
 
-    public ClassInfo(Class<?> targetClass, Transformer[] transformers, FieldInfo[] fields) {
-        this.targetClass = targetClass;
+    public BakedType(Class<?> type, Transformer[] transformers, Property[] fields) {
+        this.type = type;
         this.transformers = transformers;
         this.fields = fields;
     }
 
-    public Class<?> getTargetClass() {
-        return targetClass;
+    public Class<?> getType() {
+        return type;
     }
 
     public Transformer[] getTransformers() {
         return transformers;
     }
 
-    public FieldInfo[] getFields() {
+    public Property[] getFields() {
         return fields;
     }
 }

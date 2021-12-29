@@ -141,13 +141,13 @@ public final class DenseCodec extends OpackCodec<byte[]> {
                 continue;
             }
 
-            Class<?> objectClass = object.getClass();
+            Class<?> objectType = object.getClass();
 
-            if (ReflectionUtil.isWrapperClass(objectClass)) {
-                objectClass = ReflectionUtil.getPrimitiveClassOfWrapperClass(objectClass);
+            if (ReflectionUtil.isWrapperType(objectType)) {
+                objectType = ReflectionUtil.convertWrapperClassToPrimitiveClass(objectType);
             }
 
-            if (objectClass == OpackObject.class) {
+            if (objectType == OpackObject.class) {
                 OpackObject<Object, Object> opackObject = (OpackObject<Object, Object>) object;
                 int size = opackObject.size();
 
@@ -160,7 +160,7 @@ public final class DenseCodec extends OpackCodec<byte[]> {
                     this.encodeStack.push(value);
                     this.encodeStack.push(key);
                 }
-            } else if (objectClass == OpackArray.class) {
+            } else if (objectType == OpackArray.class) {
                 OpackArray<Object> opackArray = (OpackArray<Object>) object;
                 int length = opackArray.length();
 
@@ -176,14 +176,14 @@ public final class DenseCodec extends OpackCodec<byte[]> {
                     if (opackArrayList instanceof PrimitiveList) {
                         PrimitiveList primitiveList = (PrimitiveList) opackArrayList;
                         Object arrayObject = primitiveList.getArrayObject();
-                        Class<?> arrayClass = arrayObject.getClass();
+                        Class<?> arrayType = arrayObject.getClass();
 
-                        if (arrayClass == byte[].class) {
+                        if (arrayType == byte[].class) {
                             encodeByteArrayStream.write(CONST_BYTE_NATIVE_ARRAY);
                             byte[] array = (byte[]) arrayObject;
                             encodeByteArrayStream.write(array);
                             optimized = true;
-                        } else if (arrayClass == char[].class) {
+                        } else if (arrayType == char[].class) {
                             encodeByteArrayStream.write(CONST_CHARACTER_NATIVE_ARRAY);
                             char[] array = (char[]) arrayObject;
                             ByteBuffer byteBuffer = ByteBuffer.allocate(array.length * 2);
@@ -192,7 +192,7 @@ public final class DenseCodec extends OpackCodec<byte[]> {
 
                             encodeByteArrayStream.write(byteBuffer.array());
                             optimized = true;
-                        } else if (arrayClass == short[].class) {
+                        } else if (arrayType == short[].class) {
                             encodeByteArrayStream.write(CONST_SHORT_NATIVE_ARRAY);
                             short[] array = (short[]) arrayObject;
                             ByteBuffer byteBuffer = ByteBuffer.allocate(array.length * 2);
@@ -201,7 +201,7 @@ public final class DenseCodec extends OpackCodec<byte[]> {
 
                             encodeByteArrayStream.write(byteBuffer.array());
                             optimized = true;
-                        } else if (arrayClass == int[].class) {
+                        } else if (arrayType == int[].class) {
                             encodeByteArrayStream.write(CONST_INTEGER_NATIVE_ARRAY);
                             int[] array = (int[]) arrayObject;
                             ByteBuffer byteBuffer = ByteBuffer.allocate(array.length * 4);
@@ -210,7 +210,7 @@ public final class DenseCodec extends OpackCodec<byte[]> {
 
                             encodeByteArrayStream.write(byteBuffer.array());
                             optimized = true;
-                        } else if (arrayClass == float[].class) {
+                        } else if (arrayType == float[].class) {
                             encodeByteArrayStream.write(CONST_FLOAT_NATIVE_ARRAY);
                             float[] array = (float[]) arrayObject;
                             ByteBuffer byteBuffer = ByteBuffer.allocate(array.length * 4);
@@ -219,7 +219,7 @@ public final class DenseCodec extends OpackCodec<byte[]> {
 
                             encodeByteArrayStream.write(byteBuffer.array());
                             optimized = true;
-                        } else if (arrayClass == long[].class) {
+                        } else if (arrayType == long[].class) {
                             encodeByteArrayStream.write(CONST_LONG_NATIVE_ARRAY);
                             long[] array = (long[]) arrayObject;
                             ByteBuffer byteBuffer = ByteBuffer.allocate(array.length * 8);
@@ -228,7 +228,7 @@ public final class DenseCodec extends OpackCodec<byte[]> {
 
                             encodeByteArrayStream.write(byteBuffer.array());
                             optimized = true;
-                        } else if (arrayClass == double[].class) {
+                        } else if (arrayType == double[].class) {
                             encodeByteArrayStream.write(CONST_DOUBLE_NATIVE_ARRAY);
                             double[] array = (double[]) arrayObject;
                             ByteBuffer byteBuffer = ByteBuffer.allocate(array.length * 8);
@@ -252,48 +252,48 @@ public final class DenseCodec extends OpackCodec<byte[]> {
                     throw new IllegalStateException("Failed to access the native list object in OpackArray");
                 }
             } else {
-                if (objectClass == boolean.class) {
+                if (objectType == boolean.class) {
                     encodeByteArrayStream.write(CONST_TYPE_BOOLEAN);
                     encodeByteArrayStream.write((boolean) object ? 1 : 0);
-                } else if (objectClass == byte.class) {
+                } else if (objectType == byte.class) {
                     encodeByteArrayStream.write(CONST_TYPE_BYTE);
                     encodeByteArrayStream.write((byte) object);
-                } else if (objectClass == char.class) {
+                } else if (objectType == char.class) {
                     encodeByteArrayStream.write(CONST_TYPE_CHARACTER);
 
                     ByteBuffer.wrap(byte2Buffer).putChar((char) object);
                     encodeByteArrayStream.write(byte2Buffer);
-                } else if (objectClass == short.class) {
+                } else if (objectType == short.class) {
                     encodeByteArrayStream.write(CONST_TYPE_SHORT);
                     short value = (short) object;
 
                     ByteBuffer.wrap(byte2Buffer).putShort(value);
                     encodeByteArrayStream.write(byte2Buffer);
-                } else if (objectClass == int.class) {
+                } else if (objectType == int.class) {
                     encodeByteArrayStream.write(CONST_TYPE_INTEGER);
                     int value = (int) object;
 
                     ByteBuffer.wrap(byte4Buffer).putInt(value);
                     encodeByteArrayStream.write(byte4Buffer);
-                } else if (objectClass == float.class) {
+                } else if (objectType == float.class) {
                     encodeByteArrayStream.write(CONST_TYPE_FLOAT);
                     float value = (float) object;
 
                     ByteBuffer.wrap(byte4Buffer).putFloat(value);
                     encodeByteArrayStream.write(byte4Buffer);
-                } else if (objectClass == long.class) {
+                } else if (objectType == long.class) {
                     encodeByteArrayStream.write(CONST_TYPE_LONG);
                     long value = (long) object;
 
                     ByteBuffer.wrap(byte8Buffer).putLong(value);
                     encodeByteArrayStream.write(byte8Buffer);
-                } else if (objectClass == double.class) {
+                } else if (objectType == double.class) {
                     encodeByteArrayStream.write(CONST_TYPE_DOUBLE);
                     double value = (double) object;
 
                     ByteBuffer.wrap(byte8Buffer).putDouble(value);
                     encodeByteArrayStream.write(byte8Buffer);
-                } else if (objectClass == String.class) {
+                } else if (objectType == String.class) {
                     encodeByteArrayStream.write(CONST_TYPE_STRING);
                     String value = (String) object;
 
@@ -302,7 +302,7 @@ public final class DenseCodec extends OpackCodec<byte[]> {
                     encodeByteArrayStream.write(byte4Buffer);
                     encodeByteArrayStream.write(bytes);
                 } else {
-                    throw new IllegalArgumentException(objectClass + " is not allowed in dense format. (unknown literal object type)");
+                    throw new IllegalArgumentException(objectType + " is not allowed in dense format. (unknown literal object type)");
                 }
             }
         }
