@@ -22,7 +22,7 @@
 
 package com.realtimetech.opack.util;
 
-import com.realtimetech.opack.util.structure.PrimitiveList;
+import com.realtimetech.opack.util.structure.NativeList;
 import com.realtimetech.opack.value.OpackArray;
 import com.realtimetech.opack.value.OpackValue;
 
@@ -74,15 +74,15 @@ public class OpackArrayConverter {
 
         List<?> list = (List<?>) OPACK_ARRAY_GETTER_METHOD.invoke(opackArray);
 
-        if (list instanceof PrimitiveList) {
+        if (list instanceof NativeList) {
             /*
                 Optimize code for pinned list
              */
-            Object object = ((PrimitiveList) list).getArrayObject();
+            Object object = ((NativeList) list).getArrayObject();
             Class<?> arrayType = object.getClass();
 
             if(!arrayType.isArray()){
-                throw new IllegalArgumentException("PrimitiveList array object is not array type");
+                throw new IllegalArgumentException("NativeList array object is not array type");
             }
 
             if (arrayType.getComponentType() != componentType) {

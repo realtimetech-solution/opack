@@ -28,7 +28,7 @@ import com.realtimetech.opack.exception.EncodeException;
 import com.realtimetech.opack.util.OpackArrayConverter;
 import com.realtimetech.opack.util.ReflectionUtil;
 import com.realtimetech.opack.util.structure.FastStack;
-import com.realtimetech.opack.util.structure.PrimitiveList;
+import com.realtimetech.opack.util.structure.NativeList;
 import com.realtimetech.opack.value.OpackArray;
 import com.realtimetech.opack.value.OpackObject;
 import com.realtimetech.opack.value.OpackValue;
@@ -182,9 +182,9 @@ public final class DenseCodec extends OpackCodec<InputStream, OutputStream> {
 
                     boolean optimized = false;
 
-                    if (opackArrayList instanceof PrimitiveList) {
-                        PrimitiveList primitiveList = (PrimitiveList) opackArrayList;
-                        Object arrayObject = primitiveList.getArrayObject();
+                    if (opackArrayList instanceof NativeList) {
+                        NativeList nativeList = (NativeList) opackArrayList;
+                        Object arrayObject = nativeList.getArrayObject();
                         Class<?> arrayType = arrayObject.getClass();
 
                         if (arrayType == boolean[].class) {

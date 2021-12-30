@@ -28,7 +28,7 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.reflect.Array;
 import java.util.*;
 
-public class PrimitiveList implements List<Object> {
+public class NativeList implements List<Object> {
     final Object arrayObject;
 
     /**
@@ -37,7 +37,7 @@ public class PrimitiveList implements List<Object> {
      * @param arrayObject the array object for create
      * @throws IllegalArgumentException if the array object argument is not array object
      */
-    public PrimitiveList(Object arrayObject) {
+    public NativeList(Object arrayObject) {
         if (!arrayObject.getClass().isArray()) {
             throw new IllegalArgumentException(arrayObject + " is not array object.");
         }
@@ -130,7 +130,7 @@ public class PrimitiveList implements List<Object> {
      */
     @Override
     public boolean add(Object e) {
-        throw new UnsupportedOperationException("PrimitiveList can't modify element.");
+        throw new UnsupportedOperationException("NativeList can't modify element.");
     }
 
     /**
@@ -140,7 +140,7 @@ public class PrimitiveList implements List<Object> {
      */
     @Override
     public boolean remove(Object o) {
-        throw new UnsupportedOperationException("PrimitiveList can't modify element.");
+        throw new UnsupportedOperationException("NativeList can't modify element.");
     }
 
     /**
@@ -167,7 +167,7 @@ public class PrimitiveList implements List<Object> {
      */
     @Override
     public boolean addAll(@NotNull Collection<? extends Object> c) {
-        throw new UnsupportedOperationException("PrimitiveList can't modify element.");
+        throw new UnsupportedOperationException("NativeList can't modify element.");
     }
 
     /**
@@ -177,7 +177,7 @@ public class PrimitiveList implements List<Object> {
      */
     @Override
     public boolean addAll(int index, @NotNull Collection<? extends Object> c) {
-        throw new UnsupportedOperationException("PrimitiveList can't modify element.");
+        throw new UnsupportedOperationException("NativeList can't modify element.");
     }
 
     /**
@@ -187,7 +187,7 @@ public class PrimitiveList implements List<Object> {
      */
     @Override
     public boolean removeAll(@NotNull Collection<?> c) {
-        throw new UnsupportedOperationException("PrimitiveList can't modify element.");
+        throw new UnsupportedOperationException("NativeList can't modify element.");
     }
 
     /**
@@ -197,7 +197,7 @@ public class PrimitiveList implements List<Object> {
      */
     @Override
     public boolean retainAll(@NotNull Collection<?> c) {
-        throw new UnsupportedOperationException("PrimitiveList can't modify element.");
+        throw new UnsupportedOperationException("NativeList can't modify element.");
     }
 
     /**
@@ -207,7 +207,7 @@ public class PrimitiveList implements List<Object> {
      */
     @Override
     public void clear() {
-        throw new UnsupportedOperationException("PrimitiveList can't modify element.");
+        throw new UnsupportedOperationException("NativeList can't modify element.");
     }
 
     /**
@@ -227,7 +227,7 @@ public class PrimitiveList implements List<Object> {
      */
     @Override
     public Object set(int index, Object element) {
-        throw new UnsupportedOperationException("PrimitiveList can't modify element.");
+        throw new UnsupportedOperationException("NativeList can't modify element.");
     }
 
     /**
@@ -237,7 +237,7 @@ public class PrimitiveList implements List<Object> {
      */
     @Override
     public void add(int index, Object element) {
-        throw new UnsupportedOperationException("PrimitiveList can't modify element.");
+        throw new UnsupportedOperationException("NativeList can't modify element.");
     }
 
     /**
@@ -247,7 +247,7 @@ public class PrimitiveList implements List<Object> {
      */
     @Override
     public Object remove(int index) {
-        throw new UnsupportedOperationException("PrimitiveList can't modify element.");
+        throw new UnsupportedOperationException("NativeList can't modify element.");
     }
 
     /**
