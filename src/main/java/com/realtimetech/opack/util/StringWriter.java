@@ -22,7 +22,10 @@
 
 package com.realtimetech.opack.util;
 
-public class StringWriter {
+import java.io.IOException;
+import java.io.Writer;
+
+public class StringWriter extends Writer {
     private final int blockSize;
 
     private char[] chars;
@@ -103,6 +106,7 @@ public class StringWriter {
      * @param offset the starting position in the source array
      * @param length the number of characters to write
      */
+    @Override
     public void write(char[] src, int offset, int length) {
         int need = this.currentIndex + length;
         if (need >= this.currentSize) {
@@ -112,6 +116,15 @@ public class StringWriter {
         System.arraycopy(src, offset, this.chars, this.currentIndex + 1, length);
 
         this.currentIndex = need;
+    }
+
+    @Override
+    public void flush() throws IOException {
+    }
+
+    @Override
+    public void close() throws IOException {
+        this.reset();
     }
 
     /**
@@ -135,6 +148,7 @@ public class StringWriter {
      *
      * @return created string
      */
+    @Override
     public String toString() {
         return new String(this.chars, 0, this.currentIndex + 1);
     }

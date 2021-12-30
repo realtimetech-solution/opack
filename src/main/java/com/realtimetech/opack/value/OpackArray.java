@@ -39,7 +39,7 @@ public final class OpackArray<E> extends AbstractOpackValue<List<E>> {
         if (arrayType.isArray()) {
             Class<?> componentType = ReflectionUtil.getArrayLastComponentType(arrayType);
 
-            return ReflectionUtil.isPrimitiveType(componentType);
+            return ReflectionUtil.isPrimitiveType(componentType) || ReflectionUtil.isWrapperType(componentType);
         }
 
         return false;

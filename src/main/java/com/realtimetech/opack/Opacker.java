@@ -94,7 +94,6 @@ public class Opacker {
          * Create the Opacker through this builder.
          *
          * @return created opacker
-         * @throws InstantiationException if the predefined transformer cannot be instanced
          */
         public Opacker create() {
             return new Opacker(this);

@@ -22,7 +22,6 @@
 
 package com.realtimetech.opack.test.performance;
 
-import com.esotericsoftware.kryo.io.ByteBufferInput;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -49,7 +48,7 @@ public class GsonPerformanceTest {
         Opacker opacker = new Opacker.Builder().create();
         JsonCodec jsonCodec = new JsonCodec.Builder().create();
 
-        int loop = 256;
+        int loop = 128;
         PerformanceClass.ExceptionRunnable kryoRunnable = () -> {
             JsonElement serialize = gson.toJsonTree(performanceClass);
             String encode = serialize.toString();
@@ -64,7 +63,6 @@ public class GsonPerformanceTest {
         };
 
         long gsonTime = PerformanceClass.measureRunningTime(loop, kryoRunnable);
-
         long opackTime = PerformanceClass.measureRunningTime(loop, opackRunnable);
 
         System.out.println("# " + this.getClass().getSimpleName());
