@@ -48,9 +48,9 @@ public class TransformerFactory {
     }
 
     /**
-     * Returns instance for transformer class.
+     * Returns transformer instance.
      *
-     * @param transformerType the transformer class to create new transformer
+     * @param transformerType the transformer class
      * @return transformer instance
      * @throws InstantiationException if transformer class object cannot be instantiated; if the constructor is not in the transformer class
      */

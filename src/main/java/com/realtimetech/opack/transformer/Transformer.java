@@ -30,7 +30,7 @@ public interface Transformer {
     /**
      * Serialize specific value to opack value.
      *
-     * @param value the value to serialize
+     * @param value the value to be serialized
      * @return opack value
      * @throws SerializeException if a problem occurs during serializing
      */
@@ -39,7 +39,7 @@ public interface Transformer {
     /**
      * Deserialize opack value.
      *
-     * @param value    the opack value to deserialize
+     * @param value    the opack value to be deserialized
      * @param goalType the goal type to deserialize
      * @return deserialized value
      * @throws DeserializeException if a problem occurs during deserializing

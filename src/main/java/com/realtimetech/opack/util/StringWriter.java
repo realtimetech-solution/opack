@@ -22,13 +22,13 @@
 
 package com.realtimetech.opack.util;
 
-public class StringWriter {
-    private final int blockSize;
+import java.io.IOException;
+import java.io.Writer;
 
+public class StringWriter extends Writer {
     private char[] chars;
 
     private int currentIndex;
-    private int scope;
 
     private int currentSize;
 
@@ -40,30 +40,28 @@ public class StringWriter {
     }
 
     /**
-     * Constructs a StringWriter with block size. (The capacity of this StringWriter increases with the block size)
+     * Constructs a StringWriter with initial size.
      *
-     * @param blockSize the block size
+     * @param initialSize the initial size
      */
-    public StringWriter(int blockSize) {
-        this.blockSize = blockSize;
+    public StringWriter(int initialSize) {
         this.currentIndex = -1;
-        this.scope = 0;
-        this.currentSize = 0;
+        this.currentSize = Math.min(initialSize >> 1, 1);
 
-        this.growArray(0);
+        this.growArray(initialSize);
     }
 
     /**
-     * Increase capacity by needSize. (The final capacity : current size + needSize + blockSize)
+     * If the needSize is larger than the current size, double the capacity.
      *
-     * @param needSize the size to increase
+     * @param needSize the needed size
      */
     private void growArray(int needSize) {
-        this.scope = needSize / blockSize;
-
         char[] oldObjects = this.chars;
 
-        this.currentSize = (this.scope + 1) * this.blockSize;
+        while (needSize >= this.currentSize){
+            this.currentSize = this.currentSize << 1;
+        }
         this.chars = new char[this.currentSize];
 
         if (oldObjects != null) {
@@ -103,6 +101,7 @@ public class StringWriter {
      * @param offset the starting position in the source array
      * @param length the number of characters to write
      */
+    @Override
     public void write(char[] src, int offset, int length) {
         int need = this.currentIndex + length;
         if (need >= this.currentSize) {
@@ -112,6 +111,15 @@ public class StringWriter {
         System.arraycopy(src, offset, this.chars, this.currentIndex + 1, length);
 
         this.currentIndex = need;
+    }
+
+    @Override
+    public void flush() throws IOException {
+    }
+
+    @Override
+    public void close() throws IOException {
+        this.reset();
     }
 
     /**
@@ -135,6 +143,7 @@ public class StringWriter {
      *
      * @return created string
      */
+    @Override
     public String toString() {
         return new String(this.chars, 0, this.currentIndex + 1);
     }

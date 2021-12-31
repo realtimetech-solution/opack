@@ -59,7 +59,7 @@ public class ListTest {
     }
 
     @Test
-    public void test() throws InstantiationException, SerializeException, DeserializeException, OpackAssert.AssertException {
+    public void test() throws SerializeException, DeserializeException, OpackAssert.AssertException {
         Opacker opacker = new Opacker.Builder().create();
         ListClass originalObject = new ListClass();
 

@@ -27,36 +27,39 @@ import com.realtimetech.opack.exception.EncodeException;
 import com.realtimetech.opack.value.OpackValue;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.Writer;
 
-public abstract class OpackCodec<D> {
+public abstract class OpackCodec<I, O> {
     /**
      * Writes a code that encodes opack value by overriding this.
      *
+     * @param output     the output to encode
      * @param opackValue the opack value to encode
-     * @return encoded value
      * @throws IOException if I/O error occurs
      */
-    protected abstract D doEncode(OpackValue opackValue) throws IOException;
+    protected abstract void doEncode(O output, OpackValue opackValue) throws IOException;
 
     /**
      * Writes a code that decodes the value encoded by overriding this.
      *
-     * @param data the data to decode
+     * @param input the input to decode
      * @return decoded value
      * @throws IOException if I/O error occurs
      */
-    protected abstract OpackValue doDecode(D data) throws IOException;
+    protected abstract OpackValue doDecode(I input) throws IOException;
 
     /**
      * Encodes the opack value through a specific codec.
      *
-     * @param opackValue the OpackValue to encode
-     * @return encoded value
+     * @param output     the output to encode
+     * @param opackValue the opack value to encode
      * @throws EncodeException if a problem occurs during encoding; if the type of data to be encoded is not allowed in specific codec
      */
-    public synchronized D encode(OpackValue opackValue) throws EncodeException {
+    public final synchronized void encode(O output, OpackValue opackValue) throws EncodeException {
         try {
-            return this.doEncode(opackValue);
+            this.doEncode(output, opackValue);
         } catch (Exception exception) {
             throw new EncodeException(exception);
         }
@@ -65,13 +68,13 @@ public abstract class OpackCodec<D> {
     /**
      * Decodes the value encoded through a specific codec.
      *
-     * @param data the encoded value to decode
+     * @param input the input to decode
      * @return decoded value
      * @throws DecodeException if a problem occurs during decoding; if the type of data to be decoded is not allowed in specific codec
      */
-    public synchronized OpackValue decode(D data) throws DecodeException {
+    public final synchronized OpackValue decode(I input) throws DecodeException {
         try {
-            return this.doDecode(data);
+            return this.doDecode(input);
         } catch (Exception exception) {
             throw new DecodeException(exception);
         }

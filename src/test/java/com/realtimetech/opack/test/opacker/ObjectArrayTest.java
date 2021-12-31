@@ -59,7 +59,7 @@ public class ObjectArrayTest {
     }
 
     @Test
-    public void test() throws InstantiationException, SerializeException, DeserializeException, OpackAssert.AssertException {
+    public void test() throws SerializeException, DeserializeException, OpackAssert.AssertException {
         Opacker opacker = new Opacker.Builder().create();
         ObjectArrayClass originalObject = new ObjectArrayClass();
 

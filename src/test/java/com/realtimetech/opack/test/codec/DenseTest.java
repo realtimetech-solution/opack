@@ -59,7 +59,7 @@ public class DenseTest {
     }
 
     @Test
-    public void with_object() throws DecodeException, EncodeException, InstantiationException, SerializeException, DeserializeException, OpackAssert.AssertException {
+    public void with_object() throws DecodeException, EncodeException, SerializeException, DeserializeException, OpackAssert.AssertException {
         Opacker opacker = new Opacker.Builder().create();
         DenseCodec denseCodec = new DenseCodec.Builder().create();
 

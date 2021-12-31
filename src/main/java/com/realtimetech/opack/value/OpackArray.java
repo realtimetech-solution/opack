@@ -22,7 +22,7 @@
 
 package com.realtimetech.opack.value;
 
-import com.realtimetech.opack.util.structure.PrimitiveList;
+import com.realtimetech.opack.util.structure.NativeList;
 import com.realtimetech.opack.util.ReflectionUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -39,7 +39,7 @@ public final class OpackArray<E> extends AbstractOpackValue<List<E>> {
         if (arrayType.isArray()) {
             Class<?> componentType = ReflectionUtil.getArrayLastComponentType(arrayType);
 
-            return ReflectionUtil.isPrimitiveType(componentType);
+            return ReflectionUtil.isPrimitiveType(componentType) || ReflectionUtil.isWrapperType(componentType);
         }
 
         return false;
@@ -75,7 +75,7 @@ public final class OpackArray<E> extends AbstractOpackValue<List<E>> {
             throw new IllegalArgumentException(arrayObject + " array element is not allowed type, allow only primitive type or String or OpackValues or null");
         }
 
-        this.set((List<E>) new PrimitiveList(arrayObject));
+        this.set((List<E>) new NativeList(arrayObject));
     }
 
     /**
@@ -133,12 +133,12 @@ public final class OpackArray<E> extends AbstractOpackValue<List<E>> {
     }
 
     /**
-     * If the underlying list is {@link PrimitiveList PrimitiveList}, it is converted to List.
+     * If the underlying list is {@link NativeList NativeList}, it is converted to List.
      */
     void unpinList() {
         List<E> list = this.get();
 
-        if (list instanceof PrimitiveList) {
+        if (list instanceof NativeList) {
             this.set((List<E>) Arrays.asList(list.toArray()));
         }
     }

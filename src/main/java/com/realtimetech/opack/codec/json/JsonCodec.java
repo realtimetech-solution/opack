@@ -23,6 +23,7 @@
 package com.realtimetech.opack.codec.json;
 
 import com.realtimetech.opack.codec.OpackCodec;
+import com.realtimetech.opack.exception.EncodeException;
 import com.realtimetech.opack.util.ReflectionUtil;
 import com.realtimetech.opack.util.StringWriter;
 import com.realtimetech.opack.util.structure.FastStack;
@@ -31,8 +32,9 @@ import com.realtimetech.opack.value.OpackObject;
 import com.realtimetech.opack.value.OpackValue;
 
 import java.io.IOException;
+import java.io.Writer;
 
-public final class JsonCodec extends OpackCodec<String> {
+public final class JsonCodec extends OpackCodec<String, Writer> {
     public final static class Builder {
         boolean allowOpackValueToKeyValue;
         boolean convertCharacterToString;
@@ -160,15 +162,15 @@ public final class JsonCodec extends OpackCodec<String> {
     /**
      * Encodes the literal object.
      *
-     * @param stringWriter the string writer for writing encoded object
-     * @param object       the object to encode
+     * @param writer the string writer for writing encoded object
+     * @param object the object to encode
      * @return whether object is encoded
      * @throws IllegalArgumentException if the type of data to be encoded is not allowed in json format
      * @throws ArithmeticException      if the data to be encoded is infinite
      */
-    boolean encodeLiteral(StringWriter stringWriter, Object object) {
+    boolean encodeLiteral(Writer writer, Object object) throws IOException {
         if (object == null) {
-            stringWriter.write(CONST_NULL_CHARACTER);
+            writer.write(CONST_NULL_CHARACTER);
             return true;
         }
 
@@ -186,7 +188,7 @@ public final class JsonCodec extends OpackCodec<String> {
             String string = (String) object;
             char[] charArray = string.toCharArray();
 
-            stringWriter.write(CONST_STRING_OPEN_CHARACTER);
+            writer.write(CONST_STRING_OPEN_CHARACTER);
 
             int last = 0;
             int length = charArray.length;
@@ -205,19 +207,19 @@ public final class JsonCodec extends OpackCodec<String> {
 
                 if (replacement != null) {
                     if (last < index) {
-                        stringWriter.write(charArray, last, index - last);
+                        writer.write(charArray, last, index - last);
                     }
 
-                    stringWriter.write(replacement);
+                    writer.write(replacement);
                     last = index + 1;
                 }
             }
 
             if (last < length) {
-                stringWriter.write(charArray, last, length - last);
+                writer.write(charArray, last, length - last);
             }
 
-            stringWriter.write(CONST_STRING_CLOSE_CHARACTER);
+            writer.write(CONST_STRING_CLOSE_CHARACTER);
         } else {
             if (!OpackValue.isAllowType(objectType)) {
                 throw new IllegalArgumentException(objectType + " is not allowed in json format.");
@@ -244,15 +246,15 @@ public final class JsonCodec extends OpackCodec<String> {
 
             if (numberType == Character.class) {
                 if (convertCharacterToString) {
-                    stringWriter.write(CONST_STRING_OPEN_CHARACTER);
-                    stringWriter.write(object.toString().toCharArray());
-                    stringWriter.write(CONST_STRING_CLOSE_CHARACTER);
+                    writer.write(CONST_STRING_OPEN_CHARACTER);
+                    writer.write(object.toString().toCharArray());
+                    writer.write(CONST_STRING_CLOSE_CHARACTER);
                 } else {
                     int convertToInt = ((char) object);
-                    stringWriter.write(((Integer) convertToInt).toString().toCharArray());
+                    writer.write(((Integer) convertToInt).toString().toCharArray());
                 }
             } else {
-                stringWriter.write(object.toString().toCharArray());
+                writer.write(object.toString().toCharArray());
             }
         }
 
@@ -263,13 +265,11 @@ public final class JsonCodec extends OpackCodec<String> {
      * Encodes the OpackValue to json string.
      *
      * @param opackValue the OpackValue to encode
-     * @return json string
      * @throws IllegalArgumentException if the type of data to be encoded is not allowed in json format
      */
     @Override
-    protected String doEncode(OpackValue opackValue) {
+    protected void doEncode(Writer writer, OpackValue opackValue) throws IOException {
         this.encodeLiteralStringWriter.reset();
-        this.encodeStringWriter.reset();
         this.encodeStack.reset();
 
         FastStack<Integer> prettyIndentStack = null;
@@ -287,7 +287,7 @@ public final class JsonCodec extends OpackCodec<String> {
 
             Class<?> objectType = object == null ? null : object.getClass();
             if (objectType == char[].class) {
-                this.encodeStringWriter.write((char[]) object);
+                writer.write((char[]) object);
             } else if (objectType == OpackObject.class) {
                 OpackObject<Object, Object> opackObject = (OpackObject<Object, Object>) object;
                 int currentIndent = -1;
@@ -295,10 +295,10 @@ public final class JsonCodec extends OpackCodec<String> {
                     currentIndent = prettyIndentStack.pop();
                 }
 
-                this.encodeStringWriter.write(CONST_OBJECT_OPEN_CHARACTER);
+                writer.write(CONST_OBJECT_OPEN_CHARACTER);
                 this.encodeStack.push(CONST_OBJECT_CLOSE_CHARACTER);
                 if (this.prettyFormat && currentIndent != -1) {
-                    this.encodeStringWriter.write(CONST_PRETTY_LINE_CHARACTER);
+                    writer.write(CONST_PRETTY_LINE_CHARACTER);
                     for (int i = 0; i < currentIndent; i++) {
                         this.encodeStack.push(CONST_PRETTY_INDENT_CHARACTER);
                     }
@@ -350,7 +350,7 @@ public final class JsonCodec extends OpackCodec<String> {
                 OpackArray<Object> opackArray = (OpackArray<Object>) object;
                 this.encodeLiteralStringWriter.reset();
 
-                this.encodeStringWriter.write(CONST_ARRAY_OPEN_CHARACTER);
+                writer.write(CONST_ARRAY_OPEN_CHARACTER);
 
                 int size = opackArray.length();
                 int reverseStart = this.encodeStack.getSize();
@@ -393,10 +393,14 @@ public final class JsonCodec extends OpackCodec<String> {
                 this.encodeStack.push(CONST_ARRAY_CLOSE_CHARACTER);
                 this.encodeStack.reverse(reverseStart, this.encodeStack.getSize() - 1);
             } else {
-                this.encodeLiteral(this.encodeStringWriter, object);
+                this.encodeLiteral(writer, object);
             }
         }
+    }
 
+    public synchronized String encode(OpackValue opackValue) throws EncodeException {
+        this.encodeStringWriter.reset();
+        this.encode(this.encodeStringWriter, opackValue);
         return this.encodeStringWriter.toString();
     }
 

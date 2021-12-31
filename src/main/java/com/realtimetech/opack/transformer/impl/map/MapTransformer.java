@@ -37,7 +37,7 @@ public abstract class MapTransformer implements Transformer {
     final boolean wrapWithType;
 
     /**
-     * Constructs a MapTransformer
+     * Constructs a MapTransformer.
      */
     public MapTransformer() {
         this.wrapWithType = this.allowWrapWithType();
@@ -46,7 +46,7 @@ public abstract class MapTransformer implements Transformer {
     /**
      * Returns whether the types of each element are also serialized.
      *
-     * @return whether the types of each element are also serialized.
+     * @return true if the types of each element are also serialized.
      */
     protected abstract boolean allowWrapWithType();
 
@@ -54,8 +54,8 @@ public abstract class MapTransformer implements Transformer {
      * Serializes the map to {@link OpackObject OpackObject}.
      *
      * @param opacker the opacker
-     * @param value   the value to serialize
-     * @return the serialized value
+     * @param value   the map instance to serialize
+     * @return serialized value
      * @throws SerializeException if a problem occurs during serializing
      */
     @Override
@@ -80,6 +80,14 @@ public abstract class MapTransformer implements Transformer {
         return value;
     }
 
+    /**
+     * Serializes the object to {@link OpackValue OpackValue}.
+     *
+     * @param opacker the opacker
+     * @param object  the object to be serialized
+     * @return serialized value
+     * @throws SerializeException if a problem occurs during serializing
+     */
     Object serializeObject(Opacker opacker, Object object) throws SerializeException {
         if (object != null && !OpackValue.isAllowType(object.getClass())) {
             OpackValue opackValue = opacker.serialize(object);
@@ -136,6 +144,15 @@ public abstract class MapTransformer implements Transformer {
         return value;
     }
 
+    /**
+     * Deserializes the {@link OpackValue OpackValue}.
+     *
+     * @param opacker the opacker
+     * @param object  the opack value to be deserialized
+     * @return deserialized object
+     * @throws ClassNotFoundException if the class cannot be located
+     * @throws DeserializeException   if a problem occurs during deserializing
+     */
     Object deserializeObject(Opacker opacker, Object object) throws ClassNotFoundException, DeserializeException {
         if (object instanceof OpackObject) {
             OpackObject<Object, Object> wrapperObject = (OpackObject<Object, Object>) object;

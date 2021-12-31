@@ -29,7 +29,7 @@ import java.util.Set;
 
 public final class OpackObject<K, V> extends AbstractOpackValue<HashMap<K, V>> {
     /**
-     * Constructs an empty opack object with the specified initial capacity.
+     * Constructs an OpackObject with the specified initial capacity.
      *
      * @param initialCapacity the initial capacity
      */
@@ -38,7 +38,7 @@ public final class OpackObject<K, V> extends AbstractOpackValue<HashMap<K, V>> {
     }
 
     /**
-     * Constructs an empty opack object without underlying map.
+     * Constructs an empty OpackObject without underlying map.
      */
     public OpackObject() {
     }

@@ -91,12 +91,11 @@ public class Opacker {
         }
 
         /**
-         * Create the Opacker through this builder.
+         * Create the {@link Opacker Opacker} through this builder.
          *
          * @return created opacker
-         * @throws InstantiationException if the predefined transformer cannot be instanced
          */
-        public Opacker create() throws InstantiationException {
+        public Opacker create() {
             return new Opacker(this);
         }
     }
@@ -111,7 +110,7 @@ public class Opacker {
     final @NotNull FastStack<BakedType> typeStack;
     final @NotNull FastStack<OpackValue> valueStack;
 
-    final @NotNull boolean convertEnumToOrdinal;
+    final boolean convertEnumToOrdinal;
 
     @NotNull State state;
 
@@ -119,9 +118,9 @@ public class Opacker {
      * Constructs the Opacker with the builder of Opacker.
      *
      * @param builder the builder of Opacker
-     * @throws InstantiationException if the predefined transformer cannot be instanced
+     * @throws IllegalStateException if the predefined transformer cannot be instanced
      */
-    Opacker(Builder builder) throws InstantiationException {
+    Opacker(Builder builder) {
         this.typeBaker = new TypeBaker(this);
 
         this.objectStack = new FastStack<>(builder.contextStackInitialSize);
@@ -130,23 +129,27 @@ public class Opacker {
 
         this.state = State.NONE;
 
-        if (builder.enableWrapListElementType) {
-            this.typeBaker.registerPredefinedTransformer(List.class, WrapListTransformer.class, true);
-        } else {
-            this.typeBaker.registerPredefinedTransformer(List.class, NoWrapListTransformer.class, true);
-        }
+        try {
+            if (builder.enableWrapListElementType) {
+                this.typeBaker.registerPredefinedTransformer(List.class, WrapListTransformer.class, true);
+            } else {
+                this.typeBaker.registerPredefinedTransformer(List.class, NoWrapListTransformer.class, true);
+            }
 
-        if (builder.enableWrapMapElementType) {
-            this.typeBaker.registerPredefinedTransformer(Map.class, WrapMapTransformer.class, true);
-        } else {
-            this.typeBaker.registerPredefinedTransformer(Map.class, NoWrapMapTransformer.class, true);
+            if (builder.enableWrapMapElementType) {
+                this.typeBaker.registerPredefinedTransformer(Map.class, WrapMapTransformer.class, true);
+            } else {
+                this.typeBaker.registerPredefinedTransformer(Map.class, NoWrapMapTransformer.class, true);
+            }
+        } catch (InstantiationException exception) {
+            throw new IllegalStateException(exception);
         }
 
         this.convertEnumToOrdinal = builder.convertEnumToOrdinal;
     }
 
     /**
-     * Serializes the object to opack value.
+     * Serializes the object to {@link OpackValue OpackValue}.
      *
      * @param object the object to be serialized
      * @return opack value
@@ -175,7 +178,7 @@ public class Opacker {
      *
      * @param baseType     the class of object to be serialized
      * @param originalType the class of original object
-     * @param object        the object to be serialized
+     * @param object       the object to be serialized
      * @return prepared opack value
      * @throws SerializeException if a problem occurs during serializing; if the baseType cannot be baked into {@link BakedType BakedType}
      */
@@ -306,8 +309,8 @@ public class Opacker {
     /**
      * Deserializes the opack value to object of the target class.
      *
-     * @param type the target class
-     * @param opackValue  the opack value to be deserialized
+     * @param type       the target class
+     * @param opackValue the opack value to be deserialized
      * @return deserialized object
      * @throws DeserializeException if a problem occurs during deserializing; if this opacker is serializing
      */
@@ -333,7 +336,7 @@ public class Opacker {
      * Store information needed for deserialization in stacks.
      *
      * @param goalType the class of object to be deserialized
-     * @param object    the object to be deserialized
+     * @param object   the object to be deserialized
      * @return prepared object
      * @throws DeserializeException if a problem occurs during deserializing
      */
@@ -434,7 +437,7 @@ public class Opacker {
     }
 
     /**
-     * Deserialize the elements of each opack value in the stack. (OpackObject: fields, OpackArray element : array elements)
+     * Deserialize the elements of each opack value in the stack. (OpackObject element : fields, OpackArray element : array elements)
      *
      * @throws DeserializeException if a problem occurs during deserializing; if the field in the class of instance to be deserialized is not accessible
      */

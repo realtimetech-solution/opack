@@ -28,16 +28,16 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.reflect.Array;
 import java.util.*;
 
-public class PrimitiveList implements List<Object> {
+public class NativeList implements List<Object> {
     final Object arrayObject;
 
     /**
-     * Constructs a primitive list with array object of which component type is the primitive type.
+     * Constructs a NativeList with array object.
      *
      * @param arrayObject the array object for create
-     * @throws IllegalArgumentException if the array object argument is not array object
+     * @throws IllegalArgumentException if this object does not represent an array class
      */
-    public PrimitiveList(Object arrayObject) {
+    public NativeList(Object arrayObject) {
         if (!arrayObject.getClass().isArray()) {
             throw new IllegalArgumentException(arrayObject + " is not array object.");
         }
@@ -92,7 +92,7 @@ public class PrimitiveList implements List<Object> {
     /**
      * Returns an array containing all the elements in this list in proper sequence.
      *
-     * @return an array containing all the elements in this list in proper sequence
+     * @return all elements of this list
      */
     @Override
     public Object @NotNull [] toArray() {
@@ -110,7 +110,7 @@ public class PrimitiveList implements List<Object> {
      * The runtime type of the returned array is that of the specified array.
      *
      * @param array the array to get type
-     * @return an array containing the elements of this list
+     * @return all elements of this list
      */
     @Override
     public <T> T @NotNull [] toArray(T @NotNull [] array) {
@@ -130,7 +130,7 @@ public class PrimitiveList implements List<Object> {
      */
     @Override
     public boolean add(Object e) {
-        throw new UnsupportedOperationException("PrimitiveList can't modify element.");
+        throw new UnsupportedOperationException("NativeList can't modify element.");
     }
 
     /**
@@ -140,7 +140,7 @@ public class PrimitiveList implements List<Object> {
      */
     @Override
     public boolean remove(Object o) {
-        throw new UnsupportedOperationException("PrimitiveList can't modify element.");
+        throw new UnsupportedOperationException("NativeList can't modify element.");
     }
 
     /**
@@ -167,7 +167,7 @@ public class PrimitiveList implements List<Object> {
      */
     @Override
     public boolean addAll(@NotNull Collection<? extends Object> c) {
-        throw new UnsupportedOperationException("PrimitiveList can't modify element.");
+        throw new UnsupportedOperationException("NativeList can't modify element.");
     }
 
     /**
@@ -177,7 +177,7 @@ public class PrimitiveList implements List<Object> {
      */
     @Override
     public boolean addAll(int index, @NotNull Collection<? extends Object> c) {
-        throw new UnsupportedOperationException("PrimitiveList can't modify element.");
+        throw new UnsupportedOperationException("NativeList can't modify element.");
     }
 
     /**
@@ -187,7 +187,7 @@ public class PrimitiveList implements List<Object> {
      */
     @Override
     public boolean removeAll(@NotNull Collection<?> c) {
-        throw new UnsupportedOperationException("PrimitiveList can't modify element.");
+        throw new UnsupportedOperationException("NativeList can't modify element.");
     }
 
     /**
@@ -197,7 +197,7 @@ public class PrimitiveList implements List<Object> {
      */
     @Override
     public boolean retainAll(@NotNull Collection<?> c) {
-        throw new UnsupportedOperationException("PrimitiveList can't modify element.");
+        throw new UnsupportedOperationException("NativeList can't modify element.");
     }
 
     /**
@@ -207,7 +207,7 @@ public class PrimitiveList implements List<Object> {
      */
     @Override
     public void clear() {
-        throw new UnsupportedOperationException("PrimitiveList can't modify element.");
+        throw new UnsupportedOperationException("NativeList can't modify element.");
     }
 
     /**
@@ -227,7 +227,7 @@ public class PrimitiveList implements List<Object> {
      */
     @Override
     public Object set(int index, Object element) {
-        throw new UnsupportedOperationException("PrimitiveList can't modify element.");
+        throw new UnsupportedOperationException("NativeList can't modify element.");
     }
 
     /**
@@ -237,7 +237,7 @@ public class PrimitiveList implements List<Object> {
      */
     @Override
     public void add(int index, Object element) {
-        throw new UnsupportedOperationException("PrimitiveList can't modify element.");
+        throw new UnsupportedOperationException("NativeList can't modify element.");
     }
 
     /**
@@ -247,7 +247,7 @@ public class PrimitiveList implements List<Object> {
      */
     @Override
     public Object remove(int index) {
-        throw new UnsupportedOperationException("PrimitiveList can't modify element.");
+        throw new UnsupportedOperationException("NativeList can't modify element.");
     }
 
     /**
