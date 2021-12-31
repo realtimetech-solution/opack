@@ -2,8 +2,9 @@
 
 <a href="#"><img src="https://github.com/realtimetech-solution/opack/actions/workflows/windows-x64.yml/badge.svg"/></a>
 
-Opack is a Java library that can serialize/deserialize between Java objects and common objects(OpackValue). Also, common objects can be encoded or decoded as JSON or Byte Stream(Dense).
+Opack is a Java library that can serialize/deserialize between Java objects and common objects(OpackValue). Also, common objects can be encoded or decoded as JSON or Bytes(Dense).
 
+**We faster then GSON and Kryo.**
 
 ### Usage
 **1. Serialize**
