@@ -131,9 +131,9 @@ public final class DenseCodec extends OpackCodec<InputStream, OutputStream> {
 
 
     /**
-     * Encodes the OpackValue to byte array through dense codec.
+     * Encodes the OpackValue to bytes through dense codec.
      *
-     * @param outputStream the stream to encode
+     * @param outputStream the byte stream to write the encoded data
      * @param opackValue   the OpackValue to encode
      * @throws IOException              if an I/O error occurs when writing to byte stream
      * @throws IllegalArgumentException if the type of data to be encoded is not allowed in dense format
@@ -388,7 +388,7 @@ public final class DenseCodec extends OpackCodec<InputStream, OutputStream> {
     }
 
     /**
-     * Decodes one block to OpackValue, (basic block protocol: header(1 byte), data (variable))
+     * Decodes one block to OpackValue. (basic block protocol: header(1 byte), data (variable))
      * If data of block to be decoded is OpackObject or OpackArray(excluding primitive array), returns CONTEXT_BRANCH_CONTEXT_OBJECT for linear decoding.
      *
      * @param denseReader the byte buffer that wraps the data
@@ -514,7 +514,7 @@ public final class DenseCodec extends OpackCodec<InputStream, OutputStream> {
                     for (int index = 0; index < array.length; index++) {
                         boolean nullFlag = denseReader.readByte() == 1;
                         if (nullFlag) {
-                            array[index] = (char) denseReader.readChar();
+                            array[index] = denseReader.readChar();
                         }
                     }
                     return OpackArray.createWithArrayObject(array);
@@ -564,18 +564,12 @@ public final class DenseCodec extends OpackCodec<InputStream, OutputStream> {
                     }
                     return OpackArray.createWithArrayObject(array);
                 } else {
-                    throw new IllegalArgumentException(nativeType + " is not allowed in dense format. (unknown native type)");
+                    throw new IllegalArgumentException(nativeType + " is not registered native array type binary in dense format. (unknown native array type)");
                 }
             }
         }
 
         throw new IllegalArgumentException(b + " is not registered block header binary in dense codec. (unknown block header)");
-    }
-
-    public static void main(String[] args) {
-        Number[] numbers = (Number[]) Array.newInstance(Integer.class, 10);
-        numbers[0] = 10;
-        System.out.println(numbers);
     }
 
     /**

@@ -51,7 +51,7 @@ public class OpackArrayConverter {
      * @param opackArray the opack array to be targeted
      * @return the underlying list
      * @throws InvocationTargetException if exception occurs during invoke opack array getter method
-     * @throws IllegalAccessException if the getter method object in opack array is enforcing Java language access control and cannot access that method
+     * @throws IllegalAccessException    if the getter method object in opack array is enforcing Java language access control and cannot access that method
      */
     public static List<?> getOpackArrayList(OpackArray<?> opackArray) throws InvocationTargetException, IllegalAccessException {
         return (List<?>) OPACK_ARRAY_GETTER_METHOD.invoke(opackArray);
@@ -61,11 +61,11 @@ public class OpackArrayConverter {
      * Convert the opack array to array.
      *
      * @param componentType the component type of array
-     * @param opackArray the opack array to convert
+     * @param opackArray    the opack array to convert
      * @return the converted array
      * @throws InvocationTargetException if exception occurs during invoke opack array getter method
-     * @throws IllegalAccessException if the getter method object in opack array is enforcing Java language access control and cannot access that method.
-     * @throws IllegalArgumentException if component type is now allowed or invalid
+     * @throws IllegalAccessException    if the getter method object in opack array is enforcing Java language access control and cannot access that method.
+     * @throws IllegalArgumentException  if component type is now allowed or invalid
      */
     public static Object convertToArray(Class<?> componentType, OpackArray<?> opackArray) throws InvocationTargetException, IllegalAccessException {
         if (!OpackValue.isAllowType(componentType)) {
@@ -81,7 +81,7 @@ public class OpackArrayConverter {
             Object object = ((NativeList) list).getArrayObject();
             Class<?> arrayType = object.getClass();
 
-            if(!arrayType.isArray()){
+            if (!arrayType.isArray()) {
                 throw new IllegalArgumentException("NativeList array object is not array type");
             }
 

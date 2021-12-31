@@ -91,7 +91,7 @@ public class Opacker {
         }
 
         /**
-         * Create the Opacker through this builder.
+         * Create the {@link Opacker Opacker} through this builder.
          *
          * @return created opacker
          */
@@ -110,7 +110,7 @@ public class Opacker {
     final @NotNull FastStack<BakedType> typeStack;
     final @NotNull FastStack<OpackValue> valueStack;
 
-    final @NotNull boolean convertEnumToOrdinal;
+    final boolean convertEnumToOrdinal;
 
     @NotNull State state;
 
@@ -118,7 +118,7 @@ public class Opacker {
      * Constructs the Opacker with the builder of Opacker.
      *
      * @param builder the builder of Opacker
-     * @throws InstantiationException if the predefined transformer cannot be instanced
+     * @throws IllegalStateException if the predefined transformer cannot be instanced
      */
     Opacker(Builder builder) {
         this.typeBaker = new TypeBaker(this);
@@ -149,7 +149,7 @@ public class Opacker {
     }
 
     /**
-     * Serializes the object to opack value.
+     * Serializes the object to {@link OpackValue OpackValue}.
      *
      * @param object the object to be serialized
      * @return opack value
@@ -437,7 +437,7 @@ public class Opacker {
     }
 
     /**
-     * Deserialize the elements of each opack value in the stack. (OpackObject: fields, OpackArray element : array elements)
+     * Deserialize the elements of each opack value in the stack. (OpackObject element : fields, OpackArray element : array elements)
      *
      * @throws DeserializeException if a problem occurs during deserializing; if the field in the class of instance to be deserialized is not accessible
      */

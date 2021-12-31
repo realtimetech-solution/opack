@@ -42,7 +42,7 @@ public class FastStack<T> {
     }
 
     /**
-     * Constructs a FastStack with block size. (The capacity of this stack increases with the block size)
+     * Constructs a FastStack with initial size.
      *
      * @param initialSize the initial size
      */
@@ -55,7 +55,7 @@ public class FastStack<T> {
     }
 
     /**
-     * Increase the stack size by the block size.
+     * Double the stack size.
      */
     private void growArray() {
         T[] oldObjects = this.objects;
@@ -98,7 +98,7 @@ public class FastStack<T> {
     }
 
     /**
-     * Returns the element at the specified position in this Stack.
+     * Returns the element at the specified position in this stack.
      *
      * @param index the index of the element to return
      * @return the found element

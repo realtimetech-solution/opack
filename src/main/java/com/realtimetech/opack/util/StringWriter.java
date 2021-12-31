@@ -40,7 +40,7 @@ public class StringWriter extends Writer {
     }
 
     /**
-     * Constructs a StringWriter with block size. (The capacity of this StringWriter increases with the block size)
+     * Constructs a StringWriter with initial size.
      *
      * @param initialSize the initial size
      */
@@ -52,9 +52,9 @@ public class StringWriter extends Writer {
     }
 
     /**
-     * Increase capacity by needSize. (The final capacity : current size + needSize + blockSize)
+     * If the needSize is larger than the current size, double the capacity.
      *
-     * @param needSize the size to increase
+     * @param needSize the needed size
      */
     private void growArray(int needSize) {
         char[] oldObjects = this.chars;

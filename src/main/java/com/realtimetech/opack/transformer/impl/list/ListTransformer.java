@@ -38,7 +38,7 @@ public abstract class ListTransformer implements Transformer {
     final boolean wrapWithType;
 
     /**
-     * Constructs a ListTransformer
+     * Constructs a ListTransformer.
      */
     public ListTransformer() {
         this.wrapWithType = this.allowWrapWithType();
@@ -47,7 +47,7 @@ public abstract class ListTransformer implements Transformer {
     /**
      * Returns whether the types of each element are also serialized.
      *
-     * @return whether the types of each element are also serialized.
+     * @return true if the types of each element are also serialized.
      */
     protected abstract boolean allowWrapWithType();
 
@@ -56,7 +56,7 @@ public abstract class ListTransformer implements Transformer {
      *
      * @param opacker the opacker
      * @param value   the value to serialize
-     * @return the serialized value
+     * @return serialized value
      * @throws SerializeException if a problem occurs during serializing
      */
     @Override

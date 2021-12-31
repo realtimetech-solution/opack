@@ -79,7 +79,7 @@ public class ReflectionUtil {
     /**
      * Create new unsafe allocator for JVM, DalvikVM.
      *
-     * @return created allocator
+     * @return created unsafe allocator
      */
     static Allocator createAvailableAllocator() {
         // for JVM
@@ -135,8 +135,8 @@ public class ReflectionUtil {
     /**
      * Casts an object to the specific class.
      *
-     * @param type the class to cast
-     * @param object    the object to be cast
+     * @param type   the class to cast
+     * @param object the object to be cast
      * @return the object after casting
      */
     public static Object cast(Class<?> type, Object object) {
@@ -280,8 +280,8 @@ public class ReflectionUtil {
     /**
      * Add accessible fields of the target Class to the field List.
      *
-     * @param fieldList   the field list to be added
-     * @param type the target class
+     * @param fieldList the field list to be added
+     * @param type      the target class
      */
     static void addAccessibleFields(List<Field> fieldList, Class<?> type) {
         Class<?> superClass = type.getSuperclass();
@@ -460,7 +460,7 @@ public class ReflectionUtil {
      * Create a new instance of the class through constructor.
      *
      * @param instanceType the class to create instance
-     * @param objects       the argument of the constructor
+     * @param objects      the argument of the constructor
      * @return created instance
      * @throws IllegalArgumentException  if the class doesn't have matched constructor
      * @throws InvocationTargetException if exception occurs in invoked underlying method

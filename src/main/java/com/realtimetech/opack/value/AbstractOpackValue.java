@@ -22,13 +22,11 @@
 
 package com.realtimetech.opack.value;
 
-import java.util.Map;
-
 abstract class AbstractOpackValue<T> implements OpackValue {
     private volatile T value;
 
     /**
-     * Create and return the underlying list of this opack value.
+     * Create and return the underlying object of this opack value.
      * This method will be called if {@link AbstractOpackValue#get() get()} method is called, when this opack value does not have an underlying object.
      *
      * @return underlying object

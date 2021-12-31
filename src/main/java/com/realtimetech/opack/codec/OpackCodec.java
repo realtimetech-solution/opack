@@ -35,7 +35,7 @@ public abstract class OpackCodec<I, O> {
     /**
      * Writes a code that encodes opack value by overriding this.
      *
-     * @param output the output to encode
+     * @param output     the output to encode
      * @param opackValue the opack value to encode
      * @throws IOException if I/O error occurs
      */
@@ -53,7 +53,7 @@ public abstract class OpackCodec<I, O> {
     /**
      * Encodes the opack value through a specific codec.
      *
-     * @param output the output to encode
+     * @param output     the output to encode
      * @param opackValue the opack value to encode
      * @throws EncodeException if a problem occurs during encoding; if the type of data to be encoded is not allowed in specific codec
      */

@@ -46,8 +46,8 @@ public class TypeBaker {
         /**
          * Constructs the PredefinedTransformer.
          *
-         * @param transformer the transformer
-         * @param inheritable whether the transformer is inheritable
+         * @param transformer the transformer to be registered
+         * @param inheritable true if the transformer is inheritable
          */
         public PredefinedTransformer(@NotNull Transformer transformer, boolean inheritable) {
             this.transformer = transformer;
@@ -85,7 +85,7 @@ public class TypeBaker {
     }
 
     /**
-     * Returns predefined transformers targeting a specific class.
+     * Returns predefined transformers for a specific class.
      *
      * @param type the class to be the target
      * @return found predefined transformers
@@ -105,7 +105,7 @@ public class TypeBaker {
      *
      * @param type            the class to be the target
      * @param transformerType the predefined transformer class to register
-     * @return whether the predefined transformer registration is successful
+     * @return true if the predefined transformer registration is successful
      * @throws InstantiationException if transformer class object cannot be instantiated
      */
     public boolean registerPredefinedTransformer(@NotNull Class<?> type, @NotNull Class<? extends Transformer> transformerType) throws InstantiationException {
@@ -113,12 +113,12 @@ public class TypeBaker {
     }
 
     /**
-     * Register a predefined transformer targeting the specific class.
+     * Register a predefined transformer for the specific class.
      *
-     * @param type        the class to be the target
+     * @param type            the class to be the target
      * @param transformerType the predefined transformer to register
-     * @param inheritable      whether transformer is inheritable
-     * @return whether the predefined transformer registration is successful
+     * @param inheritable     whether transformer is inheritable
+     * @return true if the predefined transformer registration is successful
      * @throws InstantiationException if transformer class object cannot be instantiated
      */
     public synchronized boolean registerPredefinedTransformer(@NotNull Class<?> type, @NotNull Class<? extends Transformer> transformerType, boolean inheritable) throws InstantiationException {
@@ -141,11 +141,11 @@ public class TypeBaker {
     }
 
     /**
-     * Unregister a predefined transformer targeting the specific class.
+     * Unregister a predefined transformer for the specific class.
      *
-     * @param type        the targeted type class
+     * @param type            the targeted type class
      * @param transformerType the predefined transformer to unregister
-     * @return whether the cancellation of predefined transformer registration is successful
+     * @return true if the cancellation of predefined transformer registration is successful
      */
     public synchronized boolean unregisterPredefinedTransformer(@NotNull Class<?> type, @NotNull Class<? extends Transformer> transformerType) {
         List<PredefinedTransformer> predefinedTransformers = this.predefinedTransformerMap.get(type);
@@ -172,9 +172,9 @@ public class TypeBaker {
     }
 
     /**
-     * Add transformers for the element to the transformer list.
+     * Add transformers of the element to the transformer list.
      *
-     * @param transformers     the transformer list to add
+     * @param transformers     the transformer list for add
      * @param annotatedElement the element to be targeted
      * @param root             whether the element is not super class (whether the element is the root)
      * @throws BakeException if transformer class object cannot be instantiated
@@ -253,7 +253,7 @@ public class TypeBaker {
     }
 
     /**
-     * Compile the class into {@link BakedType BakedType}.
+     * Bake the class into {@link BakedType BakedType}.
      *
      * @param bakeType the type to bake
      * @return baked type info

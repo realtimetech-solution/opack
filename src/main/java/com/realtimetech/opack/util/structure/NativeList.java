@@ -32,10 +32,10 @@ public class NativeList implements List<Object> {
     final Object arrayObject;
 
     /**
-     * Constructs a primitive list with array object of which component type is the primitive type.
+     * Constructs a NativeList with array object.
      *
      * @param arrayObject the array object for create
-     * @throws IllegalArgumentException if the array object argument is not array object
+     * @throws IllegalArgumentException if this object does not represent an array class
      */
     public NativeList(Object arrayObject) {
         if (!arrayObject.getClass().isArray()) {
@@ -92,7 +92,7 @@ public class NativeList implements List<Object> {
     /**
      * Returns an array containing all the elements in this list in proper sequence.
      *
-     * @return an array containing all the elements in this list in proper sequence
+     * @return all elements of this list
      */
     @Override
     public Object @NotNull [] toArray() {
@@ -110,7 +110,7 @@ public class NativeList implements List<Object> {
      * The runtime type of the returned array is that of the specified array.
      *
      * @param array the array to get type
-     * @return an array containing the elements of this list
+     * @return all elements of this list
      */
     @Override
     public <T> T @NotNull [] toArray(T @NotNull [] array) {
