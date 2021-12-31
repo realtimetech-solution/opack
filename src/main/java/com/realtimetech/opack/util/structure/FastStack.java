@@ -27,34 +27,29 @@ import org.jetbrains.annotations.NotNull;
 import java.util.EmptyStackException;
 
 public class FastStack<T> {
-    private final int blockSize;
-
     private T[] objects;
 
     private int currentIndex;
     private int currentSize;
 
-    private int scope;
-
     private int startIndex;
 
     /**
-     * Calls {@code new StringWriter(1024)}
+     * Calls {@code new FastStack(16)}
      */
     public FastStack() {
-        this(10);
+        this(16);
     }
 
     /**
      * Constructs a FastStack with block size. (The capacity of this stack increases with the block size)
      *
-     * @param blockSize the block size
+     * @param initialSize the initial size
      */
-    public FastStack(int blockSize) {
-        this.blockSize = blockSize;
+    public FastStack(int initialSize) {
         this.currentIndex = -1;
         this.startIndex = 0;
-        this.scope = 0;
+        this.currentSize = Math.min(initialSize >> 1, 1);
 
         this.growArray();
     }
@@ -63,11 +58,9 @@ public class FastStack<T> {
      * Increase the stack size by the block size.
      */
     private void growArray() {
-        this.scope++;
-
         T[] oldObjects = this.objects;
 
-        this.currentSize = this.scope * this.blockSize;
+        this.currentSize = this.currentSize << 1;
         this.objects = (T[]) new Object[this.currentSize];
 
         if (oldObjects != null) {

@@ -26,12 +26,9 @@ import java.io.IOException;
 import java.io.Writer;
 
 public class StringWriter extends Writer {
-    private final int blockSize;
-
     private char[] chars;
 
     private int currentIndex;
-    private int scope;
 
     private int currentSize;
 
@@ -45,15 +42,13 @@ public class StringWriter extends Writer {
     /**
      * Constructs a StringWriter with block size. (The capacity of this StringWriter increases with the block size)
      *
-     * @param blockSize the block size
+     * @param initialSize the initial size
      */
-    public StringWriter(int blockSize) {
-        this.blockSize = blockSize;
+    public StringWriter(int initialSize) {
         this.currentIndex = -1;
-        this.scope = 0;
-        this.currentSize = 0;
+        this.currentSize = Math.min(initialSize >> 1, 1);
 
-        this.growArray(0);
+        this.growArray(initialSize);
     }
 
     /**
@@ -62,11 +57,11 @@ public class StringWriter extends Writer {
      * @param needSize the size to increase
      */
     private void growArray(int needSize) {
-        this.scope = needSize / blockSize;
-
         char[] oldObjects = this.chars;
 
-        this.currentSize = (this.scope + 1) * this.blockSize;
+        while (needSize >= this.currentSize){
+            this.currentSize = this.currentSize << 1;
+        }
         this.chars = new char[this.currentSize];
 
         if (oldObjects != null) {
