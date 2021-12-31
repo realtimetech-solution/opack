@@ -25,7 +25,7 @@ package com.realtimetech.opack.codec.dense;
 import java.io.IOException;
 import java.io.OutputStream;
 
-public class DenseWriter {
+class DenseWriter {
     private final OutputStream outputStream;
 
     /**

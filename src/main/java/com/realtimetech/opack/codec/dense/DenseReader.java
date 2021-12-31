@@ -25,7 +25,7 @@ package com.realtimetech.opack.codec.dense;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class DenseReader {
+class DenseReader {
     private final InputStream inputStream;
 
     /**
