@@ -84,8 +84,8 @@ InputStream inputStream = new ByteArrayInputStream(bytes);
 OpackValue decodedOpackValue2 = denseCodec.decode(inputStream);
 ```
 
-#### 5. Annotations
-##### Ignore and ExplicitType
+### Advanced Usage
+#### 1. Ignore and ExplicitType
 ```java
 public class SomeObject {
     private String stringField;
@@ -104,7 +104,7 @@ public class SomeObject {
     private List<String> listField;
 }
 ```
-##### Field Transformer
+#### 2. Field Transformer
 ```java
 public class ByteToBase64Transformer implements Transformer {
     @Override
@@ -134,7 +134,7 @@ public class SomeObject {
     private byte[] bytesField;
 }
 ```
-##### Class Transformer
+#### 3. Class Transformer
 ```java
 public class AnimalTransformer implements Transformer {
     /*
@@ -203,7 +203,7 @@ public class SomeObject {
 }
 ```
 
-#### 6. Handling Opack Value
+#### 4. Handling Opack Value
 ```java
 OpackObject<String, OpackValue> rootObject = new OpackObject<>();
 
