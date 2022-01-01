@@ -9,13 +9,7 @@ Opack is a Java library that can serialize/deserialize between Java objects and 
 ### Usage
 #### 1. Serialize
 ```java
-Opacker opacker = new Opacker.Builder()
-        .setContextStackInitialSize(128)      // (Optional) Creation size of stack for processing
-        .setValueStackInitialSize(512)        // (Optional) Creation size of stack for processing
-        .setConvertEnumToOrdinal(false)       // (Optional) Convert Enum to ordinal or name
-        .setEnableWrapListElementType(false)  // (Optional) When converting elements of a list, record the type as well
-        .setEnableWrapMapElementType(false)   // (Optional) When converting elements of a map, record the type as well
-        .create();
+Opacker opacker = new Opacker.Builder().create();
 
 SomeObject someObject = new SomeObject();
 
@@ -24,7 +18,13 @@ OpackValue opackValue = opacker.serialize(someObject);
 
 #### 2. Deserialize
 ```java
-Opacker opacker = new Opacker.Builder().create();
+Opacker opacker = new Opacker.Builder()
+        .setContextStackInitialSize(128)      // (Optional) Creation size of stack for processing
+        .setValueStackInitialSize(512)        // (Optional) Creation size of stack for processing
+        .setConvertEnumToOrdinal(false)       // (Optional) Convert Enum to ordinal or name
+        .setEnableWrapListElementType(false)  // (Optional) When converting elements of a list, record the type as well
+        .setEnableWrapMapElementType(false)   // (Optional) When converting elements of a map, record the type as well
+        .create();
 
 OpackValue serializedSomeObject = /** See Serialize Usage **/;
 
