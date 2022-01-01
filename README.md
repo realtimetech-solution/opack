@@ -7,7 +7,7 @@ Opack is a Java library that can serialize/deserialize between Java objects and 
 **We faster then GSON and Kryo.** (See [tests](./src/test/java/com/realtimetech/opack/test/performance))
 
 ### Usage
-**1. Serialize**
+#### 1. Serialize
 ```java
 Opacker opacker = new Opacker.Builder()
         .setContextStackInitialSize(128)      // (Optional) Creation size of stack for processing
@@ -21,7 +21,8 @@ SomeObject someObject = new SomeObject();
 
 OpackValue opackValue = opacker.serialize(someObject);
 ```
-**2. Deserialize**
+
+#### 2. Deserialize
 ```java
 Opacker opacker = new Opacker.Builder().create();
 
@@ -29,7 +30,8 @@ OpackValue serializedSomeObject = /** See Serialize Usage **/;
 
 SomeObject someObject = opacker.deserialize(SomeObject.class, serializedSomeObject);
 ```
-**3. Json Codec**
+
+#### 3. Json Codec
 ```java
 JsonCodec jsonCodec = new JsonCodec.Builder()
         .setEncodeStackInitialSize(128)       // (Optional) Creation size of stack for processing
@@ -54,7 +56,8 @@ jsonCodec.encode(writer, opackValue);
  */
 OpackValue decodedOpackValue = jsonCodec.decode(json);
 ```
-**4. Dense Codec**
+
+#### 4. Dense Codec
 ```java
 DenseCodec denseCodec = new DenseCodec.Builder()
         .setDecodeStackInitialSize(128)           // (Optional) Creation size of stack for processing
@@ -80,7 +83,127 @@ OpackValue decodedOpackValue1 = denseCodec.decode(bytes);
 InputStream inputStream = new ByteArrayInputStream(bytes);
 OpackValue decodedOpackValue2 = denseCodec.decode(inputStream);
 ```
-**5. Handling Opack Value**
+
+#### 5. Annotations
+##### Ignore and ExplicitType
+```java
+public class SomeObject {
+    private String stringField;
+    private byte[] bytesField;
+
+    /*
+        This field is not serialized/deserialized
+     */
+    @Ignore
+    private String verySecretField;
+
+    /*
+        This field is serialized/deserialized to explicit type `ArrayList` instead of ambiguous field type `List`
+     */
+    @ExplicitType(type = ArrayList.class)
+    private List<String> listField;
+}
+```
+##### Field Transformer
+```java
+public class ByteToBase64Transformer implements Transformer {
+    @Override
+    public Object serialize(Opacker opacker, Object value) throws SerializeException {
+        if (value instanceof byte[]) {
+            return Base64.getEncoder().encodeToString((byte[]) value);
+        }
+
+        return value;
+    }
+
+    @Override
+    public Object deserialize(Opacker opacker, Class<?> goalType, Object value) throws DeserializeException {
+        if (value instanceof String) {
+            return Base64.getDecoder().decode((String) value);
+        }
+
+        return value;
+    }
+}
+
+public class SomeObject {
+    /*
+        This field is serialized/deserialized via Base64
+     */
+    @Transform(transformer = ByteToBase64Transformer.class)
+    private byte[] bytesField;
+}
+```
+##### Class Transformer
+```java
+public class AnimalTransformer implements Transformer {
+    /*
+        Remove a `sound` from a serialized `Animal`
+    */
+    @Override
+    public Object serialize(Opacker opacker, Object value) throws SerializeException {
+        if (value instanceof Animal) {
+            Animal animal = (Animal) value;
+            OpackValue opackValue = opacker.serialize(animal);
+
+            if (opackValue instanceof OpackObject) {
+                OpackObject opackObject = (OpackObject) opackValue;
+                opackObject.remove("sound");
+                return opackObject;
+            }
+        }
+
+        return value;
+    }
+
+    /*
+        Restore `sound` from `Animal` before deserialization
+    */
+    @Override
+    public Object deserialize(Opacker opacker, Class<?> goalType, Object value) throws DeserializeException {
+        if (value instanceof OpackObject) {
+            if (Animal.class.isAssignableFrom(goalType)) {
+                OpackObject opackObject = (OpackObject) value;
+                Animal animal = (Animal) opacker.deserialize(goalType, opackObject);
+                animal.setSound(animal.bark());
+            }
+        }
+
+        return value;
+    }
+}
+
+/*
+    When `inheritable` is set to true, it applies to child classes.
+*/
+@Transform(transformer = AnimalTransformer.class, inheritable = true)
+abstract class Animal {
+    private String sound;
+
+    public abstract String bark();
+
+    public String getSound() {
+        return sound;
+    }
+
+    public void setSound(String sound) {
+        this.sound = sound;
+    }
+}
+
+public class Dog extends Animal {
+    @Override
+    public String bark() {
+        return "Bow-Wow";
+    }
+}
+
+public class SomeObject {
+    private Dog dogField;
+}
+```
+
+#### 6. Handling Opack Value
 ```java
 OpackObject<String, OpackValue> rootObject = new OpackObject<>();
 
