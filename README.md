@@ -6,6 +6,24 @@ Opack is a Java library that can serialize/deserialize between Java objects and 
 
 **We faster then GSON and Kryo.** (See [tests](./src/test/java/com/realtimetech/opack/test/performance))
 
+### Download
+
+Gradle:
+```gradle
+dependencies {
+  implementation 'io.github.realtimetech-solution:opack:<release_version>'
+}
+```
+
+Maven:
+```xml
+<dependency>
+  <groupId>io.github.realtimetech-solution</groupId>
+  <artifactId>opack</artifactId>
+  <version><release_version></version>
+</dependency>
+```
+
 ### Usage
 #### 1. Serialize
 ```java
@@ -240,25 +258,6 @@ OpackObject opackObject = (OpackObject) rootObject.get("number_map");
 System.out.println("1024 is " + (opackObject.get(1024)));
 System.out.println("Array length is " + (opackArray.length()));
 System.out.println("First element is " + (opackArray.get(0)));
-```
-
-
-### Download
-
-Gradle:
-```gradle
-dependencies {
-  implementation 'io.github.realtimetech-solution:opack:<release_version>'
-}
-```
-
-Maven:
-```xml
-<dependency>
-  <groupId>io.github.realtimetech-solution</groupId>
-  <artifactId>opack</artifactId>
-  <version><release_version></version>
-</dependency>
 ```
 
 ### License
