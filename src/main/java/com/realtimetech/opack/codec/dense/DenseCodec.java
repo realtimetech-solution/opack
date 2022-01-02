@@ -34,9 +34,9 @@ import com.realtimetech.opack.value.OpackObject;
 import com.realtimetech.opack.value.OpackValue;
 
 import java.io.*;
-import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.List;
 
 public final class DenseCodec extends OpackCodec<InputStream, OutputStream> {
@@ -44,11 +44,14 @@ public final class DenseCodec extends OpackCodec<InputStream, OutputStream> {
         int encodeOutputBufferInitialSize;
         int encodeStackInitialSize;
         int decodeStackInitialSize;
+        boolean ignoreVersionCompare;
 
         public Builder() {
             this.encodeOutputBufferInitialSize = 1024;
             this.encodeStackInitialSize = 128;
             this.decodeStackInitialSize = 128;
+
+            this.ignoreVersionCompare = false;
         }
 
         public Builder setEncodeOutputBufferInitialSize(int encodeOutputBufferInitialSize) {
@@ -66,10 +69,26 @@ public final class DenseCodec extends OpackCodec<InputStream, OutputStream> {
             return this;
         }
 
+        public Builder setIgnoreVersionCompare(boolean ignoreVersionCompare) {
+            this.ignoreVersionCompare = ignoreVersionCompare;
+            return this;
+        }
+
         public DenseCodec create() {
             return new DenseCodec(this);
         }
     }
+
+    /*
+        DO NOT CHANGE CLASSIFIER
+     */
+    private static final byte[] CONST_DENSE_CODEC_CLASSIFIER = new byte[]{0x20, 0x22, 'D', 'S'};
+
+    /*
+        !! IMPORTANT !!
+        If the structure of Dense Codec changes, you must change(increase) the version
+     */
+    private static final byte[] CONST_DENSE_CODEC_VERSION = new byte[]{0x00, 0x01};
 
     private static final byte CONST_TYPE_OPACK_OBJECT = 0x00;
     private static final byte CONST_TYPE_OPACK_ARRAY = 0x01;
@@ -114,6 +133,8 @@ public final class DenseCodec extends OpackCodec<InputStream, OutputStream> {
     final FastStack<OpackValue> decodeStack;
     final FastStack<Object[]> decodeContextStack;
 
+    final boolean ignoreVersionCompare;
+
     /**
      * Constructs the DenseCodec with the builder of DenseCodec.
      *
@@ -127,6 +148,8 @@ public final class DenseCodec extends OpackCodec<InputStream, OutputStream> {
 
         this.decodeStack = new FastStack<>(builder.decodeStackInitialSize);
         this.decodeContextStack = new FastStack<>(builder.decodeStackInitialSize);
+
+        this.ignoreVersionCompare = builder.ignoreVersionCompare;
     }
 
 
@@ -142,8 +165,10 @@ public final class DenseCodec extends OpackCodec<InputStream, OutputStream> {
     protected void doEncode(OutputStream outputStream, OpackValue opackValue) throws IOException {
         DenseWriter denseWriter = new DenseWriter(outputStream);
 
+        denseWriter.writeBytes(CONST_DENSE_CODEC_CLASSIFIER);
+        denseWriter.writeBytes(CONST_DENSE_CODEC_VERSION);
+
         this.encodeStack.push(opackValue);
-        this.encodeByteArrayStream.reset();
 
         while (!this.encodeStack.isEmpty()) {
             Object object = this.encodeStack.pop();
@@ -582,6 +607,20 @@ public final class DenseCodec extends OpackCodec<InputStream, OutputStream> {
     @Override
     protected OpackValue doDecode(InputStream inputStream) throws IOException {
         DenseReader denseReader = new DenseReader(inputStream);
+
+        byte[] classifier = inputStream.readNBytes(CONST_DENSE_CODEC_CLASSIFIER.length);
+
+        if (!Arrays.equals(CONST_DENSE_CODEC_CLASSIFIER, classifier)) {
+            throw new IllegalArgumentException("Decoding data is not dense format data. (Expected " + Arrays.toString(CONST_DENSE_CODEC_CLASSIFIER) + ", got " + Arrays.toString(classifier) + ")");
+        }
+
+        if (!this.ignoreVersionCompare) {
+            byte[] version = inputStream.readNBytes(CONST_DENSE_CODEC_VERSION.length);
+
+            if (!Arrays.equals(CONST_DENSE_CODEC_VERSION, version)) {
+                throw new IllegalArgumentException("Decoding data does not match current version of dense codec. (Expected " + Arrays.toString(CONST_DENSE_CODEC_VERSION) + ", got " + Arrays.toString(version) + ")");
+            }
+        }
 
         this.decodeStack.reset();
         this.decodeContextStack.reset();
