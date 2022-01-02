@@ -1,6 +1,6 @@
 # opack
-
-<a href="#"><img src="https://github.com/realtimetech-solution/opack/actions/workflows/windows-x64.yml/badge.svg"/></a>
+[![windows-x64](https://github.com/realtimetech-solution/opack/actions/workflows/windows-x64.yml/badge.svg)](./actions/workflows/windows-x64.yml)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.realtimetech-solution/opack/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.github.realtimetech-solution/opack)
 
 Opack is a Java library that can serialize/deserialize between Java objects and common objects(OpackValue). Also, common objects can be encoded or decoded as JSON or Bytes(Dense).
 
