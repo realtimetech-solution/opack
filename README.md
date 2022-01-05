@@ -88,6 +88,7 @@ DenseCodec denseCodec = new DenseCodec.Builder()
         .setDecodeStackInitialSize(128)           // (Optional) Creation size of stack for processing
         .setEncodeStackInitialSize(128)           // (Optional) Creation size of stack for processing
         .setEncodeOutputBufferInitialSize(1024)   // (Optional) Creation size of stack for processing
+        .setIgnoreVersionCompare(false)           // (Optional) Ignore compare dense codec version in data
         .create();
 
 OpackValue opackValue = /** See Serialize Usage **/;
