@@ -25,7 +25,7 @@ package com.realtimetech.opack.transformer.impl.map;
 import com.realtimetech.opack.Opacker;
 import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
-import com.realtimetech.opack.transformer.Transformer;
+import com.realtimetech.opack.transformer.impl.DataStructureTransformer;
 import com.realtimetech.opack.util.ReflectionUtil;
 import com.realtimetech.opack.value.OpackObject;
 import com.realtimetech.opack.value.OpackValue;
@@ -33,23 +33,7 @@ import com.realtimetech.opack.value.OpackValue;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
-public abstract class MapTransformer implements Transformer {
-    final boolean wrapWithType;
-
-    /**
-     * Constructs a MapTransformer.
-     */
-    public MapTransformer() {
-        this.wrapWithType = this.allowWrapWithType();
-    }
-
-    /**
-     * Returns whether the types of each element are also serialized.
-     *
-     * @return true if the types of each element are also serialized.
-     */
-    protected abstract boolean allowWrapWithType();
-
+public class MapTransformer extends DataStructureTransformer {
     /**
      * Serializes the map to {@link OpackObject OpackObject}.
      *
@@ -81,31 +65,6 @@ public abstract class MapTransformer implements Transformer {
     }
 
     /**
-     * Serializes the object to {@link OpackValue OpackValue}.
-     *
-     * @param opacker the opacker
-     * @param object  the object to be serialized
-     * @return serialized value
-     * @throws SerializeException if a problem occurs during serializing
-     */
-    Object serializeObject(Opacker opacker, Object object) throws SerializeException {
-        if (object != null && !OpackValue.isAllowType(object.getClass())) {
-            OpackValue opackValue = opacker.serialize(object);
-
-            if (this.wrapWithType) {
-                OpackObject<Object, Object> opackObject = new OpackObject<>();
-                opackObject.put("type", object.getClass().getName());
-                opackObject.put("value", opackValue);
-
-                opackValue = opackObject;
-            }
-
-            object = opackValue;
-        }
-        return object;
-    }
-
-    /**
      * Deserializes the {@link OpackObject OpackObject} to {@link Map map}.
      *
      * @param opacker  the opacker
@@ -126,10 +85,8 @@ public abstract class MapTransformer implements Transformer {
                         Object keyObject = element.getKey();
                         Object valueObject = element.getValue();
 
-                        if (this.wrapWithType) {
-                            keyObject = deserializeObject(opacker, keyObject);
-                            valueObject = deserializeObject(opacker, valueObject);
-                        }
+                        keyObject = this.deserializeObject(opacker, keyObject);
+                        valueObject = this.deserializeObject(opacker, valueObject);
 
                         map.put(keyObject, valueObject);
                     }
@@ -144,31 +101,17 @@ public abstract class MapTransformer implements Transformer {
         return value;
     }
 
-    /**
-     * Deserializes the {@link OpackValue OpackValue}.
-     *
-     * @param opacker the opacker
-     * @param object  the opack value to be deserialized
-     * @return deserialized object
-     * @throws ClassNotFoundException if the class cannot be located
-     * @throws DeserializeException   if a problem occurs during deserializing
-     */
-    Object deserializeObject(Opacker opacker, Object object) throws ClassNotFoundException, DeserializeException {
-        if (object instanceof OpackObject) {
-            OpackObject<Object, Object> wrapperObject = (OpackObject<Object, Object>) object;
-
-            if (wrapperObject.containsKey("type") && wrapperObject.containsKey("value")) {
-                String type = (String) wrapperObject.get("type");
-                Object value = wrapperObject.get("value");
-
-                Class<?> objectType = Class.forName(type);
-
-                if (value instanceof OpackValue) {
-                    object = opacker.deserialize(objectType, (OpackValue) value);
-                }
-            }
+    @Override
+    protected Object serializeObject(Opacker opacker, Object element) throws SerializeException {
+        if (element != null && !OpackValue.isAllowType(element.getClass())) {
+            return opacker.serialize(element);
         }
 
-        return object;
+        return element;
+    }
+
+    @Override
+    protected Object deserializeObject(Opacker opacker, Object element) throws ClassNotFoundException, DeserializeException {
+        return element;
     }
 }

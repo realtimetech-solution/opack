@@ -25,32 +25,15 @@ package com.realtimetech.opack.transformer.impl.list;
 import com.realtimetech.opack.Opacker;
 import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
-import com.realtimetech.opack.transformer.Transformer;
+import com.realtimetech.opack.transformer.impl.DataStructureTransformer;
 import com.realtimetech.opack.util.ReflectionUtil;
 import com.realtimetech.opack.value.OpackArray;
-import com.realtimetech.opack.value.OpackObject;
 import com.realtimetech.opack.value.OpackValue;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
-public abstract class ListTransformer implements Transformer {
-    final boolean wrapWithType;
-
-    /**
-     * Constructs a ListTransformer.
-     */
-    public ListTransformer() {
-        this.wrapWithType = this.allowWrapWithType();
-    }
-
-    /**
-     * Returns whether the types of each element are also serialized.
-     *
-     * @return true if the types of each element are also serialized.
-     */
-    protected abstract boolean allowWrapWithType();
-
+public class ListTransformer extends DataStructureTransformer {
     /**
      * Serializes the list to {@link OpackArray OpackArray}.
      *
@@ -66,21 +49,7 @@ public abstract class ListTransformer implements Transformer {
             OpackArray<Object> opackArray = new OpackArray<>(list.size());
 
             for (Object object : list) {
-                if (object == null || OpackValue.isAllowType(object.getClass())) {
-                    opackArray.add(object);
-                } else {
-                    OpackValue opackValue = opacker.serialize(object);
-
-                    if (this.wrapWithType) {
-                        OpackObject<Object, Object> opackObject = new OpackObject<>();
-                        opackObject.put("type", object.getClass().getName());
-                        opackObject.put("value", opackValue);
-
-                        opackValue = opackObject;
-                    }
-
-                    opackArray.add(opackValue);
-                }
+                opackArray.add(this.serializeObject(opacker, object));
             }
 
             return opackArray;
@@ -109,25 +78,7 @@ public abstract class ListTransformer implements Transformer {
                     for (int index = 0; index < opackArray.length(); index++) {
                         Object element = opackArray.get(index);
 
-                        if (this.wrapWithType) {
-                            if (element instanceof OpackObject) {
-                                OpackObject<Object, Object> opackObject = (OpackObject<Object, Object>) element;
-
-                                if (opackObject.containsKey("type") && opackObject.containsKey("value")) {
-                                    String type = (String) opackObject.get("type");
-                                    Object object = opackObject.get("value");
-
-                                    Class<?> objectClass = Class.forName(type);
-
-                                    if (object instanceof OpackValue) {
-                                        list.add(opacker.deserialize(objectClass, (OpackValue) object));
-                                        continue;
-                                    }
-                                }
-                            }
-                        }
-
-                        list.add(element);
+                        list.add(this.deserializeObject(opacker, element));
                     }
 
                     return list;
@@ -138,5 +89,19 @@ public abstract class ListTransformer implements Transformer {
         }
 
         return value;
+    }
+
+    @Override
+    protected Object serializeObject(Opacker opacker, Object element) throws SerializeException {
+        if (element != null && !OpackValue.isAllowType(element.getClass())) {
+            return opacker.serialize(element);
+        }
+
+        return element;
+    }
+
+    @Override
+    protected Object deserializeObject(Opacker opacker, Object element) throws ClassNotFoundException, DeserializeException {
+        return element;
     }
 }

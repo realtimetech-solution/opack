@@ -28,9 +28,9 @@ import com.realtimetech.opack.exception.BakeException;
 import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.transformer.Transformer;
-import com.realtimetech.opack.transformer.impl.list.NoWrapListTransformer;
+import com.realtimetech.opack.transformer.impl.list.ListTransformer;
 import com.realtimetech.opack.transformer.impl.list.WrapListTransformer;
-import com.realtimetech.opack.transformer.impl.map.NoWrapMapTransformer;
+import com.realtimetech.opack.transformer.impl.map.MapTransformer;
 import com.realtimetech.opack.transformer.impl.map.WrapMapTransformer;
 import com.realtimetech.opack.util.OpackArrayConverter;
 import com.realtimetech.opack.util.ReflectionUtil;
@@ -133,13 +133,13 @@ public class Opacker {
             if (builder.enableWrapListElementType) {
                 this.typeBaker.registerPredefinedTransformer(List.class, WrapListTransformer.class, true);
             } else {
-                this.typeBaker.registerPredefinedTransformer(List.class, NoWrapListTransformer.class, true);
+                this.typeBaker.registerPredefinedTransformer(List.class, ListTransformer.class, true);
             }
 
             if (builder.enableWrapMapElementType) {
                 this.typeBaker.registerPredefinedTransformer(Map.class, WrapMapTransformer.class, true);
             } else {
-                this.typeBaker.registerPredefinedTransformer(Map.class, NoWrapMapTransformer.class, true);
+                this.typeBaker.registerPredefinedTransformer(Map.class, MapTransformer.class, true);
             }
         } catch (InstantiationException exception) {
             throw new IllegalStateException(exception);
