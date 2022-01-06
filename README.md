@@ -6,7 +6,7 @@
 <p align="center" style="max-width: 100%;">
   <a href="#"><img src="https://img.shields.io/github/license/realtimetech-solution/opack"/></a>
   <a href="./actions/workflows/windows-x64.yml"><img src="https://github.com/realtimetech-solution/opack/actions/workflows/windows-x64.yml/badge.svg"/></a>
-  <a href="https://maven-badges.herokuapp.com/maven-central/io.github.realtimetech-solution/opack"><img src="https://maven-badges.herokuapp.com/maven-central/io.github.realtimetech-solution/opack/badge.svg"/></a>
+  <a href="https://maven-badges.herokuapp.com/maven-central/com.realtimetech/opack"><img src="https://maven-badges.herokuapp.com/maven-central/com.realtimetech/opack/badge.svg"/></a>
 </p>
 
 Opack is a Java library that can serialize/deserialize between Java objects and common objects(OpackValue). Also, common objects can be encoded or decoded as JSON or Bytes(Dense).
@@ -18,14 +18,14 @@ Opack is a Java library that can serialize/deserialize between Java objects and 
 Gradle:
 ```gradle
 dependencies {
-  implementation 'io.github.realtimetech-solution:opack:<release_version>'
+  implementation 'com.realtimetech:opack:<release_version>'
 }
 ```
 
 Maven:
 ```xml
 <dependency>
-  <groupId>io.github.realtimetech-solution</groupId>
+  <groupId>com.realtimetech</groupId>
   <artifactId>opack</artifactId>
   <version><release_version></version>
 </dependency>
