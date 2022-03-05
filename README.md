@@ -18,7 +18,7 @@ Opack is a Java library that can serialize/deserialize between Java objects and 
 Gradle:
 ```gradle
 dependencies {
-  implementation 'com.realtimetech:opack:<release_version>'
+  implementation 'com.realtimetech:opack:0.0.7'
 }
 ```
 
@@ -27,7 +27,7 @@ Maven:
 <dependency>
   <groupId>com.realtimetech</groupId>
   <artifactId>opack</artifactId>
-  <version><release_version></version>
+  <version>0.0.7</version>
 </dependency>
 ```
 
