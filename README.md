@@ -44,11 +44,14 @@ OpackValue opackValue = opacker.serialize(someObject);
 #### 2. Deserialize
 ```java
 Opacker opacker = new Opacker.Builder()
-        .setContextStackInitialSize(128)      // (Optional) Creation size of stack for processing
-        .setValueStackInitialSize(512)        // (Optional) Creation size of stack for processing
-        .setConvertEnumToOrdinal(false)       // (Optional) Convert Enum to ordinal or name
-        .setEnableWrapListElementType(false)  // (Optional) When converting elements of a list, record the type as well
-        .setEnableWrapMapElementType(false)   // (Optional) When converting elements of a map, record the type as well
+        .setContextStackInitialSize(128)                    // (Optional) Creation size of stack for processing
+        .setValueStackInitialSize(512)                      // (Optional) Creation size of stack for processing
+        
+        .setEnableWrapListElementType(false)                // (Optional) When converting elements of a list, record the type as well
+        .setEnableWrapMapElementType(false)                 // (Optional) When converting elements of a map, record the type as well
+        .setEnableConvertEnumToOrdinal(false)               // (Optional) Convert enum to ordinal or name
+        .setEnableConvertRecursiveDependencyToNull(false);  // (Optional) Convert recursive depandency, record null
+        
         .create();
 
 OpackValue serializedSomeObject = /** See Serialize Usage **/;
@@ -59,11 +62,14 @@ SomeObject someObject = opacker.deserialize(SomeObject.class, serializedSomeObje
 #### 3. Json Codec
 ```java
 JsonCodec jsonCodec = new JsonCodec.Builder()
-        .setEncodeStackInitialSize(128)       // (Optional) Creation size of stack for processing
-        .setEncodeStringBufferSize(1024)      // (Optional) Creation size of stack for processing
-        .setDecodeStackInitialSize(128)       // (Optional) Creation size of stack for processing
-        .setAllowOpackValueToKeyValue(false)  // (Optional) Accepts Objct or Array as Key of Json Object
-        .setPrettyFormat(false)               // (Optional) When encoding, it prints formatted
+        .setEncodeStackInitialSize(128)             // (Optional) Creation size of stack for processing
+        .setEncodeStringBufferSize(1024)            // (Optional) Creation size of stack for processing
+        .setDecodeStackInitialSize(128)             // (Optional) Creation size of stack for processing
+        
+        .setAllowOpackValueToKeyValue(false)        // (Optional) Accepts Objct or Array as Key of Json Object
+        .setEnableConvertCharacterToString(false)   // (Optional) Convert character to string instead of character int value
+        .setUsePrettyFormat(false)                  // (Optional) When encoding, it prints formatted
+        
         .create();
 
 OpackValue opackValue = /** See Serialize Usage **/;
@@ -85,10 +91,12 @@ OpackValue decodedOpackValue = jsonCodec.decode(json);
 #### 4. Dense Codec
 ```java
 DenseCodec denseCodec = new DenseCodec.Builder()
-        .setDecodeStackInitialSize(128)           // (Optional) Creation size of stack for processing
-        .setEncodeStackInitialSize(128)           // (Optional) Creation size of stack for processing
-        .setEncodeOutputBufferInitialSize(1024)   // (Optional) Creation size of stack for processing
-        .setIgnoreVersionCompare(false)           // (Optional) Ignore compare dense codec version in data
+        .setEncodeStackInitialSize(128)         // (Optional) Creation size of stack for processing
+        .setEncodeOutputBufferInitialSize(1024) // (Optional) Creation size of stack for processing
+        .setDecodeStackInitialSize(128)         // (Optional) Creation size of stack for processing
+        
+        .setIgnoreVersionCompare(false)         // (Optional) Ignore compare dense codec version in data
+        
         .create();
 
 OpackValue opackValue = /** See Serialize Usage **/;

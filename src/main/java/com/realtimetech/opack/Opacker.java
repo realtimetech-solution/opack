@@ -53,9 +53,8 @@ public class Opacker {
 
         boolean enableWrapListElementType;
         boolean enableWrapMapElementType;
-
-        boolean convertEnumToOrdinal;
-        boolean replaceRecursiveDependencyToNull;
+        boolean enableConvertEnumToOrdinal;
+        boolean enableConvertRecursiveDependencyToNull;
 
         public Builder() {
             this.valueStackInitialSize = 512;
@@ -63,9 +62,8 @@ public class Opacker {
 
             this.enableWrapListElementType = false;
             this.enableWrapMapElementType = false;
-
-            this.convertEnumToOrdinal = false;
-            this.replaceRecursiveDependencyToNull = false;
+            this.enableConvertEnumToOrdinal = false;
+            this.enableConvertRecursiveDependencyToNull = false;
         }
 
         public Builder setValueStackInitialSize(int valueStackInitialSize) {
@@ -88,13 +86,13 @@ public class Opacker {
             return this;
         }
 
-        public Builder setConvertEnumToOrdinal(boolean convertEnumToOrdinal) {
-            this.convertEnumToOrdinal = convertEnumToOrdinal;
+        public Builder setEnableConvertEnumToOrdinal(boolean enableConvertEnumToOrdinal) {
+            this.enableConvertEnumToOrdinal = enableConvertEnumToOrdinal;
             return this;
         }
 
-        public Builder setReplaceRecursiveDependencyToNull(boolean replaceRecursiveDependencyToNull) {
-            this.replaceRecursiveDependencyToNull = replaceRecursiveDependencyToNull;
+        public Builder setEnableConvertRecursiveDependencyToNull(boolean enableConvertRecursiveDependencyToNull) {
+            this.enableConvertRecursiveDependencyToNull = enableConvertRecursiveDependencyToNull;
             return this;
         }
 
@@ -119,8 +117,8 @@ public class Opacker {
     final @NotNull FastStack<OpackValue> valueStack;
     final @NotNull HashSet<Object> overlapSet;
 
-    final boolean convertEnumToOrdinal;
-    final boolean replaceRecursiveDependencyToNull;
+    final boolean enableConvertEnumToOrdinal;
+    final boolean enableConvertRecursiveDependencyToNull;
 
     @NotNull State state;
 
@@ -155,8 +153,8 @@ public class Opacker {
             throw new IllegalStateException(exception);
         }
 
-        this.convertEnumToOrdinal = builder.convertEnumToOrdinal;
-        this.replaceRecursiveDependencyToNull = builder.replaceRecursiveDependencyToNull;
+        this.enableConvertEnumToOrdinal = builder.enableConvertEnumToOrdinal;
+        this.enableConvertRecursiveDependencyToNull = builder.enableConvertRecursiveDependencyToNull;
     }
 
     /**
@@ -231,7 +229,7 @@ public class Opacker {
                 Enum converting
              */
             if (objectType.isEnum()) {
-                if (this.convertEnumToOrdinal) {
+                if (this.enableConvertEnumToOrdinal) {
                     Object[] enums = objectType.getEnumConstants();
 
                     for (int i = 0; i < enums.length; i++) {
@@ -266,7 +264,7 @@ public class Opacker {
             }
 
             if (this.overlapSet.contains(object)) {
-                if (!this.replaceRecursiveDependencyToNull) {
+                if (!this.enableConvertRecursiveDependencyToNull) {
                     throw new SerializeException("Recursive dependencies are not serializable.");
                 }
 
@@ -397,7 +395,7 @@ public class Opacker {
                 Enum converting
              */
             if (goalType.isEnum()) {
-                if (this.convertEnumToOrdinal) {
+                if (this.enableConvertEnumToOrdinal) {
                     return goalType.getEnumConstants()[(int) ReflectionUtil.cast(Integer.class, object)];
                 } else {
                     return Enum.valueOf((Class<? extends Enum>) goalType, object.toString());

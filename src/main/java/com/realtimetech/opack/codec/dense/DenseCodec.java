@@ -44,6 +44,7 @@ public final class DenseCodec extends OpackCodec<InputStream, OutputStream> {
         int encodeOutputBufferInitialSize;
         int encodeStackInitialSize;
         int decodeStackInitialSize;
+
         boolean ignoreVersionCompare;
 
         public Builder() {

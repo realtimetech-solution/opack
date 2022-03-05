@@ -44,7 +44,9 @@ public class RecursiveLoopTest {
 
     @Test
     public void test() throws SerializeException, DeserializeException, OpackAssert.AssertException {
-        Opacker opacker = new Opacker.Builder().create();
+        Opacker opacker = new Opacker.Builder()
+                .setEnableConvertRecursiveDependencyToNull(false)
+                .create();
         RecursiveClass originalObjectA = new RecursiveClass();
         RecursiveClass originalObjectB = new RecursiveClass();
 
