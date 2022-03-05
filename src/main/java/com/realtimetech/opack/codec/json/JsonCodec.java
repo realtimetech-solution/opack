@@ -36,32 +36,22 @@ import java.io.Writer;
 
 public final class JsonCodec extends OpackCodec<String, Writer> {
     public final static class Builder {
-        boolean allowOpackValueToKeyValue;
-        boolean convertCharacterToString;
-        boolean prettyFormat;
-
         int encodeStackInitialSize;
         int encodeStringBufferSize;
         int decodeStackInitialSize;
 
+        boolean allowOpackValueToKeyValue;
+        boolean enableConvertCharacterToString;
+        boolean usePrettyFormat;
+
         public Builder() {
             this.allowOpackValueToKeyValue = false;
-            this.convertCharacterToString = false;
-            this.prettyFormat = false;
+            this.enableConvertCharacterToString = false;
+            this.usePrettyFormat = false;
 
             this.encodeStringBufferSize = 1024;
             this.encodeStackInitialSize = 128;
             this.decodeStackInitialSize = 128;
-        }
-
-        public Builder setAllowOpackValueToKeyValue(boolean allowOpackValueToKeyValue) {
-            this.allowOpackValueToKeyValue = allowOpackValueToKeyValue;
-            return this;
-        }
-
-        public Builder setPrettyFormat(boolean prettyFormat) {
-            this.prettyFormat = prettyFormat;
-            return this;
         }
 
         public Builder setEncodeStringBufferSize(int encodeStringBufferSize) {
@@ -76,6 +66,21 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
 
         public Builder setDecodeStackInitialSize(int decodeStackInitialSize) {
             this.decodeStackInitialSize = decodeStackInitialSize;
+            return this;
+        }
+
+        public Builder setAllowOpackValueToKeyValue(boolean allowOpackValueToKeyValue) {
+            this.allowOpackValueToKeyValue = allowOpackValueToKeyValue;
+            return this;
+        }
+
+        public Builder setEnableConvertCharacterToString(boolean enableConvertCharacterToString) {
+            this.enableConvertCharacterToString = enableConvertCharacterToString;
+            return this;
+        }
+
+        public Builder setUsePrettyFormat(boolean usePrettyFormat) {
+            this.usePrettyFormat = usePrettyFormat;
             return this;
         }
 
@@ -126,10 +131,6 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
         CONST_REPLACEMENT_CHARACTERS['\f'] = new char[]{'\\', 'f'};
     }
 
-    final boolean allowOpackValueToKeyValue;
-    final boolean convertCharacterToString;
-    final boolean prettyFormat;
-
     final StringWriter encodeLiteralStringWriter;
     final StringWriter encodeStringWriter;
     final FastStack<Object> encodeStack;
@@ -137,6 +138,10 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
     final FastStack<Integer> decodeBaseStack;
     final FastStack<Object> decodeValueStack;
     final StringWriter decodeStringWriter;
+
+    final boolean allowOpackValueToKeyValue;
+    final boolean enableConvertCharacterToString;
+    final boolean usePrettyFormat;
 
     /**
      * Constructs the JsonCodec with the builder of JsonCodec.
@@ -146,10 +151,6 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
     JsonCodec(Builder builder) {
         super();
 
-        this.allowOpackValueToKeyValue = builder.allowOpackValueToKeyValue;
-        this.convertCharacterToString = builder.convertCharacterToString;
-        this.prettyFormat = builder.prettyFormat;
-
         this.encodeLiteralStringWriter = new StringWriter(builder.encodeStringBufferSize);
         this.encodeStringWriter = new StringWriter(builder.encodeStringBufferSize);
         this.encodeStack = new FastStack<>(builder.encodeStackInitialSize);
@@ -157,6 +158,10 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
         this.decodeBaseStack = new FastStack<>(builder.decodeStackInitialSize);
         this.decodeValueStack = new FastStack<>(builder.decodeStackInitialSize);
         this.decodeStringWriter = new StringWriter();
+
+        this.allowOpackValueToKeyValue = builder.allowOpackValueToKeyValue;
+        this.enableConvertCharacterToString = builder.enableConvertCharacterToString;
+        this.usePrettyFormat = builder.usePrettyFormat;
     }
 
     /**
@@ -245,7 +250,7 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
             }
 
             if (numberType == Character.class) {
-                if (convertCharacterToString) {
+                if (enableConvertCharacterToString) {
                     writer.write(CONST_STRING_OPEN_CHARACTER);
                     writer.write(object.toString().toCharArray());
                     writer.write(CONST_STRING_CLOSE_CHARACTER);
@@ -274,7 +279,7 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
 
         FastStack<Integer> prettyIndentStack = null;
 
-        if (this.prettyFormat) {
+        if (this.usePrettyFormat) {
             prettyIndentStack = new FastStack<>();
             prettyIndentStack.push(0);
         }
@@ -291,13 +296,13 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
             } else if (objectType == OpackObject.class) {
                 OpackObject<Object, Object> opackObject = (OpackObject<Object, Object>) object;
                 int currentIndent = -1;
-                if (this.prettyFormat) {
+                if (this.usePrettyFormat) {
                     currentIndent = prettyIndentStack.pop();
                 }
 
                 writer.write(CONST_OBJECT_OPEN_CHARACTER);
                 this.encodeStack.push(CONST_OBJECT_CLOSE_CHARACTER);
-                if (this.prettyFormat && currentIndent != -1) {
+                if (this.usePrettyFormat && currentIndent != -1) {
                     writer.write(CONST_PRETTY_LINE_CHARACTER);
                     for (int i = 0; i < currentIndent; i++) {
                         this.encodeStack.push(CONST_PRETTY_INDENT_CHARACTER);
@@ -310,7 +315,7 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
                     Object value = opackObject.get(key);
 
                     if (count != 0) {
-                        if (this.prettyFormat) {
+                        if (this.usePrettyFormat) {
                             if (currentIndent != -1) {
                                 this.encodeStack.push(CONST_PRETTY_LINE_CHARACTER);
                             } else {
@@ -324,7 +329,7 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
                         throw new IllegalArgumentException("Object type keys are not allowed in json format.");
                     }
 
-                    if (this.prettyFormat) {
+                    if (this.usePrettyFormat) {
                         if (value instanceof OpackObject) {
                             prettyIndentStack.push(currentIndent == -1 ? -1 : currentIndent + 1);
                         }
@@ -333,12 +338,12 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
                         }
                     }
                     this.encodeStack.push(value);
-                    if (this.prettyFormat) {
+                    if (this.usePrettyFormat) {
                         this.encodeStack.push(CONST_PRETTY_SPACE_CHARACTER);
                     }
                     this.encodeStack.push(CONST_OBJECT_MAP_CHARACTER);
                     this.encodeStack.push(key);
-                    if (this.prettyFormat && currentIndent != -1) {
+                    if (this.usePrettyFormat && currentIndent != -1) {
                         for (int i = 0; i < currentIndent + 1; i++) {
                             this.encodeStack.push(CONST_PRETTY_INDENT_CHARACTER);
                         }
@@ -359,7 +364,7 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
                     Object value = opackArray.get(index);
 
                     if (!this.encodeLiteral(this.encodeLiteralStringWriter, value)) {
-                        if (this.prettyFormat) {
+                        if (this.usePrettyFormat) {
                             if (value instanceof OpackObject) {
                                 prettyIndentStack.push(-1);
                             }
@@ -369,7 +374,7 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
                         this.encodeStack.swap(this.encodeStack.getSize() - 1, this.encodeStack.getSize() - 2);
                         if (index != size - 1) {
                             this.encodeStack.push(CONST_SEPARATOR_CHARACTER);
-                            if (this.prettyFormat) {
+                            if (this.usePrettyFormat) {
                                 this.encodeStack.push(CONST_PRETTY_SPACE_CHARACTER);
                             }
                         }
@@ -378,7 +383,7 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
                     } else {
                         if (index != size - 1) {
                             this.encodeLiteralStringWriter.write(CONST_SEPARATOR_CHARACTER);
-                            if (this.prettyFormat) {
+                            if (this.usePrettyFormat) {
                                 this.encodeLiteralStringWriter.write(CONST_PRETTY_SPACE_CHARACTER);
                             }
                         }
@@ -448,7 +453,7 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
                 case '}':
                 case ']': {
                     if (this.decodeValueStack.getSize() - 1 != this.decodeBaseStack.peek()) {
-                        throw new IOException("Expected literal value, but got close syntax character at " + pointer + "(" + currentChar + ")");
+                        throw new IOException("Expected literal value, but got close syntax character at " + pointer + "(" + currentChar + ").");
                     }
 
                     this.decodeBaseStack.pop();
@@ -459,7 +464,7 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
                 case ',':
                 case ':': {
                     if (literalMode) {
-                        throw new IOException("Expected literal value, but got syntax character at " + pointer + "(" + currentChar + ")");
+                        throw new IOException("Expected literal value, but got syntax character at " + pointer + "(" + currentChar + ").");
                     }
 
                     int baseIndex = this.decodeBaseStack.peek();
@@ -471,7 +476,7 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
                         case ',': {
                             if (objectType == OpackObject.class) {
                                 if (valueSize != 0) {
-                                    throw new IOException("The map type cannot contain items that do not exist. at " + pointer + "(" + currentChar + ")");
+                                    throw new IOException("The map type cannot contain items that do not exist. at " + pointer + "(" + currentChar + ").");
                                 }
                             }
 
@@ -480,11 +485,11 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
                         case ':': {
                             if (objectType == OpackObject.class) {
                                 if (valueSize != 1) {
-                                    throw new IOException("The map item must have a key. at " + pointer + "(" + currentChar + ")");
+                                    throw new IOException("The map item must have a key. at " + pointer + "(" + currentChar + ").");
                                 }
                             }
                             if (objectType == OpackArray.class) {
-                                throw new IOException("The array type cannot contain colons. at " + pointer + "(" + currentChar + ")");
+                                throw new IOException("The array type cannot contain colons. at " + pointer + "(" + currentChar + ").");
                             }
 
                             break;
@@ -539,7 +544,7 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
                                                 } else if (unicode >= 'A' && unicode <= 'F') {
                                                     result += (unicode - 'A' + 10);
                                                 } else {
-                                                    throw new IOException("Parsed unknown unicode pattern at " + pointer + "(" + unicode + ")");
+                                                    throw new IOException("Parsed unknown unicode pattern at " + pointer + "(" + unicode + ").");
                                                 }
                                             }
                                             this.decodeStringWriter.write(result);
@@ -603,10 +608,10 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
                             pointer = pointer + 3;
                             stackMerge = true;
                         } else {
-                            throw new IOException("This value is not an opack value. Unknown value at " + pointer + "(" + currentChar + ")");
+                            throw new IOException("This value is not an opack value. Unknown value at " + pointer + "(" + currentChar + ").");
                         }
                     } else {
-                        throw new IOException("Parsed unknown character at " + pointer + "(" + currentChar + ")");
+                        throw new IOException("Parsed unknown character at " + pointer + "(" + currentChar + ").");
                     }
                 }
             }
@@ -637,7 +642,7 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
                         opackArray.add(value);
                     }
                 } else {
-                    throw new IOException("Caught corrupted stack, got " + objectType.getSimpleName());
+                    throw new IOException("Caught corrupted stack, got " + objectType.getSimpleName() + ".");
                 }
             }
         }

@@ -44,6 +44,7 @@ public final class DenseCodec extends OpackCodec<InputStream, OutputStream> {
         int encodeOutputBufferInitialSize;
         int encodeStackInitialSize;
         int decodeStackInitialSize;
+
         boolean ignoreVersionCompare;
 
         public Builder() {
@@ -365,7 +366,7 @@ public final class DenseCodec extends OpackCodec<InputStream, OutputStream> {
                         }
                     }
                 } catch (InvocationTargetException | IllegalAccessException e) {
-                    throw new IllegalStateException("Failed to access the native list object in OpackArray");
+                    throw new IllegalStateException("Failed to access the native list object in OpackArray.");
                 }
             } else {
                 if (objectType == boolean.class) {
@@ -400,7 +401,7 @@ public final class DenseCodec extends OpackCodec<InputStream, OutputStream> {
                     denseWriter.writeInt(bytes.length);
                     denseWriter.writeBytes(bytes);
                 } else {
-                    throw new IllegalArgumentException(objectType + " is not allowed in dense format. (unknown literal object type)");
+                    throw new IllegalArgumentException(objectType + " is not allowed in dense format. (unknown literal object type).");
                 }
             }
         }

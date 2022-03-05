@@ -64,15 +64,15 @@ public final class OpackArray<E> extends AbstractOpackValue<List<E>> {
      */
     OpackArray(@NotNull Object arrayObject) {
         if (!arrayObject.getClass().isArray()) {
-            throw new IllegalArgumentException(arrayObject + " is not array object");
+            throw new IllegalArgumentException(arrayObject + " is not array object.");
         }
 
         if (ReflectionUtil.getArrayDimension(arrayObject.getClass()) != 1) {
-            throw new IllegalArgumentException(arrayObject + " must have 1 dimension");
+            throw new IllegalArgumentException(arrayObject + " must have 1 dimension.");
         }
 
         if (!OpackArray.isAllowArray(arrayObject.getClass())) {
-            throw new IllegalArgumentException(arrayObject + " array element is not allowed type, allow only primitive type or String or OpackValues or null");
+            throw new IllegalArgumentException(arrayObject + " array element is not allowed type, allow only primitive type or String or OpackValues or null.");
         }
 
         this.set((List<E>) new NativeList(arrayObject));

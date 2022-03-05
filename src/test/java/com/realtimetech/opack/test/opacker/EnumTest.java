@@ -61,7 +61,7 @@ public class EnumTest {
             OpackAssert.assertEquals(originalObject, deserialized);
         }
         {
-            Opacker opacker = new Opacker.Builder().setConvertEnumToOrdinal(true).create();
+            Opacker opacker = new Opacker.Builder().setEnableConvertEnumToOrdinal(true).create();
             EnumTest.EnumClass originalObject = new EnumTest.EnumClass();
 
             OpackValue serialized = opacker.serialize(originalObject);
