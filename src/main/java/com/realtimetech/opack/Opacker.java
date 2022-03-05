@@ -42,6 +42,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -54,6 +55,7 @@ public class Opacker {
         boolean enableWrapMapElementType;
 
         boolean convertEnumToOrdinal;
+        boolean replaceRecursiveDependencyToNull;
 
         public Builder() {
             this.valueStackInitialSize = 512;
@@ -63,6 +65,7 @@ public class Opacker {
             this.enableWrapMapElementType = false;
 
             this.convertEnumToOrdinal = false;
+            this.replaceRecursiveDependencyToNull = false;
         }
 
         public Builder setValueStackInitialSize(int valueStackInitialSize) {
@@ -90,6 +93,11 @@ public class Opacker {
             return this;
         }
 
+        public Builder setReplaceRecursiveDependencyToNull(boolean replaceRecursiveDependencyToNull) {
+            this.replaceRecursiveDependencyToNull = replaceRecursiveDependencyToNull;
+            return this;
+        }
+
         /**
          * Create the {@link Opacker Opacker} through this builder.
          *
@@ -109,8 +117,10 @@ public class Opacker {
     final @NotNull FastStack<Object> objectStack;
     final @NotNull FastStack<BakedType> typeStack;
     final @NotNull FastStack<OpackValue> valueStack;
+    final @NotNull HashSet<Object> overlapSet;
 
     final boolean convertEnumToOrdinal;
+    final boolean replaceRecursiveDependencyToNull;
 
     @NotNull State state;
 
@@ -126,7 +136,7 @@ public class Opacker {
         this.objectStack = new FastStack<>(builder.contextStackInitialSize);
         this.typeStack = new FastStack<>(builder.contextStackInitialSize);
         this.valueStack = new FastStack<>(builder.valueStackInitialSize);
-
+        this.overlapSet = new HashSet<>();
         this.state = State.NONE;
 
         try {
@@ -146,6 +156,7 @@ public class Opacker {
         }
 
         this.convertEnumToOrdinal = builder.convertEnumToOrdinal;
+        this.replaceRecursiveDependencyToNull = builder.replaceRecursiveDependencyToNull;
     }
 
     /**
@@ -157,7 +168,11 @@ public class Opacker {
      */
     public synchronized OpackValue serialize(Object object) throws SerializeException {
         if (this.state == State.DESERIALIZE)
-            throw new SerializeException("Opacker is deserializing");
+            throw new SerializeException("Opacker is deserializing.");
+
+        if (this.state == State.NONE) {
+            this.overlapSet.clear();
+        }
 
         int separatorStack = this.objectStack.getSize();
         OpackValue value = (OpackValue) this.prepareObjectSerialize(object.getClass(), object.getClass(), object);
@@ -250,13 +265,22 @@ public class Opacker {
                 opackValue = new OpackObject<>();
             }
 
+            if (this.overlapSet.contains(object)) {
+                if (!this.replaceRecursiveDependencyToNull) {
+                    throw new SerializeException("Recursive dependencies are not serializable.");
+                }
+
+                return null;
+            }
+
+            this.overlapSet.add(object);
             this.objectStack.push(object);
             this.valueStack.push(opackValue);
             this.typeStack.push(bakedType);
 
             return opackValue;
         } catch (BakeException exception) {
-            throw new SerializeException("Can't bake " + baseType.getName() + " class information", exception);
+            throw new SerializeException("Can't bake " + baseType.getName() + " class information.", exception);
         }
     }
 
@@ -299,7 +323,7 @@ public class Opacker {
                         Object serializedValue = this.prepareObjectSerialize(fieldType, originalType, element);
                         opackObject.put(property.getName(), serializedValue);
                     } catch (IllegalAccessException exception) {
-                        throw new SerializeException("Can't get " + property.getName() + " field data in " + bakedType.getType().getSimpleName(), exception);
+                        throw new SerializeException("Can't get " + property.getName() + " field data in " + bakedType.getType().getSimpleName() + ".", exception);
                     }
                 }
             }
@@ -316,7 +340,11 @@ public class Opacker {
      */
     public synchronized <T> T deserialize(Class<T> type, OpackValue opackValue) throws DeserializeException {
         if (this.state == State.SERIALIZE)
-            throw new DeserializeException("Opacker is serializing");
+            throw new DeserializeException("Opacker is serializing.");
+
+        if (this.state == State.NONE) {
+            this.overlapSet.clear();
+        }
 
         int separatorStack = this.objectStack.getSize();
         T value = type.cast(this.prepareObjectDeserialize(type, opackValue));
@@ -389,7 +417,7 @@ public class Opacker {
                     try {
                         return OpackArrayConverter.convertToArray(componentType, opackArray);
                     } catch (InvocationTargetException | IllegalAccessException exception) {
-                        throw new DeserializeException("Can't convert OpackArray to native array", exception);
+                        throw new DeserializeException("Can't convert OpackArray to native array.", exception);
                     }
                 }
             }
@@ -405,7 +433,7 @@ public class Opacker {
 
                         targetObject = Array.newInstance(goalType.getComponentType(), opackArray.length());
                     } else {
-                        throw new DeserializeException("Target class is array. but, object is not OpackArray");
+                        throw new DeserializeException("Target class is array. but, object is not OpackArray.");
                     }
                 } else {
                     if (object instanceof OpackObject) {
@@ -414,10 +442,10 @@ public class Opacker {
                         try {
                             targetObject = ReflectionUtil.createInstanceUnsafe(goalType);
                         } catch (InvocationTargetException | IllegalAccessException | InstantiationException exception) {
-                            throw new DeserializeException("Can't create instance using unsafe method", exception);
+                            throw new DeserializeException("Can't create instance using unsafe method.", exception);
                         }
                     } else {
-                        throw new DeserializeException("Target class is object. but, object is not OpackObject");
+                        throw new DeserializeException("Target class is object. but, object is not OpackObject.");
                     }
                 }
 
@@ -429,10 +457,10 @@ public class Opacker {
             } else if (object.getClass() == goalType) {
                 return object;
             } else {
-                throw new DeserializeException("Found object, stack corruption");
+                throw new DeserializeException("Found object, stack corruption.");
             }
         } catch (BakeException exception) {
-            throw new DeserializeException("Can't bake " + goalType.getName() + " class information", exception);
+            throw new DeserializeException("Can't bake " + goalType.getName() + " class information.", exception);
         }
     }
 
@@ -474,7 +502,7 @@ public class Opacker {
 
                         property.set(object, deserializedValue == null ? null : ReflectionUtil.cast(actualFieldType, deserializedValue));
                     } catch (IllegalAccessException | IllegalArgumentException exception) {
-                        throw new DeserializeException("Can't set " + property.getName() + " field in " + bakedType.getType().getSimpleName(), exception);
+                        throw new DeserializeException("Can't set " + property.getName() + " field in " + bakedType.getType().getSimpleName() + ".", exception);
                     }
                 }
             }

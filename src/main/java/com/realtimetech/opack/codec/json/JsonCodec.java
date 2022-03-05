@@ -448,7 +448,7 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
                 case '}':
                 case ']': {
                     if (this.decodeValueStack.getSize() - 1 != this.decodeBaseStack.peek()) {
-                        throw new IOException("Expected literal value, but got close syntax character at " + pointer + "(" + currentChar + ")");
+                        throw new IOException("Expected literal value, but got close syntax character at " + pointer + "(" + currentChar + ").");
                     }
 
                     this.decodeBaseStack.pop();
@@ -459,7 +459,7 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
                 case ',':
                 case ':': {
                     if (literalMode) {
-                        throw new IOException("Expected literal value, but got syntax character at " + pointer + "(" + currentChar + ")");
+                        throw new IOException("Expected literal value, but got syntax character at " + pointer + "(" + currentChar + ").");
                     }
 
                     int baseIndex = this.decodeBaseStack.peek();
@@ -471,7 +471,7 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
                         case ',': {
                             if (objectType == OpackObject.class) {
                                 if (valueSize != 0) {
-                                    throw new IOException("The map type cannot contain items that do not exist. at " + pointer + "(" + currentChar + ")");
+                                    throw new IOException("The map type cannot contain items that do not exist. at " + pointer + "(" + currentChar + ").");
                                 }
                             }
 
@@ -480,11 +480,11 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
                         case ':': {
                             if (objectType == OpackObject.class) {
                                 if (valueSize != 1) {
-                                    throw new IOException("The map item must have a key. at " + pointer + "(" + currentChar + ")");
+                                    throw new IOException("The map item must have a key. at " + pointer + "(" + currentChar + ").");
                                 }
                             }
                             if (objectType == OpackArray.class) {
-                                throw new IOException("The array type cannot contain colons. at " + pointer + "(" + currentChar + ")");
+                                throw new IOException("The array type cannot contain colons. at " + pointer + "(" + currentChar + ").");
                             }
 
                             break;
@@ -539,7 +539,7 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
                                                 } else if (unicode >= 'A' && unicode <= 'F') {
                                                     result += (unicode - 'A' + 10);
                                                 } else {
-                                                    throw new IOException("Parsed unknown unicode pattern at " + pointer + "(" + unicode + ")");
+                                                    throw new IOException("Parsed unknown unicode pattern at " + pointer + "(" + unicode + ").");
                                                 }
                                             }
                                             this.decodeStringWriter.write(result);
@@ -603,10 +603,10 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
                             pointer = pointer + 3;
                             stackMerge = true;
                         } else {
-                            throw new IOException("This value is not an opack value. Unknown value at " + pointer + "(" + currentChar + ")");
+                            throw new IOException("This value is not an opack value. Unknown value at " + pointer + "(" + currentChar + ").");
                         }
                     } else {
-                        throw new IOException("Parsed unknown character at " + pointer + "(" + currentChar + ")");
+                        throw new IOException("Parsed unknown character at " + pointer + "(" + currentChar + ").");
                     }
                 }
             }
@@ -637,7 +637,7 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
                         opackArray.add(value);
                     }
                 } else {
-                    throw new IOException("Caught corrupted stack, got " + objectType.getSimpleName());
+                    throw new IOException("Caught corrupted stack, got " + objectType.getSimpleName() + ".");
                 }
             }
         }

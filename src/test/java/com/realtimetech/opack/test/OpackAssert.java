@@ -59,7 +59,7 @@ public class OpackAssert {
 
                     OpackAssert.assertSingleValue(originalObject, targetObject);
                 } catch (IllegalAccessException e) {
-                    throw new IllegalArgumentException("Assert failure, throw illegal access exception when get field value");
+                    throw new IllegalArgumentException("Assert failure, throw illegal access exception when get field value.");
                 } catch (AssertException exception) {
                     throw new FieldAssertException(original.getClass(), field.getName(), exception);
                 }
@@ -72,11 +72,11 @@ public class OpackAssert {
     }
 
     static void throwException(String property, Object originalValue, Object targetValue) throws AssertException {
-        throw new AssertException("Assert failure, expected " + property + " is \"" + originalValue + "\" but got \"" + targetValue + "\"");
+        throw new AssertException("Assert failure, expected " + property + " is \"" + originalValue + "\" but got \"" + targetValue + "\".");
     }
 
     static void throwExceptionNotContains(Object originalValue) throws AssertException {
-        throw new AssertException("Assert failure, originally contains " + originalValue + " but not contains");
+        throw new AssertException("Assert failure, originally contains " + originalValue + " but not contains.");
     }
 
     static void assertSingleValue(Object originalObject, Object targetObject) throws AssertException {

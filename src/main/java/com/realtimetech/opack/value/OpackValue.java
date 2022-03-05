@@ -33,7 +33,7 @@ public interface OpackValue {
      */
     public static void assertAllowType(Class<?> type) {
         if (!OpackValue.isAllowType(type)) {
-            throw new IllegalArgumentException(type.getName() + " is not allowed type, allow only primitive type or String or OpackValues or null");
+            throw new IllegalArgumentException(type.getName() + " is not allowed type, allow only primitive type or String or OpackValues or null.");
         }
     }
 
