@@ -168,10 +168,6 @@ public class Opacker {
         if (this.state == State.DESERIALIZE)
             throw new SerializeException("Opacker is deserializing.");
 
-        if (this.state == State.NONE) {
-            this.overlapSet.clear();
-        }
-
         int separatorStack = this.objectStack.getSize();
         OpackValue value = (OpackValue) this.prepareObjectSerialize(object.getClass(), object.getClass(), object);
 
@@ -181,6 +177,10 @@ public class Opacker {
             this.executeSerializeStack(separatorStack);
         } finally {
             this.state = lastState;
+
+            if (this.state == State.NONE) {
+                this.overlapSet.clear();
+            }
         }
 
         return value;
@@ -340,10 +340,6 @@ public class Opacker {
         if (this.state == State.SERIALIZE)
             throw new DeserializeException("Opacker is serializing.");
 
-        if (this.state == State.NONE) {
-            this.overlapSet.clear();
-        }
-
         int separatorStack = this.objectStack.getSize();
         T value = type.cast(this.prepareObjectDeserialize(type, opackValue));
 
@@ -353,6 +349,10 @@ public class Opacker {
             this.executeDeserializeStack(separatorStack);
         } finally {
             this.state = lastState;
+
+            if (this.state == State.NONE) {
+                this.overlapSet.clear();
+            }
         }
 
         return value;
