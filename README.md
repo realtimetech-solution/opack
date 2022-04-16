@@ -281,7 +281,7 @@ System.out.println("First element is " + (opackArray.get(0)));
 Opack uses [Apache License 2.0](./LICENSE.txt). Please, leave your feedback if you have any suggestions!
 
 ```
-JeongHwan, Park
+Jeonghwan, Park
 +821032735003
 dev.parkjeonghwan@gmail.com
 ```
