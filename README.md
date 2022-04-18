@@ -41,7 +41,7 @@ Maven:
 <dependency>
   <groupId>com.realtimetech</groupId>
   <artifactId>opack</artifactId>
-  <version>0.0.7</version>
+  <version>0.0.8</version>
 </dependency>
 ```
 
