@@ -29,14 +29,12 @@ Opack is a Java library that can serialize/deserialize between Java objects and 
 
 
 ### Simple flow
-**Serialize and Deserialize**
 <p align="center" style="max-width: 100%;">
-  <a href="#"><img src=".readme/1_serialize_deserialize.png"/></a>
+  <a href="#"><img width="484" src=".readme/1_serialize_deserialize.png"/></a>
 </p>
  
-**Encode and Decode**
 <p align="center" style="max-width: 100%;">
-  <a href="#"><img src=".readme/2_encode_decode.png"/></a>
+  <a href="#"><img width="484" src=".readme/2_encode_decode.png"/></a>
 </p>
 
     
