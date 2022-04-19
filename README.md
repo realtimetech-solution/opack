@@ -26,6 +26,17 @@ Opack is a Java library that can serialize/deserialize between Java objects and 
 ```
 </details>
 
+
+
+### Simple flow
+**Serialize and Deserialize**
+
+![Serialize and Deserialize](.readme/1_serialize_deserialize.png)
+
+**Encode and Decode**
+
+![Encode and Decode](.readme/2_encode_decode.png)
+
     
 ### Download
 
@@ -133,7 +144,7 @@ OpackValue decodedOpackValue2 = denseCodec.decode(inputStream);
 ```
 
 ### Advanced Usage
-#### 1. Ignore and ExplicitType and SerializedName
+#### 1. Ignore and Type and Name
 ```java
 public class SomeObject {
     private String stringField;
@@ -152,7 +163,7 @@ public class SomeObject {
     private List<String> listField;
 
     /*
-        This field is serialized/deserialized to explicit type `ArrayList` instead of ambiguous field type `List`
+        This field is serialized/deserialized to `newFieldName` name instead of actual field name `oldFieldName`
      */
     @Name("newFieldName")
     private String oldFieldName;
