@@ -17,12 +17,12 @@ Opack is a Java library that can serialize/deserialize between Java objects and 
 
 ```
 # GsonPerformanceTest
-  Gson	: 9295ms
-  Opack	: 4910ms
+  Gson	: 8640ms
+  Opack	: 4309ms
 
 # KryoPerformanceTest
- Kryo	: 5333ms
- Opack	: 1657ms
+ Kryo	: 5566ms
+ Opack	: 1670ms
 ```
 </details>
 

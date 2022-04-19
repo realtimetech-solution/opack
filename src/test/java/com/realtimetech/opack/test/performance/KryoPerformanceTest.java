@@ -27,6 +27,8 @@ import com.esotericsoftware.kryo.io.ByteBufferInput;
 import com.esotericsoftware.kryo.io.ByteBufferOutput;
 import com.realtimetech.opack.Opacker;
 import com.realtimetech.opack.codec.dense.DenseCodec;
+import com.realtimetech.opack.codec.dense.reader.ByteArrayReader;
+import com.realtimetech.opack.codec.dense.writer.ByteArrayWriter;
 import com.realtimetech.opack.test.opacker.*;
 import com.realtimetech.opack.value.OpackValue;
 import org.junit.jupiter.api.Assertions;
@@ -86,27 +88,36 @@ public class KryoPerformanceTest {
             Opack Contexts
          */
         Opacker opacker = new Opacker.Builder().create();
+        ByteArrayWriter byteArrayWriter = new ByteArrayWriter();
         DenseCodec denseCodec = new DenseCodec.Builder().create();
 
-        int warmUploop = 512;
+        int warmloop = 512;
         int loop = 512 * 2;
 
         PerformanceClass.ExceptionRunnable kryoRunnable = () -> {
             byteBufferOutput.reset();
+
             kryo.writeObject(byteBufferOutput, performanceClass);
             byte[] encode = byteBufferOutput.toBytes();
             PerformanceClass deserialize = kryo.readObject(new ByteBufferInput(encode), PerformanceClass.class);
+
+            deserialize.hashCode();
         };
         PerformanceClass.ExceptionRunnable opackRunnable = () -> {
+            byteArrayWriter.reset();
+
             OpackValue serialize = opacker.serialize(performanceClass);
-            byte[] encode = denseCodec.encode(serialize);
+            denseCodec.encode(byteArrayWriter, serialize);
+            byte[] encode = byteArrayWriter.toByteArray();
             OpackValue decode = denseCodec.decode(encode);
             PerformanceClass deserialize = opacker.deserialize(PerformanceClass.class, decode);
+
+            deserialize.hashCode();
         };
 
         // Warm up!
-        PerformanceClass.measureRunningTime(warmUploop, kryoRunnable);
-        PerformanceClass.measureRunningTime(warmUploop, opackRunnable);
+        PerformanceClass.measureRunningTime(warmloop, kryoRunnable);
+        PerformanceClass.measureRunningTime(warmloop, opackRunnable);
 
         long kryoTime = PerformanceClass.measureRunningTime(loop, kryoRunnable);
         long opackTime = PerformanceClass.measureRunningTime(loop, opackRunnable);

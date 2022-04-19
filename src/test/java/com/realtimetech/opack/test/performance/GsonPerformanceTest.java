@@ -48,21 +48,31 @@ public class GsonPerformanceTest {
         Opacker opacker = new Opacker.Builder().create();
         JsonCodec jsonCodec = new JsonCodec.Builder().create();
 
+        int warmloop = 64;
         int loop = 128;
-        PerformanceClass.ExceptionRunnable kryoRunnable = () -> {
+
+        PerformanceClass.ExceptionRunnable gsonRunnable = () -> {
             JsonElement serialize = gson.toJsonTree(performanceClass);
             String encode = serialize.toString();
             JsonElement decode = gson.fromJson(encode, JsonElement.class);
             PerformanceClass deserialize = gson.fromJson(decode, PerformanceClass.class);
+
+            deserialize.hashCode();
         };
         PerformanceClass.ExceptionRunnable opackRunnable = () -> {
             OpackValue serialize = opacker.serialize(performanceClass);
             String encode = jsonCodec.encode(serialize);
             OpackValue decode = jsonCodec.decode(encode);
             PerformanceClass deserialize = opacker.deserialize(PerformanceClass.class, decode);
+
+            deserialize.hashCode();
         };
 
-        long gsonTime = PerformanceClass.measureRunningTime(loop, kryoRunnable);
+        // Warm up!
+        PerformanceClass.measureRunningTime(warmloop, gsonRunnable);
+        PerformanceClass.measureRunningTime(warmloop, opackRunnable);
+
+        long gsonTime = PerformanceClass.measureRunningTime(loop, gsonRunnable);
         long opackTime = PerformanceClass.measureRunningTime(loop, opackRunnable);
 
         System.out.println("# " + this.getClass().getSimpleName());
