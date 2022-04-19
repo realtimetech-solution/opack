@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 REALTIMETECH All Rights Reserved
+ * Copyright (C) 2022 REALTIMETECH All Rights Reserved
  *
  * Licensed either under the Apache License, Version 2.0, or (at your option)
  * under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
  * limitations under the License.
  */
 
-package com.realtimetech.opack.test.opacker;
+package com.realtimetech.opack.test.opacker.list;
 
 import com.realtimetech.opack.Opacker;
 import com.realtimetech.opack.exception.DeserializeException;

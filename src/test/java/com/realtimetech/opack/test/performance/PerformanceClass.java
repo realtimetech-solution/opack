@@ -22,7 +22,12 @@
 
 package com.realtimetech.opack.test.performance;
 
-import com.realtimetech.opack.test.opacker.*;
+import com.realtimetech.opack.test.opacker.array.PrimitiveArrayTest;
+import com.realtimetech.opack.test.opacker.array.WrapperArrayTest;
+import com.realtimetech.opack.test.opacker.single.ObjectTest;
+import com.realtimetech.opack.test.opacker.single.PrimitiveTest;
+import com.realtimetech.opack.test.opacker.single.StringTest;
+import com.realtimetech.opack.test.opacker.single.WrapperTest;
 
 import java.util.Random;
 

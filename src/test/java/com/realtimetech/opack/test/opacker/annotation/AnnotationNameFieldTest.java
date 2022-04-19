@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 REALTIMETECH All Rights Reserved
+ * Copyright (C) 2022 REALTIMETECH All Rights Reserved
  *
  * Licensed either under the Apache License, Version 2.0, or (at your option)
  * under the terms of the GNU General Public License as published by
@@ -20,40 +20,33 @@
  * limitations under the License.
  */
 
-package com.realtimetech.opack.test.opacker;
+package com.realtimetech.opack.test.opacker.annotation;
 
 import com.realtimetech.opack.Opacker;
+import com.realtimetech.opack.annotation.Name;
 import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.test.OpackAssert;
 import com.realtimetech.opack.value.OpackValue;
 import org.junit.jupiter.api.Test;
 
-public class StringTest {
-    public static class StringClass {
-        private String stringValue;
+public class AnnotationNameFieldTest {
+    public static class SerializedNameFieldTestClass {
+        @Name("newName")
+        private String oldName;
 
-        private String unicodeStringValue;
-
-        private String jsonStringValue;
-
-        private String stringNullValue;
-
-        public StringClass() {
-            this.stringValue = "Hello, World!";
-            this.unicodeStringValue = "\u0161 and \u003d is Unicode Character";
-            this.jsonStringValue = "{what} [if] {is} [to:o] {b,o,r,i,n,g}";
-            this.stringNullValue = null;
+        public SerializedNameFieldTestClass() {
+            this.oldName = "This is ignored field";
         }
     }
 
     @Test
     public void test() throws SerializeException, DeserializeException, OpackAssert.AssertException {
         Opacker opacker = new Opacker.Builder().create();
-        StringArrayTest.StringArrayClass originalObject = new StringArrayTest.StringArrayClass();
+        SerializedNameFieldTestClass originalObject = new SerializedNameFieldTestClass();
 
         OpackValue serialized = opacker.serialize(originalObject);
-        StringArrayTest.StringArrayClass deserialized = opacker.deserialize(StringArrayTest.StringArrayClass.class, serialized);
+        SerializedNameFieldTestClass deserialized = opacker.deserialize(SerializedNameFieldTestClass.class, serialized);
 
         OpackAssert.assertEquals(originalObject, deserialized);
     }

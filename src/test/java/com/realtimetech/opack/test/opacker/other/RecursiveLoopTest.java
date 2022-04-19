@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 REALTIMETECH All Rights Reserved
+ * Copyright (C) 2022 REALTIMETECH All Rights Reserved
  *
  * Licensed either under the Apache License, Version 2.0, or (at your option)
  * under the terms of the GNU General Public License as published by
@@ -20,40 +20,45 @@
  * limitations under the License.
  */
 
-package com.realtimetech.opack.test.opacker;
+package com.realtimetech.opack.test.opacker.other;
 
 import com.realtimetech.opack.Opacker;
 import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.test.OpackAssert;
 import com.realtimetech.opack.value.OpackValue;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class StringArrayTest {
-    public static class StringArrayClass {
-        private String[] stringArrayValue;
+public class RecursiveLoopTest {
+    public static class RecursiveClass {
+        private RecursiveClass recursiveClass;
 
-        public StringArrayClass() {
-            this.stringArrayValue = new String[]{
-                    "Hello, World!",
-                    "RealtimeTech",
-                    "Object Packager",
-                    "Opack",
-                    "Allow",
-                    null,
-                    "!"
-            };
+        public RecursiveClass() {
+        }
+
+        public void setRecursiveClass(RecursiveClass recursiveClass) {
+            this.recursiveClass = recursiveClass;
         }
     }
 
     @Test
     public void test() throws SerializeException, DeserializeException, OpackAssert.AssertException {
-        Opacker opacker = new Opacker.Builder().create();
-        StringArrayClass originalObject = new StringArrayClass();
+        Opacker opacker = new Opacker.Builder()
+                .setEnableConvertRecursiveDependencyToNull(false)
+                .create();
+        RecursiveClass originalObjectA = new RecursiveClass();
+        RecursiveClass originalObjectB = new RecursiveClass();
 
-        OpackValue serialized = opacker.serialize(originalObject);
-        StringArrayClass deserialized = opacker.deserialize(StringArrayClass.class, serialized);
+        originalObjectA.setRecursiveClass(originalObjectB);
+        originalObjectB.setRecursiveClass(originalObjectA);
 
-        OpackAssert.assertEquals(originalObject, deserialized);
+        try {
+            OpackValue serialized = opacker.serialize(originalObjectA);
+
+            Assertions.fail("Not detected recursive dependency.");
+        } catch (SerializeException exception) {
+            // Ok!
+        }
     }
 }

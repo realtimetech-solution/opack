@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 REALTIMETECH All Rights Reserved
+ * Copyright (C) 2022 REALTIMETECH All Rights Reserved
  *
  * Licensed either under the Apache License, Version 2.0, or (at your option)
  * under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
  * limitations under the License.
  */
 
-package com.realtimetech.opack.test.opacker;
+package com.realtimetech.opack.test.opacker.map;
 
 import com.realtimetech.opack.Opacker;
 import com.realtimetech.opack.annotation.Type;
@@ -30,41 +30,39 @@ import com.realtimetech.opack.test.OpackAssert;
 import com.realtimetech.opack.value.OpackValue;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Array;
-import java.util.Random;
+import java.util.*;
 
-public class ExplicitObjectTest {
-    static final Random RANDOM = new Random();
+public class MapTest {
+    public static class MapClass {
+        private HashMap<String, String> hashMapValue;
 
-    public static class ExplicitObjectClass {
-        private Object nullValue;
+        @Type(HashMap.class)
+        private Map<String, String> mapValue;
 
-        @Type(ObjectTest.SubObjectClass[].class)
-        private Object subObjectArrayValue;
+        public MapClass() {
+            this.hashMapValue = new HashMap<>();
+            this.hashMapValue.put("hash_map_key_1", "hash_map_value_1");
+            this.hashMapValue.put("hash_map_key_2", "hash_map_value_2");
+            this.hashMapValue.put("hash_map_key_3", "hash_map_value_3");
+            this.hashMapValue.put("hash_map_key_4", "hash_map_value_4");
+            this.hashMapValue.put("hash_map_key_5", "hash_map_value_5");
 
-        @Type(ObjectTest.SubObjectClass.class)
-        private Object subObjectWithExplicitValue;
-
-        public ExplicitObjectClass() {
-            this.nullValue = null;
-            int length = RANDOM.nextInt(5) + 5;
-
-            this.subObjectArrayValue = new ObjectTest.SubObjectClass[length];
-            for (int index = 0; index < length; index++) {
-                Array.set(this.subObjectArrayValue, index, new ObjectTest.SubObjectClass());
-            }
-
-            this.subObjectWithExplicitValue = new ObjectTest.SubObjectClass();
+            this.mapValue = new HashMap<>();
+            this.mapValue.put("map_key_1", "map_value_1");
+            this.mapValue.put("map_key_2", "map_value_2");
+            this.mapValue.put("map_key_3", "map_value_3");
+            this.mapValue.put("map_key_4", "map_value_4");
+            this.mapValue.put("map_key_5", "map_value_5");
         }
     }
 
     @Test
     public void test() throws SerializeException, DeserializeException, OpackAssert.AssertException {
         Opacker opacker = new Opacker.Builder().create();
-        ExplicitObjectClass originalObject = new ExplicitObjectClass();
+        MapClass originalObject = new MapClass();
 
         OpackValue serialized = opacker.serialize(originalObject);
-        ExplicitObjectClass deserialized = opacker.deserialize(ExplicitObjectClass.class, serialized);
+        MapClass deserialized = opacker.deserialize(MapClass.class, serialized);
 
         OpackAssert.assertEquals(originalObject, deserialized);
     }

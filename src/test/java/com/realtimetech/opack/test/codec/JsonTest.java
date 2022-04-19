@@ -29,7 +29,7 @@ import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.EncodeException;
 import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.test.OpackAssert;
-import com.realtimetech.opack.test.opacker.ComplexTest;
+import com.realtimetech.opack.test.opacker.other.ComplexTest;
 import com.realtimetech.opack.value.OpackObject;
 import com.realtimetech.opack.value.OpackValue;
 import org.junit.jupiter.api.Assertions;

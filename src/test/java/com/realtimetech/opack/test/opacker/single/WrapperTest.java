@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 REALTIMETECH All Rights Reserved
+ * Copyright (C) 2022 REALTIMETECH All Rights Reserved
  *
  * Licensed either under the Apache License, Version 2.0, or (at your option)
  * under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
  * limitations under the License.
  */
 
-package com.realtimetech.opack.test.opacker;
+package com.realtimetech.opack.test.opacker.single;
 
 import com.realtimetech.opack.Opacker;
 import com.realtimetech.opack.exception.DeserializeException;
@@ -31,46 +31,61 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
-public class ObjectTest {
+public class WrapperTest {
     static final Random RANDOM = new Random();
 
-    public static class SubObjectClass {
-        private Object nullValue;
+    public static class WrapperClass {
+        private Boolean booleanValue;
+        private Byte byteValue;
 
-        private String stringValue;
-        private int intValue;
+        private Character characterValue;
+        private Short shortValue;
+
         private Integer integerValue;
+        private Float floatValue;
 
-        public SubObjectClass() {
-            this.nullValue = null;
+        private Double doubleValue;
+        private Long longValue;
 
-            this.stringValue = "sub_object_string_value" + System.currentTimeMillis();
-            this.intValue = RANDOM.nextInt();
+        private Boolean booleanNullValue;
+        private Byte byteNullValue;
+
+        private Character characterNullValue;
+        private Short shortNullValue;
+
+        private Integer integerNullValue;
+        private Float floatNullValue;
+        private Double doubleNullValue;
+        private Long longNullValue;
+
+        public WrapperClass() {
+            this.booleanValue = RANDOM.nextBoolean();
+            this.byteValue = (byte) RANDOM.nextInt();
+            this.characterValue = (char) RANDOM.nextInt();
+            this.shortValue = (short) RANDOM.nextInt();
             this.integerValue = RANDOM.nextInt();
-        }
-    }
+            this.floatValue = RANDOM.nextFloat();
+            this.doubleValue = RANDOM.nextDouble();
+            this.longValue = RANDOM.nextLong();
 
-    public static class ObjectClass {
-        private Object nullValue;
-
-        private SubObjectClass subObjectValue1;
-        private SubObjectClass subObjectValue2;
-
-        public ObjectClass() {
-            this.nullValue = null;
-
-            this.subObjectValue1 = new SubObjectClass();
-            this.subObjectValue2 = new SubObjectClass();
+            this.booleanNullValue = null;
+            this.byteNullValue = null;
+            this.characterNullValue = null;
+            this.shortNullValue = null;
+            this.integerNullValue = null;
+            this.floatNullValue = null;
+            this.doubleNullValue = null;
+            this.longNullValue = null;
         }
     }
 
     @Test
     public void test() throws SerializeException, DeserializeException, OpackAssert.AssertException {
         Opacker opacker = new Opacker.Builder().create();
-        ObjectClass originalObject = new ObjectClass();
+        WrapperClass originalObject = new WrapperClass();
 
         OpackValue serialized = opacker.serialize(originalObject);
-        ObjectClass deserialized = opacker.deserialize(ObjectClass.class, serialized);
+        WrapperClass deserialized = opacker.deserialize(WrapperClass.class, serialized);
 
         OpackAssert.assertEquals(originalObject, deserialized);
     }

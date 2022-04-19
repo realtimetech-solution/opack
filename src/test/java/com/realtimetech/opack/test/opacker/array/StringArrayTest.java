@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 REALTIMETECH All Rights Reserved
+ * Copyright (C) 2022 REALTIMETECH All Rights Reserved
  *
  * Licensed either under the Apache License, Version 2.0, or (at your option)
  * under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
  * limitations under the License.
  */
 
-package com.realtimetech.opack.test.opacker;
+package com.realtimetech.opack.test.opacker.array;
 
 import com.realtimetech.opack.Opacker;
 import com.realtimetech.opack.exception.DeserializeException;
@@ -29,42 +29,30 @@ import com.realtimetech.opack.test.OpackAssert;
 import com.realtimetech.opack.value.OpackValue;
 import org.junit.jupiter.api.Test;
 
-import java.util.Random;
+public class StringArrayTest {
+    public static class StringArrayClass {
+        private String[] stringArrayValue;
 
-public class ObjectArrayTest {
-    static final Random RANDOM = new Random();
-
-    public static class ObjectArrayClass {
-        private Object nullValue;
-
-        private ObjectTest.SubObjectClass[] subObjectArrayValue;
-        private ObjectTest.SubObjectClass[] subObjectArrayWithNullValue;
-
-        public ObjectArrayClass() {
-            this.nullValue = null;
-            int length = RANDOM.nextInt(5) + 5;
-
-            this.subObjectArrayValue = new ObjectTest.SubObjectClass[length];
-            for (int index = 0; index < length; index++) {
-                this.subObjectArrayValue[index] = new ObjectTest.SubObjectClass();
-            }
-
-            this.subObjectArrayWithNullValue = new ObjectTest.SubObjectClass[length];
-            for (int index = 0; index < length; index++) {
-                this.subObjectArrayWithNullValue[index] = new ObjectTest.SubObjectClass();
-            }
-
-            this.subObjectArrayWithNullValue[RANDOM.nextInt(length)] = null;
+        public StringArrayClass() {
+            this.stringArrayValue = new String[]{
+                    "Hello, World!",
+                    "RealtimeTech",
+                    "Object Packager",
+                    "Opack",
+                    "Allow",
+                    null,
+                    "!"
+            };
         }
     }
 
     @Test
     public void test() throws SerializeException, DeserializeException, OpackAssert.AssertException {
         Opacker opacker = new Opacker.Builder().create();
-        ObjectArrayClass originalObject = new ObjectArrayClass();
+        StringArrayClass originalObject = new StringArrayClass();
 
         OpackValue serialized = opacker.serialize(originalObject);
-        ObjectArrayClass deserialized = opacker.deserialize(ObjectArrayClass.class, serialized);
+        StringArrayClass deserialized = opacker.deserialize(StringArrayClass.class, serialized);
 
         OpackAssert.assertEquals(originalObject, deserialized);
     }

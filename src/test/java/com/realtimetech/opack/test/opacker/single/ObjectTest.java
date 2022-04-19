@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 REALTIMETECH All Rights Reserved
+ * Copyright (C) 2022 REALTIMETECH All Rights Reserved
  *
  * Licensed either under the Apache License, Version 2.0, or (at your option)
  * under the terms of the GNU General Public License as published by
@@ -20,55 +20,57 @@
  * limitations under the License.
  */
 
-package com.realtimetech.opack.test.opacker;
+package com.realtimetech.opack.test.opacker.single;
 
 import com.realtimetech.opack.Opacker;
 import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.test.OpackAssert;
-import com.realtimetech.opack.value.OpackObject;
 import com.realtimetech.opack.value.OpackValue;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashMap;
 import java.util.Random;
 
-public class WrapMapElementTest {
+public class ObjectTest {
     static final Random RANDOM = new Random();
 
-    public static class WrapMapClass {
-        private HashMap<Object, Object> wrappedTypeMap;
+    public static class SubObjectClass {
+        private Object nullValue;
 
-        public WrapMapClass() {
-            this.wrappedTypeMap = new HashMap<>();
+        private String stringValue;
+        private int intValue;
+        private Integer integerValue;
 
-            this.wrappedTypeMap.put("null_value", null);
-            this.wrappedTypeMap.put(null, "null_key");
+        public SubObjectClass() {
+            this.nullValue = null;
 
-            this.wrappedTypeMap.put("object_value", new WrapListElementTest.TestElement());
-            this.wrappedTypeMap.put(new WrapListElementTest.TestElement(), "object_key");
+            this.stringValue = "sub_object_string_value" + System.currentTimeMillis();
+            this.intValue = RANDOM.nextInt();
+            this.integerValue = RANDOM.nextInt();
+        }
+    }
+
+    public static class ObjectClass {
+        private Object nullValue;
+
+        private SubObjectClass subObjectValue1;
+        private SubObjectClass subObjectValue2;
+
+        public ObjectClass() {
+            this.nullValue = null;
+
+            this.subObjectValue1 = new SubObjectClass();
+            this.subObjectValue2 = new SubObjectClass();
         }
     }
 
     @Test
-    public void testWithWrapMapTransformer() throws SerializeException, DeserializeException, OpackAssert.AssertException {
-        this.common(true);
-    }
-
-    @Test
-    public void testWithNoWrapMapTransformer() {
-        Assertions.assertThrows(OpackAssert.AssertException.class, () -> {
-            this.common(false);
-        });
-    }
-
-    private void common(boolean enableWrapMapElementType) throws SerializeException, DeserializeException, OpackAssert.AssertException {
-        Opacker opacker = new Opacker.Builder().setEnableWrapMapElementType(enableWrapMapElementType).create();
-        WrapMapClass originalObject = new WrapMapClass();
+    public void test() throws SerializeException, DeserializeException, OpackAssert.AssertException {
+        Opacker opacker = new Opacker.Builder().create();
+        ObjectClass originalObject = new ObjectClass();
 
         OpackValue serialized = opacker.serialize(originalObject);
-        WrapMapClass deserialized = opacker.deserialize(WrapMapClass.class, serialized);
+        ObjectClass deserialized = opacker.deserialize(ObjectClass.class, serialized);
 
         OpackAssert.assertEquals(originalObject, deserialized);
     }

@@ -20,7 +20,7 @@
  * limitations under the License.
  */
 
-package com.realtimetech.opack.test.opacker;
+package com.realtimetech.opack.test.opacker.single;
 
 import com.realtimetech.opack.Opacker;
 import com.realtimetech.opack.exception.DeserializeException;
@@ -30,35 +30,49 @@ import com.realtimetech.opack.value.OpackValue;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class RecursiveLoopTest {
-    public static class RecursiveClass {
-        private RecursiveClass recursiveClass;
+import java.util.Random;
 
-        public RecursiveClass() {
-        }
+public class PrimitiveTest {
+    static final Random RANDOM = new Random();
 
-        public void setRecursiveClass(RecursiveClass recursiveClass) {
-            this.recursiveClass = recursiveClass;
+    public static class PrimitiveClass {
+        private boolean booleanValue;
+
+        private byte byteValue;
+        private char charValue;
+
+        private short shortValue;
+
+        private int intValue;
+        private float floatValue;
+
+        private double doubleValue;
+        private long longValue;
+
+        public PrimitiveClass() {
+            this.booleanValue = RANDOM.nextBoolean();
+
+            this.byteValue = (byte) RANDOM.nextInt();
+            this.charValue = (char) RANDOM.nextInt();
+
+            this.shortValue = (short) RANDOM.nextInt();
+
+            this.intValue = RANDOM.nextInt();
+            this.floatValue = RANDOM.nextFloat();
+
+            this.doubleValue = RANDOM.nextDouble();
+            this.longValue = RANDOM.nextLong();
         }
     }
 
     @Test
     public void test() throws SerializeException, DeserializeException, OpackAssert.AssertException {
-        Opacker opacker = new Opacker.Builder()
-                .setEnableConvertRecursiveDependencyToNull(false)
-                .create();
-        RecursiveClass originalObjectA = new RecursiveClass();
-        RecursiveClass originalObjectB = new RecursiveClass();
+        Opacker opacker = new Opacker.Builder().create();
+        PrimitiveClass originalObject = new PrimitiveClass();
 
-        originalObjectA.setRecursiveClass(originalObjectB);
-        originalObjectB.setRecursiveClass(originalObjectA);
+        OpackValue serialized = opacker.serialize(originalObject);
+        PrimitiveClass deserialized = opacker.deserialize(PrimitiveClass.class, serialized);
 
-        try {
-            OpackValue serialized = opacker.serialize(originalObjectA);
-
-            Assertions.fail("Not detected recursive dependency.");
-        } catch (SerializeException exception) {
-            // Ok!
-        }
+        OpackAssert.assertEquals(originalObject, deserialized);
     }
 }

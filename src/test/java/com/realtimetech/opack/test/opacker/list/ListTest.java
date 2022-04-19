@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 REALTIMETECH All Rights Reserved
+ * Copyright (C) 2022 REALTIMETECH All Rights Reserved
  *
  * Licensed either under the Apache License, Version 2.0, or (at your option)
  * under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
  * limitations under the License.
  */
 
-package com.realtimetech.opack.test.opacker;
+package com.realtimetech.opack.test.opacker.list;
 
 import com.realtimetech.opack.Opacker;
 import com.realtimetech.opack.annotation.Type;
@@ -30,39 +30,41 @@ import com.realtimetech.opack.test.OpackAssert;
 import com.realtimetech.opack.value.OpackValue;
 import org.junit.jupiter.api.Test;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
-public class MapTest {
-    public static class MapClass {
-        private HashMap<String, String> hashMapValue;
+public class ListTest {
+    public static class ListClass {
+        private LinkedList<String> linkedListValue;
 
-        @Type(HashMap.class)
-        private Map<String, String> mapValue;
+        @Type(ArrayList.class)
+        private List<String> arrayListValue;
 
-        public MapClass() {
-            this.hashMapValue = new HashMap<>();
-            this.hashMapValue.put("hash_map_key_1", "hash_map_value_1");
-            this.hashMapValue.put("hash_map_key_2", "hash_map_value_2");
-            this.hashMapValue.put("hash_map_key_3", "hash_map_value_3");
-            this.hashMapValue.put("hash_map_key_4", "hash_map_value_4");
-            this.hashMapValue.put("hash_map_key_5", "hash_map_value_5");
+        public ListClass() {
+            this.linkedListValue = new LinkedList<>();
+            this.linkedListValue.add("linked_list_value_1");
+            this.linkedListValue.add("linked_list_value_2");
+            this.linkedListValue.add("linked_list_value_3");
+            this.linkedListValue.add("linked_list_value_4");
+            this.linkedListValue.add("linked_list_value_5");
 
-            this.mapValue = new HashMap<>();
-            this.mapValue.put("map_key_1", "map_value_1");
-            this.mapValue.put("map_key_2", "map_value_2");
-            this.mapValue.put("map_key_3", "map_value_3");
-            this.mapValue.put("map_key_4", "map_value_4");
-            this.mapValue.put("map_key_5", "map_value_5");
+            this.arrayListValue = new ArrayList<>();
+            this.arrayListValue.add("array_list_value_1");
+            this.arrayListValue.add("array_list_value_2");
+            this.arrayListValue.add("array_list_value_3");
+            this.arrayListValue.add("array_list_value_4");
+            this.arrayListValue.add("array_list_value_5");
         }
     }
 
     @Test
     public void test() throws SerializeException, DeserializeException, OpackAssert.AssertException {
         Opacker opacker = new Opacker.Builder().create();
-        MapClass originalObject = new MapClass();
+        ListClass originalObject = new ListClass();
 
         OpackValue serialized = opacker.serialize(originalObject);
-        MapClass deserialized = opacker.deserialize(MapClass.class, serialized);
+        ListClass deserialized = opacker.deserialize(ListClass.class, serialized);
 
         OpackAssert.assertEquals(originalObject, deserialized);
     }

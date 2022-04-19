@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 REALTIMETECH All Rights Reserved
+ * Copyright (C) 2022 REALTIMETECH All Rights Reserved
  *
  * Licensed either under the Apache License, Version 2.0, or (at your option)
  * under the terms of the GNU General Public License as published by
@@ -20,40 +20,53 @@
  * limitations under the License.
  */
 
-package com.realtimetech.opack.test.opacker;
+package com.realtimetech.opack.test.opacker.array;
 
 import com.realtimetech.opack.Opacker;
-import com.realtimetech.opack.annotation.Ignore;
 import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.test.OpackAssert;
+import com.realtimetech.opack.test.opacker.single.ObjectTest;
 import com.realtimetech.opack.value.OpackValue;
 import org.junit.jupiter.api.Test;
 
-public class IgnoreFieldTest {
-    public static class IgnoreFieldTestClass {
-        @Ignore
-        private String ignoredField;
-        private String notIgnoredField;
+import java.util.Random;
 
-        public IgnoreFieldTestClass() {
-            this.ignoredField = "This is ignored field";
-            this.notIgnoredField = "This is not ignored field";
+public class ObjectArrayTest {
+    static final Random RANDOM = new Random();
+
+    public static class ObjectArrayClass {
+        private Object nullValue;
+
+        private ObjectTest.SubObjectClass[] subObjectArrayValue;
+        private ObjectTest.SubObjectClass[] subObjectArrayWithNullValue;
+
+        public ObjectArrayClass() {
+            this.nullValue = null;
+            int length = RANDOM.nextInt(5) + 5;
+
+            this.subObjectArrayValue = new ObjectTest.SubObjectClass[length];
+            for (int index = 0; index < length; index++) {
+                this.subObjectArrayValue[index] = new ObjectTest.SubObjectClass();
+            }
+
+            this.subObjectArrayWithNullValue = new ObjectTest.SubObjectClass[length];
+            for (int index = 0; index < length; index++) {
+                this.subObjectArrayWithNullValue[index] = new ObjectTest.SubObjectClass();
+            }
+
+            this.subObjectArrayWithNullValue[RANDOM.nextInt(length)] = null;
         }
     }
 
     @Test
     public void test() throws SerializeException, DeserializeException, OpackAssert.AssertException {
         Opacker opacker = new Opacker.Builder().create();
-        IgnoreFieldTestClass originalObject = new IgnoreFieldTestClass();
+        ObjectArrayClass originalObject = new ObjectArrayClass();
 
         OpackValue serialized = opacker.serialize(originalObject);
-        IgnoreFieldTestClass deserialized = opacker.deserialize(IgnoreFieldTestClass.class, serialized);
+        ObjectArrayClass deserialized = opacker.deserialize(ObjectArrayClass.class, serialized);
 
         OpackAssert.assertEquals(originalObject, deserialized);
-
-        if (deserialized.ignoredField != null) {
-            throw new OpackAssert.AssertException("The IgnoreFieldTestClass.ignoredField field was not ignored.");
-        }
     }
 }

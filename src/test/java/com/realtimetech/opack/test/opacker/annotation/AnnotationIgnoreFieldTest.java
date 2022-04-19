@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 REALTIMETECH All Rights Reserved
+ * Copyright (C) 2022 REALTIMETECH All Rights Reserved
  *
  * Licensed either under the Apache License, Version 2.0, or (at your option)
  * under the terms of the GNU General Public License as published by
@@ -20,59 +20,40 @@
  * limitations under the License.
  */
 
-package com.realtimetech.opack.test.opacker;
+package com.realtimetech.opack.test.opacker.annotation;
 
 import com.realtimetech.opack.Opacker;
+import com.realtimetech.opack.annotation.Ignore;
 import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.test.OpackAssert;
 import com.realtimetech.opack.value.OpackValue;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.Random;
+public class AnnotationIgnoreFieldTest {
+    public static class IgnoreFieldTestClass {
+        @Ignore
+        private String ignoredField;
+        private String notIgnoredField;
 
-public class PrimitiveTest {
-    static final Random RANDOM = new Random();
-
-    public static class PrimitiveClass {
-        private boolean booleanValue;
-
-        private byte byteValue;
-        private char charValue;
-
-        private short shortValue;
-
-        private int intValue;
-        private float floatValue;
-
-        private double doubleValue;
-        private long longValue;
-
-        public PrimitiveClass() {
-            this.booleanValue = RANDOM.nextBoolean();
-
-            this.byteValue = (byte) RANDOM.nextInt();
-            this.charValue = (char) RANDOM.nextInt();
-
-            this.shortValue = (short) RANDOM.nextInt();
-
-            this.intValue = RANDOM.nextInt();
-            this.floatValue = RANDOM.nextFloat();
-
-            this.doubleValue = RANDOM.nextDouble();
-            this.longValue = RANDOM.nextLong();
+        public IgnoreFieldTestClass() {
+            this.ignoredField = "This is ignored field";
+            this.notIgnoredField = "This is not ignored field";
         }
     }
 
     @Test
     public void test() throws SerializeException, DeserializeException, OpackAssert.AssertException {
         Opacker opacker = new Opacker.Builder().create();
-        PrimitiveClass originalObject = new PrimitiveClass();
+        IgnoreFieldTestClass originalObject = new IgnoreFieldTestClass();
 
         OpackValue serialized = opacker.serialize(originalObject);
-        PrimitiveClass deserialized = opacker.deserialize(PrimitiveClass.class, serialized);
+        IgnoreFieldTestClass deserialized = opacker.deserialize(IgnoreFieldTestClass.class, serialized);
 
         OpackAssert.assertEquals(originalObject, deserialized);
+
+        if (deserialized.ignoredField != null) {
+            throw new OpackAssert.AssertException("The IgnoreFieldTestClass.ignoredField field was not ignored.");
+        }
     }
 }

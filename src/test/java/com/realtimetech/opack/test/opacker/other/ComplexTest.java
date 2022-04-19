@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 REALTIMETECH All Rights Reserved
+ * Copyright (C) 2022 REALTIMETECH All Rights Reserved
  *
  * Licensed either under the Apache License, Version 2.0, or (at your option)
  * under the terms of the GNU General Public License as published by
@@ -20,12 +20,22 @@
  * limitations under the License.
  */
 
-package com.realtimetech.opack.test.opacker;
+package com.realtimetech.opack.test.opacker.other;
 
 import com.realtimetech.opack.Opacker;
 import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.test.OpackAssert;
+import com.realtimetech.opack.test.opacker.single.ObjectTest;
+import com.realtimetech.opack.test.opacker.single.PrimitiveTest;
+import com.realtimetech.opack.test.opacker.single.StringTest;
+import com.realtimetech.opack.test.opacker.single.WrapperTest;
+import com.realtimetech.opack.test.opacker.annotation.AnnotationTypeObjectTest;
+import com.realtimetech.opack.test.opacker.array.PrimitiveArrayTest;
+import com.realtimetech.opack.test.opacker.array.WrapperArrayTest;
+import com.realtimetech.opack.test.opacker.list.ListTest;
+import com.realtimetech.opack.test.opacker.transform.TransformClassTest;
+import com.realtimetech.opack.test.opacker.transform.TransformFieldTest;
 import com.realtimetech.opack.value.OpackValue;
 import org.junit.jupiter.api.Test;
 
@@ -53,17 +63,17 @@ public class ComplexTest {
         private ObjectTest.ObjectClass objectClassValue;
         private ObjectTest.ObjectClass[] objectClassArrayValue;
 
-        private ExplicitObjectTest.ExplicitObjectClass explicitObjectClassValue;
-        private ExplicitObjectTest.ExplicitObjectClass[] explicitObjectClassArrayValue;
+        private AnnotationTypeObjectTest.ExplicitObjectClass explicitObjectClassValue;
+        private AnnotationTypeObjectTest.ExplicitObjectClass[] explicitObjectClassArrayValue;
 
         private ListTest.ListClass listClassValue;
         private ListTest.ListClass[] listClassArrayValue;
 
-        private FieldTransformTest.FieldTransformClass fieldTransformClassValue;
-        private FieldTransformTest.FieldTransformClass[] fieldTransformClassArrayValue;
+        private TransformFieldTest.FieldTransformClass fieldTransformClassValue;
+        private TransformFieldTest.FieldTransformClass[] fieldTransformClassArrayValue;
 
-        private ClassTransformTest.ClassTransformClass classTransformClassValue;
-        private ClassTransformTest.ClassTransformClass[] classTransformClassArrayValue;
+        private TransformClassTest.ClassTransformClass classTransformClassValue;
+        private TransformClassTest.ClassTransformClass[] classTransformClassArrayValue;
 
         public ComplexClass() {
             int length = RANDOM.nextInt(5) + 5;
@@ -104,10 +114,10 @@ public class ComplexTest {
                 this.objectClassArrayValue[index] = new ObjectTest.ObjectClass();
             }
 
-            this.explicitObjectClassValue = new ExplicitObjectTest.ExplicitObjectClass();
-            this.explicitObjectClassArrayValue = new ExplicitObjectTest.ExplicitObjectClass[length];
+            this.explicitObjectClassValue = new AnnotationTypeObjectTest.ExplicitObjectClass();
+            this.explicitObjectClassArrayValue = new AnnotationTypeObjectTest.ExplicitObjectClass[length];
             for (int index = 0; index < length; index++) {
-                this.explicitObjectClassArrayValue[index] = new ExplicitObjectTest.ExplicitObjectClass();
+                this.explicitObjectClassArrayValue[index] = new AnnotationTypeObjectTest.ExplicitObjectClass();
             }
 
             this.listClassValue = new ListTest.ListClass();
@@ -116,16 +126,16 @@ public class ComplexTest {
                 this.listClassArrayValue[index] = new ListTest.ListClass();
             }
 
-            this.fieldTransformClassValue = new FieldTransformTest.FieldTransformClass();
-            this.fieldTransformClassArrayValue = new FieldTransformTest.FieldTransformClass[length];
+            this.fieldTransformClassValue = new TransformFieldTest.FieldTransformClass();
+            this.fieldTransformClassArrayValue = new TransformFieldTest.FieldTransformClass[length];
             for (int index = 0; index < length; index++) {
-                this.fieldTransformClassArrayValue[index] = new FieldTransformTest.FieldTransformClass();
+                this.fieldTransformClassArrayValue[index] = new TransformFieldTest.FieldTransformClass();
             }
 
-            this.classTransformClassValue = new ClassTransformTest.ClassTransformClass();
-            this.classTransformClassArrayValue = new ClassTransformTest.ClassTransformClass[length];
+            this.classTransformClassValue = new TransformClassTest.ClassTransformClass();
+            this.classTransformClassArrayValue = new TransformClassTest.ClassTransformClass[length];
             for (int index = 0; index < length; index++) {
-                this.classTransformClassArrayValue[index] = new ClassTransformTest.ClassTransformClass();
+                this.classTransformClassArrayValue[index] = new TransformClassTest.ClassTransformClass();
             }
         }
     }

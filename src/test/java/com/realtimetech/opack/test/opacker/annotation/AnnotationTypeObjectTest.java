@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 REALTIMETECH All Rights Reserved
+ * Copyright (C) 2022 REALTIMETECH All Rights Reserved
  *
  * Licensed either under the Apache License, Version 2.0, or (at your option)
  * under the terms of the GNU General Public License as published by
@@ -20,51 +20,52 @@
  * limitations under the License.
  */
 
-package com.realtimetech.opack.test.opacker;
+package com.realtimetech.opack.test.opacker.annotation;
 
 import com.realtimetech.opack.Opacker;
 import com.realtimetech.opack.annotation.Type;
 import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.test.OpackAssert;
+import com.realtimetech.opack.test.opacker.single.ObjectTest;
 import com.realtimetech.opack.value.OpackValue;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.lang.reflect.Array;
+import java.util.Random;
 
-public class ListTest {
-    public static class ListClass {
-        private LinkedList<String> linkedListValue;
+public class AnnotationTypeObjectTest {
+    static final Random RANDOM = new Random();
 
-        @Type(ArrayList.class)
-        private List<String> arrayListValue;
+    public static class ExplicitObjectClass {
+        private Object nullValue;
 
-        public ListClass() {
-            this.linkedListValue = new LinkedList<>();
-            this.linkedListValue.add("linked_list_value_1");
-            this.linkedListValue.add("linked_list_value_2");
-            this.linkedListValue.add("linked_list_value_3");
-            this.linkedListValue.add("linked_list_value_4");
-            this.linkedListValue.add("linked_list_value_5");
+        @Type(ObjectTest.SubObjectClass[].class)
+        private Object subObjectArrayValue;
 
-            this.arrayListValue = new ArrayList<>();
-            this.arrayListValue.add("array_list_value_1");
-            this.arrayListValue.add("array_list_value_2");
-            this.arrayListValue.add("array_list_value_3");
-            this.arrayListValue.add("array_list_value_4");
-            this.arrayListValue.add("array_list_value_5");
+        @Type(ObjectTest.SubObjectClass.class)
+        private Object subObjectWithExplicitValue;
+
+        public ExplicitObjectClass() {
+            this.nullValue = null;
+            int length = RANDOM.nextInt(5) + 5;
+
+            this.subObjectArrayValue = new ObjectTest.SubObjectClass[length];
+            for (int index = 0; index < length; index++) {
+                Array.set(this.subObjectArrayValue, index, new ObjectTest.SubObjectClass());
+            }
+
+            this.subObjectWithExplicitValue = new ObjectTest.SubObjectClass();
         }
     }
 
     @Test
     public void test() throws SerializeException, DeserializeException, OpackAssert.AssertException {
         Opacker opacker = new Opacker.Builder().create();
-        ListClass originalObject = new ListClass();
+        ExplicitObjectClass originalObject = new ExplicitObjectClass();
 
         OpackValue serialized = opacker.serialize(originalObject);
-        ListClass deserialized = opacker.deserialize(ListClass.class, serialized);
+        ExplicitObjectClass deserialized = opacker.deserialize(ExplicitObjectClass.class, serialized);
 
         OpackAssert.assertEquals(originalObject, deserialized);
     }
