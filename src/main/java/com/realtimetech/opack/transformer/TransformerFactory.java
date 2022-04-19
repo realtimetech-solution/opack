@@ -31,10 +31,10 @@ import java.util.HashMap;
 
 public class TransformerFactory {
     @NotNull
-    final Opacker opacker;
+    private final Opacker opacker;
 
     @NotNull
-    final HashMap<Class<? extends Transformer>, Transformer> transformerMap;
+    private final HashMap<Class<? extends Transformer>, Transformer> transformerMap;
 
     /**
      * Constructs a TransformerFactory with the opacker.

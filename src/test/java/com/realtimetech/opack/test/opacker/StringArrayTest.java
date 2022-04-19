@@ -56,5 +56,4 @@ public class StringArrayTest {
 
         OpackAssert.assertEquals(originalObject, deserialized);
     }
-
 }

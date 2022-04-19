@@ -89,5 +89,4 @@ public class WrapperTest {
 
         OpackAssert.assertEquals(originalObject, deserialized);
     }
-
 }

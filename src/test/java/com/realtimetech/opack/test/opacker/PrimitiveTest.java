@@ -75,5 +75,4 @@ public class PrimitiveTest {
 
         OpackAssert.assertEquals(originalObject, deserialized);
     }
-
 }

@@ -74,5 +74,4 @@ public class ObjectTest {
 
         OpackAssert.assertEquals(originalObject, deserialized);
     }
-
 }

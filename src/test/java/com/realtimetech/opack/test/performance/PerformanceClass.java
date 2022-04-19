@@ -22,6 +22,7 @@
 
 package com.realtimetech.opack.test.performance;
 
+import com.realtimetech.opack.annotation.SerializedName;
 import com.realtimetech.opack.test.opacker.*;
 
 import java.util.Random;

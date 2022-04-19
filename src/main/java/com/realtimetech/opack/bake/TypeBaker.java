@@ -25,6 +25,7 @@ package com.realtimetech.opack.bake;
 import com.realtimetech.opack.Opacker;
 import com.realtimetech.opack.annotation.ExplicitType;
 import com.realtimetech.opack.annotation.Ignore;
+import com.realtimetech.opack.annotation.SerializedName;
 import com.realtimetech.opack.annotation.Transform;
 import com.realtimetech.opack.exception.BakeException;
 import com.realtimetech.opack.transformer.Transformer;
@@ -40,8 +41,8 @@ import java.util.List;
 
 public class TypeBaker {
     static class PredefinedTransformer {
-        final Transformer transformer;
-        final boolean inheritable;
+        private final Transformer transformer;
+        private final boolean inheritable;
 
         /**
          * Constructs the PredefinedTransformer.
@@ -63,12 +64,12 @@ public class TypeBaker {
         }
     }
 
-    final @NotNull Opacker opacker;
+    private final @NotNull Opacker opacker;
 
-    final @NotNull TransformerFactory transformerFactory;
+    private final @NotNull TransformerFactory transformerFactory;
 
-    final @NotNull HashMap<Class<?>, BakedType> backedTypeMap;
-    final @NotNull HashMap<Class<?>, List<PredefinedTransformer>> predefinedTransformerMap;
+    private final @NotNull HashMap<Class<?>, BakedType> backedTypeMap;
+    private final @NotNull HashMap<Class<?>, List<PredefinedTransformer>> predefinedTransformerMap;
 
     /**
      * Constructs an TypeBaker with the opacker.
@@ -253,6 +254,21 @@ public class TypeBaker {
     }
 
     /**
+     * Returns the serialized type of specific element registered through {@link SerializedName SerializedName}.
+     *
+     * @param annotatedElement the element that annotated {@link ExplicitType ExplicitType}
+     * @return explicit type
+     */
+    String getSerializedName(AnnotatedElement annotatedElement) {
+        if (annotatedElement.isAnnotationPresent(SerializedName.class)) {
+            SerializedName explicit = annotatedElement.getAnnotation(SerializedName.class);
+            return explicit.value();
+        }
+
+        return null;
+    }
+
+    /**
      * Bake the class into {@link BakedType BakedType}.
      *
      * @param bakeType the type to bake
@@ -276,8 +292,10 @@ public class TypeBaker {
 
                 Transformer[] fieldTransformers = this.getTransformer(field);
                 Class<?> explicitType = this.getExplicitType(field);
+                String serializedName = this.getSerializedName(field);
+                String fieldName = serializedName == null ? field.getName() : serializedName;
 
-                properties.add(new BakedType.Property(field, fieldTransformers.length > 0 ? fieldTransformers[0] : null, explicitType));
+                properties.add(new BakedType.Property(field, fieldName, fieldTransformers.length > 0 ? fieldTransformers[0] : null, explicitType));
             }
 
             transformers = this.getTransformer(bakeType);

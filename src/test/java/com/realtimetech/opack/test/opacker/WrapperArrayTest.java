@@ -110,5 +110,4 @@ public class WrapperArrayTest {
 
         OpackAssert.assertEquals(originalObject, deserialized);
     }
-
 }

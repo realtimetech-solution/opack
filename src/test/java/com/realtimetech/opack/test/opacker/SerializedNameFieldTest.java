@@ -24,36 +24,31 @@ package com.realtimetech.opack.test.opacker;
 
 import com.realtimetech.opack.Opacker;
 import com.realtimetech.opack.annotation.Ignore;
+import com.realtimetech.opack.annotation.SerializedName;
 import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.test.OpackAssert;
 import com.realtimetech.opack.value.OpackValue;
 import org.junit.jupiter.api.Test;
 
-public class IgnoreFieldTest {
-    public static class IgnoreFieldTestClass {
-        @Ignore
-        private String ignoredField;
-        private String notIgnoredField;
+public class SerializedNameFieldTest {
+    public static class SerializedNameFieldTestClass {
+        @SerializedName("newName")
+        private String oldName;
 
-        public IgnoreFieldTestClass() {
-            this.ignoredField = "This is ignored field";
-            this.notIgnoredField = "This is not ignored field";
+        public SerializedNameFieldTestClass() {
+            this.oldName = "This is ignored field";
         }
     }
 
     @Test
     public void test() throws SerializeException, DeserializeException, OpackAssert.AssertException {
         Opacker opacker = new Opacker.Builder().create();
-        IgnoreFieldTestClass originalObject = new IgnoreFieldTestClass();
+        SerializedNameFieldTestClass originalObject = new SerializedNameFieldTestClass();
 
         OpackValue serialized = opacker.serialize(originalObject);
-        IgnoreFieldTestClass deserialized = opacker.deserialize(IgnoreFieldTestClass.class, serialized);
+        SerializedNameFieldTestClass deserialized = opacker.deserialize(SerializedNameFieldTestClass.class, serialized);
 
         OpackAssert.assertEquals(originalObject, deserialized);
-
-        if (deserialized.ignoredField != null) {
-            throw new OpackAssert.AssertException("The IgnoreFieldTestClass.ignoredField field was not ignored.");
-        }
     }
 }

@@ -42,7 +42,7 @@ public class ReflectionUtil {
         abstract <T> T allocate(Class<T> typeClass) throws InvocationTargetException, IllegalAccessException;
     }
 
-    static final Map<Class<?>, Class<?>> PRIMITIVES_WRAPPERS_MAP = Map.of(
+    private static final Map<Class<?>, Class<?>> PRIMITIVES_WRAPPERS_MAP = Map.of(
             boolean.class, Boolean.class,
 
             byte.class, Byte.class,
@@ -57,7 +57,7 @@ public class ReflectionUtil {
             long.class, Long.class
     );
 
-    static final Map<Class<?>, Class<?>> WRAPPERS_PRIMITIVES_MAP = Collections.unmodifiableMap(new HashMap<>() {
+    private static final Map<Class<?>, Class<?>> WRAPPERS_PRIMITIVES_MAP = Collections.unmodifiableMap(new HashMap<>() {
         {
             for (Class<?> primitiveType : PRIMITIVES_WRAPPERS_MAP.keySet()) {
                 Class<?> wrapperType = PRIMITIVES_WRAPPERS_MAP.get(primitiveType);
@@ -67,7 +67,7 @@ public class ReflectionUtil {
         }
     });
 
-    static final Allocator ALLOCATOR;
+    private static final Allocator ALLOCATOR;
 
     static {
         ALLOCATOR = ReflectionUtil.createAvailableAllocator();
@@ -81,7 +81,7 @@ public class ReflectionUtil {
      *
      * @return created unsafe allocator
      */
-    static Allocator createAvailableAllocator() {
+    private static Allocator createAvailableAllocator() {
         // for JVM
         try {
             Class<?> unsafeClass = Class.forName("sun.misc.Unsafe");

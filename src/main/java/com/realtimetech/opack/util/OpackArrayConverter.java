@@ -32,7 +32,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 public class OpackArrayConverter {
-    static final Method OPACK_ARRAY_GETTER_METHOD;
+    private static final Method OPACK_ARRAY_GETTER_METHOD;
 
     static {
         Method method;

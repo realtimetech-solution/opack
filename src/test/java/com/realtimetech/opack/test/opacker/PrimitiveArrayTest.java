@@ -103,5 +103,4 @@ public class PrimitiveArrayTest {
 
         OpackAssert.assertEquals(originalObject, deserialized);
     }
-
 }

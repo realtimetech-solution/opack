@@ -45,23 +45,16 @@ import java.util.List;
 
 public final class DenseCodec extends OpackCodec<Reader, Writer> {
     public final static class Builder {
-        int encodeOutputBufferInitialSize;
-        int encodeStackInitialSize;
-        int decodeStackInitialSize;
+        private int encodeStackInitialSize;
+        private int decodeStackInitialSize;
 
         boolean ignoreVersionCompare;
 
         public Builder() {
-            this.encodeOutputBufferInitialSize = 1024;
             this.encodeStackInitialSize = 128;
             this.decodeStackInitialSize = 128;
 
             this.ignoreVersionCompare = false;
-        }
-
-        public Builder setEncodeOutputBufferInitialSize(int encodeOutputBufferInitialSize) {
-            this.encodeOutputBufferInitialSize = encodeOutputBufferInitialSize;
-            return this;
         }
 
         public Builder setEncodeStackInitialSize(int encodeStackInitialSize) {
@@ -132,19 +125,19 @@ public final class DenseCodec extends OpackCodec<Reader, Writer> {
     private static final Object CONTEXT_NULL_OBJECT = new Object();
     private static final Object CONTEXT_BRANCH_CONTEXT_OBJECT = new Object();
 
-    final FastStack<Object> encodeStack;
+    private final FastStack<Object> encodeStack;
 
-    final FastStack<OpackValue> decodeStack;
-    final FastStack<Object[]> decodeContextStack;
+    private final FastStack<OpackValue> decodeStack;
+    private final FastStack<Object[]> decodeContextStack;
 
-    final boolean ignoreVersionCompare;
+    private final boolean ignoreVersionCompare;
 
     /**
      * Constructs the DenseCodec with the builder of DenseCodec.
      *
      * @param builder the builder of DenseCodec
      */
-    DenseCodec(Builder builder) {
+    private DenseCodec(Builder builder) {
         super();
 
         this.encodeStack = new FastStack<>(builder.encodeStackInitialSize);
@@ -154,7 +147,6 @@ public final class DenseCodec extends OpackCodec<Reader, Writer> {
 
         this.ignoreVersionCompare = builder.ignoreVersionCompare;
     }
-
 
     /**
      * Encodes the OpackValue to bytes through dense codec.

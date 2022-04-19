@@ -36,13 +36,13 @@ import java.io.Writer;
 
 public final class JsonCodec extends OpackCodec<String, Writer> {
     public final static class Builder {
-        int encodeStackInitialSize;
-        int encodeStringBufferSize;
-        int decodeStackInitialSize;
+        private int encodeStackInitialSize;
+        private int encodeStringBufferSize;
+        private int decodeStackInitialSize;
 
-        boolean allowOpackValueToKeyValue;
-        boolean enableConvertCharacterToString;
-        boolean usePrettyFormat;
+        private boolean allowOpackValueToKeyValue;
+        private boolean enableConvertCharacterToString;
+        private boolean usePrettyFormat;
 
         public Builder() {
             this.allowOpackValueToKeyValue = false;
@@ -131,24 +131,24 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
         CONST_REPLACEMENT_CHARACTERS['\f'] = new char[]{'\\', 'f'};
     }
 
-    final StringWriter encodeLiteralStringWriter;
-    final StringWriter encodeStringWriter;
-    final FastStack<Object> encodeStack;
+    private final StringWriter encodeLiteralStringWriter;
+    private final StringWriter encodeStringWriter;
+    private final FastStack<Object> encodeStack;
 
-    final FastStack<Integer> decodeBaseStack;
-    final FastStack<Object> decodeValueStack;
-    final StringWriter decodeStringWriter;
+    private final FastStack<Integer> decodeBaseStack;
+    private final FastStack<Object> decodeValueStack;
+    private final StringWriter decodeStringWriter;
 
-    final boolean allowOpackValueToKeyValue;
-    final boolean enableConvertCharacterToString;
-    final boolean usePrettyFormat;
+    private final boolean allowOpackValueToKeyValue;
+    private final boolean enableConvertCharacterToString;
+    private final boolean usePrettyFormat;
 
     /**
      * Constructs the JsonCodec with the builder of JsonCodec.
      *
      * @param builder the builder of JsonCodec
      */
-    JsonCodec(Builder builder) {
+    private JsonCodec(Builder builder) {
         super();
 
         this.encodeLiteralStringWriter = new StringWriter(builder.encodeStringBufferSize);

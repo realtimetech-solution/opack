@@ -48,13 +48,13 @@ import java.util.Map;
 
 public class Opacker {
     public static class Builder {
-        int valueStackInitialSize;
-        int contextStackInitialSize;
+        private int valueStackInitialSize;
+        private int contextStackInitialSize;
 
-        boolean enableWrapListElementType;
-        boolean enableWrapMapElementType;
-        boolean enableConvertEnumToOrdinal;
-        boolean enableConvertRecursiveDependencyToNull;
+        private boolean enableWrapListElementType;
+        private boolean enableWrapMapElementType;
+        private boolean enableConvertEnumToOrdinal;
+        private boolean enableConvertRecursiveDependencyToNull;
 
         public Builder() {
             this.valueStackInitialSize = 512;
@@ -110,15 +110,15 @@ public class Opacker {
         NONE, SERIALIZE, DESERIALIZE
     }
 
-    final @NotNull TypeBaker typeBaker;
+    private final @NotNull TypeBaker typeBaker;
 
-    final @NotNull FastStack<Object> objectStack;
-    final @NotNull FastStack<BakedType> typeStack;
-    final @NotNull FastStack<OpackValue> valueStack;
-    final @NotNull HashSet<Object> overlapSet;
+    private final @NotNull FastStack<Object> objectStack;
+    private final @NotNull FastStack<BakedType> typeStack;
+    private final @NotNull FastStack<OpackValue> valueStack;
+    private final @NotNull HashSet<Object> overlapSet;
 
-    final boolean enableConvertEnumToOrdinal;
-    final boolean enableConvertRecursiveDependencyToNull;
+    private final boolean enableConvertEnumToOrdinal;
+    private final boolean enableConvertRecursiveDependencyToNull;
 
     @NotNull State state;
 
@@ -128,7 +128,7 @@ public class Opacker {
      * @param builder the builder of Opacker
      * @throws IllegalStateException if the predefined transformer cannot be instanced
      */
-    Opacker(Builder builder) {
+    private Opacker(Builder builder) {
         this.typeBaker = new TypeBaker(this);
 
         this.objectStack = new FastStack<>(builder.contextStackInitialSize);
@@ -195,7 +195,7 @@ public class Opacker {
      * @return prepared opack value
      * @throws SerializeException if a problem occurs during serializing; if the baseType cannot be baked into {@link BakedType BakedType}
      */
-    Object prepareObjectSerialize(Class<?> baseType, Class<?> originalType, Object object) throws SerializeException {
+    private Object prepareObjectSerialize(Class<?> baseType, Class<?> originalType, Object object) throws SerializeException {
         if (baseType == null || originalType == null || object == null) {
             return null;
         }
@@ -287,7 +287,7 @@ public class Opacker {
      *
      * @throws SerializeException if a problem occurs during serializing; if the field in the class of instance to be serialized is not accessible
      */
-    void executeSerializeStack(int endOfStack) throws SerializeException {
+    private void executeSerializeStack(int endOfStack) throws SerializeException {
         while (this.objectStack.getSize() > endOfStack) {
             Object object = this.objectStack.pop();
             OpackValue opackValue = this.valueStack.pop();
@@ -319,6 +319,7 @@ public class Opacker {
                         }
 
                         Object serializedValue = this.prepareObjectSerialize(fieldType, originalType, element);
+
                         opackObject.put(property.getName(), serializedValue);
                     } catch (IllegalAccessException exception) {
                         throw new SerializeException("Can't get " + property.getName() + " field data in " + bakedType.getType().getSimpleName() + ".", exception);
@@ -467,7 +468,7 @@ public class Opacker {
      *
      * @throws DeserializeException if a problem occurs during deserializing; if the field in the class of instance to be deserialized is not accessible
      */
-    void executeDeserializeStack(int endOfStack) throws DeserializeException {
+    private void executeDeserializeStack(int endOfStack) throws DeserializeException {
         while (this.objectStack.getSize() > endOfStack) {
             Object object = this.objectStack.pop();
             OpackValue opackValue = this.valueStack.pop();
@@ -488,7 +489,7 @@ public class Opacker {
                 OpackObject<Object, Object> opackObject = (OpackObject<Object, Object>) opackValue;
                 for (BakedType.Property property : bakedType.getFields()) {
                     try {
-                        Object element = opackObject.get(property.getField().getName());
+                        Object element = opackObject.get(property.getName());
                         Class<?> fieldType = property.getType();
                         Class<?> actualFieldType = property.getField().getType();
 

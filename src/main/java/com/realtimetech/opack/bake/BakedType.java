@@ -24,44 +24,45 @@ package com.realtimetech.opack.bake;
 
 import com.realtimetech.opack.transformer.Transformer;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
 
 public class BakedType {
     public static class Property {
-        final Field field;
-        final String name;
-        final Class<?> type;
+        private final @NotNull Field field;
+        private final @NotNull String name;
+        private final @NotNull Class<?> type;
 
-        final Transformer transformer;
-        final Class<?> explicitType;
+        private final @Nullable Transformer transformer;
+        private final @Nullable Class<?> explicitType;
 
-        public Property(@NotNull Field field, Transformer transformer, Class<?> explicitType) {
+        public Property(@NotNull Field field, @NotNull String name, @Nullable Transformer transformer, @Nullable Class<?> explicitType) {
             this.field = field;
-            this.name = this.field.getName();
+            this.name = name;
             this.type = explicitType == null ? this.field.getType() : explicitType;
 
             this.transformer = transformer;
             this.explicitType = explicitType;
         }
 
-        public String getName() {
-            return name;
-        }
-
-        public Class<?> getType() {
-            return type;
-        }
-
-        public Field getField() {
+        public @NotNull Field getField() {
             return field;
         }
 
-        public Transformer getTransformer() {
+        public @NotNull String getName() {
+            return name;
+        }
+
+        public @NotNull Class<?> getType() {
+            return type;
+        }
+
+        public @Nullable Transformer getTransformer() {
             return transformer;
         }
 
-        public Class<?> getExplicitType() {
+        public @Nullable Class<?> getExplicitType() {
             return explicitType;
         }
 
@@ -76,6 +77,7 @@ public class BakedType {
             if (!this.field.canAccess(object)) {
                 this.field.setAccessible(true);
             }
+
             this.field.set(object, value);
         }
 
@@ -90,6 +92,7 @@ public class BakedType {
             if (!this.field.canAccess(object)) {
                 this.field.setAccessible(true);
             }
+
             return this.field.get(object);
         }
     }
