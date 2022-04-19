@@ -23,7 +23,7 @@
 package com.realtimetech.opack.test.opacker;
 
 import com.realtimetech.opack.Opacker;
-import com.realtimetech.opack.annotation.ExplicitType;
+import com.realtimetech.opack.annotation.Type;
 import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.test.OpackAssert;
@@ -39,10 +39,10 @@ public class ExplicitObjectTest {
     public static class ExplicitObjectClass {
         private Object nullValue;
 
-        @ExplicitType(type = ObjectTest.SubObjectClass[].class)
+        @Type(ObjectTest.SubObjectClass[].class)
         private Object subObjectArrayValue;
 
-        @ExplicitType(type = ObjectTest.SubObjectClass.class)
+        @Type(ObjectTest.SubObjectClass.class)
         private Object subObjectWithExplicitValue;
 
         public ExplicitObjectClass() {

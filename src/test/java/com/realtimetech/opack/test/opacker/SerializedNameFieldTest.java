@@ -23,8 +23,7 @@
 package com.realtimetech.opack.test.opacker;
 
 import com.realtimetech.opack.Opacker;
-import com.realtimetech.opack.annotation.Ignore;
-import com.realtimetech.opack.annotation.SerializedName;
+import com.realtimetech.opack.annotation.Name;
 import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.test.OpackAssert;
@@ -33,7 +32,7 @@ import org.junit.jupiter.api.Test;
 
 public class SerializedNameFieldTest {
     public static class SerializedNameFieldTestClass {
-        @SerializedName("newName")
+        @Name("newName")
         private String oldName;
 
         public SerializedNameFieldTestClass() {

@@ -35,15 +35,13 @@ public class BakedType {
         private final @NotNull Class<?> type;
 
         private final @Nullable Transformer transformer;
-        private final @Nullable Class<?> explicitType;
 
-        public Property(@NotNull Field field, @NotNull String name, @Nullable Transformer transformer, @Nullable Class<?> explicitType) {
+        public Property(@NotNull Field field, @Nullable String name, @Nullable Transformer transformer, @Nullable Class<?> type) {
             this.field = field;
-            this.name = name;
-            this.type = explicitType == null ? this.field.getType() : explicitType;
+            this.name = name == null ? this.field.getName() : name;
+            this.type = type == null ? this.field.getType() : type;
 
             this.transformer = transformer;
-            this.explicitType = explicitType;
         }
 
         public @NotNull Field getField() {
@@ -60,10 +58,6 @@ public class BakedType {
 
         public @Nullable Transformer getTransformer() {
             return transformer;
-        }
-
-        public @Nullable Class<?> getExplicitType() {
-            return explicitType;
         }
 
         /**

@@ -133,7 +133,7 @@ OpackValue decodedOpackValue2 = denseCodec.decode(inputStream);
 ```
 
 ### Advanced Usage
-#### 1. Ignore and ExplicitType
+#### 1. Ignore and ExplicitType and SerializedName
 ```java
 public class SomeObject {
     private String stringField;
@@ -148,8 +148,14 @@ public class SomeObject {
     /*
         This field is serialized/deserialized to explicit type `ArrayList` instead of ambiguous field type `List`
      */
-    @ExplicitType(type = ArrayList.class)
+    @Type(ArrayList.class)
     private List<String> listField;
+
+    /*
+        This field is serialized/deserialized to explicit type `ArrayList` instead of ambiguous field type `List`
+     */
+    @Name("newFieldName")
+    private String oldFieldName;
 }
 ```
 #### 2. Field Transformer

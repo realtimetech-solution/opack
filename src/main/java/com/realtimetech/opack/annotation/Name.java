@@ -22,23 +22,21 @@
 
 package com.realtimetech.opack.annotation;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Fields annotated with @ExplicitType(type=xxxx.class) will serialize and deserialize to explicit type instead of fields type.
+ * Fields annotated with @Name("new name") will be serialized and deserialized to name.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({
         ElementType.FIELD,
 })
-public @interface ExplicitType {
+public @interface Name {
     /**
-     * @return the explicit type
+     * @return returns name to be serialized/deserialized
      */
-    @NotNull Class<?> type();
+    String value();
 }

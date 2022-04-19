@@ -23,7 +23,7 @@
 package com.realtimetech.opack.test.opacker;
 
 import com.realtimetech.opack.Opacker;
-import com.realtimetech.opack.annotation.ExplicitType;
+import com.realtimetech.opack.annotation.Type;
 import com.realtimetech.opack.annotation.Transform;
 import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
@@ -130,16 +130,16 @@ public class ClassTransformTest {
     public static class ClassTransformClass {
         private ClassTransformInheritable classTransformInheritableValue;
         private ClassTransformInheritableChild classTransformInheritableChildValue;
-        @ExplicitType(type = ClassTransformInheritable.class)
+        @Type(ClassTransformInheritable.class)
         private Object explicitClassTransformInheritableValue;
-        @ExplicitType(type = ClassTransformInheritableChild.class)
+        @Type(ClassTransformInheritableChild.class)
         private Object explicitClassTransformInheritableChildValue;
 
         private ClassTransformNoInheritable classTransformNoInheritableValue;
         private ClassTransformNoInheritableChild classTransformNoInheritableChildValue;
-        @ExplicitType(type = ClassTransformNoInheritable.class)
+        @Type(ClassTransformNoInheritable.class)
         private Object explicitClassTransformNoInheritableValue;
-        @ExplicitType(type = ClassTransformNoInheritableChild.class)
+        @Type(ClassTransformNoInheritableChild.class)
         private Object explicitClassTransformNoInheritableChildValue;
 
         public ClassTransformClass() {

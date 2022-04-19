@@ -22,21 +22,23 @@
 
 package com.realtimetech.opack.annotation;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Fields annotated with @Ignore will not be serialized and deserialized.
+ * Fields annotated with @Type(type=xxxx.class) will serialize and deserialize to explicit type instead of fields type.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({
         ElementType.FIELD,
 })
-public @interface SerializedName {
+public @interface Type {
     /**
-     * @return returns name to be serialized/deserialized
+     * @return the explicit type
      */
-    String value();
+    @NotNull Class<?> value();
 }

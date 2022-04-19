@@ -23,9 +23,9 @@
 package com.realtimetech.opack.bake;
 
 import com.realtimetech.opack.Opacker;
-import com.realtimetech.opack.annotation.ExplicitType;
+import com.realtimetech.opack.annotation.Type;
 import com.realtimetech.opack.annotation.Ignore;
-import com.realtimetech.opack.annotation.SerializedName;
+import com.realtimetech.opack.annotation.Name;
 import com.realtimetech.opack.annotation.Transform;
 import com.realtimetech.opack.exception.BakeException;
 import com.realtimetech.opack.transformer.Transformer;
@@ -180,7 +180,7 @@ public class TypeBaker {
      * @param root             whether the element is not super class (whether the element is the root)
      * @throws BakeException if transformer class object cannot be instantiated
      */
-    void addTransformer(List<Transformer> transformers, AnnotatedElement annotatedElement, boolean root) throws BakeException {
+    private void addTransformer(List<Transformer> transformers, AnnotatedElement annotatedElement, boolean root) throws BakeException {
         if (annotatedElement instanceof Class) {
             Class<?> elementType = (Class<?>) annotatedElement;
             Class<?> superType = elementType.getSuperclass();
@@ -232,37 +232,37 @@ public class TypeBaker {
      * @return transformers
      * @throws BakeException if transformer class object cannot be instantiated
      */
-    Transformer[] getTransformer(AnnotatedElement annotatedElement) throws BakeException {
+    private Transformer[] getTransformer(AnnotatedElement annotatedElement) throws BakeException {
         List<Transformer> transformers = new LinkedList<>();
         this.addTransformer(transformers, annotatedElement, true);
         return transformers.toArray(new Transformer[0]);
     }
 
     /**
-     * Returns the explicit type of specific element registered through {@link ExplicitType ExplicitType}.
+     * Returns the explicit type of specific element registered through {@link Type ExplicitType}.
      *
-     * @param annotatedElement the element that annotated {@link ExplicitType ExplicitType}
-     * @return explicit type
+     * @param annotatedElement the element that annotated {@link Type ExplicitType}
+     * @return returns annotated type
      */
-    Class<?> getExplicitType(AnnotatedElement annotatedElement) {
-        if (annotatedElement.isAnnotationPresent(ExplicitType.class)) {
-            ExplicitType explicit = annotatedElement.getAnnotation(ExplicitType.class);
-            return explicit.type();
+    private Class<?> getAnnotatedType(AnnotatedElement annotatedElement) {
+        if (annotatedElement.isAnnotationPresent(Type.class)) {
+            Type type = annotatedElement.getAnnotation(Type.class);
+            return type.value();
         }
 
         return null;
     }
 
     /**
-     * Returns the serialized type of specific element registered through {@link SerializedName SerializedName}.
+     * Returns the serialized type of specific element registered through {@link Name SerializedName}.
      *
-     * @param annotatedElement the element that annotated {@link ExplicitType ExplicitType}
-     * @return explicit type
+     * @param annotatedElement the element that annotated {@link Type ExplicitType}
+     * @return returns annotated type
      */
-    String getSerializedName(AnnotatedElement annotatedElement) {
-        if (annotatedElement.isAnnotationPresent(SerializedName.class)) {
-            SerializedName explicit = annotatedElement.getAnnotation(SerializedName.class);
-            return explicit.value();
+    private String getAnnotatedName(AnnotatedElement annotatedElement) {
+        if (annotatedElement.isAnnotationPresent(Name.class)) {
+            Name name = annotatedElement.getAnnotation(Name.class);
+            return name.value();
         }
 
         return null;
@@ -275,7 +275,7 @@ public class TypeBaker {
      * @return baked type info
      * @throws BakeException if a problem occurs during baking a class into {@link BakedType BakedType}
      */
-    @NotNull BakedType bake(@NotNull Class<?> bakeType) throws BakeException {
+    private @NotNull BakedType bake(@NotNull Class<?> bakeType) throws BakeException {
         List<BakedType.Property> properties = new LinkedList<>();
         Transformer[] transformers = new Transformer[0];
 
@@ -291,11 +291,10 @@ public class TypeBaker {
                 }
 
                 Transformer[] fieldTransformers = this.getTransformer(field);
-                Class<?> explicitType = this.getExplicitType(field);
-                String serializedName = this.getSerializedName(field);
-                String fieldName = serializedName == null ? field.getName() : serializedName;
+                Class<?> type = this.getAnnotatedType(field);
+                String name = this.getAnnotatedName(field);
 
-                properties.add(new BakedType.Property(field, fieldName, fieldTransformers.length > 0 ? fieldTransformers[0] : null, explicitType));
+                properties.add(new BakedType.Property(field, name, fieldTransformers.length > 0 ? fieldTransformers[0] : null, type));
             }
 
             transformers = this.getTransformer(bakeType);

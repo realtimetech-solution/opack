@@ -23,7 +23,7 @@
 package com.realtimetech.opack.test.opacker;
 
 import com.realtimetech.opack.Opacker;
-import com.realtimetech.opack.annotation.ExplicitType;
+import com.realtimetech.opack.annotation.Type;
 import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.test.OpackAssert;
@@ -38,7 +38,7 @@ public class ListTest {
     public static class ListClass {
         private LinkedList<String> linkedListValue;
 
-        @ExplicitType(type = ArrayList.class)
+        @Type(ArrayList.class)
         private List<String> arrayListValue;
 
         public ListClass() {
