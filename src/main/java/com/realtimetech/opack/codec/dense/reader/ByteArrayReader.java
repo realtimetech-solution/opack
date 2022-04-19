@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 REALTIMETECH All Rights Reserved
+ * Copyright (C) 2022 REALTIMETECH All Rights Reserved
  *
  * Licensed either under the Apache License, Version 2.0, or (at your option)
  * under the terms of the GNU General Public License as published by
@@ -20,21 +20,36 @@
  * limitations under the License.
  */
 
-package com.realtimetech.opack.codec.dense;
+package com.realtimetech.opack.codec.dense.reader;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.io.InputStream;
 
-class DenseReader {
-    private final InputStream inputStream;
+public class ByteArrayReader implements Reader {
+    private final byte @NotNull [] bytes;
+
+    private int currentIndex;
 
     /**
-     * Constructs the DenseReader.
+     * Constructs a ByteArrayWriter
      *
-     * @param inputStream an InputStream
+     * @param bytes the bytes
      */
-    public DenseReader(InputStream inputStream) {
-        this.inputStream = inputStream;
+    public ByteArrayReader(byte @NotNull [] bytes) {
+        this.bytes = bytes;
+        this.currentIndex = 0;
+    }
+
+    /**
+     * Assert size
+     *
+     * @param size the size to be read
+     */
+    private void assertSize(int size) throws IOException {
+        if (this.currentIndex + size > this.bytes.length) {
+            throw new IOException("Reached end of array.");
+        }
     }
 
     /**
@@ -45,7 +60,9 @@ class DenseReader {
      * @throws IOException if an I/O exception occurs
      */
     public int readByte() throws IOException {
-        return this.inputStream.read();
+        this.assertSize(1);
+
+        return this.bytes[this.currentIndex++];
     }
 
     /**
@@ -55,8 +72,13 @@ class DenseReader {
      * @throws IOException if an I/O exception occurs
      */
     public char readChar() throws IOException {
-        return (char) (((this.inputStream.read() & 0xFF) << 8) |
-                ((this.inputStream.read() & 0xFF) << 0));
+        this.assertSize(2);
+
+        byte byte1 = this.bytes[this.currentIndex++];
+        byte byte2 = this.bytes[this.currentIndex++];
+
+        return (char) (((byte1 & 0xFF) << 8) |
+                ((byte2 & 0xFF) << 0));
     }
 
     /**
@@ -66,8 +88,13 @@ class DenseReader {
      * @throws IOException if an I/O exception occurs
      */
     public short readShort() throws IOException {
-        return (short) (((this.inputStream.read() & 0xFF) << 8) |
-                ((this.inputStream.read() & 0xFF) << 0));
+        this.assertSize(2);
+
+        byte byte1 = this.bytes[this.currentIndex++];
+        byte byte2 = this.bytes[this.currentIndex++];
+
+        return (short) (((byte1 & 0xFF) << 8) |
+                ((byte2 & 0xFF) << 0));
     }
 
     /**
@@ -77,10 +104,17 @@ class DenseReader {
      * @throws IOException if an I/O exception occurs
      */
     public int readInt() throws IOException {
-        return (((this.inputStream.read() & 0xFF) << 24) |
-                ((this.inputStream.read() & 0xFF) << 16) |
-                ((this.inputStream.read() & 0xFF) << 8) |
-                ((this.inputStream.read() & 0xFF) << 0));
+        this.assertSize(4);
+
+        byte byte1 = this.bytes[this.currentIndex++];
+        byte byte2 = this.bytes[this.currentIndex++];
+        byte byte3 = this.bytes[this.currentIndex++];
+        byte byte4 = this.bytes[this.currentIndex++];
+
+        return ((byte1 & 0xFF) << 24) |
+                ((byte2 & 0xFF) << 16) |
+                ((byte3 & 0xFF) << 8) |
+                ((byte4 & 0xFF) << 0);
     }
 
     /**
@@ -100,14 +134,25 @@ class DenseReader {
      * @throws IOException if an I/O exception occurs
      */
     public long readLong() throws IOException {
-        return ((((long) this.inputStream.read() & 0xFF) << 56) |
-                (((long) this.inputStream.read() & 0xFF) << 48) |
-                (((long) this.inputStream.read() & 0xFF) << 40) |
-                (((long) this.inputStream.read() & 0xFF) << 32) |
-                (((long) this.inputStream.read() & 0xFF) << 24) |
-                (((long) this.inputStream.read() & 0xFF) << 16) |
-                (((long) this.inputStream.read() & 0xFF) << 8) |
-                (((long) this.inputStream.read() & 0xFF) << 0));
+        this.assertSize(8);
+
+        byte byte1 = this.bytes[this.currentIndex++];
+        byte byte2 = this.bytes[this.currentIndex++];
+        byte byte3 = this.bytes[this.currentIndex++];
+        byte byte4 = this.bytes[this.currentIndex++];
+        byte byte5 = this.bytes[this.currentIndex++];
+        byte byte6 = this.bytes[this.currentIndex++];
+        byte byte7 = this.bytes[this.currentIndex++];
+        byte byte8 = this.bytes[this.currentIndex++];
+
+        return ((((long) byte1 & 0xFF) << 56) |
+                (((long) byte2 & 0xFF) << 48) |
+                (((long) byte3 & 0xFF) << 40) |
+                (((long) byte4 & 0xFF) << 32) |
+                (((long) byte5 & 0xFF) << 24) |
+                (((long) byte6 & 0xFF) << 16) |
+                (((long) byte7 & 0xFF) << 8) |
+                (((long) byte8 & 0xFF) << 0));
     }
 
     /**
@@ -127,6 +172,10 @@ class DenseReader {
      * @throws IOException if an I/O exception occurs
      */
     public void readBytes(byte[] bytes) throws IOException {
-        this.inputStream.readNBytes(bytes, 0, bytes.length);
+        this.assertSize(bytes.length);
+
+        System.arraycopy(this.bytes, this.currentIndex, bytes, 0, bytes.length);
+
+        this.currentIndex += bytes.length;
     }
 }

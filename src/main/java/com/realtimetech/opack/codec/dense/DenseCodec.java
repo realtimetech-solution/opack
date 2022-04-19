@@ -23,6 +23,10 @@
 package com.realtimetech.opack.codec.dense;
 
 import com.realtimetech.opack.codec.OpackCodec;
+import com.realtimetech.opack.codec.dense.reader.ByteArrayReader;
+import com.realtimetech.opack.codec.dense.reader.Reader;
+import com.realtimetech.opack.codec.dense.writer.ByteArrayWriter;
+import com.realtimetech.opack.codec.dense.writer.Writer;
 import com.realtimetech.opack.exception.DecodeException;
 import com.realtimetech.opack.exception.EncodeException;
 import com.realtimetech.opack.util.OpackArrayConverter;
@@ -33,13 +37,13 @@ import com.realtimetech.opack.value.OpackArray;
 import com.realtimetech.opack.value.OpackObject;
 import com.realtimetech.opack.value.OpackValue;
 
-import java.io.*;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 
-public final class DenseCodec extends OpackCodec<InputStream, OutputStream> {
+public final class DenseCodec extends OpackCodec<Reader, Writer> {
     public final static class Builder {
         int encodeOutputBufferInitialSize;
         int encodeStackInitialSize;
@@ -128,7 +132,6 @@ public final class DenseCodec extends OpackCodec<InputStream, OutputStream> {
     private static final Object CONTEXT_NULL_OBJECT = new Object();
     private static final Object CONTEXT_BRANCH_CONTEXT_OBJECT = new Object();
 
-    final ByteArrayOutputStream encodeByteArrayStream;
     final FastStack<Object> encodeStack;
 
     final FastStack<OpackValue> decodeStack;
@@ -144,7 +147,6 @@ public final class DenseCodec extends OpackCodec<InputStream, OutputStream> {
     DenseCodec(Builder builder) {
         super();
 
-        this.encodeByteArrayStream = new ByteArrayOutputStream(builder.encodeOutputBufferInitialSize);
         this.encodeStack = new FastStack<>(builder.encodeStackInitialSize);
 
         this.decodeStack = new FastStack<>(builder.decodeStackInitialSize);
@@ -157,17 +159,15 @@ public final class DenseCodec extends OpackCodec<InputStream, OutputStream> {
     /**
      * Encodes the OpackValue to bytes through dense codec.
      *
-     * @param outputStream the byte stream to write the encoded data
-     * @param opackValue   the OpackValue to encode
+     * @param writer     the writer to write the encoded data
+     * @param opackValue the OpackValue to encode
      * @throws IOException              if an I/O error occurs when writing to byte stream
      * @throws IllegalArgumentException if the type of data to be encoded is not allowed in dense format
      */
     @Override
-    protected void doEncode(OutputStream outputStream, OpackValue opackValue) throws IOException {
-        DenseWriter denseWriter = new DenseWriter(outputStream);
-
-        denseWriter.writeBytes(CONST_DENSE_CODEC_CLASSIFIER);
-        denseWriter.writeBytes(CONST_DENSE_CODEC_VERSION);
+    protected void doEncode(Writer writer, OpackValue opackValue) throws IOException {
+        writer.writeBytes(CONST_DENSE_CODEC_CLASSIFIER);
+        writer.writeBytes(CONST_DENSE_CODEC_VERSION);
 
         this.encodeStack.push(opackValue);
 
@@ -175,7 +175,7 @@ public final class DenseCodec extends OpackCodec<InputStream, OutputStream> {
             Object object = this.encodeStack.pop();
 
             if (object == null) {
-                denseWriter.writeByte(CONST_TYPE_NULL);
+                writer.writeByte(CONST_TYPE_NULL);
                 continue;
             }
 
@@ -189,8 +189,8 @@ public final class DenseCodec extends OpackCodec<InputStream, OutputStream> {
                 OpackObject<Object, Object> opackObject = (OpackObject<Object, Object>) object;
                 int size = opackObject.size();
 
-                denseWriter.writeByte(CONST_TYPE_OPACK_OBJECT);
-                denseWriter.writeInt(size);
+                writer.writeByte(CONST_TYPE_OPACK_OBJECT);
+                writer.writeInt(size);
 
                 for (Object key : opackObject.keySet()) {
                     Object value = opackObject.get(key);
@@ -204,8 +204,8 @@ public final class DenseCodec extends OpackCodec<InputStream, OutputStream> {
                 try {
                     List<?> opackArrayList = OpackArrayConverter.getOpackArrayList(opackArray);
 
-                    denseWriter.writeByte(CONST_TYPE_OPACK_ARRAY);
-                    denseWriter.writeInt(length);
+                    writer.writeByte(CONST_TYPE_OPACK_ARRAY);
+                    writer.writeInt(length);
 
                     boolean optimized = true;
 
@@ -216,138 +216,138 @@ public final class DenseCodec extends OpackCodec<InputStream, OutputStream> {
 
                         if (arrayType == boolean[].class) {
                             boolean[] array = (boolean[]) arrayObject;
-                            denseWriter.writeByte(CONST_PRIMITIVE_BOOLEAN_NATIVE_ARRAY);
+                            writer.writeByte(CONST_PRIMITIVE_BOOLEAN_NATIVE_ARRAY);
                             for (boolean value : array) {
-                                denseWriter.writeByte(value ? 1 : 0);
+                                writer.writeByte(value ? 1 : 0);
                             }
                         } else if (arrayType == byte[].class) {
                             byte[] array = (byte[]) arrayObject;
-                            denseWriter.writeByte(CONST_PRIMITIVE_BYTE_NATIVE_ARRAY);
+                            writer.writeByte(CONST_PRIMITIVE_BYTE_NATIVE_ARRAY);
                             for (byte value : array) {
-                                denseWriter.writeByte(value);
+                                writer.writeByte(value);
                             }
                         } else if (arrayType == char[].class) {
                             char[] array = (char[]) arrayObject;
-                            denseWriter.writeByte(CONST_PRIMITIVE_CHARACTER_NATIVE_ARRAY);
+                            writer.writeByte(CONST_PRIMITIVE_CHARACTER_NATIVE_ARRAY);
                             for (char value : array) {
-                                denseWriter.writeChar(value);
+                                writer.writeChar(value);
                             }
                         } else if (arrayType == short[].class) {
                             short[] array = (short[]) arrayObject;
-                            denseWriter.writeByte(CONST_PRIMITIVE_SHORT_NATIVE_ARRAY);
+                            writer.writeByte(CONST_PRIMITIVE_SHORT_NATIVE_ARRAY);
                             for (short value : array) {
-                                denseWriter.writeShort(value);
+                                writer.writeShort(value);
                             }
                         } else if (arrayType == int[].class) {
                             int[] array = (int[]) arrayObject;
-                            denseWriter.writeByte(CONST_PRIMITIVE_INTEGER_NATIVE_ARRAY);
+                            writer.writeByte(CONST_PRIMITIVE_INTEGER_NATIVE_ARRAY);
                             for (int value : array) {
-                                denseWriter.writeInt(value);
+                                writer.writeInt(value);
                             }
                         } else if (arrayType == float[].class) {
                             float[] array = (float[]) arrayObject;
-                            denseWriter.writeByte(CONST_PRIMITIVE_FLOAT_NATIVE_ARRAY);
+                            writer.writeByte(CONST_PRIMITIVE_FLOAT_NATIVE_ARRAY);
                             for (float value : array) {
-                                denseWriter.writeFloat(value);
+                                writer.writeFloat(value);
                             }
                         } else if (arrayType == long[].class) {
                             long[] array = (long[]) arrayObject;
-                            denseWriter.writeByte(CONST_PRIMITIVE_LONG_NATIVE_ARRAY);
+                            writer.writeByte(CONST_PRIMITIVE_LONG_NATIVE_ARRAY);
                             for (long value : array) {
-                                denseWriter.writeLong(value);
+                                writer.writeLong(value);
                             }
                         } else if (arrayType == double[].class) {
                             double[] array = (double[]) arrayObject;
-                            denseWriter.writeByte(CONST_PRIMITIVE_DOUBLE_NATIVE_ARRAY);
+                            writer.writeByte(CONST_PRIMITIVE_DOUBLE_NATIVE_ARRAY);
                             for (double value : array) {
-                                denseWriter.writeDouble(value);
+                                writer.writeDouble(value);
                             }
                         } else if (arrayType == Boolean[].class) {
                             Boolean[] array = (Boolean[]) arrayObject;
-                            denseWriter.writeByte(CONST_WRAPPER_BOOLEAN_NATIVE_ARRAY);
+                            writer.writeByte(CONST_WRAPPER_BOOLEAN_NATIVE_ARRAY);
                             for (Boolean value : array) {
                                 if (value == null) {
-                                    denseWriter.writeByte(0);
+                                    writer.writeByte(0);
                                 } else {
-                                    denseWriter.writeByte(1);
-                                    denseWriter.writeByte(value ? 1 : 0);
+                                    writer.writeByte(1);
+                                    writer.writeByte(value ? 1 : 0);
                                 }
                             }
                         } else if (arrayType == Byte[].class) {
                             Byte[] array = (Byte[]) arrayObject;
-                            denseWriter.writeByte(CONST_WRAPPER_BYTE_NATIVE_ARRAY);
+                            writer.writeByte(CONST_WRAPPER_BYTE_NATIVE_ARRAY);
                             for (Byte value : array) {
                                 if (value == null) {
-                                    denseWriter.writeByte(0);
+                                    writer.writeByte(0);
                                 } else {
-                                    denseWriter.writeByte(1);
-                                    denseWriter.writeByte(value);
+                                    writer.writeByte(1);
+                                    writer.writeByte(value);
                                 }
                             }
                         } else if (arrayType == Character[].class) {
                             Character[] array = (Character[]) arrayObject;
-                            denseWriter.writeByte(CONST_WRAPPER_CHARACTER_NATIVE_ARRAY);
+                            writer.writeByte(CONST_WRAPPER_CHARACTER_NATIVE_ARRAY);
                             for (Character value : array) {
                                 if (value == null) {
-                                    denseWriter.writeByte(0);
+                                    writer.writeByte(0);
                                 } else {
-                                    denseWriter.writeByte(1);
-                                    denseWriter.writeChar(value);
+                                    writer.writeByte(1);
+                                    writer.writeChar(value);
                                 }
                             }
                         } else if (arrayType == Short[].class) {
                             Short[] array = (Short[]) arrayObject;
-                            denseWriter.writeByte(CONST_WRAPPER_SHORT_NATIVE_ARRAY);
+                            writer.writeByte(CONST_WRAPPER_SHORT_NATIVE_ARRAY);
                             for (Short value : array) {
                                 if (value == null) {
-                                    denseWriter.writeByte(0);
+                                    writer.writeByte(0);
                                 } else {
-                                    denseWriter.writeByte(1);
-                                    denseWriter.writeShort(value);
+                                    writer.writeByte(1);
+                                    writer.writeShort(value);
                                 }
                             }
                         } else if (arrayType == Integer[].class) {
                             Integer[] array = (Integer[]) arrayObject;
-                            denseWriter.writeByte(CONST_WRAPPER_INTEGER_NATIVE_ARRAY);
+                            writer.writeByte(CONST_WRAPPER_INTEGER_NATIVE_ARRAY);
                             for (Integer value : array) {
                                 if (value == null) {
-                                    denseWriter.writeByte(0);
+                                    writer.writeByte(0);
                                 } else {
-                                    denseWriter.writeByte(1);
-                                    denseWriter.writeInt(value);
+                                    writer.writeByte(1);
+                                    writer.writeInt(value);
                                 }
                             }
                         } else if (arrayType == Float[].class) {
                             Float[] array = (Float[]) arrayObject;
-                            denseWriter.writeByte(CONST_WRAPPER_FLOAT_NATIVE_ARRAY);
+                            writer.writeByte(CONST_WRAPPER_FLOAT_NATIVE_ARRAY);
                             for (Float value : array) {
                                 if (value == null) {
-                                    denseWriter.writeByte(0);
+                                    writer.writeByte(0);
                                 } else {
-                                    denseWriter.writeByte(1);
-                                    denseWriter.writeFloat(value);
+                                    writer.writeByte(1);
+                                    writer.writeFloat(value);
                                 }
                             }
                         } else if (arrayType == Long[].class) {
                             Long[] array = (Long[]) arrayObject;
-                            denseWriter.writeByte(CONST_WRAPPER_LONG_NATIVE_ARRAY);
+                            writer.writeByte(CONST_WRAPPER_LONG_NATIVE_ARRAY);
                             for (Long value : array) {
                                 if (value == null) {
-                                    denseWriter.writeByte(0);
+                                    writer.writeByte(0);
                                 } else {
-                                    denseWriter.writeByte(1);
-                                    denseWriter.writeLong(value);
+                                    writer.writeByte(1);
+                                    writer.writeLong(value);
                                 }
                             }
                         } else if (arrayType == Double[].class) {
                             Double[] array = (Double[]) arrayObject;
-                            denseWriter.writeByte(CONST_WRAPPER_DOUBLE_NATIVE_ARRAY);
+                            writer.writeByte(CONST_WRAPPER_DOUBLE_NATIVE_ARRAY);
                             for (Double value : array) {
                                 if (value == null) {
-                                    denseWriter.writeByte(0);
+                                    writer.writeByte(0);
                                 } else {
-                                    denseWriter.writeByte(1);
-                                    denseWriter.writeDouble(value);
+                                    writer.writeByte(1);
+                                    writer.writeDouble(value);
                                 }
                             }
                         } else {
@@ -358,7 +358,7 @@ public final class DenseCodec extends OpackCodec<InputStream, OutputStream> {
                     }
 
                     if (!optimized) {
-                        denseWriter.writeByte(CONST_NO_NATIVE_ARRAY);
+                        writer.writeByte(CONST_NO_NATIVE_ARRAY);
 
                         for (int index = length - 1; index >= 0; index--) {
                             Object value = opackArray.get(index);
@@ -370,36 +370,36 @@ public final class DenseCodec extends OpackCodec<InputStream, OutputStream> {
                 }
             } else {
                 if (objectType == boolean.class) {
-                    denseWriter.writeByte(CONST_TYPE_BOOLEAN);
-                    denseWriter.writeByte((boolean) object ? 1 : 0);
+                    writer.writeByte(CONST_TYPE_BOOLEAN);
+                    writer.writeByte((boolean) object ? 1 : 0);
                 } else if (objectType == byte.class) {
-                    denseWriter.writeByte(CONST_TYPE_BYTE);
-                    denseWriter.writeByte((byte) object);
+                    writer.writeByte(CONST_TYPE_BYTE);
+                    writer.writeByte((byte) object);
                 } else if (objectType == char.class) {
-                    denseWriter.writeByte(CONST_TYPE_CHARACTER);
-                    denseWriter.writeChar((char) object);
+                    writer.writeByte(CONST_TYPE_CHARACTER);
+                    writer.writeChar((char) object);
                 } else if (objectType == short.class) {
-                    denseWriter.writeByte(CONST_TYPE_SHORT);
-                    denseWriter.writeShort((short) object);
+                    writer.writeByte(CONST_TYPE_SHORT);
+                    writer.writeShort((short) object);
                 } else if (objectType == int.class) {
-                    denseWriter.writeByte(CONST_TYPE_INTEGER);
-                    denseWriter.writeInt((int) object);
+                    writer.writeByte(CONST_TYPE_INTEGER);
+                    writer.writeInt((int) object);
                 } else if (objectType == float.class) {
-                    denseWriter.writeByte(CONST_TYPE_FLOAT);
-                    denseWriter.writeFloat((float) object);
+                    writer.writeByte(CONST_TYPE_FLOAT);
+                    writer.writeFloat((float) object);
                 } else if (objectType == long.class) {
-                    denseWriter.writeByte(CONST_TYPE_LONG);
-                    denseWriter.writeLong((long) object);
+                    writer.writeByte(CONST_TYPE_LONG);
+                    writer.writeLong((long) object);
                 } else if (objectType == double.class) {
-                    denseWriter.writeByte(CONST_TYPE_DOUBLE);
-                    denseWriter.writeDouble((double) object);
+                    writer.writeByte(CONST_TYPE_DOUBLE);
+                    writer.writeDouble((double) object);
                 } else if (objectType == String.class) {
                     String string = (String) object;
                     byte[] bytes = string.getBytes(StandardCharsets.UTF_8);
 
-                    denseWriter.writeByte(CONST_TYPE_STRING);
-                    denseWriter.writeInt(bytes.length);
-                    denseWriter.writeBytes(bytes);
+                    writer.writeByte(CONST_TYPE_STRING);
+                    writer.writeInt(bytes.length);
+                    writer.writeBytes(bytes);
                 } else {
                     throw new IllegalArgumentException(objectType + " is not allowed in dense format. (unknown literal object type).");
                 }
@@ -408,48 +408,50 @@ public final class DenseCodec extends OpackCodec<InputStream, OutputStream> {
     }
 
     public synchronized byte[] encode(OpackValue opackValue) throws EncodeException {
-        this.encodeByteArrayStream.reset();
-        this.encode(this.encodeByteArrayStream, opackValue);
-        return this.encodeByteArrayStream.toByteArray();
+        ByteArrayWriter byteArrayWriter = new ByteArrayWriter();
+
+        this.encode(byteArrayWriter, opackValue);
+
+        return byteArrayWriter.toByteArray();
     }
 
     /**
      * Decodes one block to OpackValue. (basic block protocol: header(1 byte), data (variable))
      * If data of block to be decoded is OpackObject or OpackArray(excluding primitive array), returns CONTEXT_BRANCH_CONTEXT_OBJECT for linear decoding.
      *
-     * @param denseReader the byte buffer that wraps the data
+     * @param reader the byte reader that wraps the data
      * @return opack value or CONTEXT_BRANCH_CONTEXT_OBJECT
      * @throws IllegalArgumentException if the type of data to be decoded is not allowed in dense format; if unknown block header is parsed
      */
-    Object decodeBlock(DenseReader denseReader) throws IOException {
-        byte b = (byte) denseReader.readByte();
+    Object decodeBlock(Reader reader) throws IOException {
+        byte b = (byte) reader.readByte();
 
         if (b == CONST_TYPE_BOOLEAN) {
-            return (byte) denseReader.readByte() == 1;
+            return (byte) reader.readByte() == 1;
         } else if (b == CONST_TYPE_BYTE) {
-            return (byte) denseReader.readByte();
+            return (byte) reader.readByte();
         } else if (b == CONST_TYPE_CHARACTER) {
-            return denseReader.readChar();
+            return reader.readChar();
         } else if (b == CONST_TYPE_SHORT) {
-            return denseReader.readShort();
+            return reader.readShort();
         } else if (b == CONST_TYPE_INTEGER) {
-            return denseReader.readInt();
+            return reader.readInt();
         } else if (b == CONST_TYPE_FLOAT) {
-            return denseReader.readFloat();
+            return reader.readFloat();
         } else if (b == CONST_TYPE_LONG) {
-            return denseReader.readLong();
+            return reader.readLong();
         } else if (b == CONST_TYPE_DOUBLE) {
-            return denseReader.readDouble();
+            return reader.readDouble();
         } else if (b == CONST_TYPE_NULL) {
             return null;
         } else if (b == CONST_TYPE_STRING) {
-            int length = denseReader.readInt();
+            int length = reader.readInt();
             byte[] bytes = new byte[length];
-            denseReader.readBytes(bytes);
+            reader.readBytes(bytes);
 
             return new String(bytes, StandardCharsets.UTF_8);
         } else if (b == CONST_TYPE_OPACK_OBJECT) {
-            int size = denseReader.readInt();
+            int size = reader.readInt();
             OpackObject<Object, Object> opackObject = new OpackObject<>(size);
 
             decodeContextStack.push(new Object[]{size, 0, CONTEXT_NULL_OBJECT, CONTEXT_NULL_OBJECT});
@@ -457,9 +459,9 @@ public final class DenseCodec extends OpackCodec<InputStream, OutputStream> {
 
             return CONTEXT_BRANCH_CONTEXT_OBJECT;
         } else if (b == CONST_TYPE_OPACK_ARRAY) {
-            int length = denseReader.readInt();
+            int length = reader.readInt();
 
-            byte nativeType = (byte) denseReader.readByte();
+            byte nativeType = (byte) reader.readByte();
 
             if (nativeType == CONST_NO_NATIVE_ARRAY) {
                 OpackArray<Object> opackArray = new OpackArray<>(length);
@@ -472,120 +474,120 @@ public final class DenseCodec extends OpackCodec<InputStream, OutputStream> {
                 if (nativeType == CONST_PRIMITIVE_BOOLEAN_NATIVE_ARRAY) {
                     boolean[] array = new boolean[length];
                     for (int index = 0; index < array.length; index++) {
-                        array[index] = denseReader.readByte() == 1;
+                        array[index] = reader.readByte() == 1;
                     }
                     return OpackArray.createWithArrayObject(array);
                 } else if (nativeType == CONST_PRIMITIVE_BYTE_NATIVE_ARRAY) {
                     byte[] array = new byte[length];
                     for (int index = 0; index < array.length; index++) {
-                        array[index] = (byte) denseReader.readByte();
+                        array[index] = (byte) reader.readByte();
                     }
                     return OpackArray.createWithArrayObject(array);
                 } else if (nativeType == CONST_PRIMITIVE_CHARACTER_NATIVE_ARRAY) {
                     char[] array = new char[length];
                     for (int index = 0; index < array.length; index++) {
-                        array[index] = denseReader.readChar();
+                        array[index] = reader.readChar();
                     }
                     return OpackArray.createWithArrayObject(array);
                 } else if (nativeType == CONST_PRIMITIVE_SHORT_NATIVE_ARRAY) {
                     short[] array = new short[length];
                     for (int index = 0; index < array.length; index++) {
-                        array[index] = denseReader.readShort();
+                        array[index] = reader.readShort();
                     }
                     return OpackArray.createWithArrayObject(array);
                 } else if (nativeType == CONST_PRIMITIVE_INTEGER_NATIVE_ARRAY) {
                     int[] array = new int[length];
                     for (int index = 0; index < array.length; index++) {
-                        array[index] = denseReader.readInt();
+                        array[index] = reader.readInt();
                     }
                     return OpackArray.createWithArrayObject(array);
                 } else if (nativeType == CONST_PRIMITIVE_FLOAT_NATIVE_ARRAY) {
                     float[] array = new float[length];
                     for (int index = 0; index < array.length; index++) {
-                        array[index] = denseReader.readFloat();
+                        array[index] = reader.readFloat();
                     }
                     return OpackArray.createWithArrayObject(array);
                 } else if (nativeType == CONST_PRIMITIVE_LONG_NATIVE_ARRAY) {
                     long[] array = new long[length];
                     for (int index = 0; index < array.length; index++) {
-                        array[index] = denseReader.readLong();
+                        array[index] = reader.readLong();
                     }
                     return OpackArray.createWithArrayObject(array);
                 } else if (nativeType == CONST_PRIMITIVE_DOUBLE_NATIVE_ARRAY) {
                     double[] array = new double[length];
                     for (int index = 0; index < array.length; index++) {
-                        array[index] = denseReader.readDouble();
+                        array[index] = reader.readDouble();
                     }
                     return OpackArray.createWithArrayObject(array);
                 } else if (nativeType == CONST_WRAPPER_BOOLEAN_NATIVE_ARRAY) {
                     Boolean[] array = new Boolean[length];
                     for (int index = 0; index < array.length; index++) {
-                        boolean nullFlag = denseReader.readByte() == 1;
+                        boolean nullFlag = reader.readByte() == 1;
                         if (nullFlag) {
-                            array[index] = denseReader.readByte() == 1;
+                            array[index] = reader.readByte() == 1;
                         }
                     }
                     return OpackArray.createWithArrayObject(array);
                 } else if (nativeType == CONST_WRAPPER_BYTE_NATIVE_ARRAY) {
                     Byte[] array = new Byte[length];
                     for (int index = 0; index < array.length; index++) {
-                        boolean nullFlag = denseReader.readByte() == 1;
+                        boolean nullFlag = reader.readByte() == 1;
                         if (nullFlag) {
-                            array[index] = (byte) denseReader.readByte();
+                            array[index] = (byte) reader.readByte();
                         }
                     }
                     return OpackArray.createWithArrayObject(array);
                 } else if (nativeType == CONST_WRAPPER_CHARACTER_NATIVE_ARRAY) {
                     Character[] array = new Character[length];
                     for (int index = 0; index < array.length; index++) {
-                        boolean nullFlag = denseReader.readByte() == 1;
+                        boolean nullFlag = reader.readByte() == 1;
                         if (nullFlag) {
-                            array[index] = denseReader.readChar();
+                            array[index] = reader.readChar();
                         }
                     }
                     return OpackArray.createWithArrayObject(array);
                 } else if (nativeType == CONST_WRAPPER_SHORT_NATIVE_ARRAY) {
                     Short[] array = new Short[length];
                     for (int index = 0; index < array.length; index++) {
-                        boolean nullFlag = denseReader.readByte() == 1;
+                        boolean nullFlag = reader.readByte() == 1;
                         if (nullFlag) {
-                            array[index] = denseReader.readShort();
+                            array[index] = reader.readShort();
                         }
                     }
                     return OpackArray.createWithArrayObject(array);
                 } else if (nativeType == CONST_WRAPPER_INTEGER_NATIVE_ARRAY) {
                     Integer[] array = new Integer[length];
                     for (int index = 0; index < array.length; index++) {
-                        boolean nullFlag = denseReader.readByte() == 1;
+                        boolean nullFlag = reader.readByte() == 1;
                         if (nullFlag) {
-                            array[index] = denseReader.readInt();
+                            array[index] = reader.readInt();
                         }
                     }
                     return OpackArray.createWithArrayObject(array);
                 } else if (nativeType == CONST_WRAPPER_FLOAT_NATIVE_ARRAY) {
                     Float[] array = new Float[length];
                     for (int index = 0; index < array.length; index++) {
-                        boolean nullFlag = denseReader.readByte() == 1;
+                        boolean nullFlag = reader.readByte() == 1;
                         if (nullFlag) {
-                            array[index] = denseReader.readFloat();
+                            array[index] = reader.readFloat();
                         }
                     }
                     return OpackArray.createWithArrayObject(array);
                 } else if (nativeType == CONST_WRAPPER_LONG_NATIVE_ARRAY) {
                     Long[] array = new Long[length];
                     for (int index = 0; index < array.length; index++) {
-                        boolean nullFlag = denseReader.readByte() == 1;
+                        boolean nullFlag = reader.readByte() == 1;
                         if (nullFlag) {
-                            array[index] = denseReader.readLong();
+                            array[index] = reader.readLong();
                         }
                     }
                     return OpackArray.createWithArrayObject(array);
                 } else if (nativeType == CONST_WRAPPER_DOUBLE_NATIVE_ARRAY) {
                     Double[] array = new Double[length];
                     for (int index = 0; index < array.length; index++) {
-                        boolean nullFlag = denseReader.readByte() == 1;
+                        boolean nullFlag = reader.readByte() == 1;
                         if (nullFlag) {
-                            array[index] = denseReader.readDouble();
+                            array[index] = reader.readDouble();
                         }
                     }
                     return OpackArray.createWithArrayObject(array);
@@ -601,23 +603,23 @@ public final class DenseCodec extends OpackCodec<InputStream, OutputStream> {
     /**
      * Decodes the byte array encoded through the dense codec to OpackValue.
      *
-     * @param inputStream the stream to decode
+     * @param reader the reader to decode
      * @return opack value
      * @throws IllegalArgumentException if the decoded value is not a opack value
      */
     @Override
-    protected OpackValue doDecode(InputStream inputStream) throws IOException {
-        DenseReader denseReader = new DenseReader(inputStream);
-
-        byte[] classifier = inputStream.readNBytes(CONST_DENSE_CODEC_CLASSIFIER.length);
+    protected OpackValue doDecode(Reader reader) throws IOException {
+        byte[] classifier = new byte[CONST_DENSE_CODEC_CLASSIFIER.length];
+        reader.readBytes(classifier);
 
         if (!Arrays.equals(CONST_DENSE_CODEC_CLASSIFIER, classifier)) {
             throw new IllegalArgumentException("Decoding data is not dense format data. (Expected " + Arrays.toString(CONST_DENSE_CODEC_CLASSIFIER) + ", got " + Arrays.toString(classifier) + ")");
         }
 
-        if (!this.ignoreVersionCompare) {
-            byte[] version = inputStream.readNBytes(CONST_DENSE_CODEC_VERSION.length);
+        byte[] version = new byte[CONST_DENSE_CODEC_VERSION.length];
+        reader.readBytes(version);
 
+        if (!this.ignoreVersionCompare) {
             if (!Arrays.equals(CONST_DENSE_CODEC_VERSION, version)) {
                 throw new IllegalArgumentException("Decoding data does not match current version of dense codec. (Expected " + Arrays.toString(CONST_DENSE_CODEC_VERSION) + ", got " + Arrays.toString(version) + ")");
             }
@@ -626,7 +628,7 @@ public final class DenseCodec extends OpackCodec<InputStream, OutputStream> {
         this.decodeStack.reset();
         this.decodeContextStack.reset();
 
-        decodeBlock(denseReader);
+        this.decodeBlock(reader);
         OpackValue rootValue = this.decodeStack.peek();
 
         while (!this.decodeStack.isEmpty()) {
@@ -647,7 +649,7 @@ public final class DenseCodec extends OpackCodec<InputStream, OutputStream> {
                     Object value = context[3];
 
                     if (key == CONTEXT_NULL_OBJECT) {
-                        key = decodeBlock(denseReader);
+                        key = this.decodeBlock(reader);
                         if (key == CONTEXT_BRANCH_CONTEXT_OBJECT) {
                             context[2] = this.decodeStack.peek();
                             bypass = true;
@@ -658,7 +660,7 @@ public final class DenseCodec extends OpackCodec<InputStream, OutputStream> {
                     }
 
                     if (value == CONTEXT_NULL_OBJECT) {
-                        value = decodeBlock(denseReader);
+                        value = this.decodeBlock(reader);
                         if (value == CONTEXT_BRANCH_CONTEXT_OBJECT) {
                             context[3] = this.decodeStack.peek();
                             bypass = true;
@@ -676,7 +678,7 @@ public final class DenseCodec extends OpackCodec<InputStream, OutputStream> {
                 OpackArray<Object> opackArray = (OpackArray<Object>) opackValue;
 
                 for (; index < size; index++) {
-                    Object value = decodeBlock(denseReader);
+                    Object value = this.decodeBlock(reader);
 
                     if (value == CONTEXT_BRANCH_CONTEXT_OBJECT) {
                         index++;
@@ -704,6 +706,8 @@ public final class DenseCodec extends OpackCodec<InputStream, OutputStream> {
     }
 
     public OpackValue decode(byte[] bytes) throws DecodeException {
-        return this.decode(new ByteArrayInputStream(bytes));
+        ByteArrayReader byteArrayReader = new ByteArrayReader(bytes);
+
+        return this.decode(byteArrayReader);
     }
 }

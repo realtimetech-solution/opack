@@ -88,7 +88,9 @@ public class KryoPerformanceTest {
         Opacker opacker = new Opacker.Builder().create();
         DenseCodec denseCodec = new DenseCodec.Builder().create();
 
+        int warmUploop = 512;
         int loop = 512 * 2;
+
         PerformanceClass.ExceptionRunnable kryoRunnable = () -> {
             byteBufferOutput.reset();
             kryo.writeObject(byteBufferOutput, performanceClass);
@@ -101,7 +103,10 @@ public class KryoPerformanceTest {
             OpackValue decode = denseCodec.decode(encode);
             PerformanceClass deserialize = opacker.deserialize(PerformanceClass.class, decode);
         };
-        opackRunnable.run(); // Warm up! (because kryo already register)
+
+        // Warm up!
+        PerformanceClass.measureRunningTime(warmUploop, kryoRunnable);
+        PerformanceClass.measureRunningTime(warmUploop, opackRunnable);
 
         long kryoTime = PerformanceClass.measureRunningTime(loop, kryoRunnable);
         long opackTime = PerformanceClass.measureRunningTime(loop, opackRunnable);
