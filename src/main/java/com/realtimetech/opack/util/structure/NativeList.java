@@ -28,7 +28,7 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.reflect.Array;
 import java.util.*;
 
-public class NativeList implements List<Object> {
+public final class NativeList implements List<Object> {
     final Object arrayObject;
 
     /**

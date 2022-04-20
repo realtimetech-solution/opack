@@ -199,7 +199,7 @@ public final class DenseCodec extends OpackCodec<Reader, Writer> {
                     writer.writeByte(CONST_TYPE_OPACK_ARRAY);
                     writer.writeInt(length);
 
-                    boolean optimized = true;
+                    boolean optimized = false;
 
                     if (opackArrayList instanceof NativeList) {
                         NativeList nativeList = (NativeList) opackArrayList;
@@ -208,55 +208,89 @@ public final class DenseCodec extends OpackCodec<Reader, Writer> {
 
                         if (arrayType == boolean[].class) {
                             boolean[] array = (boolean[]) arrayObject;
+
                             writer.writeByte(CONST_PRIMITIVE_BOOLEAN_NATIVE_ARRAY);
+
                             for (boolean value : array) {
                                 writer.writeByte(value ? 1 : 0);
                             }
+
+                            optimized = true;
                         } else if (arrayType == byte[].class) {
                             byte[] array = (byte[]) arrayObject;
+
                             writer.writeByte(CONST_PRIMITIVE_BYTE_NATIVE_ARRAY);
+
                             for (byte value : array) {
                                 writer.writeByte(value);
                             }
+
+                            optimized = true;
                         } else if (arrayType == char[].class) {
                             char[] array = (char[]) arrayObject;
+
                             writer.writeByte(CONST_PRIMITIVE_CHARACTER_NATIVE_ARRAY);
+
                             for (char value : array) {
                                 writer.writeChar(value);
                             }
+
+                            optimized = true;
                         } else if (arrayType == short[].class) {
                             short[] array = (short[]) arrayObject;
+
                             writer.writeByte(CONST_PRIMITIVE_SHORT_NATIVE_ARRAY);
+
                             for (short value : array) {
                                 writer.writeShort(value);
                             }
+
+                            optimized = true;
                         } else if (arrayType == int[].class) {
                             int[] array = (int[]) arrayObject;
+
                             writer.writeByte(CONST_PRIMITIVE_INTEGER_NATIVE_ARRAY);
+
                             for (int value : array) {
                                 writer.writeInt(value);
                             }
+
+                            optimized = true;
                         } else if (arrayType == float[].class) {
                             float[] array = (float[]) arrayObject;
+
                             writer.writeByte(CONST_PRIMITIVE_FLOAT_NATIVE_ARRAY);
+
                             for (float value : array) {
                                 writer.writeFloat(value);
                             }
+
+                            optimized = true;
                         } else if (arrayType == long[].class) {
                             long[] array = (long[]) arrayObject;
+
                             writer.writeByte(CONST_PRIMITIVE_LONG_NATIVE_ARRAY);
+
                             for (long value : array) {
                                 writer.writeLong(value);
                             }
+
+                            optimized = true;
                         } else if (arrayType == double[].class) {
                             double[] array = (double[]) arrayObject;
+
                             writer.writeByte(CONST_PRIMITIVE_DOUBLE_NATIVE_ARRAY);
+
                             for (double value : array) {
                                 writer.writeDouble(value);
                             }
+
+                            optimized = true;
                         } else if (arrayType == Boolean[].class) {
                             Boolean[] array = (Boolean[]) arrayObject;
+
                             writer.writeByte(CONST_WRAPPER_BOOLEAN_NATIVE_ARRAY);
+
                             for (Boolean value : array) {
                                 if (value == null) {
                                     writer.writeByte(0);
@@ -265,9 +299,13 @@ public final class DenseCodec extends OpackCodec<Reader, Writer> {
                                     writer.writeByte(value ? 1 : 0);
                                 }
                             }
+
+                            optimized = true;
                         } else if (arrayType == Byte[].class) {
                             Byte[] array = (Byte[]) arrayObject;
+
                             writer.writeByte(CONST_WRAPPER_BYTE_NATIVE_ARRAY);
+
                             for (Byte value : array) {
                                 if (value == null) {
                                     writer.writeByte(0);
@@ -276,9 +314,13 @@ public final class DenseCodec extends OpackCodec<Reader, Writer> {
                                     writer.writeByte(value);
                                 }
                             }
+
+                            optimized = true;
                         } else if (arrayType == Character[].class) {
                             Character[] array = (Character[]) arrayObject;
+
                             writer.writeByte(CONST_WRAPPER_CHARACTER_NATIVE_ARRAY);
+
                             for (Character value : array) {
                                 if (value == null) {
                                     writer.writeByte(0);
@@ -287,9 +329,13 @@ public final class DenseCodec extends OpackCodec<Reader, Writer> {
                                     writer.writeChar(value);
                                 }
                             }
+
+                            optimized = true;
                         } else if (arrayType == Short[].class) {
                             Short[] array = (Short[]) arrayObject;
+
                             writer.writeByte(CONST_WRAPPER_SHORT_NATIVE_ARRAY);
+
                             for (Short value : array) {
                                 if (value == null) {
                                     writer.writeByte(0);
@@ -298,9 +344,13 @@ public final class DenseCodec extends OpackCodec<Reader, Writer> {
                                     writer.writeShort(value);
                                 }
                             }
+
+                            optimized = true;
                         } else if (arrayType == Integer[].class) {
                             Integer[] array = (Integer[]) arrayObject;
+
                             writer.writeByte(CONST_WRAPPER_INTEGER_NATIVE_ARRAY);
+
                             for (Integer value : array) {
                                 if (value == null) {
                                     writer.writeByte(0);
@@ -309,9 +359,13 @@ public final class DenseCodec extends OpackCodec<Reader, Writer> {
                                     writer.writeInt(value);
                                 }
                             }
+
+                            optimized = true;
                         } else if (arrayType == Float[].class) {
                             Float[] array = (Float[]) arrayObject;
+
                             writer.writeByte(CONST_WRAPPER_FLOAT_NATIVE_ARRAY);
+
                             for (Float value : array) {
                                 if (value == null) {
                                     writer.writeByte(0);
@@ -320,9 +374,13 @@ public final class DenseCodec extends OpackCodec<Reader, Writer> {
                                     writer.writeFloat(value);
                                 }
                             }
+
+                            optimized = true;
                         } else if (arrayType == Long[].class) {
                             Long[] array = (Long[]) arrayObject;
+
                             writer.writeByte(CONST_WRAPPER_LONG_NATIVE_ARRAY);
+
                             for (Long value : array) {
                                 if (value == null) {
                                     writer.writeByte(0);
@@ -331,9 +389,13 @@ public final class DenseCodec extends OpackCodec<Reader, Writer> {
                                     writer.writeLong(value);
                                 }
                             }
+
+                            optimized = true;
                         } else if (arrayType == Double[].class) {
                             Double[] array = (Double[]) arrayObject;
+
                             writer.writeByte(CONST_WRAPPER_DOUBLE_NATIVE_ARRAY);
+
                             for (Double value : array) {
                                 if (value == null) {
                                     writer.writeByte(0);
@@ -342,11 +404,9 @@ public final class DenseCodec extends OpackCodec<Reader, Writer> {
                                     writer.writeDouble(value);
                                 }
                             }
-                        } else {
-                            optimized = false;
+
+                            optimized = true;
                         }
-                    } else {
-                        optimized = false;
                     }
 
                     if (!optimized) {
@@ -399,7 +459,14 @@ public final class DenseCodec extends OpackCodec<Reader, Writer> {
         }
     }
 
-    public synchronized byte[] encode(OpackValue opackValue) throws EncodeException {
+    /**
+     * Encodes the OpackValue to bytes through dense codec.
+     *
+     * @param opackValue the OpackValue to encode
+     * @return returns encoded bytes
+     * @throws EncodeException if a problem occurs during encoding; if the type of data to be encoded is not allowed in specific codec
+     */
+    public byte[] encode(OpackValue opackValue) throws EncodeException {
         ByteArrayWriter byteArrayWriter = new ByteArrayWriter();
 
         this.encode(byteArrayWriter, opackValue);
@@ -697,6 +764,13 @@ public final class DenseCodec extends OpackCodec<Reader, Writer> {
         return rootValue;
     }
 
+    /**
+     * Decodes the byte array encoded through the dense codec to OpackValue.
+     *
+     * @param bytes the bytes to decode
+     * @return the decoded opack value
+     * @throws DecodeException if a problem occurs during decoding; if the type of data to be decoded is not allowed in specific codec
+     */
     public OpackValue decode(byte[] bytes) throws DecodeException {
         ByteArrayReader byteArrayReader = new ByteArrayReader(bytes);
 

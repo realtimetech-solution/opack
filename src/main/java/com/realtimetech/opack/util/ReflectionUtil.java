@@ -27,7 +27,8 @@ import org.jetbrains.annotations.NotNull;
 import java.io.ObjectInputStream;
 import java.io.ObjectStreamClass;
 import java.lang.reflect.*;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
 
 public class ReflectionUtil {
     private static abstract class Allocator {
@@ -41,31 +42,6 @@ public class ReflectionUtil {
          */
         abstract <T> T allocate(Class<T> typeClass) throws InvocationTargetException, IllegalAccessException;
     }
-
-    private static final Map<Class<?>, Class<?>> PRIMITIVES_WRAPPERS_MAP = Map.of(
-            boolean.class, Boolean.class,
-
-            byte.class, Byte.class,
-            char.class, Character.class,
-
-            short.class, Short.class,
-
-            int.class, Integer.class,
-            float.class, Float.class,
-
-            double.class, Double.class,
-            long.class, Long.class
-    );
-
-    private static final Map<Class<?>, Class<?>> WRAPPERS_PRIMITIVES_MAP = Collections.unmodifiableMap(new HashMap<>() {
-        {
-            for (Class<?> primitiveType : PRIMITIVES_WRAPPERS_MAP.keySet()) {
-                Class<?> wrapperType = PRIMITIVES_WRAPPERS_MAP.get(primitiveType);
-
-                put(wrapperType, primitiveType);
-            }
-        }
-    });
 
     private static final Allocator ALLOCATOR;
 
@@ -140,57 +116,34 @@ public class ReflectionUtil {
      * @return the object after casting
      */
     public static Object cast(Class<?> type, Object object) {
-        if (ReflectionUtil.isPrimitiveType(type)) {
-            type = ReflectionUtil.convertPrimitiveTypeToWrapperType(type);
-        }
-        if (ReflectionUtil.isWrapperType(type)) {
-            Class<?> objectType = object.getClass();
+        Class<?> objectType = object.getClass();
 
-            if (objectType == Long.class) {
-                Long value = (Long) object;
+        if (Number.class.isAssignableFrom(objectType)) {
+            Number number = (Number) object;
 
-                if (type == Integer.class) {
-                    return value.intValue();
-                } else if (type == Short.class) {
-                    return value.shortValue();
-                } else if (type == Character.class) {
-                    return (char) value.intValue();
-                } else if (type == Byte.class) {
-                    return value.byteValue();
-                }
-            } else if (objectType == Integer.class) {
-                Integer value = (Integer) object;
-
-                if (type == Short.class) {
-                    return value.shortValue();
-                } else if (type == Character.class) {
-                    return (char) value.intValue();
-                } else if (type == Byte.class) {
-                    return value.byteValue();
-                }
-            } else if (objectType == Short.class) {
-                Short value = (Short) object;
-
-                if (type == Character.class) {
-                    return (char) value.intValue();
-                } else if (type == Byte.class) {
-                    return value.byteValue();
-                }
-            } else if (objectType == Character.class) {
-                Character value = (Character) object;
-
-                if (type == Byte.class) {
-                    return (byte) value.charValue();
-                }
-            } else if (objectType == Double.class) {
-                Double value = (Double) object;
-
-                if (type == Float.class) {
-                    return value.floatValue();
-                }
+            if (type == byte.class || type == Byte.class) {
+                return number.byteValue();
+            } else if (type == char.class || type == Character.class) {
+                return (char) number.intValue();
+            } else if (type == short.class || type == Short.class) {
+                return number.shortValue();
+            } else if (type == int.class || type == Integer.class) {
+                return number.intValue();
+            } else if (type == float.class || type == Float.class) {
+                return number.floatValue();
+            } else if (type == double.class || type == Double.class) {
+                return number.doubleValue();
+            } else if (type == long.class || type == Long.class) {
+                return number.longValue();
             }
-
-            return object;
+        } else if (objectType == Boolean.class) {
+            if (type == boolean.class || type == Boolean.class) {
+                return object;
+            }
+        } else if (objectType == Character.class) {
+            if (type == char.class || type == Character.class) {
+                return object;
+            }
         }
 
         return type.cast(object);
@@ -369,7 +322,18 @@ public class ReflectionUtil {
      * @return whether the target class is wrapper class
      */
     public static boolean isWrapperType(Class<?> type) {
-        return WRAPPERS_PRIMITIVES_MAP.containsKey(type);
+        return type == Boolean.class ||
+
+                type == Byte.class ||
+                type == Character.class ||
+
+                type == Short.class ||
+                type == Integer.class ||
+
+                type == Float.class ||
+                type == Double.class ||
+
+                type == Long.class;
     }
 
     /**
@@ -380,13 +344,25 @@ public class ReflectionUtil {
      * @throws IllegalArgumentException if target class is not wrapper class
      */
     public static @NotNull Class<?> convertWrapperClassToPrimitiveClass(@NotNull Class<?> type) {
-        Class<?> primitiveClass = WRAPPERS_PRIMITIVES_MAP.getOrDefault(type, null);
-
-        if (primitiveClass == null) {
-            throw new IllegalArgumentException(type + " is not wrapper class.");
+        if (type == Boolean.class) {
+            return boolean.class;
+        } else if (type == Byte.class) {
+            return byte.class;
+        } else if (type == Character.class) {
+            return char.class;
+        } else if (type == Short.class) {
+            return short.class;
+        } else if (type == Integer.class) {
+            return int.class;
+        } else if (type == Float.class) {
+            return float.class;
+        } else if (type == Double.class) {
+            return double.class;
+        } else if (type == Long.class) {
+            return long.class;
         }
 
-        return primitiveClass;
+        throw new IllegalArgumentException(type + " is not wrapper class.");
     }
 
     /**
@@ -394,7 +370,18 @@ public class ReflectionUtil {
      * @return whether the target class is primitive class
      */
     public static boolean isPrimitiveType(Class<?> type) {
-        return PRIMITIVES_WRAPPERS_MAP.containsKey(type);
+        return type == boolean.class ||
+
+                type == byte.class ||
+                type == char.class ||
+
+                type == short.class ||
+                type == int.class ||
+
+                type == float.class ||
+                type == double.class ||
+
+                type == long.class;
     }
 
     /**
@@ -405,13 +392,25 @@ public class ReflectionUtil {
      * @throws IllegalArgumentException if target class is not primitive class
      */
     public static @NotNull Class<?> convertPrimitiveTypeToWrapperType(@NotNull Class<?> type) {
-        Class<?> wrapperClass = PRIMITIVES_WRAPPERS_MAP.getOrDefault(type, null);
-
-        if (wrapperClass == null) {
-            throw new IllegalArgumentException(type + " is not primitive class.");
+        if (type == boolean.class) {
+            return Boolean.class;
+        } else if (type == byte.class) {
+            return Byte.class;
+        } else if (type == char.class) {
+            return Character.class;
+        } else if (type == short.class) {
+            return Short.class;
+        } else if (type == int.class) {
+            return Integer.class;
+        } else if (type == float.class) {
+            return Float.class;
+        } else if (type == double.class) {
+            return Double.class;
+        } else if (type == long.class) {
+            return Long.class;
         }
 
-        return wrapperClass;
+        throw new IllegalArgumentException(type + " is not primitive class.");
     }
 
     /**

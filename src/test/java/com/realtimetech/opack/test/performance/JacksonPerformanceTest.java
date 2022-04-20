@@ -22,24 +22,33 @@
 
 package com.realtimetech.opack.test.performance;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.realtimetech.opack.Opacker;
 import com.realtimetech.opack.codec.json.JsonCodec;
+import com.realtimetech.opack.exception.DecodeException;
+import com.realtimetech.opack.exception.EncodeException;
+import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.value.OpackValue;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-public class GsonPerformanceTest {
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+public class JacksonPerformanceTest {
     @Test
-    public void gson_json() {
+    @Disabled
+    public void jackson_bytes() throws SerializeException, EncodeException, DecodeException {
         PerformanceClass performanceClass = new PerformanceClass();
 
         /*
-            Gson Contexts
+            Jackson Contexts
          */
-        Gson gson = new GsonBuilder().create();
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
 
         /*
             Opack Contexts
@@ -48,16 +57,15 @@ public class GsonPerformanceTest {
         JsonCodec jsonCodec = new JsonCodec.Builder().create();
 
         int warmLoop = 64;
-        int loop = 128;
+        int loop = 128 * 2;
 
-        PerformanceClass.ExceptionRunnable gsonRunnable = () -> {
-            JsonElement serialize = gson.toJsonTree(performanceClass);
-            String encode = serialize.toString();
-            JsonElement decode = gson.fromJson(encode, JsonElement.class);
-            PerformanceClass deserialize = gson.fromJson(decode, PerformanceClass.class);
+        PerformanceClass.ExceptionRunnable jacksonRunnable = () -> {
+            String value = objectMapper.writeValueAsString(performanceClass);
+            PerformanceClass deserialize = objectMapper.readValue(value, PerformanceClass.class);
 
             deserialize.hashCode();
         };
+
         PerformanceClass.ExceptionRunnable opackRunnable = () -> {
             OpackValue serialize = opacker.serialize(performanceClass);
             String encode = jsonCodec.encode(serialize);
@@ -68,18 +76,18 @@ public class GsonPerformanceTest {
         };
 
         // Warm up!
-        PerformanceClass.measureRunningTime(warmLoop, gsonRunnable);
+        PerformanceClass.measureRunningTime(warmLoop, jacksonRunnable);
         PerformanceClass.measureRunningTime(warmLoop, opackRunnable);
 
-        long gsonTime = PerformanceClass.measureRunningTime(loop, gsonRunnable);
+        long jacksonTime = PerformanceClass.measureRunningTime(loop, jacksonRunnable);
         long opackTime = PerformanceClass.measureRunningTime(loop, opackRunnable);
 
         System.out.println("# " + this.getClass().getSimpleName());
-        System.out.println(" Gson\t: " + gsonTime + "ms");
+        System.out.println(" Jackson\t: " + jacksonTime + "ms");
         System.out.println(" Opack\t: " + opackTime + "ms");
 
-        if (opackTime > gsonTime) {
-            Assertions.fail("Opack must faster then gson");
+        if (opackTime > jacksonTime) {
+            Assertions.fail("Opack must faster then jackson");
         }
     }
 }

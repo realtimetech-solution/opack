@@ -138,7 +138,7 @@ public final class OpackArray<E> extends AbstractOpackValue<List<E>> {
     void unpinList() {
         List<E> list = this.get();
 
-        if (list instanceof NativeList) {
+        if (list.getClass() == NativeList.class) {
             this.set((List<E>) Arrays.asList(list.toArray()));
         }
     }

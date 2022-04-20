@@ -32,8 +32,6 @@ public class FastStack<T> {
     private int currentIndex;
     private int currentSize;
 
-    private int startIndex;
-
     /**
      * Calls {@code new FastStack(16)}
      */
@@ -47,9 +45,8 @@ public class FastStack<T> {
      * @param initialSize the initial size
      */
     public FastStack(int initialSize) {
-        this.currentIndex = -1;
-        this.startIndex = 0;
-        this.currentSize = Math.min(initialSize >> 1, 1);
+        this.currentIndex = 0;
+        this.currentSize = 1;
 
         this.growArray();
     }
@@ -64,7 +61,7 @@ public class FastStack<T> {
         this.objects = (T[]) new Object[this.currentSize];
 
         if (oldObjects != null) {
-            System.arraycopy(oldObjects, 0, objects, 0, currentIndex + 1);
+            System.arraycopy(oldObjects, 0, objects, 0, currentIndex);
         }
     }
 
@@ -73,12 +70,11 @@ public class FastStack<T> {
      * @return pushed element
      */
     public T push(T object) {
-        if (this.currentIndex + 2 >= this.currentSize) {
-            growArray();
+        if (this.currentIndex >= this.currentSize) {
+            this.growArray();
         }
 
-        this.currentIndex++;
-        this.objects[this.currentIndex] = object;
+        this.objects[this.currentIndex++] = object;
 
         return object;
     }
@@ -94,7 +90,7 @@ public class FastStack<T> {
      * @return true if this stack is empty
      */
     public boolean isEmpty() {
-        return this.currentIndex == -1;
+        return this.currentIndex == 0;
     }
 
     /**
@@ -104,9 +100,6 @@ public class FastStack<T> {
      * @return the found element
      */
     public @NotNull T get(int index) {
-        if (this.currentIndex == -1)
-            throw new EmptyStackException();
-
         return this.objects[index];
     }
 
@@ -118,6 +111,7 @@ public class FastStack<T> {
      */
     public void swap(int index1, int index2) {
         T temp = this.objects[index1];
+
         this.objects[index1] = this.objects[index2];
         this.objects[index2] = temp;
     }
@@ -130,8 +124,10 @@ public class FastStack<T> {
      */
     public void reverse(int start, int end) {
         int length = (end - start + 1) / 2;
+
         for (int index = 0; index < length; index++) {
             T temp = this.objects[start + index];
+
             this.objects[start + index] = this.objects[end - index];
             this.objects[end - index] = temp;
         }
@@ -143,10 +139,10 @@ public class FastStack<T> {
      * @return the element at the top of this stack
      */
     public @NotNull T peek() {
-        if (this.currentIndex == -1)
+        if (this.currentIndex == 0)
             throw new EmptyStackException();
 
-        return this.objects[this.currentIndex];
+        return this.objects[this.currentIndex - 1];
     }
 
     /**
@@ -155,35 +151,32 @@ public class FastStack<T> {
      * @return The object at the top of this stack
      */
     public T pop() {
-        if (this.currentIndex == -1)
+        if (this.currentIndex == 0)
             throw new EmptyStackException();
 
-        T object = this.objects[this.currentIndex];
+        T object = this.objects[this.currentIndex - 1];
 
-        this.objects[this.currentIndex] = null;
+        this.objects[this.currentIndex - 1] = null;
         this.currentIndex--;
 
         return object;
     }
 
     /**
-     * Shifts this stack to right.
-     *
-     * @return the element at the bottom before shifting
+     * Remove amount elements.
      */
-    public T shift() {
-        if (this.currentIndex == -1)
+    public void remove(int amount) {
+        if (this.currentIndex <= amount)
             throw new EmptyStackException();
 
-        return this.objects[this.startIndex++];
+        this.currentIndex -= amount;
     }
 
     /**
      * Reset this stack.
      */
     public void reset() {
-        this.currentIndex = -1;
-        this.startIndex = 0;
+        this.currentIndex = 0;
     }
 
     /**
@@ -192,6 +185,6 @@ public class FastStack<T> {
      * @return the number of elements
      */
     public int getSize() {
-        return this.currentIndex + 1;
+        return this.currentIndex;
     }
 }

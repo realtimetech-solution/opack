@@ -22,6 +22,8 @@
 
 package com.realtimetech.opack.util;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 import java.io.Writer;
 
@@ -29,8 +31,7 @@ public class StringWriter extends Writer {
     private char[] chars;
 
     private int currentIndex;
-
-    private int currentSize;
+    private int actualLength;
 
     /**
      * Calls {@code new StringWriter(1024)}
@@ -45,28 +46,45 @@ public class StringWriter extends Writer {
      * @param initialSize the initial size
      */
     public StringWriter(int initialSize) {
-        this.currentIndex = -1;
-        this.currentSize = Math.min(initialSize >> 1, 1);
+        this.currentIndex = 0;
+        this.actualLength = 1;
 
-        this.growArray(initialSize);
+        this.increaseArray(initialSize);
     }
 
     /**
      * If the needSize is larger than the current size, double the capacity.
      *
-     * @param needSize the needed size
+     * @param requireSize the need more size
      */
-    private void growArray(int needSize) {
-        char[] oldObjects = this.chars;
+    private void increaseArray(int requireSize) {
+        int need = this.currentIndex + requireSize;
 
-        while (needSize >= this.currentSize){
-            this.currentSize = this.currentSize << 1;
-        }
-        this.chars = new char[this.currentSize];
+        if (need > this.actualLength) {
+            char[] oldObjects = this.chars;
 
-        if (oldObjects != null) {
-            System.arraycopy(oldObjects, 0, this.chars, 0, currentIndex + 1);
+            do {
+                this.actualLength = this.actualLength << 1;
+            } while (need > this.actualLength);
+            this.chars = new char[this.actualLength];
+
+            if (oldObjects != null) {
+                System.arraycopy(oldObjects, 0, this.chars, 0, this.currentIndex);
+            }
         }
+    }
+
+    /**
+     * Writes a string.
+     *
+     * @param str String to be written
+     * @throws IOException If an I/O error occurs
+     */
+    @Override
+    public void write(@NotNull String str) throws IOException {
+        char[] array = str.toCharArray();
+
+        this.write(array, 0, array.length);
     }
 
     /**
@@ -75,14 +93,9 @@ public class StringWriter extends Writer {
      * @param object the character to write
      */
     public void write(char object) {
-        int need = this.currentIndex + 1;
-        if (need >= this.currentSize) {
-            growArray(need);
-        }
+        this.increaseArray(1);
 
-        this.currentIndex = need;
-
-        this.chars[this.currentIndex] = object;
+        this.chars[this.currentIndex++] = object;
     }
 
     /**
@@ -90,6 +103,7 @@ public class StringWriter extends Writer {
      *
      * @param src the source array to write
      */
+    @Override
     public void write(char[] src) {
         this.write(src, 0, src.length);
     }
@@ -103,14 +117,11 @@ public class StringWriter extends Writer {
      */
     @Override
     public void write(char[] src, int offset, int length) {
-        int need = this.currentIndex + length;
-        if (need >= this.currentSize) {
-            growArray(need);
-        }
+        this.increaseArray(length);
 
-        System.arraycopy(src, offset, this.chars, this.currentIndex + 1, length);
+        System.arraycopy(src, offset, this.chars, this.currentIndex, length);
 
-        this.currentIndex = need;
+        this.currentIndex += length;
     }
 
     @Override
@@ -128,14 +139,14 @@ public class StringWriter extends Writer {
      * @return string length
      */
     public int getLength() {
-        return this.currentIndex + 1;
+        return this.currentIndex;
     }
 
     /**
      * Reset this string writer
      */
     public void reset() {
-        this.currentIndex = -1;
+        this.currentIndex = 0;
     }
 
     /**
@@ -145,17 +156,15 @@ public class StringWriter extends Writer {
      */
     @Override
     public String toString() {
-        return new String(this.chars, 0, this.currentIndex + 1);
+        return new String(this.chars, 0, this.currentIndex);
     }
 
     /**
-     * Returns an array containing all the characters in this writer in proper sequence.
-     *
      * @return an array containing all the characters in this writer in proper sequence
      */
     public char[] toCharArray() {
-        char[] charArray = new char[this.currentIndex + 1];
-        System.arraycopy(this.chars, 0, charArray, 0, this.currentIndex + 1);
+        char[] charArray = new char[this.currentIndex];
+        System.arraycopy(this.chars, 0, charArray, 0, this.currentIndex);
         return charArray;
     }
 }

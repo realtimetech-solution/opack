@@ -28,7 +28,6 @@ public class ByteArrayWriter implements Writer {
     private byte[] bytes;
 
     private int currentIndex;
-
     private int actualLength;
 
     /**
@@ -45,7 +44,7 @@ public class ByteArrayWriter implements Writer {
      */
     public ByteArrayWriter(int initialSize) {
         this.currentIndex = 0;
-        this.actualLength = Math.min(initialSize >> 1, 1);
+        this.actualLength = 1;
 
         this.increaseArray(initialSize);
     }

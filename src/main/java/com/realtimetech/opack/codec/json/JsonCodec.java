@@ -24,15 +24,18 @@ package com.realtimetech.opack.codec.json;
 
 import com.realtimetech.opack.codec.OpackCodec;
 import com.realtimetech.opack.exception.EncodeException;
-import com.realtimetech.opack.util.ReflectionUtil;
+import com.realtimetech.opack.util.OpackArrayConverter;
 import com.realtimetech.opack.util.StringWriter;
 import com.realtimetech.opack.util.structure.FastStack;
+import com.realtimetech.opack.util.structure.NativeList;
 import com.realtimetech.opack.value.OpackArray;
 import com.realtimetech.opack.value.OpackObject;
 import com.realtimetech.opack.value.OpackValue;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 
 public final class JsonCodec extends OpackCodec<String, Writer> {
     public final static class Builder {
@@ -102,6 +105,8 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
     private static final char[] CONST_PRETTY_SPACE_CHARACTER = new char[]{' '};
 
     private static final char[] CONST_NULL_CHARACTER = new char[]{'n', 'u', 'l', 'l'};
+    private static final char[] CONST_TRUE_CHARACTER = new char[]{'t', 'r', 'u', 'e'};
+    private static final char[] CONST_FALSE_CHARACTER = new char[]{'f', 'a', 'l', 's', 'e'};
 
     private static final char[] CONST_SEPARATOR_CHARACTER = new char[]{','};
 
@@ -173,7 +178,7 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
      * @throws IllegalArgumentException if the type of data to be encoded is not allowed in json format
      * @throws ArithmeticException      if the data to be encoded is infinite
      */
-    boolean encodeLiteral(Writer writer, Object object) throws IOException {
+    private boolean encodeLiteral(final Writer writer, Object object) throws IOException {
         if (object == null) {
             writer.write(CONST_NULL_CHARACTER);
             return true;
@@ -226,24 +231,18 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
 
             writer.write(CONST_STRING_CLOSE_CHARACTER);
         } else {
-            if (!OpackValue.isAllowType(objectType)) {
-                throw new IllegalArgumentException(objectType + " is not allowed in json format.");
-            }
-
             Class<?> numberType = objectType;
-
-            if (ReflectionUtil.isPrimitiveType(objectType)) {
-                numberType = ReflectionUtil.convertPrimitiveTypeToWrapperType(objectType);
-            }
 
             // Asserts
             if (numberType == Double.class) {
                 Double doubleValue = (Double) object;
+
                 if (Double.isNaN(doubleValue) || Double.isInfinite(doubleValue) || !Double.isFinite(doubleValue)) {
                     throw new ArithmeticException("Only finite values are allowed in json format.");
                 }
             } else if (numberType == Float.class) {
                 Float floatValue = (Float) object;
+
                 if (Float.isNaN(floatValue) || Float.isInfinite(floatValue) || !Float.isFinite(floatValue)) {
                     throw new ArithmeticException("Only finite values are allowed in json format.");
                 }
@@ -252,14 +251,13 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
             if (numberType == Character.class) {
                 if (enableConvertCharacterToString) {
                     writer.write(CONST_STRING_OPEN_CHARACTER);
-                    writer.write(object.toString().toCharArray());
+                    writer.write(object.toString());
                     writer.write(CONST_STRING_CLOSE_CHARACTER);
                 } else {
-                    int convertToInt = ((char) object);
-                    writer.write(((Integer) convertToInt).toString().toCharArray());
+                    writer.write(Integer.toString((char) object));
                 }
             } else {
-                writer.write(object.toString().toCharArray());
+                writer.write(object.toString());
             }
         }
 
@@ -269,7 +267,7 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
     /**
      * Encodes the OpackValue to json string.
      *
-     * @param opackValue the OpackValue to encode
+     * @param opackValue the opack value to encode
      * @throws IllegalArgumentException if the type of data to be encoded is not allowed in json format
      */
     @Override
@@ -286,22 +284,23 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
 
         this.encodeStack.push(opackValue);
 
-
         while (!this.encodeStack.isEmpty()) {
             Object object = this.encodeStack.pop();
-
             Class<?> objectType = object == null ? null : object.getClass();
+
             if (objectType == char[].class) {
                 writer.write((char[]) object);
             } else if (objectType == OpackObject.class) {
                 OpackObject<Object, Object> opackObject = (OpackObject<Object, Object>) object;
                 int currentIndent = -1;
+
                 if (this.usePrettyFormat) {
                     currentIndent = prettyIndentStack.pop();
                 }
 
                 writer.write(CONST_OBJECT_OPEN_CHARACTER);
                 this.encodeStack.push(CONST_OBJECT_CLOSE_CHARACTER);
+
                 if (this.usePrettyFormat && currentIndent != -1) {
                     writer.write(CONST_PRETTY_LINE_CHARACTER);
                     for (int i = 0; i < currentIndent; i++) {
@@ -322,6 +321,7 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
                                 this.encodeStack.push(CONST_PRETTY_SPACE_CHARACTER);
                             }
                         }
+
                         this.encodeStack.push(CONST_SEPARATOR_CHARACTER);
                     }
 
@@ -333,16 +333,21 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
                         if (value instanceof OpackObject) {
                             prettyIndentStack.push(currentIndent == -1 ? -1 : currentIndent + 1);
                         }
+
                         if (key instanceof OpackObject) {
                             prettyIndentStack.push(currentIndent == -1 ? -1 : currentIndent + 1);
                         }
                     }
+
                     this.encodeStack.push(value);
+
                     if (this.usePrettyFormat) {
                         this.encodeStack.push(CONST_PRETTY_SPACE_CHARACTER);
                     }
+
                     this.encodeStack.push(CONST_OBJECT_MAP_CHARACTER);
                     this.encodeStack.push(key);
+
                     if (this.usePrettyFormat && currentIndent != -1) {
                         for (int i = 0; i < currentIndent + 1; i++) {
                             this.encodeStack.push(CONST_PRETTY_INDENT_CHARACTER);
@@ -355,54 +360,282 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
                 OpackArray<Object> opackArray = (OpackArray<Object>) object;
                 this.encodeLiteralStringWriter.reset();
 
-                writer.write(CONST_ARRAY_OPEN_CHARACTER);
+                boolean optimized = false;
 
-                int size = opackArray.length();
-                int reverseStart = this.encodeStack.getSize();
+                try {
+                    List<?> opackArrayList = OpackArrayConverter.getOpackArrayList(opackArray);
 
-                for (int index = 0; index < size; index++) {
-                    Object value = opackArray.get(index);
+                    if (opackArrayList instanceof NativeList) {
+                        NativeList nativeList = (NativeList) opackArrayList;
+                        Object arrayObject = nativeList.getArrayObject();
+                        Class<?> arrayType = arrayObject.getClass();
 
-                    if (!this.encodeLiteral(this.encodeLiteralStringWriter, value)) {
-                        if (this.usePrettyFormat) {
-                            if (value instanceof OpackObject) {
-                                prettyIndentStack.push(-1);
+                        if (arrayType == boolean[].class) {
+                            boolean[] array = (boolean[]) arrayObject;
+
+                            writer.write(CONST_ARRAY_OPEN_CHARACTER);
+
+                            for (int index = 0; index < array.length; index++) {
+                                if (index != 0) {
+                                    writer.write(CONST_SEPARATOR_CHARACTER);
+                                }
+
+                                if (array[index]) {
+                                    writer.write(CONST_TRUE_CHARACTER);
+                                } else {
+                                    writer.write(CONST_FALSE_CHARACTER);
+                                }
                             }
-                        }
 
-                        this.encodeStack.push(this.encodeLiteralStringWriter.toCharArray());
-                        this.encodeStack.swap(this.encodeStack.getSize() - 1, this.encodeStack.getSize() - 2);
-                        if (index != size - 1) {
-                            this.encodeStack.push(CONST_SEPARATOR_CHARACTER);
-                            if (this.usePrettyFormat) {
-                                this.encodeStack.push(CONST_PRETTY_SPACE_CHARACTER);
+                            writer.write(CONST_ARRAY_CLOSE_CHARACTER);
+                            optimized = true;
+                        } else if (arrayType == byte[].class) {
+                            byte[] array = (byte[]) arrayObject;
+
+                            writer.write(CONST_ARRAY_OPEN_CHARACTER);
+
+                            for (int index = 0; index < array.length; index++) {
+                                if (index != 0) {
+                                    writer.write(CONST_SEPARATOR_CHARACTER);
+                                }
+
+                                writer.write(Byte.toString(array[index]));
                             }
-                        }
 
-                        this.encodeLiteralStringWriter.reset();
-                    } else {
-                        if (index != size - 1) {
-                            this.encodeLiteralStringWriter.write(CONST_SEPARATOR_CHARACTER);
+                            writer.write(CONST_ARRAY_CLOSE_CHARACTER);
+                            optimized = true;
+                        } else if (arrayType == char[].class) {
+                            char[] array = (char[]) arrayObject;
+
+                            writer.write(CONST_ARRAY_OPEN_CHARACTER);
+
+                            for (int index = 0; index < array.length; index++) {
+                                if (index != 0) {
+                                    writer.write(CONST_SEPARATOR_CHARACTER);
+                                }
+
+                                if (enableConvertCharacterToString) {
+                                    writer.write(CONST_STRING_OPEN_CHARACTER);
+                                    writer.write(Character.toString(array[index]));
+                                    writer.write(CONST_STRING_CLOSE_CHARACTER);
+                                } else {
+                                    writer.write(Integer.toString(array[index]));
+                                }
+                            }
+
+                            writer.write(CONST_ARRAY_CLOSE_CHARACTER);
+                            optimized = true;
+                        } else if (arrayType == short[].class) {
+                            short[] array = (short[]) arrayObject;
+
+                            writer.write(CONST_ARRAY_OPEN_CHARACTER);
+
+                            for (int index = 0; index < array.length; index++) {
+                                if (index != 0) {
+                                    writer.write(CONST_SEPARATOR_CHARACTER);
+                                }
+
+                                writer.write(Short.toString(array[index]));
+                            }
+
+                            writer.write(CONST_ARRAY_CLOSE_CHARACTER);
+                            optimized = true;
+                        } else if (arrayType == int[].class) {
+                            int[] array = (int[]) arrayObject;
+
+                            writer.write(CONST_ARRAY_OPEN_CHARACTER);
+
+                            for (int index = 0; index < array.length; index++) {
+                                if (index != 0) {
+                                    writer.write(CONST_SEPARATOR_CHARACTER);
+                                }
+
+                                writer.write(Integer.toString(array[index]));
+                            }
+
+                            writer.write(CONST_ARRAY_CLOSE_CHARACTER);
+                            optimized = true;
+                        } else if (arrayType == float[].class) {
+                            float[] array = (float[]) arrayObject;
+
+                            writer.write(CONST_ARRAY_OPEN_CHARACTER);
+
+                            for (int index = 0; index < array.length; index++) {
+                                if (index != 0) {
+                                    writer.write(CONST_SEPARATOR_CHARACTER);
+                                }
+
+                                writer.write(Float.toString(array[index]));
+                            }
+
+                            writer.write(CONST_ARRAY_CLOSE_CHARACTER);
+                            optimized = true;
+                        } else if (arrayType == long[].class) {
+                            long[] array = (long[]) arrayObject;
+
+                            writer.write(CONST_ARRAY_OPEN_CHARACTER);
+
+                            for (int index = 0; index < array.length; index++) {
+                                if (index != 0) {
+                                    writer.write(CONST_SEPARATOR_CHARACTER);
+                                }
+
+                                writer.write(Long.toString(array[index]));
+                            }
+
+                            writer.write(CONST_ARRAY_CLOSE_CHARACTER);
+                            optimized = true;
+                        } else if (arrayType == double[].class) {
+                            double[] array = (double[]) arrayObject;
+
+                            writer.write(CONST_ARRAY_OPEN_CHARACTER);
+
+                            for (int index = 0; index < array.length; index++) {
+                                if (index != 0) {
+                                    writer.write(CONST_SEPARATOR_CHARACTER);
+                                }
+
+                                writer.write(Double.toString(array[index]));
+                            }
+
+                            writer.write(CONST_ARRAY_CLOSE_CHARACTER);
+                            optimized = true;
+                        } else if (arrayType == Boolean[].class) {
+                            Boolean[] array = (Boolean[]) arrayObject;
+
+                            writer.write(CONST_ARRAY_OPEN_CHARACTER);
+
+                            for (int index = 0; index < array.length; index++) {
+                                if (index != 0) {
+                                    writer.write(CONST_SEPARATOR_CHARACTER);
+                                }
+
+                                if (array[index] == null) {
+                                    writer.write(CONST_NULL_CHARACTER);
+                                } else if (array[index]) {
+                                    writer.write(CONST_TRUE_CHARACTER);
+                                } else {
+                                    writer.write(CONST_FALSE_CHARACTER);
+                                }
+                            }
+
+                            writer.write(CONST_ARRAY_CLOSE_CHARACTER);
+                            optimized = true;
+                        } else if (arrayType == Character[].class) {
+                            Character[] array = (Character[]) arrayObject;
+
+                            writer.write(CONST_ARRAY_OPEN_CHARACTER);
+
+                            for (int index = 0; index < array.length; index++) {
+                                if (index != 0) {
+                                    writer.write(CONST_SEPARATOR_CHARACTER);
+                                }
+
+                                if (array[index] == null) {
+                                    writer.write(CONST_NULL_CHARACTER);
+                                } else {
+                                    if (enableConvertCharacterToString) {
+                                        writer.write(CONST_STRING_OPEN_CHARACTER);
+                                        writer.write(Character.toString(array[index]));
+                                        writer.write(CONST_STRING_CLOSE_CHARACTER);
+                                    } else {
+                                        writer.write(Integer.toString(array[index]));
+                                    }
+                                }
+                            }
+
+                            writer.write(CONST_ARRAY_CLOSE_CHARACTER);
+                            optimized = true;
+                        } else if (arrayType == Byte[].class ||
+                                arrayType == Short[].class ||
+                                arrayType == Integer[].class ||
+                                arrayType == Float[].class ||
+                                arrayType == Long[].class ||
+                                arrayType == Double[].class) {
+                            Object[] array = (Object[]) arrayObject;
+
+                            writer.write(CONST_ARRAY_OPEN_CHARACTER);
+
+                            for (int index = 0; index < array.length; index++) {
+                                if (index != 0) {
+                                    writer.write(CONST_SEPARATOR_CHARACTER);
+                                }
+
+                                if (array[index] == null) {
+                                    writer.write(CONST_NULL_CHARACTER);
+                                } else {
+                                    writer.write(array[index].toString());
+                                }
+                            }
+
+                            writer.write(CONST_ARRAY_CLOSE_CHARACTER);
+                            optimized = true;
+                        }
+                    }
+                } catch (InvocationTargetException | IllegalAccessException exception) {
+                    // Skip optimization.
+                }
+
+                if (!optimized) {
+                    writer.write(CONST_ARRAY_OPEN_CHARACTER);
+
+                    int size = opackArray.length();
+                    int reverseStart = this.encodeStack.getSize();
+
+                    for (int index = 0; index < size; index++) {
+                        Object value = opackArray.get(index);
+
+                        if (!this.encodeLiteral(this.encodeLiteralStringWriter, value)) {
                             if (this.usePrettyFormat) {
-                                this.encodeLiteralStringWriter.write(CONST_PRETTY_SPACE_CHARACTER);
+                                if (value instanceof OpackObject) {
+                                    prettyIndentStack.push(-1);
+                                }
+                            }
+
+                            this.encodeStack.push(this.encodeLiteralStringWriter.toCharArray());
+                            this.encodeStack.swap(this.encodeStack.getSize() - 1, this.encodeStack.getSize() - 2);
+
+                            if (index != size - 1) {
+                                this.encodeStack.push(CONST_SEPARATOR_CHARACTER);
+
+                                if (this.usePrettyFormat) {
+                                    this.encodeStack.push(CONST_PRETTY_SPACE_CHARACTER);
+                                }
+                            }
+
+                            this.encodeLiteralStringWriter.reset();
+                        } else {
+                            if (index != size - 1) {
+                                this.encodeLiteralStringWriter.write(CONST_SEPARATOR_CHARACTER);
+
+                                if (this.usePrettyFormat) {
+                                    this.encodeLiteralStringWriter.write(CONST_PRETTY_SPACE_CHARACTER);
+                                }
                             }
                         }
                     }
-                }
 
-                if (this.encodeLiteralStringWriter.getLength() > 0) {
-                    this.encodeStack.push(this.encodeLiteralStringWriter.toCharArray());
-                    this.encodeLiteralStringWriter.reset();
-                }
+                    if (this.encodeLiteralStringWriter.getLength() > 0) {
+                        this.encodeStack.push(this.encodeLiteralStringWriter.toCharArray());
+                        this.encodeLiteralStringWriter.reset();
+                    }
 
-                this.encodeStack.push(CONST_ARRAY_CLOSE_CHARACTER);
-                this.encodeStack.reverse(reverseStart, this.encodeStack.getSize() - 1);
+                    this.encodeStack.push(CONST_ARRAY_CLOSE_CHARACTER);
+                    this.encodeStack.reverse(reverseStart, this.encodeStack.getSize() - 1);
+                }
             } else {
                 this.encodeLiteral(writer, object);
             }
         }
     }
 
+    /**
+     * Encodes the OpackValue to json string.
+     *
+     * @param opackValue the opack value to encode
+     * @return returns encoded string
+     * @throws EncodeException if a problem occurs during encoding; if the type of data to be encoded is not allowed in specific codec
+     */
     public synchronized String encode(OpackValue opackValue) throws EncodeException {
         this.encodeStringWriter.reset();
         this.encode(this.encodeStringWriter, opackValue);
@@ -428,222 +661,246 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
         char[] charArray = data.toCharArray();
         boolean literalMode = false;
 
+        int currentContextIndex = -1;
+        OpackValue currentContext = null;
+        Class<?> currentContextType = null;
+
         while (pointer < length) {
-            boolean stackMerge = false;
             char currentChar = charArray[pointer++];
 
             switch (currentChar) {
                 /*
                     Syntax Parse
                  */
-                case '{': {
-                    this.decodeBaseStack.push(this.decodeValueStack.getSize());
-                    this.decodeValueStack.push(new OpackObject<>());
+                case '{':
+                    currentContextIndex = this.decodeBaseStack.push(this.decodeValueStack.getSize());
+                    currentContext = (OpackValue) this.decodeValueStack.push(new OpackObject<>());
+                    currentContextType = currentContext.getClass();
                     literalMode = true;
 
                     break;
-                }
-                case '[': {
-                    this.decodeBaseStack.push(this.decodeValueStack.getSize());
-                    this.decodeValueStack.push(new OpackArray<>());
+                case '[':
+                    currentContextIndex = this.decodeBaseStack.push(this.decodeValueStack.getSize());
+                    currentContext = (OpackValue) this.decodeValueStack.push(new OpackArray<>());
+                    currentContextType = currentContext.getClass();
                     literalMode = true;
 
                     break;
-                }
                 case '}':
-                case ']': {
-                    if (this.decodeValueStack.getSize() - 1 != this.decodeBaseStack.peek()) {
-                        throw new IOException("Expected literal value, but got close syntax character at " + pointer + "(" + currentChar + ").");
+                case ']':
+                    int valueSize = this.decodeValueStack.getSize() - currentContextIndex - 1;
+
+                    if (currentContextType == OpackObject.class) {
+                        OpackObject<Object, Object> opackObject = (OpackObject<Object, Object>) currentContext;
+
+                        for (int i = 0; i < valueSize; i += 2) {
+                            Object value = this.decodeValueStack.pop();
+                            Object key = this.decodeValueStack.pop();
+
+                            opackObject.put(key, value);
+                        }
+                    } else if (currentContextType == OpackArray.class) {
+                        OpackArray<Object> opackArray = (OpackArray<Object>) currentContext;
+                        int currentSize = this.decodeValueStack.getSize();
+
+                        for (int i = currentSize - valueSize; i < currentSize; i++) {
+                            opackArray.add(this.decodeValueStack.get(i));
+                        }
+
+                        this.decodeValueStack.remove(valueSize);
+                    } else {
+                        throw new IOException("Caught corrupted stack, got " + (currentContextType == null ? "null" : currentContextType.getSimpleName()) + ".");
                     }
 
                     this.decodeBaseStack.pop();
-                    stackMerge = true;
+
+                    if (!this.decodeBaseStack.isEmpty()) {
+                        currentContextIndex = this.decodeBaseStack.peek();
+                        currentContext = (OpackValue) this.decodeValueStack.get(currentContextIndex);
+                        currentContextType = currentContext.getClass();
+                    }
 
                     break;
-                }
                 case ',':
                 case ':': {
                     if (literalMode) {
                         throw new IOException("Expected literal value, but got syntax character at " + pointer + "(" + currentChar + ").");
                     }
 
-                    int baseIndex = this.decodeBaseStack.peek();
-                    int valueSize = this.decodeValueStack.getSize() - baseIndex - 1;
-                    Object object = this.decodeValueStack.get(baseIndex);
-                    Class<?> objectType = object.getClass();
-
-                    switch (currentChar) {
-                        case ',': {
-                            if (objectType == OpackObject.class) {
-                                if (valueSize != 0) {
-                                    throw new IOException("The map type cannot contain items that do not exist. at " + pointer + "(" + currentChar + ").");
-                                }
-                            }
-
-                            break;
-                        }
-                        case ':': {
-                            if (objectType == OpackObject.class) {
-                                if (valueSize != 1) {
-                                    throw new IOException("The map item must have a key. at " + pointer + "(" + currentChar + ").");
-                                }
-                            }
-                            if (objectType == OpackArray.class) {
-                                throw new IOException("The array type cannot contain colons. at " + pointer + "(" + currentChar + ").");
-                            }
-
-                            break;
+                    if (currentChar == ':') {
+                        if (currentContextType == OpackArray.class) {
+                            throw new IOException("The array type cannot contain colons. at " + pointer + "(" + currentChar + ").");
                         }
                     }
 
                     literalMode = true;
+
                     break;
                 }
-
                 case ' ':
                 case '\r':
                 case '\n':
-                case '\t': {
+                case '\t':
                     // Skip no-meaning character
                     break;
-                }
-                default: {
+                default:
                     /*
                         Literal Parse
                      */
                     if (literalMode) {
-                        if (currentChar == '\"') {
-                            while (pointer < length) {
-                                char literalChar = charArray[pointer++];
+                        Object object = this.decodeValueStack.get(this.decodeBaseStack.peek());
 
-                                if (literalChar == '\"') {
-                                    this.decodeValueStack.push(this.decodeStringWriter.toString());
+                        switch (currentChar) {
+                            case '\"':
+                                STRING_LOOP:
+                                while (pointer < length) {
+                                    char literalChar = charArray[pointer++];
 
-                                    this.decodeStringWriter.reset();
-                                    stackMerge = true;
-                                    break;
-                                } else if (literalChar == '\\') {
-                                    char nextChar = charArray[pointer++];
-
-                                    switch (nextChar) {
-                                        case '"':
-                                            this.decodeStringWriter.write('\"');
-                                            break;
+                                    switch (literalChar) {
+                                        case '\"':
+                                            this.decodeValueStack.push(this.decodeStringWriter.toString());
+                                            this.decodeStringWriter.reset();
+                                            break STRING_LOOP;
                                         case '\\':
-                                            this.decodeStringWriter.write('\\');
-                                            break;
-                                        case 'u':
-                                            char result = 0;
-                                            for (int i = 0; i < 4; i++) {
-                                                char unicode = charArray[pointer++];
-                                                result <<= 4;
-                                                if (unicode >= '0' && unicode <= '9') {
-                                                    result += (unicode - '0');
-                                                } else if (unicode >= 'a' && unicode <= 'f') {
-                                                    result += (unicode - 'a' + 10);
-                                                } else if (unicode >= 'A' && unicode <= 'F') {
-                                                    result += (unicode - 'A' + 10);
-                                                } else {
-                                                    throw new IOException("Parsed unknown unicode pattern at " + pointer + "(" + unicode + ").");
-                                                }
+                                            char nextChar = charArray[pointer++];
+
+                                            switch (nextChar) {
+                                                case '"':
+                                                    this.decodeStringWriter.write('\"');
+
+                                                    break;
+                                                case '\\':
+                                                    this.decodeStringWriter.write('\\');
+
+                                                    break;
+                                                case 'u':
+                                                    char result = 0;
+
+                                                    for (int i = 0; i < 4; i++) {
+                                                        char unicode = charArray[pointer++];
+
+                                                        result <<= 4;
+
+                                                        if (unicode >= '0' && unicode <= '9') {
+                                                            result += (unicode - '0');
+                                                        } else if (unicode >= 'a' && unicode <= 'f') {
+                                                            result += (unicode - 'a' + 10);
+                                                        } else if (unicode >= 'A' && unicode <= 'F') {
+                                                            result += (unicode - 'A' + 10);
+                                                        } else {
+                                                            throw new IOException("Parsed unknown unicode pattern at " + pointer + "(" + unicode + ").");
+                                                        }
+                                                    }
+
+                                                    this.decodeStringWriter.write(result);
+
+                                                    break;
+                                                case 'b':
+                                                    this.decodeStringWriter.write('\b');
+
+                                                    break;
+                                                case 'f':
+                                                    this.decodeStringWriter.write('\f');
+
+                                                    break;
+                                                case 'n':
+                                                    this.decodeStringWriter.write('\n');
+
+                                                    break;
+                                                case 'r':
+                                                    this.decodeStringWriter.write('\r');
+
+                                                    break;
+                                                case 't':
+                                                    this.decodeStringWriter.write('\t');
+
+                                                    break;
                                             }
-                                            this.decodeStringWriter.write(result);
+
                                             break;
-                                        case 'b':
-                                            this.decodeStringWriter.write('\b');
-                                            break;
-                                        case 'f':
-                                            this.decodeStringWriter.write('\f');
-                                            break;
-                                        case 'n':
-                                            this.decodeStringWriter.write('\n');
-                                            break;
-                                        case 'r':
-                                            this.decodeStringWriter.write('\r');
-                                            break;
-                                        case 't':
-                                            this.decodeStringWriter.write('\t');
-                                            break;
+                                        default:
+                                            this.decodeStringWriter.write(literalChar);
                                     }
-                                } else {
-                                    this.decodeStringWriter.write(literalChar);
                                 }
-                            }
-                        } else if ((currentChar >= '0' && currentChar <= '9') || currentChar == '-') {
-                            pointer--;
 
-                            boolean decimal = false;
-                            while (pointer < length) {
-                                char literalChar = charArray[pointer++];
+                                break;
+                            case '0':
+                            case '1':
+                            case '2':
+                            case '3':
+                            case '4':
+                            case '5':
+                            case '6':
+                            case '7':
+                            case '8':
+                            case '9':
+                            case '-':
+                                pointer--;
 
-                                if (!(literalChar >= '0' && literalChar <= '9') && literalChar != 'E' && literalChar != 'e' && literalChar != '+' && literalChar != '-' && literalChar != '.') {
-                                    if (decimal) {
-                                        this.decodeValueStack.push(Double.parseDouble(this.decodeStringWriter.toString()));
-                                    } else {
-                                        this.decodeValueStack.push(Long.parseLong(this.decodeStringWriter.toString()));
+                                boolean decimal = false;
+
+                                NUMBER_LOOP:
+                                while (pointer < length) {
+                                    char literalChar = charArray[pointer++];
+
+                                    switch (literalChar) {
+                                        case '.':
+                                            decimal = true;
+                                        case '0':
+                                        case '1':
+                                        case '2':
+                                        case '3':
+                                        case '4':
+                                        case '5':
+                                        case '6':
+                                        case '7':
+                                        case '8':
+                                        case '9':
+                                        case 'E':
+                                        case 'e':
+                                        case '+':
+                                        case '-':
+                                            this.decodeStringWriter.write(literalChar);
+
+                                            break;
+                                        default:
+                                            if (decimal) {
+                                                this.decodeValueStack.push(Double.parseDouble(this.decodeStringWriter.toString()));
+                                            } else {
+                                                this.decodeValueStack.push(Long.parseLong(this.decodeStringWriter.toString()));
+                                            }
+
+                                            pointer--;
+                                            this.decodeStringWriter.reset();
+
+                                            break NUMBER_LOOP;
                                     }
-
-                                    pointer--;
-                                    this.decodeStringWriter.reset();
-                                    stackMerge = true;
-                                    break;
-                                } else {
-                                    if (literalChar == '.') {
-                                        decimal = true;
-                                    }
-
-                                    this.decodeStringWriter.write(literalChar);
                                 }
-                            }
-                        } else if (currentChar == 't') {
-                            this.decodeValueStack.push(true);
-                            pointer = pointer + 3;
-                            stackMerge = true;
-                        } else if (currentChar == 'f') {
-                            this.decodeValueStack.push(false);
-                            pointer = pointer + 4;
-                            stackMerge = true;
-                        } else if (currentChar == 'n') {
-                            this.decodeValueStack.push(null);
-                            pointer = pointer + 3;
-                            stackMerge = true;
-                        } else {
-                            throw new IOException("This value is not an opack value. Unknown value at " + pointer + "(" + currentChar + ").");
+
+                                break;
+                            case 't':
+                                this.decodeValueStack.push(true);
+                                pointer = pointer + 3;
+
+                                break;
+                            case 'f':
+                                this.decodeValueStack.push(false);
+                                pointer = pointer + 4;
+
+                                break;
+                            case 'n':
+                                this.decodeValueStack.push(null);
+                                pointer = pointer + 3;
+
+                                break;
+                            default:
+                                throw new IOException("This value is not an opack value. Unknown value at " + pointer + "(" + currentChar + ").");
                         }
+
+                        literalMode = false;
                     } else {
                         throw new IOException("Parsed unknown character at " + pointer + "(" + currentChar + ").");
                     }
-                }
-            }
-
-            if (stackMerge && !this.decodeBaseStack.isEmpty()) {
-                literalMode = false;
-
-                //Let's merge
-                int baseIndex = this.decodeBaseStack.peek();
-                int valueSize = this.decodeValueStack.getSize() - baseIndex - 1;
-                Object object = this.decodeValueStack.get(baseIndex);
-                Class<?> objectType = object.getClass();
-
-                if (objectType == OpackObject.class) {
-                    if (valueSize == 2) {
-                        OpackObject<Object, Object> opackObject = (OpackObject<Object, Object>) object;
-
-                        Object value = this.decodeValueStack.pop();
-                        Object key = this.decodeValueStack.pop();
-
-                        opackObject.put(key, value);
-                    }
-                } else if (objectType == OpackArray.class) {
-                    if (valueSize == 1) {
-                        OpackArray<Object> opackArray = (OpackArray<Object>) object;
-                        Object value = this.decodeValueStack.pop();
-
-                        opackArray.add(value);
-                    }
-                } else {
-                    throw new IOException("Caught corrupted stack, got " + objectType.getSimpleName() + ".");
-                }
             }
         }
 

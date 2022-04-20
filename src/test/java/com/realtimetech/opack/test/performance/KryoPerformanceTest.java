@@ -95,7 +95,7 @@ public class KryoPerformanceTest {
         ByteArrayWriter byteArrayWriter = new ByteArrayWriter();
         DenseCodec denseCodec = new DenseCodec.Builder().create();
 
-        int warmloop = 512;
+        int warmLoop = 512;
         int loop = 512 * 2;
 
         PerformanceClass.ExceptionRunnable kryoRunnable = () -> {
@@ -120,8 +120,8 @@ public class KryoPerformanceTest {
         };
 
         // Warm up!
-        PerformanceClass.measureRunningTime(warmloop, kryoRunnable);
-        PerformanceClass.measureRunningTime(warmloop, opackRunnable);
+        PerformanceClass.measureRunningTime(warmLoop, kryoRunnable);
+        PerformanceClass.measureRunningTime(warmLoop, opackRunnable);
 
         long kryoTime = PerformanceClass.measureRunningTime(loop, kryoRunnable);
         long opackTime = PerformanceClass.measureRunningTime(loop, opackRunnable);
