@@ -56,13 +56,15 @@ public final class OpackArray<E> extends AbstractOpackValue<List<E>> {
         return new OpackArray<>(arrayObject);
     }
 
+    private boolean nativeArray;
+
     /**
      * Constructs an opack array with the specified array object of which component type is the primitive type.
      *
      * @param arrayObject the array object for create
      * @throws IllegalArgumentException if the component type for array object is not primitive type; if the array object is not 1 dimension
      */
-    OpackArray(@NotNull Object arrayObject) {
+    private OpackArray(@NotNull Object arrayObject) {
         if (!arrayObject.getClass().isArray()) {
             throw new IllegalArgumentException(arrayObject + " is not array object.");
         }
@@ -76,6 +78,7 @@ public final class OpackArray<E> extends AbstractOpackValue<List<E>> {
         }
 
         this.set((List<E>) new NativeList(arrayObject));
+        this.nativeArray = true;
     }
 
     /**
@@ -85,6 +88,7 @@ public final class OpackArray<E> extends AbstractOpackValue<List<E>> {
      */
     public OpackArray(E @NotNull [] array) {
         this.set(Arrays.asList(array));
+        this.nativeArray = false;
     }
 
     /**
@@ -113,12 +117,15 @@ public final class OpackArray<E> extends AbstractOpackValue<List<E>> {
      */
     public OpackArray(int initialCapacity) {
         this.set(new ArrayList<>(initialCapacity));
+
+        this.nativeArray = false;
     }
 
     /**
      * Constructs an empty opack array without underlying list.
      */
     public OpackArray() {
+        this.nativeArray = false;
     }
 
     /**
@@ -128,18 +135,20 @@ public final class OpackArray<E> extends AbstractOpackValue<List<E>> {
      * @return underlying list
      */
     @Override
-    ArrayList<E> createLazyValue() {
+    protected ArrayList<E> createLazyValue() {
         return new ArrayList<>();
     }
 
-    /**
-     * If the underlying list is {@link NativeList NativeList}, it is converted to List.
-     */
-    void unpinList() {
-        List<E> list = this.get();
+    private void convertNativeArrayToList() {
+        if (this.nativeArray) {
+            List<E> list = this.get();
 
-        if (list.getClass() == NativeList.class) {
-            this.set((List<E>) Arrays.asList(list.toArray()));
+            if (list.getClass() == NativeList.class) {
+                list = (List<E>) Arrays.asList(list.toArray());
+                this.set(list);
+            }
+
+            this.nativeArray = false;
         }
     }
 
@@ -152,10 +161,11 @@ public final class OpackArray<E> extends AbstractOpackValue<List<E>> {
      * @throws IllegalArgumentException if type of the value is not allowed in opack value
      */
     public E set(int index, E value) {
-        if (value != null)
+        if (value != null) {
             OpackValue.assertAllowType(value.getClass());
+        }
 
-        this.unpinList();
+        this.convertNativeArrayToList();
 
         return this.get().set(index, value);
     }
@@ -168,10 +178,11 @@ public final class OpackArray<E> extends AbstractOpackValue<List<E>> {
      * @throws IllegalArgumentException if type of the value is not allowed in opack value
      */
     public boolean add(E value) {
-        if (value != null)
+        if (value != null) {
             OpackValue.assertAllowType(value.getClass());
+        }
 
-        this.unpinList();
+        this.convertNativeArrayToList();
 
         return this.get().add(value);
     }
@@ -212,7 +223,7 @@ public final class OpackArray<E> extends AbstractOpackValue<List<E>> {
      * @return a string representation of the List
      */
     @Override
-    String toString(List<E> value) {
+    protected String toString(List<E> value) {
         StringBuilder stringBuilder = new StringBuilder();
 
         stringBuilder.append('[');

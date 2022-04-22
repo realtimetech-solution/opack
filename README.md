@@ -23,6 +23,10 @@ Opack is a Java library that can serialize/deserialize between Java objects and 
 # KryoPerformanceTest
  Kryo	: 5566ms
  Opack	: 1670ms
+
+# JacksonPerformanceTest
+ Jackson: 4194ms
+ Opack	: 4169ms
 ```
 </details>
 

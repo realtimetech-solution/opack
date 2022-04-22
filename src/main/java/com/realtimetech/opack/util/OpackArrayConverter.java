@@ -32,31 +32,6 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 public class OpackArrayConverter {
-    private static final Method OPACK_ARRAY_GETTER_METHOD;
-
-    static {
-        Method method;
-        try {
-            method = Class.forName("com.realtimetech.opack.value.AbstractOpackValue").getDeclaredMethod("get");
-        } catch (NoSuchMethodException | ClassNotFoundException e) {
-            throw new ExceptionInInitializerError("No getter method found in OpackArray.");
-        }
-        OPACK_ARRAY_GETTER_METHOD = method;
-        OPACK_ARRAY_GETTER_METHOD.setAccessible(true);
-    }
-
-    /**
-     * Returns the underlying list of opack array.
-     *
-     * @param opackArray the opack array to be targeted
-     * @return the underlying list
-     * @throws InvocationTargetException if exception occurs during invoke opack array getter method
-     * @throws IllegalAccessException    if the getter method object in opack array is enforcing Java language access control and cannot access that method
-     */
-    public static List<?> getOpackArrayList(OpackArray<?> opackArray) throws InvocationTargetException, IllegalAccessException {
-        return (List<?>) OPACK_ARRAY_GETTER_METHOD.invoke(opackArray);
-    }
-
     /**
      * Convert the opack array to array.
      *
@@ -72,7 +47,7 @@ public class OpackArrayConverter {
             throw new IllegalArgumentException(componentType + " type is not allowed");
         }
 
-        List<?> list = (List<?>) OPACK_ARRAY_GETTER_METHOD.invoke(opackArray);
+        List<?> list = UnsafeOpackValue.getList(opackArray);
 
         if (list instanceof NativeList) {
             /*
@@ -97,15 +72,116 @@ public class OpackArrayConverter {
             return dest;
         }
 
-        Object array = Array.newInstance(componentType, opackArray.length());
-        for (int i = 0; i < opackArray.length(); i++) {
-            Object object = opackArray.get(i);
+        if (ReflectionUtil.isPrimitiveType(componentType)) {
+            /*
+                Optimize code for primitive array
+             */
 
-            if (object instanceof OpackValue) {
-                object = ((OpackValue) object).clone();
+            if (componentType == boolean.class) {
+                boolean[] array = new boolean[list.size()];
+                int index = 0;
+
+                for (Object object : list) {
+                    array[index] = (boolean) ReflectionUtil.cast(componentType, object);
+
+                    index++;
+                }
+
+                return array;
+            } else if (componentType == byte.class) {
+                byte[] array = new byte[list.size()];
+                int index = 0;
+
+                for (Object object : list) {
+                    array[index] = ((Number) object).byteValue();
+
+                    index++;
+                }
+
+                return array;
+            } else if (componentType == char.class) {
+                char[] array = new char[list.size()];
+                int index = 0;
+
+                for (Object object : list) {
+                    array[index] = (char) ReflectionUtil.cast(componentType, object);
+
+                    index++;
+                }
+
+                return array;
+            } else if (componentType == short.class) {
+                short[] array = new short[list.size()];
+                int index = 0;
+
+                for (Object object : list) {
+                    array[index] = ((Number) object).shortValue();
+
+                    index++;
+                }
+
+                return array;
+            } else if (componentType == int.class) {
+                int[] array = new int[list.size()];
+                int index = 0;
+
+                for (Object object : list) {
+                    array[index] = ((Number) object).intValue();
+
+                    index++;
+                }
+
+                return array;
+            } else if (componentType == float.class) {
+                float[] array = new float[list.size()];
+                int index = 0;
+
+                for (Object object : list) {
+                    array[index] = ((Number) object).floatValue();
+
+                    index++;
+                }
+
+                return array;
+            } else if (componentType == long.class) {
+                long[] array = new long[list.size()];
+                int index = 0;
+
+                for (Object object : list) {
+                    array[index] = ((Number) object).longValue();
+
+                    index++;
+                }
+
+                return array;
+            } else if (componentType == double.class) {
+                double[] array = new double[list.size()];
+                int index = 0;
+
+                for (Object object : list) {
+                    array[index] = ((Number) object).doubleValue();
+
+                    index++;
+                }
+
+                return array;
+            }
+        }
+
+        Object array = Array.newInstance(componentType, opackArray.length());
+        Object[] wrapperArray = (Object[]) array;
+        int index = 0;
+
+        for (Object object : list) {
+            if (object != null) {
+                if (object instanceof OpackValue) {
+                    object = ((OpackValue) object).clone();
+                }
+
+                wrapperArray[index] = ReflectionUtil.cast(componentType, object);
             }
 
-            ReflectionUtil.setArrayItem(array, i, object == null ? null : ReflectionUtil.cast(componentType, object));
+            index++;
         }
 
         return array;

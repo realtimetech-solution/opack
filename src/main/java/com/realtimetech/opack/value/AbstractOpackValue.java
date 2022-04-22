@@ -31,14 +31,14 @@ abstract class AbstractOpackValue<T> implements OpackValue {
      *
      * @return underlying object
      */
-    abstract T createLazyValue();
+    protected abstract T createLazyValue();
 
     /**
      * Returns the underlying object of this opack value.
      *
      * @return underlying object
      */
-    T get() {
+    protected T get() {
         if (this.value == null) {
             synchronized (this) {
                 if (this.value == null) {
@@ -55,7 +55,7 @@ abstract class AbstractOpackValue<T> implements OpackValue {
      *
      * @param value the underlying object to set
      */
-    void set(T value) {
+    protected void set(T value) {
         synchronized (this) {
             this.value = value;
         }
@@ -67,7 +67,7 @@ abstract class AbstractOpackValue<T> implements OpackValue {
      * @param value the underlying object of opack value
      * @return a string representation of the underlying object of opack value
      */
-    abstract String toString(T value);
+    protected abstract String toString(T value);
 
     /**
      * Returns true if a specific object is the same as this opack value.

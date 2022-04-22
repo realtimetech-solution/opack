@@ -24,18 +24,20 @@ package com.realtimetech.opack.codec.json;
 
 import com.realtimetech.opack.codec.OpackCodec;
 import com.realtimetech.opack.exception.EncodeException;
-import com.realtimetech.opack.util.OpackArrayConverter;
 import com.realtimetech.opack.util.StringWriter;
+import com.realtimetech.opack.util.UnsafeOpackValue;
 import com.realtimetech.opack.util.structure.FastStack;
 import com.realtimetech.opack.util.structure.NativeList;
 import com.realtimetech.opack.value.OpackArray;
 import com.realtimetech.opack.value.OpackObject;
 import com.realtimetech.opack.value.OpackValue;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import java.util.Map;
 
 public final class JsonCodec extends OpackCodec<String, Writer> {
     public final static class Builder {
@@ -181,6 +183,7 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
     private boolean encodeLiteral(final Writer writer, Object object) throws IOException {
         if (object == null) {
             writer.write(CONST_NULL_CHARACTER);
+
             return true;
         }
 
@@ -230,6 +233,8 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
             }
 
             writer.write(CONST_STRING_CLOSE_CHARACTER);
+
+            return true;
         } else {
             Class<?> numberType = objectType;
 
@@ -259,13 +264,240 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
             } else {
                 writer.write(object.toString());
             }
-        }
 
-        return true;
+            return true;
+        }
     }
 
     /**
-     * Encodes the OpackValue to json string.
+     * Encodes the {@link NativeList NativeList} to writer
+     *
+     * @param writer     the writer
+     * @param nativeList the native list to encode
+     * @throws IllegalArgumentException if the type of data to be encoded is not allowed in json format
+     */
+    private boolean encodeNativeArray(@NotNull Writer writer, @NotNull NativeList nativeList) throws IOException {
+        Object arrayObject = nativeList.getArrayObject();
+        Class<?> arrayType = arrayObject.getClass();
+
+        if (arrayType == boolean[].class) {
+            boolean[] array = (boolean[]) arrayObject;
+
+            writer.write(CONST_ARRAY_OPEN_CHARACTER);
+
+            for (int index = 0; index < array.length; index++) {
+                if (index != 0) {
+                    writer.write(CONST_SEPARATOR_CHARACTER);
+                }
+
+                if (array[index]) {
+                    writer.write(CONST_TRUE_CHARACTER);
+                } else {
+                    writer.write(CONST_FALSE_CHARACTER);
+                }
+            }
+
+            writer.write(CONST_ARRAY_CLOSE_CHARACTER);
+
+            return true;
+        } else if (arrayType == byte[].class) {
+            byte[] array = (byte[]) arrayObject;
+
+            writer.write(CONST_ARRAY_OPEN_CHARACTER);
+
+            for (int index = 0; index < array.length; index++) {
+                if (index != 0) {
+                    writer.write(CONST_SEPARATOR_CHARACTER);
+                }
+
+                writer.write(Byte.toString(array[index]));
+            }
+
+            writer.write(CONST_ARRAY_CLOSE_CHARACTER);
+
+            return true;
+        } else if (arrayType == char[].class) {
+            char[] array = (char[]) arrayObject;
+
+            writer.write(CONST_ARRAY_OPEN_CHARACTER);
+
+            for (int index = 0; index < array.length; index++) {
+                if (index != 0) {
+                    writer.write(CONST_SEPARATOR_CHARACTER);
+                }
+
+                if (enableConvertCharacterToString) {
+                    writer.write(CONST_STRING_OPEN_CHARACTER);
+                    writer.write(Character.toString(array[index]));
+                    writer.write(CONST_STRING_CLOSE_CHARACTER);
+                } else {
+                    writer.write(Integer.toString(array[index]));
+                }
+            }
+
+            writer.write(CONST_ARRAY_CLOSE_CHARACTER);
+
+            return true;
+        } else if (arrayType == short[].class) {
+            short[] array = (short[]) arrayObject;
+
+            writer.write(CONST_ARRAY_OPEN_CHARACTER);
+
+            for (int index = 0; index < array.length; index++) {
+                if (index != 0) {
+                    writer.write(CONST_SEPARATOR_CHARACTER);
+                }
+
+                writer.write(Short.toString(array[index]));
+            }
+
+            writer.write(CONST_ARRAY_CLOSE_CHARACTER);
+
+            return true;
+        } else if (arrayType == int[].class) {
+            int[] array = (int[]) arrayObject;
+
+            writer.write(CONST_ARRAY_OPEN_CHARACTER);
+
+            for (int index = 0; index < array.length; index++) {
+                if (index != 0) {
+                    writer.write(CONST_SEPARATOR_CHARACTER);
+                }
+
+                writer.write(Integer.toString(array[index]));
+            }
+
+            writer.write(CONST_ARRAY_CLOSE_CHARACTER);
+
+            return true;
+        } else if (arrayType == float[].class) {
+            float[] array = (float[]) arrayObject;
+
+            writer.write(CONST_ARRAY_OPEN_CHARACTER);
+
+            for (int index = 0; index < array.length; index++) {
+                if (index != 0) {
+                    writer.write(CONST_SEPARATOR_CHARACTER);
+                }
+
+                writer.write(Float.toString(array[index]));
+            }
+
+            writer.write(CONST_ARRAY_CLOSE_CHARACTER);
+
+            return true;
+        } else if (arrayType == long[].class) {
+            long[] array = (long[]) arrayObject;
+
+            writer.write(CONST_ARRAY_OPEN_CHARACTER);
+
+            for (int index = 0; index < array.length; index++) {
+                if (index != 0) {
+                    writer.write(CONST_SEPARATOR_CHARACTER);
+                }
+
+                writer.write(Long.toString(array[index]));
+            }
+
+            writer.write(CONST_ARRAY_CLOSE_CHARACTER);
+
+            return true;
+        } else if (arrayType == double[].class) {
+            double[] array = (double[]) arrayObject;
+
+            writer.write(CONST_ARRAY_OPEN_CHARACTER);
+
+            for (int index = 0; index < array.length; index++) {
+                if (index != 0) {
+                    writer.write(CONST_SEPARATOR_CHARACTER);
+                }
+
+                writer.write(Double.toString(array[index]));
+            }
+
+            writer.write(CONST_ARRAY_CLOSE_CHARACTER);
+
+            return true;
+        } else if (arrayType == Boolean[].class) {
+            Boolean[] array = (Boolean[]) arrayObject;
+
+            writer.write(CONST_ARRAY_OPEN_CHARACTER);
+
+            for (int index = 0; index < array.length; index++) {
+                if (index != 0) {
+                    writer.write(CONST_SEPARATOR_CHARACTER);
+                }
+
+                if (array[index] == null) {
+                    writer.write(CONST_NULL_CHARACTER);
+                } else if (array[index]) {
+                    writer.write(CONST_TRUE_CHARACTER);
+                } else {
+                    writer.write(CONST_FALSE_CHARACTER);
+                }
+            }
+
+            writer.write(CONST_ARRAY_CLOSE_CHARACTER);
+
+            return true;
+        } else if (arrayType == Character[].class) {
+            Character[] array = (Character[]) arrayObject;
+
+            writer.write(CONST_ARRAY_OPEN_CHARACTER);
+
+            for (int index = 0; index < array.length; index++) {
+                if (index != 0) {
+                    writer.write(CONST_SEPARATOR_CHARACTER);
+                }
+
+                if (array[index] == null) {
+                    writer.write(CONST_NULL_CHARACTER);
+                } else {
+                    if (enableConvertCharacterToString) {
+                        writer.write(CONST_STRING_OPEN_CHARACTER);
+                        writer.write(Character.toString(array[index]));
+                        writer.write(CONST_STRING_CLOSE_CHARACTER);
+                    } else {
+                        writer.write(Integer.toString(array[index]));
+                    }
+                }
+            }
+
+            writer.write(CONST_ARRAY_CLOSE_CHARACTER);
+
+            return true;
+        } else if (arrayType == Byte[].class ||
+                arrayType == Short[].class ||
+                arrayType == Integer[].class ||
+                arrayType == Float[].class ||
+                arrayType == Long[].class ||
+                arrayType == Double[].class) {
+            Object[] array = (Object[]) arrayObject;
+
+            writer.write(CONST_ARRAY_OPEN_CHARACTER);
+
+            for (int index = 0; index < array.length; index++) {
+                if (index != 0) {
+                    writer.write(CONST_SEPARATOR_CHARACTER);
+                }
+
+                if (array[index] == null) {
+                    writer.write(CONST_NULL_CHARACTER);
+                } else {
+                    writer.write(array[index].toString());
+                }
+            }
+
+            writer.write(CONST_ARRAY_CLOSE_CHARACTER);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Encodes the {@link OpackValue OpackValue} to json string.
      *
      * @param opackValue the opack value to encode
      * @throws IllegalArgumentException if the type of data to be encoded is not allowed in json format
@@ -292,6 +524,14 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
                 writer.write((char[]) object);
             } else if (objectType == OpackObject.class) {
                 OpackObject<Object, Object> opackObject = (OpackObject<Object, Object>) object;
+                Map<Object, Object> opackObjectMap = null;
+
+                try {
+                    opackObjectMap = UnsafeOpackValue.getMap(opackObject);
+                } catch (InvocationTargetException | IllegalAccessException exception) {
+                    throw new IOException("Can't access opack object map.", exception);
+                }
+
                 int currentIndent = -1;
 
                 if (this.usePrettyFormat) {
@@ -309,11 +549,12 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
                     this.encodeStack.push(CONST_PRETTY_LINE_CHARACTER);
                 }
 
-                int count = 0;
-                for (Object key : opackObject.keySet()) {
-                    Object value = opackObject.get(key);
+                int index = 0;
+                for (Map.Entry<Object, Object> entry : opackObjectMap.entrySet()) {
+                    Object key = entry.getKey();
+                    Object value = entry.getValue();
 
-                    if (count != 0) {
+                    if (index != 0) {
                         if (this.usePrettyFormat) {
                             if (currentIndent != -1) {
                                 this.encodeStack.push(CONST_PRETTY_LINE_CHARACTER);
@@ -354,237 +595,36 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
                         }
                     }
 
-                    count++;
+                    index++;
                 }
             } else if (objectType == OpackArray.class) {
                 OpackArray<Object> opackArray = (OpackArray<Object>) object;
+                int size = opackArray.length();
+                List<Object> opackArrayList = null;
+
+                try {
+                    opackArrayList = UnsafeOpackValue.getList(opackArray);
+                } catch (InvocationTargetException | IllegalAccessException exception) {
+                    throw new IOException("Can't access opack array list.", exception);
+                }
+
                 this.encodeLiteralStringWriter.reset();
 
                 boolean optimized = false;
 
-                try {
-                    List<?> opackArrayList = OpackArrayConverter.getOpackArrayList(opackArray);
+                if (opackArrayList instanceof NativeList) {
+                    NativeList nativeList = (NativeList) opackArrayList;
 
-                    if (opackArrayList instanceof NativeList) {
-                        NativeList nativeList = (NativeList) opackArrayList;
-                        Object arrayObject = nativeList.getArrayObject();
-                        Class<?> arrayType = arrayObject.getClass();
-
-                        if (arrayType == boolean[].class) {
-                            boolean[] array = (boolean[]) arrayObject;
-
-                            writer.write(CONST_ARRAY_OPEN_CHARACTER);
-
-                            for (int index = 0; index < array.length; index++) {
-                                if (index != 0) {
-                                    writer.write(CONST_SEPARATOR_CHARACTER);
-                                }
-
-                                if (array[index]) {
-                                    writer.write(CONST_TRUE_CHARACTER);
-                                } else {
-                                    writer.write(CONST_FALSE_CHARACTER);
-                                }
-                            }
-
-                            writer.write(CONST_ARRAY_CLOSE_CHARACTER);
-                            optimized = true;
-                        } else if (arrayType == byte[].class) {
-                            byte[] array = (byte[]) arrayObject;
-
-                            writer.write(CONST_ARRAY_OPEN_CHARACTER);
-
-                            for (int index = 0; index < array.length; index++) {
-                                if (index != 0) {
-                                    writer.write(CONST_SEPARATOR_CHARACTER);
-                                }
-
-                                writer.write(Byte.toString(array[index]));
-                            }
-
-                            writer.write(CONST_ARRAY_CLOSE_CHARACTER);
-                            optimized = true;
-                        } else if (arrayType == char[].class) {
-                            char[] array = (char[]) arrayObject;
-
-                            writer.write(CONST_ARRAY_OPEN_CHARACTER);
-
-                            for (int index = 0; index < array.length; index++) {
-                                if (index != 0) {
-                                    writer.write(CONST_SEPARATOR_CHARACTER);
-                                }
-
-                                if (enableConvertCharacterToString) {
-                                    writer.write(CONST_STRING_OPEN_CHARACTER);
-                                    writer.write(Character.toString(array[index]));
-                                    writer.write(CONST_STRING_CLOSE_CHARACTER);
-                                } else {
-                                    writer.write(Integer.toString(array[index]));
-                                }
-                            }
-
-                            writer.write(CONST_ARRAY_CLOSE_CHARACTER);
-                            optimized = true;
-                        } else if (arrayType == short[].class) {
-                            short[] array = (short[]) arrayObject;
-
-                            writer.write(CONST_ARRAY_OPEN_CHARACTER);
-
-                            for (int index = 0; index < array.length; index++) {
-                                if (index != 0) {
-                                    writer.write(CONST_SEPARATOR_CHARACTER);
-                                }
-
-                                writer.write(Short.toString(array[index]));
-                            }
-
-                            writer.write(CONST_ARRAY_CLOSE_CHARACTER);
-                            optimized = true;
-                        } else if (arrayType == int[].class) {
-                            int[] array = (int[]) arrayObject;
-
-                            writer.write(CONST_ARRAY_OPEN_CHARACTER);
-
-                            for (int index = 0; index < array.length; index++) {
-                                if (index != 0) {
-                                    writer.write(CONST_SEPARATOR_CHARACTER);
-                                }
-
-                                writer.write(Integer.toString(array[index]));
-                            }
-
-                            writer.write(CONST_ARRAY_CLOSE_CHARACTER);
-                            optimized = true;
-                        } else if (arrayType == float[].class) {
-                            float[] array = (float[]) arrayObject;
-
-                            writer.write(CONST_ARRAY_OPEN_CHARACTER);
-
-                            for (int index = 0; index < array.length; index++) {
-                                if (index != 0) {
-                                    writer.write(CONST_SEPARATOR_CHARACTER);
-                                }
-
-                                writer.write(Float.toString(array[index]));
-                            }
-
-                            writer.write(CONST_ARRAY_CLOSE_CHARACTER);
-                            optimized = true;
-                        } else if (arrayType == long[].class) {
-                            long[] array = (long[]) arrayObject;
-
-                            writer.write(CONST_ARRAY_OPEN_CHARACTER);
-
-                            for (int index = 0; index < array.length; index++) {
-                                if (index != 0) {
-                                    writer.write(CONST_SEPARATOR_CHARACTER);
-                                }
-
-                                writer.write(Long.toString(array[index]));
-                            }
-
-                            writer.write(CONST_ARRAY_CLOSE_CHARACTER);
-                            optimized = true;
-                        } else if (arrayType == double[].class) {
-                            double[] array = (double[]) arrayObject;
-
-                            writer.write(CONST_ARRAY_OPEN_CHARACTER);
-
-                            for (int index = 0; index < array.length; index++) {
-                                if (index != 0) {
-                                    writer.write(CONST_SEPARATOR_CHARACTER);
-                                }
-
-                                writer.write(Double.toString(array[index]));
-                            }
-
-                            writer.write(CONST_ARRAY_CLOSE_CHARACTER);
-                            optimized = true;
-                        } else if (arrayType == Boolean[].class) {
-                            Boolean[] array = (Boolean[]) arrayObject;
-
-                            writer.write(CONST_ARRAY_OPEN_CHARACTER);
-
-                            for (int index = 0; index < array.length; index++) {
-                                if (index != 0) {
-                                    writer.write(CONST_SEPARATOR_CHARACTER);
-                                }
-
-                                if (array[index] == null) {
-                                    writer.write(CONST_NULL_CHARACTER);
-                                } else if (array[index]) {
-                                    writer.write(CONST_TRUE_CHARACTER);
-                                } else {
-                                    writer.write(CONST_FALSE_CHARACTER);
-                                }
-                            }
-
-                            writer.write(CONST_ARRAY_CLOSE_CHARACTER);
-                            optimized = true;
-                        } else if (arrayType == Character[].class) {
-                            Character[] array = (Character[]) arrayObject;
-
-                            writer.write(CONST_ARRAY_OPEN_CHARACTER);
-
-                            for (int index = 0; index < array.length; index++) {
-                                if (index != 0) {
-                                    writer.write(CONST_SEPARATOR_CHARACTER);
-                                }
-
-                                if (array[index] == null) {
-                                    writer.write(CONST_NULL_CHARACTER);
-                                } else {
-                                    if (enableConvertCharacterToString) {
-                                        writer.write(CONST_STRING_OPEN_CHARACTER);
-                                        writer.write(Character.toString(array[index]));
-                                        writer.write(CONST_STRING_CLOSE_CHARACTER);
-                                    } else {
-                                        writer.write(Integer.toString(array[index]));
-                                    }
-                                }
-                            }
-
-                            writer.write(CONST_ARRAY_CLOSE_CHARACTER);
-                            optimized = true;
-                        } else if (arrayType == Byte[].class ||
-                                arrayType == Short[].class ||
-                                arrayType == Integer[].class ||
-                                arrayType == Float[].class ||
-                                arrayType == Long[].class ||
-                                arrayType == Double[].class) {
-                            Object[] array = (Object[]) arrayObject;
-
-                            writer.write(CONST_ARRAY_OPEN_CHARACTER);
-
-                            for (int index = 0; index < array.length; index++) {
-                                if (index != 0) {
-                                    writer.write(CONST_SEPARATOR_CHARACTER);
-                                }
-
-                                if (array[index] == null) {
-                                    writer.write(CONST_NULL_CHARACTER);
-                                } else {
-                                    writer.write(array[index].toString());
-                                }
-                            }
-
-                            writer.write(CONST_ARRAY_CLOSE_CHARACTER);
-                            optimized = true;
-                        }
-                    }
-                } catch (InvocationTargetException | IllegalAccessException exception) {
-                    // Skip optimization.
+                    optimized = encodeNativeArray(writer, nativeList);
                 }
 
                 if (!optimized) {
                     writer.write(CONST_ARRAY_OPEN_CHARACTER);
 
-                    int size = opackArray.length();
                     int reverseStart = this.encodeStack.getSize();
+                    int index = 0;
 
-                    for (int index = 0; index < size; index++) {
-                        Object value = opackArray.get(index);
-
+                    for (Object value : opackArrayList) {
                         if (!this.encodeLiteral(this.encodeLiteralStringWriter, value)) {
                             if (this.usePrettyFormat) {
                                 if (value instanceof OpackObject) {
@@ -592,8 +632,10 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
                                 }
                             }
 
-                            this.encodeStack.push(this.encodeLiteralStringWriter.toCharArray());
-                            this.encodeStack.swap(this.encodeStack.getSize() - 1, this.encodeStack.getSize() - 2);
+                            if (this.encodeLiteralStringWriter.getLength() > 0) {
+                                this.encodeStack.push(this.encodeLiteralStringWriter.toCharArray());
+                                this.encodeStack.swap(this.encodeStack.getSize() - 1, this.encodeStack.getSize() - 2);
+                            }
 
                             if (index != size - 1) {
                                 this.encodeStack.push(CONST_SEPARATOR_CHARACTER);
@@ -613,6 +655,8 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
                                 }
                             }
                         }
+
+                        index++;
                     }
 
                     if (this.encodeLiteralStringWriter.getLength() > 0) {
@@ -693,18 +737,41 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
                     if (currentContextType == OpackObject.class) {
                         OpackObject<Object, Object> opackObject = (OpackObject<Object, Object>) currentContext;
 
-                        for (int i = 0; i < valueSize; i += 2) {
-                            Object value = this.decodeValueStack.pop();
-                            Object key = this.decodeValueStack.pop();
+                        Map<Object, Object> opackObjectMap = null;
 
-                            opackObject.put(key, value);
+                        try {
+                            opackObjectMap = UnsafeOpackValue.getMap(opackObject);
+
+                            for (int i = 0; i < valueSize; i += 2) {
+                                Object value = this.decodeValueStack.pop();
+                                Object key = this.decodeValueStack.pop();
+
+                                opackObjectMap.put(key, value);
+                            }
+                        } catch (InvocationTargetException | IllegalAccessException exception) {
+                            for (int i = 0; i < valueSize; i += 2) {
+                                Object value = this.decodeValueStack.pop();
+                                Object key = this.decodeValueStack.pop();
+
+                                opackObject.put(key, value);
+                            }
                         }
                     } else if (currentContextType == OpackArray.class) {
                         OpackArray<Object> opackArray = (OpackArray<Object>) currentContext;
                         int currentSize = this.decodeValueStack.getSize();
 
-                        for (int i = currentSize - valueSize; i < currentSize; i++) {
-                            opackArray.add(this.decodeValueStack.get(i));
+                        List<Object> opackArrayList = null;
+
+                        try {
+                            opackArrayList = UnsafeOpackValue.getList(opackArray);
+
+                            for (int i = currentSize - valueSize; i < currentSize; i++) {
+                                opackArrayList.add(this.decodeValueStack.get(i));
+                            }
+                        } catch (InvocationTargetException | IllegalAccessException exception) {
+                            for (int i = currentSize - valueSize; i < currentSize; i++) {
+                                opackArray.add(this.decodeValueStack.get(i));
+                            }
                         }
 
                         this.decodeValueStack.remove(valueSize);
@@ -748,7 +815,7 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
                         Literal Parse
                      */
                     if (literalMode) {
-                        Object object = this.decodeValueStack.get(this.decodeBaseStack.peek());
+                        int startAnchor = pointer;
 
                         switch (currentChar) {
                             case '\"':
@@ -756,70 +823,72 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
                                 while (pointer < length) {
                                     char literalChar = charArray[pointer++];
 
-                                    switch (literalChar) {
-                                        case '\"':
-                                            this.decodeValueStack.push(this.decodeStringWriter.toString());
-                                            this.decodeStringWriter.reset();
-                                            break STRING_LOOP;
-                                        case '\\':
-                                            char nextChar = charArray[pointer++];
+                                    if (literalChar == '\"') {
+                                        this.decodeStringWriter.write(charArray, startAnchor, pointer - startAnchor - 1);
 
-                                            switch (nextChar) {
-                                                case '"':
-                                                    this.decodeStringWriter.write('\"');
+                                        this.decodeValueStack.push(this.decodeStringWriter.toString());
+                                        this.decodeStringWriter.reset();
 
-                                                    break;
-                                                case '\\':
-                                                    this.decodeStringWriter.write('\\');
+                                        break STRING_LOOP;
+                                    } else if (literalChar == '\\') {
+                                        this.decodeStringWriter.write(charArray, startAnchor, pointer - startAnchor - 1);
 
-                                                    break;
-                                                case 'u':
-                                                    char result = 0;
+                                        char nextChar = charArray[pointer++];
 
-                                                    for (int i = 0; i < 4; i++) {
-                                                        char unicode = charArray[pointer++];
+                                        switch (nextChar) {
+                                            case '"':
+                                                this.decodeStringWriter.write('\"');
 
-                                                        result <<= 4;
+                                                break;
+                                            case '\\':
+                                                this.decodeStringWriter.write('\\');
 
-                                                        if (unicode >= '0' && unicode <= '9') {
-                                                            result += (unicode - '0');
-                                                        } else if (unicode >= 'a' && unicode <= 'f') {
-                                                            result += (unicode - 'a' + 10);
-                                                        } else if (unicode >= 'A' && unicode <= 'F') {
-                                                            result += (unicode - 'A' + 10);
-                                                        } else {
-                                                            throw new IOException("Parsed unknown unicode pattern at " + pointer + "(" + unicode + ").");
-                                                        }
+                                                break;
+                                            case 'u':
+                                                char result = 0;
+
+                                                for (int i = 0; i < 4; i++) {
+                                                    char unicode = charArray[pointer++];
+
+                                                    result <<= 4;
+
+                                                    if (unicode >= '0' && unicode <= '9') {
+                                                        result += (unicode - '0');
+                                                    } else if (unicode >= 'a' && unicode <= 'f') {
+                                                        result += (unicode - 'a' + 10);
+                                                    } else if (unicode >= 'A' && unicode <= 'F') {
+                                                        result += (unicode - 'A' + 10);
+                                                    } else {
+                                                        throw new IOException("Parsed unknown unicode pattern at " + pointer + "(" + unicode + ").");
                                                     }
+                                                }
 
-                                                    this.decodeStringWriter.write(result);
+                                                this.decodeStringWriter.write(result);
 
-                                                    break;
-                                                case 'b':
-                                                    this.decodeStringWriter.write('\b');
+                                                break;
+                                            case 'b':
+                                                this.decodeStringWriter.write('\b');
 
-                                                    break;
-                                                case 'f':
-                                                    this.decodeStringWriter.write('\f');
+                                                break;
+                                            case 'f':
+                                                this.decodeStringWriter.write('\f');
 
-                                                    break;
-                                                case 'n':
-                                                    this.decodeStringWriter.write('\n');
+                                                break;
+                                            case 'n':
+                                                this.decodeStringWriter.write('\n');
 
-                                                    break;
-                                                case 'r':
-                                                    this.decodeStringWriter.write('\r');
+                                                break;
+                                            case 'r':
+                                                this.decodeStringWriter.write('\r');
 
-                                                    break;
-                                                case 't':
-                                                    this.decodeStringWriter.write('\t');
+                                                break;
+                                            case 't':
+                                                this.decodeStringWriter.write('\t');
 
-                                                    break;
-                                            }
+                                                break;
+                                        }
 
-                                            break;
-                                        default:
-                                            this.decodeStringWriter.write(literalChar);
+                                        startAnchor = pointer;
                                     }
                                 }
 
@@ -846,6 +915,7 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
                                     switch (literalChar) {
                                         case '.':
                                             decimal = true;
+                                            break;
                                         case '0':
                                         case '1':
                                         case '2':
@@ -860,22 +930,21 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
                                         case 'e':
                                         case '+':
                                         case '-':
-                                            this.decodeStringWriter.write(literalChar);
-
                                             break;
                                         default:
-                                            if (decimal) {
-                                                this.decodeValueStack.push(Double.parseDouble(this.decodeStringWriter.toString()));
-                                            } else {
-                                                this.decodeValueStack.push(Long.parseLong(this.decodeStringWriter.toString()));
-                                            }
-
-                                            pointer--;
-                                            this.decodeStringWriter.reset();
-
                                             break NUMBER_LOOP;
                                     }
                                 }
+
+                                String numberString = new String(charArray, startAnchor - 1, pointer - startAnchor);
+
+                                if (decimal) {
+                                    this.decodeValueStack.push(Double.parseDouble(numberString));
+                                } else {
+                                    this.decodeValueStack.push(Long.parseLong(numberString));
+                                }
+
+                                pointer--;
 
                                 break;
                             case 't':

@@ -40,7 +40,6 @@ import java.nio.file.Path;
 
 public class JacksonPerformanceTest {
     @Test
-    @Disabled
     public void jackson_bytes() throws SerializeException, EncodeException, DecodeException {
         PerformanceClass performanceClass = new PerformanceClass();
 
@@ -86,8 +85,12 @@ public class JacksonPerformanceTest {
         System.out.println(" Jackson\t: " + jacksonTime + "ms");
         System.out.println(" Opack\t: " + opackTime + "ms");
 
-        if (opackTime > jacksonTime) {
-            Assertions.fail("Opack must faster then jackson");
+        double delta = Math.abs((double) opackTime - (double) jacksonTime) / Math.max(opackTime, jacksonTime);
+
+        delta *= 100;
+
+        if (delta > 1) {
+            Assertions.fail("Opack performance must similar with jackson");
         }
     }
 }

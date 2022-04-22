@@ -77,14 +77,17 @@ public class StringWriter extends Writer {
     /**
      * Writes a string.
      *
-     * @param str String to be written
+     * @param string String to be written
      * @throws IOException If an I/O error occurs
      */
     @Override
-    public void write(@NotNull String str) throws IOException {
-        char[] array = str.toCharArray();
+    public void write(@NotNull String string) throws IOException {
+        int length = string.length();
+        this.increaseArray(length);
 
-        this.write(array, 0, array.length);
+        string.getChars(0, length, this.chars, this.currentIndex);
+
+        this.currentIndex += length;
     }
 
     /**
@@ -117,9 +120,36 @@ public class StringWriter extends Writer {
      */
     @Override
     public void write(char[] src, int offset, int length) {
+        if (length == 0) return;
+
         this.increaseArray(length);
 
-        System.arraycopy(src, offset, this.chars, this.currentIndex, length);
+        if (length > 4) {
+            System.arraycopy(src, offset, this.chars, this.currentIndex, length);
+        } else {
+            // Optimized code for small array
+
+            switch (length) {
+                case 4:
+                    this.chars[this.currentIndex + 0] = src[offset + 0];
+                    this.chars[this.currentIndex + 1] = src[offset + 1];
+                    this.chars[this.currentIndex + 2] = src[offset + 2];
+                    this.chars[this.currentIndex + 3] = src[offset + 3];
+                    break;
+                case 3:
+                    this.chars[this.currentIndex + 0] = src[offset + 0];
+                    this.chars[this.currentIndex + 1] = src[offset + 1];
+                    this.chars[this.currentIndex + 2] = src[offset + 2];
+                    break;
+                case 2:
+                    this.chars[this.currentIndex + 0] = src[offset + 0];
+                    this.chars[this.currentIndex + 1] = src[offset + 1];
+                    break;
+                case 1:
+                    this.chars[this.currentIndex + 0] = src[offset + 0];
+                    break;
+            }
+        }
 
         this.currentIndex += length;
     }

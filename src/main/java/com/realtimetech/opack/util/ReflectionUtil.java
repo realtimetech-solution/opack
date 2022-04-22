@@ -188,23 +188,23 @@ public class ReflectionUtil {
      * @param value the new value of the indexed component
      */
     public static void setArrayItem(Object array, int index, Object value) {
-        Class<?> c = array.getClass();
+        Class<?> arrayType = array.getClass();
 
-        if (int[].class == c) {
+        if (int[].class == arrayType) {
             ((int[]) array)[index] = (int) value;
-        } else if (float[].class == c) {
+        } else if (float[].class == arrayType) {
             ((float[]) array)[index] = (float) value;
-        } else if (boolean[].class == c) {
+        } else if (boolean[].class == arrayType) {
             ((boolean[]) array)[index] = (boolean) value;
-        } else if (char[].class == c) {
+        } else if (char[].class == arrayType) {
             ((char[]) array)[index] = (char) value;
-        } else if (double[].class == c) {
+        } else if (double[].class == arrayType) {
             ((double[]) array)[index] = (double) value;
-        } else if (long[].class == c) {
+        } else if (long[].class == arrayType) {
             ((long[]) array)[index] = (long) value;
-        } else if (short[].class == c) {
+        } else if (short[].class == arrayType) {
             ((short[]) array)[index] = (short) value;
-        } else if (byte[].class == c) {
+        } else if (byte[].class == arrayType) {
             ((byte[]) array)[index] = (byte) value;
         } else {
             ((Object[]) array)[index] = value;

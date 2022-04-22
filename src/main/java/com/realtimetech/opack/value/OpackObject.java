@@ -50,7 +50,7 @@ public final class OpackObject<K, V> extends AbstractOpackValue<HashMap<K, V>> {
      * @return underlying map
      */
     @Override
-    HashMap<K, V> createLazyValue() {
+    protected HashMap<K, V> createLazyValue() {
         return new HashMap<>();
     }
 
@@ -82,11 +82,13 @@ public final class OpackObject<K, V> extends AbstractOpackValue<HashMap<K, V>> {
      * @return the previous value associated with key, or null if there was no mapping for key
      */
     public V put(K key, V value) {
-        if (key != null)
+        if (key != null) {
             OpackValue.assertAllowType(key.getClass());
+        }
 
-        if (value != null)
+        if (value != null) {
             OpackValue.assertAllowType(value.getClass());
+        }
 
         return this.get().put(key, value);
     }
@@ -98,8 +100,9 @@ public final class OpackObject<K, V> extends AbstractOpackValue<HashMap<K, V>> {
      * @return the previous value associated with key, or null if there was no mapping for key
      */
     public V remove(K key) {
-        if (key != null)
+        if (key != null) {
             OpackValue.assertAllowType(key.getClass());
+        }
 
         return this.get().remove(key);
     }
@@ -159,7 +162,7 @@ public final class OpackObject<K, V> extends AbstractOpackValue<HashMap<K, V>> {
      * @return a string representation of the HashMap
      */
     @Override
-    String toString(HashMap<K, V> value) {
+    protected String toString(HashMap<K, V> value) {
         return value.toString();
     }
 
