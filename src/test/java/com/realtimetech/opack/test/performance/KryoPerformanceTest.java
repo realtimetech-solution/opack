@@ -127,8 +127,8 @@ public class KryoPerformanceTest {
         long opackTime = PerformanceClass.measureRunningTime(loop, opackRunnable);
 
         System.out.println("# " + this.getClass().getSimpleName());
-        System.out.println(" Kryo\t: " + kryoTime + "ms");
-        System.out.println(" Opack\t: " + opackTime + "ms");
+        System.out.println("\tKryo \t: " + kryoTime + "ms");
+        System.out.println("\tOpack\t: " + opackTime + "ms");
 
         if (opackTime > kryoTime) {
             Assertions.fail("Opack must faster then kryo");

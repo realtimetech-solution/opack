@@ -50,13 +50,19 @@ public class GsonPerformanceTest {
         int warmLoop = 64;
         int loop = 128;
 
-        PerformanceClass.ExceptionRunnable gsonRunnable = () -> {
+        PerformanceClass.ExceptionRunnable gsonTreeRunnable = () -> {
             JsonElement serialize = gson.toJsonTree(performanceClass);
             String encode = serialize.toString();
             JsonElement decode = gson.fromJson(encode, JsonElement.class);
             PerformanceClass deserialize = gson.fromJson(decode, PerformanceClass.class);
 
             deserialize.hashCode();
+        };
+        PerformanceClass.ExceptionRunnable gsonDirectRunnable = () -> {
+            String encode = gson.toJson(performanceClass);
+            PerformanceClass decode = gson.fromJson(encode, PerformanceClass.class);
+
+            decode.hashCode();
         };
         PerformanceClass.ExceptionRunnable opackRunnable = () -> {
             OpackValue serialize = opacker.serialize(performanceClass);
@@ -68,17 +74,23 @@ public class GsonPerformanceTest {
         };
 
         // Warm up!
-        PerformanceClass.measureRunningTime(warmLoop, gsonRunnable);
-        PerformanceClass.measureRunningTime(warmLoop, opackRunnable);
+        PerformanceClass.measureRunningTime(warmLoop, gsonTreeRunnable);
+        PerformanceClass.measureRunningTime(warmLoop, gsonDirectRunnable);
+        PerformanceClass.measureRunningTime(warmLoop * 2, opackRunnable);
 
-        long gsonTime = PerformanceClass.measureRunningTime(loop, gsonRunnable);
+        long gsonTreeTime = PerformanceClass.measureRunningTime(loop, gsonTreeRunnable);
+        long gsonDirectTime = PerformanceClass.measureRunningTime(loop, gsonDirectRunnable);
         long opackTime = PerformanceClass.measureRunningTime(loop, opackRunnable);
 
         System.out.println("# " + this.getClass().getSimpleName());
-        System.out.println(" Gson\t: " + gsonTime + "ms");
-        System.out.println(" Opack\t: " + opackTime + "ms");
+        System.out.println("\tGson(T)\t: " + gsonTreeTime + "ms");
+        System.out.println("\tGson(D)\t: " + gsonDirectTime + "ms");
+        System.out.println("\tOpack  \t: " + opackTime + "ms");
 
-        if (opackTime > gsonTime) {
+        if (opackTime > gsonTreeTime) {
+            Assertions.fail("Opack must faster then gson");
+        }
+        if (opackTime > gsonDirectTime) {
             Assertions.fail("Opack must faster then gson");
         }
     }

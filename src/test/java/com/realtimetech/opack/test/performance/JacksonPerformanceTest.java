@@ -55,8 +55,8 @@ public class JacksonPerformanceTest {
         Opacker opacker = new Opacker.Builder().create();
         JsonCodec jsonCodec = new JsonCodec.Builder().create();
 
-        int warmLoop = 64;
-        int loop = 128 * 2;
+        int warmLoop = 128;
+        int loop = 256;
 
         PerformanceClass.ExceptionRunnable jacksonRunnable = () -> {
             String value = objectMapper.writeValueAsString(performanceClass);
@@ -82,14 +82,14 @@ public class JacksonPerformanceTest {
         long opackTime = PerformanceClass.measureRunningTime(loop, opackRunnable);
 
         System.out.println("# " + this.getClass().getSimpleName());
-        System.out.println(" Jackson\t: " + jacksonTime + "ms");
-        System.out.println(" Opack\t: " + opackTime + "ms");
+        System.out.println("\tJackson\t: " + jacksonTime + "ms");
+        System.out.println("\tOpack  \t: " + opackTime + "ms");
 
         double delta = Math.abs((double) opackTime - (double) jacksonTime) / Math.max(opackTime, jacksonTime);
 
         delta *= 100;
 
-        if (delta > 1 && jacksonTime < opackTime) {
+        if (delta > 5 && jacksonTime < opackTime) {
             Assertions.fail("Opack performance must similar with jackson");
         }
     }
