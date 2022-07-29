@@ -23,6 +23,7 @@
 package com.realtimetech.opack.value;
 
 import com.realtimetech.opack.util.ReflectionUtil;
+import org.jetbrains.annotations.NotNull;
 
 public interface OpackValue {
     /**
@@ -31,7 +32,7 @@ public interface OpackValue {
      * @param type the target class
      * @throws IllegalArgumentException if the class is not allowed type
      */
-    public static void assertAllowType(Class<?> type) {
+    static void assertAllowType(@NotNull Class<?> type) {
         if (!OpackValue.isAllowType(type)) {
             throw new IllegalArgumentException(type.getName() + " is not allowed type, allow only primitive type or String or OpackValues or null.");
         }
@@ -43,7 +44,7 @@ public interface OpackValue {
      * @param type the target class
      * @return whether class is allowed type
      */
-    public static boolean isAllowType(Class<?> type) {
+    static boolean isAllowType(@NotNull Class<?> type) {
         return ReflectionUtil.isWrapperType(type) ||
                 ReflectionUtil.isPrimitiveType(type) ||
                 (type == String.class) ||
@@ -55,5 +56,5 @@ public interface OpackValue {
      *
      * @return cloned opack value
      */
-    public OpackValue clone();
+    OpackValue clone();
 }

@@ -22,11 +22,13 @@
 
 package com.realtimetech.opack.exception;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Thrown when a problem occurs during decoding.
  */
 public class DecodeException extends Exception {
-    public DecodeException(Throwable cause) {
+    public DecodeException(@NotNull Throwable cause) {
         super(cause);
     }
 }

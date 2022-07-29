@@ -22,10 +22,12 @@
 
 package com.realtimetech.opack.codec.dense.writer;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 
 public class ByteArrayWriter implements Writer {
-    private byte[] bytes;
+    private byte @NotNull [] bytes;
 
     private int currentIndex;
     private int actualLength;
@@ -43,6 +45,8 @@ public class ByteArrayWriter implements Writer {
      * @param initialSize the initial size
      */
     public ByteArrayWriter(int initialSize) {
+        this.bytes = new byte[0];
+
         this.currentIndex = 0;
         this.actualLength = 1;
 
@@ -81,7 +85,7 @@ public class ByteArrayWriter implements Writer {
             } while (need > this.actualLength);
             this.bytes = new byte[this.actualLength];
 
-            if (oldObjects != null) {
+            if (oldObjects.length != 0) {
                 System.arraycopy(oldObjects, 0, this.bytes, 0, this.currentIndex);
             }
         }
@@ -185,7 +189,7 @@ public class ByteArrayWriter implements Writer {
      * @param bytes the byte array to write
      * @throws IOException if an I/O error occurs; if the output stream has been closed.
      */
-    public void writeBytes(byte[] bytes) throws IOException {
+    public void writeBytes(byte @NotNull [] bytes) throws IOException {
         this.increaseArray(bytes.length);
 
         System.arraycopy(bytes, 0, this.bytes, this.currentIndex, bytes.length);
@@ -195,7 +199,7 @@ public class ByteArrayWriter implements Writer {
     /**
      * @return an array containing all the bytes in this writer in proper sequence
      */
-    public byte[] toByteArray() {
+    public byte @NotNull [] toByteArray() {
         byte[] byteArray = new byte[this.currentIndex];
         System.arraycopy(this.bytes, 0, byteArray, 0, this.currentIndex);
         return byteArray;

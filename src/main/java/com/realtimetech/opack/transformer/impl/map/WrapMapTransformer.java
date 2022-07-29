@@ -27,10 +27,20 @@ import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.value.OpackObject;
 import com.realtimetech.opack.value.OpackValue;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class WrapMapTransformer extends MapTransformer {
+    /**
+     * Serializes the element to {@link OpackValue OpackValue}.
+     *
+     * @param opacker the opacker
+     * @param element the element to be serialized
+     * @return serialized value
+     * @throws SerializeException if a problem occurs during serializing
+     */
     @Override
-    protected Object serializeObject(Opacker opacker, Object element) throws SerializeException {
+    protected @Nullable Object serializeObject(@NotNull Opacker opacker, @Nullable Object element) throws SerializeException {
         if (element != null && !OpackValue.isAllowType(element.getClass())) {
             OpackValue opackValue = opacker.serialize(element);
             OpackObject<Object, Object> opackObject = new OpackObject<>();
@@ -44,8 +54,17 @@ public class WrapMapTransformer extends MapTransformer {
         return element;
     }
 
+    /**
+     * Deserializes the {@link OpackValue OpackValue}.
+     *
+     * @param opacker the opacker
+     * @param element the opack value to be deserialized
+     * @return deserialized element
+     * @throws ClassNotFoundException if the class cannot be located
+     * @throws DeserializeException   if a problem occurs during deserializing
+     */
     @Override
-    protected Object deserializeObject(Opacker opacker, Object element) throws ClassNotFoundException, DeserializeException {
+    protected @Nullable Object deserializeObject(@NotNull Opacker opacker, @Nullable Object element) throws ClassNotFoundException, DeserializeException {
         if (element != null && element instanceof OpackObject) {
             OpackObject<Object, Object> opackObject = (OpackObject<Object, Object>) element;
 

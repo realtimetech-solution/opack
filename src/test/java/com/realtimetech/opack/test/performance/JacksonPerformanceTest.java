@@ -89,7 +89,7 @@ public class JacksonPerformanceTest {
 
         delta *= 100;
 
-        if (delta > 5 && jacksonTime < opackTime) {
+        if (delta > 8 && jacksonTime < opackTime) {
             Assertions.fail("Opack performance must similar with jackson");
         }
     }

@@ -22,11 +22,13 @@
 
 package com.realtimetech.opack.exception;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Thrown when a problem occurs during baking a class.
  */
 public class BakeException extends Exception {
-    public BakeException(Throwable cause) {
+    public BakeException(@NotNull Throwable cause) {
         super(cause);
     }
 }

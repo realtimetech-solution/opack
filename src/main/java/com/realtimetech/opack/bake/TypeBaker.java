@@ -32,6 +32,7 @@ import com.realtimetech.opack.transformer.Transformer;
 import com.realtimetech.opack.transformer.TransformerFactory;
 import com.realtimetech.opack.util.ReflectionUtil;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
@@ -39,9 +40,9 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-public class TypeBaker {
-    static class PredefinedTransformer {
-        private final Transformer transformer;
+public final class TypeBaker {
+    static final class PredefinedTransformer {
+        private final @NotNull Transformer transformer;
         private final boolean inheritable;
 
         /**
@@ -55,7 +56,7 @@ public class TypeBaker {
             this.inheritable = inheritable;
         }
 
-        public Transformer getTransformer() {
+        public @NotNull Transformer getTransformer() {
             return transformer;
         }
 
@@ -68,8 +69,8 @@ public class TypeBaker {
 
     private final @NotNull TransformerFactory transformerFactory;
 
-    private final @NotNull HashMap<Class<?>, BakedType> backedTypeMap;
-    private final @NotNull HashMap<Class<?>, List<PredefinedTransformer>> predefinedTransformerMap;
+    private final @NotNull HashMap<@NotNull Class<?>, @NotNull BakedType> backedTypeMap;
+    private final @NotNull HashMap<@NotNull Class<?>, @NotNull List<@NotNull PredefinedTransformer>> predefinedTransformerMap;
 
     /**
      * Constructs an TypeBaker with the opacker.
@@ -91,7 +92,7 @@ public class TypeBaker {
      * @param type the class to be the target
      * @return found predefined transformers
      */
-    public PredefinedTransformer[] getPredefinedTransformers(Class<?> type) {
+    public @NotNull PredefinedTransformer @NotNull [] getPredefinedTransformers(@NotNull Class<?> type) {
         List<PredefinedTransformer> predefinedTransformers = this.predefinedTransformerMap.get(type);
 
         if (predefinedTransformers == null) {
@@ -180,7 +181,7 @@ public class TypeBaker {
      * @param root             whether the element is not super class (whether the element is the root)
      * @throws BakeException if transformer class object cannot be instantiated
      */
-    private void addTransformer(List<Transformer> transformers, AnnotatedElement annotatedElement, boolean root) throws BakeException {
+    private void addTransformer(@NotNull List<@NotNull Transformer> transformers, @NotNull AnnotatedElement annotatedElement, boolean root) throws BakeException {
         if (annotatedElement instanceof Class) {
             Class<?> elementType = (Class<?>) annotatedElement;
             Class<?> superType = elementType.getSuperclass();
@@ -232,7 +233,7 @@ public class TypeBaker {
      * @return transformers
      * @throws BakeException if transformer class object cannot be instantiated
      */
-    private Transformer[] getTransformer(AnnotatedElement annotatedElement) throws BakeException {
+    private @NotNull Transformer @NotNull[] getTransformer(@NotNull AnnotatedElement annotatedElement) throws BakeException {
         List<Transformer> transformers = new LinkedList<>();
         this.addTransformer(transformers, annotatedElement, true);
         return transformers.toArray(new Transformer[0]);
@@ -244,7 +245,7 @@ public class TypeBaker {
      * @param annotatedElement the element that annotated {@link Type ExplicitType}
      * @return returns annotated type
      */
-    private Class<?> getAnnotatedType(AnnotatedElement annotatedElement) {
+    private @Nullable Class<?> getAnnotatedType(@NotNull AnnotatedElement annotatedElement) {
         if (annotatedElement.isAnnotationPresent(Type.class)) {
             Type type = annotatedElement.getAnnotation(Type.class);
             return type.value();
@@ -259,7 +260,7 @@ public class TypeBaker {
      * @param annotatedElement the element that annotated {@link Type ExplicitType}
      * @return returns annotated type
      */
-    private String getAnnotatedName(AnnotatedElement annotatedElement) {
+    private @Nullable String getAnnotatedName(@NotNull AnnotatedElement annotatedElement) {
         if (annotatedElement.isAnnotationPresent(Name.class)) {
             Name name = annotatedElement.getAnnotation(Name.class);
             return name.value();

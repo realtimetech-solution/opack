@@ -23,11 +23,12 @@
 package com.realtimetech.opack.util.structure;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.EmptyStackException;
 
 public class FastStack<T> {
-    private T[] objects;
+    private T @NotNull [] objects;
 
     private int currentIndex;
     private int currentSize;
@@ -45,6 +46,8 @@ public class FastStack<T> {
      * @param initialSize the initial size
      */
     public FastStack(int initialSize) {
+        this.objects = (T[]) new Object[0];
+
         this.currentIndex = 0;
         this.currentSize = 1;
 
@@ -60,7 +63,7 @@ public class FastStack<T> {
         this.currentSize = this.currentSize << 1;
         this.objects = (T[]) new Object[this.currentSize];
 
-        if (oldObjects != null) {
+        if (oldObjects.length != 0) {
             System.arraycopy(oldObjects, 0, objects, 0, currentIndex);
         }
     }
@@ -69,7 +72,7 @@ public class FastStack<T> {
      * @param object the element to push
      * @return pushed element
      */
-    public T push(T object) {
+    public <D extends T> D push(D object) {
         if (this.currentIndex >= this.currentSize) {
             this.growArray();
         }
@@ -82,7 +85,7 @@ public class FastStack<T> {
     /**
      * @return element array
      */
-    public @NotNull T @NotNull [] getArray() {
+    public @Nullable T @NotNull [] getArray() {
         return objects;
     }
 

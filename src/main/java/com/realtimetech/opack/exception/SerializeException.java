@@ -22,15 +22,17 @@
 
 package com.realtimetech.opack.exception;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Thrown when a problem occurs during serializing.
  */
 public class SerializeException extends Exception {
-    public SerializeException(String message, Throwable cause) {
+    public SerializeException(@NotNull String message, @NotNull Throwable cause) {
         super(message, cause);
     }
 
-    public SerializeException(String message) {
+    public SerializeException(@NotNull String message) {
         super(message);
     }
 }

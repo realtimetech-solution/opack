@@ -35,7 +35,7 @@ public final class OpackArray<E> extends AbstractOpackValue<List<E>> {
      * @param arrayType the class of array object
      * @return true if component type for the class of array object is primitive class
      */
-    public static boolean isAllowArray(Class<?> arrayType) {
+    public static boolean isAllowArray(@NotNull Class<?> arrayType) {
         if (arrayType.isArray()) {
             Class<?> componentType = ReflectionUtil.getArrayLastComponentType(arrayType);
 
@@ -135,7 +135,7 @@ public final class OpackArray<E> extends AbstractOpackValue<List<E>> {
      * @return underlying list
      */
     @Override
-    protected ArrayList<E> createLazyValue() {
+    protected @NotNull ArrayList<E> createLazyValue() {
         return new ArrayList<>();
     }
 

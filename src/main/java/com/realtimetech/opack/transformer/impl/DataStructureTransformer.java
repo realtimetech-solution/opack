@@ -28,6 +28,8 @@ import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.transformer.Transformer;
 import com.realtimetech.opack.value.OpackObject;
 import com.realtimetech.opack.value.OpackValue;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public abstract class DataStructureTransformer implements Transformer {
     /**
@@ -38,7 +40,7 @@ public abstract class DataStructureTransformer implements Transformer {
      * @return serialized value
      * @throws SerializeException if a problem occurs during serializing
      */
-    protected abstract Object serializeObject(Opacker opacker, Object element) throws SerializeException;
+    protected abstract @Nullable Object serializeObject(@NotNull Opacker opacker, @Nullable Object element) throws SerializeException;
 
     /**
      * Deserializes the {@link OpackValue OpackValue}.
@@ -49,6 +51,6 @@ public abstract class DataStructureTransformer implements Transformer {
      * @throws ClassNotFoundException if the class cannot be located
      * @throws DeserializeException   if a problem occurs during deserializing
      */
-    protected abstract Object deserializeObject(Opacker opacker, Object element) throws ClassNotFoundException, DeserializeException;
+    protected abstract @Nullable Object deserializeObject(@NotNull Opacker opacker, @Nullable Object element) throws ClassNotFoundException, DeserializeException;
 
 }

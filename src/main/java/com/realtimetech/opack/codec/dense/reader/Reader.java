@@ -22,6 +22,8 @@
 
 package com.realtimetech.opack.codec.dense.reader;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 
 public interface Reader {
@@ -32,7 +34,7 @@ public interface Reader {
      * @return the byte read, or -1 if the end of the stream has been reached
      * @throws IOException if an I/O exception occurs
      */
-    public int readByte() throws IOException;
+    int readByte() throws IOException;
 
     /**
      * Reads the next character of data from the input stream.
@@ -40,7 +42,7 @@ public interface Reader {
      * @return the character read
      * @throws IOException if an I/O exception occurs
      */
-    public char readChar() throws IOException;
+    char readChar() throws IOException;
 
     /**
      * Reads the next short of data from the input stream.
@@ -48,7 +50,7 @@ public interface Reader {
      * @return the short read
      * @throws IOException if an I/O exception occurs
      */
-    public short readShort() throws IOException;
+    short readShort() throws IOException;
 
     /**
      * Reads the next int of data from the input stream.
@@ -56,7 +58,7 @@ public interface Reader {
      * @return the int read
      * @throws IOException if an I/O exception occurs
      */
-    public int readInt() throws IOException;
+    int readInt() throws IOException;
 
     /**
      * Reads the next float of data from the input stream.
@@ -64,7 +66,7 @@ public interface Reader {
      * @return the float read
      * @throws IOException if an I/O exception occurs
      */
-    public float readFloat() throws IOException;
+    float readFloat() throws IOException;
 
     /**
      * Reads the next long of data from the input stream.
@@ -72,7 +74,7 @@ public interface Reader {
      * @return the long read
      * @throws IOException if an I/O exception occurs
      */
-    public long readLong() throws IOException;
+    long readLong() throws IOException;
 
     /**
      * Reads the next double of data from the input stream.
@@ -80,7 +82,7 @@ public interface Reader {
      * @return the double read
      * @throws IOException if an I/O exception occurs
      */
-    public double readDouble() throws IOException;
+    double readDouble() throws IOException;
 
     /**
      * Reads the next bytes of data from the input stream.
@@ -88,5 +90,5 @@ public interface Reader {
      * @param bytes the byte array to write the bytes read
      * @throws IOException if an I/O exception occurs
      */
-    public void readBytes(byte[] bytes) throws IOException;
+    void readBytes(byte @NotNull [] bytes) throws IOException;
 }

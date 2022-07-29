@@ -22,8 +22,11 @@
 
 package com.realtimetech.opack.value;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 abstract class AbstractOpackValue<T> implements OpackValue {
-    private volatile T value;
+    private volatile @Nullable T value;
 
     /**
      * Create and return the underlying object of this opack value.
@@ -31,7 +34,7 @@ abstract class AbstractOpackValue<T> implements OpackValue {
      *
      * @return underlying object
      */
-    protected abstract T createLazyValue();
+    protected abstract @NotNull T createLazyValue();
 
     /**
      * Returns the underlying object of this opack value.

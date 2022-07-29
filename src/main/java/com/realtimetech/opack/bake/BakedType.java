@@ -28,8 +28,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
 
-public class BakedType {
-    public static class Property {
+public final class BakedType {
+    public final static class Property {
         private final @NotNull Field field;
         private final @NotNull String name;
         private final @NotNull Class<?> type;
@@ -67,7 +67,7 @@ public class BakedType {
          * @param value  the new value for the field of object being modified
          * @throws IllegalAccessException if this Field object is enforcing Java language access control and the underlying field is either inaccessible or final
          */
-        public void set(Object object, Object value) throws IllegalAccessException {
+        public void set(@NotNull Object object, @Nullable Object value) throws IllegalAccessException {
             if (!this.field.canAccess(object)) {
                 this.field.setAccessible(true);
             }
@@ -82,7 +82,7 @@ public class BakedType {
          * @return field value
          * @throws IllegalAccessException if this Field object is enforcing Java language access control and the underlying field is inaccessible.
          */
-        public Object get(Object object) throws IllegalAccessException {
+        public @Nullable Object get(@NotNull Object object) throws IllegalAccessException {
             if (!this.field.canAccess(object)) {
                 this.field.setAccessible(true);
             }
@@ -91,25 +91,25 @@ public class BakedType {
         }
     }
 
-    final Class<?> type;
-    final Transformer[] transformers;
-    final Property[] fields;
+    final @NotNull Class<?> type;
+    final @NotNull Transformer @NotNull [] transformers;
+    final @NotNull Property @NotNull [] fields;
 
-    public BakedType(Class<?> type, Transformer[] transformers, Property[] fields) {
+    public BakedType(@NotNull Class<?> type, @NotNull Transformer @NotNull [] transformers, @NotNull Property @NotNull [] fields) {
         this.type = type;
         this.transformers = transformers;
         this.fields = fields;
     }
 
-    public Class<?> getType() {
+    public @NotNull Class<?> getType() {
         return type;
     }
 
-    public Transformer[] getTransformers() {
+    public @NotNull Transformer @NotNull [] getTransformers() {
         return transformers;
     }
 
-    public Property[] getFields() {
+    public @NotNull Property @NotNull [] getFields() {
         return fields;
     }
 }

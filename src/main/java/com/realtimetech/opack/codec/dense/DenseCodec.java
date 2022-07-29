@@ -29,7 +29,6 @@ import com.realtimetech.opack.codec.dense.writer.ByteArrayWriter;
 import com.realtimetech.opack.codec.dense.writer.Writer;
 import com.realtimetech.opack.exception.DecodeException;
 import com.realtimetech.opack.exception.EncodeException;
-import com.realtimetech.opack.util.OpackArrayConverter;
 import com.realtimetech.opack.util.ReflectionUtil;
 import com.realtimetech.opack.util.UnsafeOpackValue;
 import com.realtimetech.opack.util.structure.FastStack;
@@ -37,6 +36,8 @@ import com.realtimetech.opack.util.structure.NativeList;
 import com.realtimetech.opack.value.OpackArray;
 import com.realtimetech.opack.value.OpackObject;
 import com.realtimetech.opack.value.OpackValue;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -58,22 +59,22 @@ public final class DenseCodec extends OpackCodec<Reader, Writer> {
             this.ignoreVersionCompare = false;
         }
 
-        public Builder setEncodeStackInitialSize(int encodeStackInitialSize) {
+        public @NotNull Builder setEncodeStackInitialSize(int encodeStackInitialSize) {
             this.encodeStackInitialSize = encodeStackInitialSize;
             return this;
         }
 
-        public Builder setDecodeStackInitialSize(int decodeStackInitialSize) {
+        public @NotNull Builder setDecodeStackInitialSize(int decodeStackInitialSize) {
             this.decodeStackInitialSize = decodeStackInitialSize;
             return this;
         }
 
-        public Builder setIgnoreVersionCompare(boolean ignoreVersionCompare) {
+        public @NotNull Builder setIgnoreVersionCompare(boolean ignoreVersionCompare) {
             this.ignoreVersionCompare = ignoreVersionCompare;
             return this;
         }
 
-        public DenseCodec create() {
+        public @NotNull DenseCodec create() {
             return new DenseCodec(this);
         }
     }
@@ -126,10 +127,10 @@ public final class DenseCodec extends OpackCodec<Reader, Writer> {
     private static final Object CONTEXT_NULL_OBJECT = new Object();
     private static final Object CONTEXT_BRANCH_CONTEXT_OBJECT = new Object();
 
-    private final FastStack<Object> encodeStack;
+    private final @NotNull FastStack<@Nullable Object> encodeStack;
 
-    private final FastStack<OpackValue> decodeStack;
-    private final FastStack<Object[]> decodeContextStack;
+    private final @NotNull FastStack<@NotNull OpackValue> decodeStack;
+    private final @NotNull FastStack<@NotNull Object @NotNull []> decodeContextStack;
 
     private final boolean ignoreVersionCompare;
 
@@ -138,7 +139,7 @@ public final class DenseCodec extends OpackCodec<Reader, Writer> {
      *
      * @param builder the builder of DenseCodec
      */
-    private DenseCodec(Builder builder) {
+    private DenseCodec(@NotNull Builder builder) {
         super();
 
         this.encodeStack = new FastStack<>(builder.encodeStackInitialSize);
@@ -158,7 +159,7 @@ public final class DenseCodec extends OpackCodec<Reader, Writer> {
      * @throws IllegalArgumentException if the type of data to be encoded is not allowed in dense format
      */
     @Override
-    protected void doEncode(Writer writer, OpackValue opackValue) throws IOException {
+    protected void doEncode(@NotNull Writer writer, @NotNull OpackValue opackValue) throws IOException {
         writer.writeBytes(CONST_DENSE_CODEC_CLASSIFIER);
         writer.writeBytes(CONST_DENSE_CODEC_VERSION);
 
@@ -467,7 +468,7 @@ public final class DenseCodec extends OpackCodec<Reader, Writer> {
      * @return returns encoded bytes
      * @throws EncodeException if a problem occurs during encoding; if the type of data to be encoded is not allowed in specific codec
      */
-    public byte[] encode(OpackValue opackValue) throws EncodeException {
+    public byte @NotNull [] encode(@NotNull OpackValue opackValue) throws EncodeException {
         ByteArrayWriter byteArrayWriter = new ByteArrayWriter();
 
         this.encode(byteArrayWriter, opackValue);
@@ -483,7 +484,7 @@ public final class DenseCodec extends OpackCodec<Reader, Writer> {
      * @return opack value or CONTEXT_BRANCH_CONTEXT_OBJECT
      * @throws IllegalArgumentException if the type of data to be decoded is not allowed in dense format; if unknown block header is parsed
      */
-    Object decodeBlock(Reader reader) throws IOException {
+    @Nullable Object decodeBlock(@NotNull Reader reader) throws IOException {
         byte b = (byte) reader.readByte();
 
         if (b == CONST_TYPE_BOOLEAN) {
@@ -668,7 +669,7 @@ public final class DenseCodec extends OpackCodec<Reader, Writer> {
      * @throws IllegalArgumentException if the decoded value is not a opack value
      */
     @Override
-    protected OpackValue doDecode(Reader reader) throws IOException {
+    protected @NotNull OpackValue doDecode(@NotNull Reader reader) throws IOException {
         byte[] classifier = new byte[CONST_DENSE_CODEC_CLASSIFIER.length];
         reader.readBytes(classifier);
 
@@ -772,7 +773,7 @@ public final class DenseCodec extends OpackCodec<Reader, Writer> {
      * @return the decoded opack value
      * @throws DecodeException if a problem occurs during decoding; if the type of data to be decoded is not allowed in specific codec
      */
-    public OpackValue decode(byte[] bytes) throws DecodeException {
+    public @NotNull OpackValue decode(byte @NotNull [] bytes) throws DecodeException {
         ByteArrayReader byteArrayReader = new ByteArrayReader(bytes);
 
         return this.decode(byteArrayReader);

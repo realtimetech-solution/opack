@@ -28,7 +28,7 @@ import java.io.IOException;
 import java.io.Writer;
 
 public class StringWriter extends Writer {
-    private char[] chars;
+    private char @NotNull [] chars;
 
     private int currentIndex;
     private int actualLength;
@@ -46,6 +46,8 @@ public class StringWriter extends Writer {
      * @param initialSize the initial size
      */
     public StringWriter(int initialSize) {
+        this.chars = new char[0];
+
         this.currentIndex = 0;
         this.actualLength = 1;
 
@@ -68,7 +70,7 @@ public class StringWriter extends Writer {
             } while (need > this.actualLength);
             this.chars = new char[this.actualLength];
 
-            if (oldObjects != null) {
+            if (oldObjects.length != 0) {
                 System.arraycopy(oldObjects, 0, this.chars, 0, this.currentIndex);
             }
         }
@@ -107,7 +109,7 @@ public class StringWriter extends Writer {
      * @param src the source array to write
      */
     @Override
-    public void write(char[] src) {
+    public void write(char @NotNull [] src) {
         this.write(src, 0, src.length);
     }
 
@@ -119,7 +121,7 @@ public class StringWriter extends Writer {
      * @param length the number of characters to write
      */
     @Override
-    public void write(char[] src, int offset, int length) {
+    public void write(char @NotNull [] src, int offset, int length) {
         if (length == 0) return;
 
         this.increaseArray(length);
@@ -192,7 +194,7 @@ public class StringWriter extends Writer {
     /**
      * @return an array containing all the characters in this writer in proper sequence
      */
-    public char[] toCharArray() {
+    public char @NotNull [] toCharArray() {
         char[] charArray = new char[this.currentIndex];
         System.arraycopy(this.chars, 0, charArray, 0, this.currentIndex);
         return charArray;

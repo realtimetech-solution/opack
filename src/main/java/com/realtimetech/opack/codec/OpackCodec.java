@@ -25,6 +25,7 @@ package com.realtimetech.opack.codec;
 import com.realtimetech.opack.exception.DecodeException;
 import com.realtimetech.opack.exception.EncodeException;
 import com.realtimetech.opack.value.OpackValue;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,7 +40,7 @@ public abstract class OpackCodec<I, O> {
      * @param opackValue the opack value to encode
      * @throws IOException if I/O error occurs
      */
-    protected abstract void doEncode(O output, OpackValue opackValue) throws IOException;
+    protected abstract void doEncode(@NotNull O output, @NotNull OpackValue opackValue) throws IOException;
 
     /**
      * Writes a code that decodes the value encoded by overriding this.
@@ -48,7 +49,7 @@ public abstract class OpackCodec<I, O> {
      * @return decoded value
      * @throws IOException if I/O error occurs
      */
-    protected abstract OpackValue doDecode(I input) throws IOException;
+    protected abstract @NotNull OpackValue doDecode(@NotNull I input) throws IOException;
 
     /**
      * Encodes the opack value through a specific codec.
@@ -57,7 +58,7 @@ public abstract class OpackCodec<I, O> {
      * @param opackValue the opack value to encode
      * @throws EncodeException if a problem occurs during encoding; if the type of data to be encoded is not allowed in specific codec
      */
-    public final synchronized void encode(O output, OpackValue opackValue) throws EncodeException {
+    public final synchronized void encode(@NotNull O output, @NotNull OpackValue opackValue) throws EncodeException {
         try {
             this.doEncode(output, opackValue);
         } catch (Exception exception) {
@@ -72,7 +73,7 @@ public abstract class OpackCodec<I, O> {
      * @return decoded value
      * @throws DecodeException if a problem occurs during decoding; if the type of data to be decoded is not allowed in specific codec
      */
-    public final synchronized OpackValue decode(I input) throws DecodeException {
+    public final synchronized OpackValue decode(@NotNull I input) throws DecodeException {
         try {
             return this.doDecode(input);
         } catch (Exception exception) {

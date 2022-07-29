@@ -32,6 +32,7 @@ import com.realtimetech.opack.value.OpackArray;
 import com.realtimetech.opack.value.OpackObject;
 import com.realtimetech.opack.value.OpackValue;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -59,32 +60,32 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
             this.decodeStackInitialSize = 128;
         }
 
-        public Builder setEncodeStringBufferSize(int encodeStringBufferSize) {
+        public @NotNull Builder setEncodeStringBufferSize(int encodeStringBufferSize) {
             this.encodeStringBufferSize = encodeStringBufferSize;
             return this;
         }
 
-        public Builder setEncodeStackInitialSize(int encodeStackInitialSize) {
+        public @NotNull Builder setEncodeStackInitialSize(int encodeStackInitialSize) {
             this.encodeStackInitialSize = encodeStackInitialSize;
             return this;
         }
 
-        public Builder setDecodeStackInitialSize(int decodeStackInitialSize) {
+        public @NotNull Builder setDecodeStackInitialSize(int decodeStackInitialSize) {
             this.decodeStackInitialSize = decodeStackInitialSize;
             return this;
         }
 
-        public Builder setAllowOpackValueToKeyValue(boolean allowOpackValueToKeyValue) {
+        public @NotNull Builder setAllowOpackValueToKeyValue(boolean allowOpackValueToKeyValue) {
             this.allowOpackValueToKeyValue = allowOpackValueToKeyValue;
             return this;
         }
 
-        public Builder setEnableConvertCharacterToString(boolean enableConvertCharacterToString) {
+        public @NotNull Builder setEnableConvertCharacterToString(boolean enableConvertCharacterToString) {
             this.enableConvertCharacterToString = enableConvertCharacterToString;
             return this;
         }
 
-        public Builder setUsePrettyFormat(boolean usePrettyFormat) {
+        public @NotNull Builder setUsePrettyFormat(boolean usePrettyFormat) {
             this.usePrettyFormat = usePrettyFormat;
             return this;
         }
@@ -94,7 +95,7 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
          *
          * @return created json codec
          */
-        public JsonCodec create() {
+        public @NotNull JsonCodec create() {
             return new JsonCodec(this);
         }
     }
@@ -138,13 +139,13 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
         CONST_REPLACEMENT_CHARACTERS['\f'] = new char[]{'\\', 'f'};
     }
 
-    private final StringWriter encodeLiteralStringWriter;
-    private final StringWriter encodeStringWriter;
-    private final FastStack<Object> encodeStack;
+    private final @NotNull StringWriter encodeLiteralStringWriter;
+    private final @NotNull StringWriter encodeStringWriter;
+    private final @NotNull FastStack<@Nullable Object> encodeStack;
 
-    private final FastStack<Integer> decodeBaseStack;
-    private final FastStack<Object> decodeValueStack;
-    private final StringWriter decodeStringWriter;
+    private final @NotNull FastStack<@NotNull Integer> decodeBaseStack;
+    private final @NotNull FastStack<@Nullable Object> decodeValueStack;
+    private final @NotNull StringWriter decodeStringWriter;
 
     private final boolean allowOpackValueToKeyValue;
     private final boolean enableConvertCharacterToString;
@@ -155,7 +156,7 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
      *
      * @param builder the builder of JsonCodec
      */
-    private JsonCodec(Builder builder) {
+    private JsonCodec(@NotNull Builder builder) {
         super();
 
         this.encodeLiteralStringWriter = new StringWriter(builder.encodeStringBufferSize);
@@ -180,7 +181,7 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
      * @throws IllegalArgumentException if the type of data to be encoded is not allowed in json format
      * @throws ArithmeticException      if the data to be encoded is infinite
      */
-    private boolean encodeLiteral(final Writer writer, Object object) throws IOException {
+    private boolean encodeLiteral(final @NotNull Writer writer, @Nullable Object object) throws IOException {
         if (object == null) {
             writer.write(CONST_NULL_CHARACTER);
 
@@ -503,15 +504,17 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
      * @throws IllegalArgumentException if the type of data to be encoded is not allowed in json format
      */
     @Override
-    protected void doEncode(Writer writer, OpackValue opackValue) throws IOException {
+    protected void doEncode(@NotNull Writer writer, @NotNull OpackValue opackValue) throws IOException {
         this.encodeLiteralStringWriter.reset();
         this.encodeStack.reset();
 
-        FastStack<Integer> prettyIndentStack = null;
+        final FastStack<@NotNull Integer> prettyIndentStack;
 
         if (this.usePrettyFormat) {
             prettyIndentStack = new FastStack<>();
             prettyIndentStack.push(0);
+        } else {
+            prettyIndentStack = null;
         }
 
         this.encodeStack.push(opackValue);
@@ -680,9 +683,10 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
      * @return returns encoded string
      * @throws EncodeException if a problem occurs during encoding; if the type of data to be encoded is not allowed in specific codec
      */
-    public synchronized String encode(OpackValue opackValue) throws EncodeException {
+    public synchronized @NotNull String encode(@NotNull OpackValue opackValue) throws EncodeException {
         this.encodeStringWriter.reset();
         this.encode(this.encodeStringWriter, opackValue);
+
         return this.encodeStringWriter.toString();
     }
 
@@ -694,7 +698,7 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
      * @throws IOException if there is a syntax problem with the json string; if the json string has a unicode whose unknown pattern
      */
     @Override
-    protected OpackValue doDecode(String data) throws IOException {
+    protected @NotNull OpackValue doDecode(@NotNull String data) throws IOException {
         this.decodeBaseStack.reset();
         this.decodeValueStack.reset();
         this.decodeStringWriter.reset();
@@ -718,14 +722,14 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
                  */
                 case '{':
                     currentContextIndex = this.decodeBaseStack.push(this.decodeValueStack.getSize());
-                    currentContext = (OpackValue) this.decodeValueStack.push(new OpackObject<>());
+                    currentContext = this.decodeValueStack.push(new OpackObject<>());
                     currentContextType = currentContext.getClass();
                     literalMode = true;
 
                     break;
                 case '[':
                     currentContextIndex = this.decodeBaseStack.push(this.decodeValueStack.getSize());
-                    currentContext = (OpackValue) this.decodeValueStack.push(new OpackArray<>());
+                    currentContext = this.decodeValueStack.push(new OpackArray<>());
                     currentContextType = currentContext.getClass();
                     literalMode = true;
 

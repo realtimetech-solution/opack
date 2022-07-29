@@ -22,18 +22,20 @@
 
 package com.realtimetech.opack.codec.dense.writer;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 import java.io.OutputStream;
 
-public class OutputStreamWriter implements Writer{
-    private final OutputStream outputStream;
+public class OutputStreamWriter implements Writer {
+    private final @NotNull OutputStream outputStream;
 
     /**
      * Constructs a OutputStreamWriter
      *
      * @param outputStream an outputStream
      */
-    public OutputStreamWriter(OutputStream outputStream) {
+    public OutputStreamWriter(@NotNull OutputStream outputStream) {
         this.outputStream = outputStream;
     }
 
@@ -125,7 +127,7 @@ public class OutputStreamWriter implements Writer{
      * @param bytes the byte array to write
      * @throws IOException if an I/O error occurs; if the output stream has been closed.
      */
-    public void writeBytes(byte[] bytes) throws IOException {
+    public void writeBytes(byte @NotNull [] bytes) throws IOException {
         this.outputStream.write(bytes);
     }
 }

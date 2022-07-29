@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 REALTIMETECH All Rights Reserved
+ * Copyright (C) 2022 REALTIMETECH All Rights Reserved
  *
  * Licensed either under the Apache License, Version 2.0, or (at your option)
  * under the terms of the GNU General Public License as published by
@@ -20,31 +20,40 @@
  * limitations under the License.
  */
 
-package com.realtimetech.opack.transformer;
+package com.realtimetech.opack.transformer.impl.date;
 
 import com.realtimetech.opack.Opacker;
 import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
+import com.realtimetech.opack.transformer.Transformer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface Transformer {
+public class DateToLongTransformer implements Transformer {
     /**
      * Serialize specific value to opack value.
      *
-     * @param value the value to be serialized
+     * @param opacker
+     * @param value   the value to be serialized
      * @return opack value
      * @throws SerializeException if a problem occurs during serializing
      */
-    @Nullable Object serialize(@NotNull Opacker opacker, @Nullable Object value) throws SerializeException;
+    @Override
+    public @Nullable Object serialize(@NotNull Opacker opacker, @Nullable Object value) throws SerializeException {
+        return null;
+    }
 
     /**
      * Deserialize opack value.
      *
-     * @param value    the opack value to be deserialized
+     * @param opacker
      * @param goalType the goal type to deserialize
+     * @param value    the opack value to be deserialized
      * @return deserialized value
      * @throws DeserializeException if a problem occurs during deserializing
      */
-    @Nullable Object deserialize(@NotNull Opacker opacker, @NotNull Class<?> goalType, @Nullable Object value) throws DeserializeException;
+    @Override
+    public @Nullable Object deserialize(@NotNull Opacker opacker, @NotNull Class<?> goalType, @Nullable Object value) throws DeserializeException {
+        return null;
+    }
 }

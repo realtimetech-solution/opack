@@ -23,6 +23,7 @@
 package com.realtimetech.opack.util;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectStreamClass;
@@ -40,16 +41,19 @@ public class ReflectionUtil {
          * @throws InvocationTargetException if exception occurs in invoked underlying method
          * @throws IllegalAccessException    if this Method object is enforcing Java language access control and the underlying method is inaccessible
          */
-        abstract <T> T allocate(Class<T> typeClass) throws InvocationTargetException, IllegalAccessException;
+        abstract <T> @NotNull T allocate(@NotNull Class<T> typeClass) throws InvocationTargetException, IllegalAccessException;
     }
 
-    private static final Allocator ALLOCATOR;
+    private static final @NotNull Allocator ALLOCATOR;
 
     static {
-        ALLOCATOR = ReflectionUtil.createAvailableAllocator();
-        if (ALLOCATOR == null) {
+        Allocator allocator = ReflectionUtil.createAvailableAllocator();
+
+        if (allocator == null) {
             throw new ExceptionInInitializerError("This virtual machine doesn't support unsafe allocator.");
         }
+
+        ALLOCATOR = allocator;
     }
 
     /**
@@ -57,7 +61,7 @@ public class ReflectionUtil {
      *
      * @return created unsafe allocator
      */
-    private static Allocator createAvailableAllocator() {
+    private static @Nullable Allocator createAvailableAllocator() {
         // for JVM
         try {
             Class<?> unsafeClass = Class.forName("sun.misc.Unsafe");
@@ -115,7 +119,7 @@ public class ReflectionUtil {
      * @param object the object to be cast
      * @return the object after casting
      */
-    public static Object cast(Class<?> type, Object object) {
+    public static @NotNull Object cast(@NotNull Class<?> type, @NotNull Object object) {
         Class<?> objectType = object.getClass();
 
         if (Number.class.isAssignableFrom(objectType)) {
@@ -156,7 +160,7 @@ public class ReflectionUtil {
      * @param index the index
      * @return the value of the indexed component in the specified array
      */
-    public static Object getArrayItem(Object array, int index) {
+    public static @Nullable Object getArrayItem(@NotNull Object array, int index) {
         Class<?> c = array.getClass();
 
         if (int[].class == c) {
@@ -187,27 +191,31 @@ public class ReflectionUtil {
      * @param index the index
      * @param value the new value of the indexed component
      */
-    public static void setArrayItem(Object array, int index, Object value) {
+    public static void setArrayItem(@NotNull Object array, int index, @Nullable Object value) {
         Class<?> arrayType = array.getClass();
 
-        if (int[].class == arrayType) {
-            ((int[]) array)[index] = (int) value;
-        } else if (float[].class == arrayType) {
-            ((float[]) array)[index] = (float) value;
-        } else if (boolean[].class == arrayType) {
-            ((boolean[]) array)[index] = (boolean) value;
-        } else if (char[].class == arrayType) {
-            ((char[]) array)[index] = (char) value;
-        } else if (double[].class == arrayType) {
-            ((double[]) array)[index] = (double) value;
-        } else if (long[].class == arrayType) {
-            ((long[]) array)[index] = (long) value;
-        } else if (short[].class == arrayType) {
-            ((short[]) array)[index] = (short) value;
-        } else if (byte[].class == arrayType) {
-            ((byte[]) array)[index] = (byte) value;
+        if (value != null) {
+            if (int[].class == arrayType) {
+                ((int[]) array)[index] = (int) value;
+            } else if (float[].class == arrayType) {
+                ((float[]) array)[index] = (float) value;
+            } else if (boolean[].class == arrayType) {
+                ((boolean[]) array)[index] = (boolean) value;
+            } else if (char[].class == arrayType) {
+                ((char[]) array)[index] = (char) value;
+            } else if (double[].class == arrayType) {
+                ((double[]) array)[index] = (double) value;
+            } else if (long[].class == arrayType) {
+                ((long[]) array)[index] = (long) value;
+            } else if (short[].class == arrayType) {
+                ((short[]) array)[index] = (short) value;
+            } else if (byte[].class == arrayType) {
+                ((byte[]) array)[index] = (byte) value;
+            } else {
+                ((Object[]) array)[index] = value;
+            }
         } else {
-            ((Object[]) array)[index] = value;
+            ((Object[]) array)[index] = null;
         }
     }
 
@@ -218,7 +226,7 @@ public class ReflectionUtil {
      * @return cloned array object
      * @throws IllegalArgumentException if the object is not array object
      */
-    public static Object cloneArray(Object array) {
+    public static @NotNull Object cloneArray(@NotNull Object array) {
         if (!array.getClass().isArray()) {
             throw new IllegalArgumentException(array + " is not array object.");
         }
@@ -236,7 +244,7 @@ public class ReflectionUtil {
      * @param fieldList the field list to be added
      * @param type      the target class
      */
-    static void addAccessibleFields(List<Field> fieldList, Class<?> type) {
+    static void addAccessibleFields(@NotNull List<Field> fieldList, @NotNull Class<?> type) {
         Class<?> superClass = type.getSuperclass();
 
         if (superClass != null && superClass != Object.class) {
@@ -256,7 +264,7 @@ public class ReflectionUtil {
      * @param type the target class
      * @return accessible fields
      */
-    public static Field[] getAccessibleFields(Class<?> type) {
+    public static @NotNull Field @NotNull [] getAccessibleFields(@NotNull Class<?> type) {
         List<Field> fields = new LinkedList<>();
         ReflectionUtil.addAccessibleFields(fields, type);
 
@@ -270,7 +278,7 @@ public class ReflectionUtil {
      * @return dimension
      * @throws IllegalArgumentException if the class is not the class of the array object
      */
-    public static int getArrayDimension(Class<?> arrayType) {
+    public static int getArrayDimension(@NotNull Class<?> arrayType) {
         if (!arrayType.isArray()) {
             throw new IllegalArgumentException(arrayType + " is not array class.");
         }
@@ -297,7 +305,7 @@ public class ReflectionUtil {
      * @param arrayType the class of the array object
      * @return component type
      */
-    public static Class<?> getArrayLastComponentType(Class<?> arrayType) {
+    public static @NotNull Class<?> getArrayLastComponentType(@NotNull Class<?> arrayType) {
         if (!arrayType.isArray()) {
             throw new IllegalArgumentException(arrayType + " is not array class.");
         }
@@ -321,7 +329,7 @@ public class ReflectionUtil {
      * @param type the target class
      * @return whether the target class is wrapper class
      */
-    public static boolean isWrapperType(Class<?> type) {
+    public static boolean isWrapperType(@NotNull Class<?> type) {
         return type == Boolean.class ||
 
                 type == Byte.class ||
@@ -369,7 +377,7 @@ public class ReflectionUtil {
      * @param type the target class
      * @return whether the target class is primitive class
      */
-    public static boolean isPrimitiveType(Class<?> type) {
+    public static boolean isPrimitiveType(@NotNull Class<?> type) {
         return type == boolean.class ||
 
                 type == byte.class ||

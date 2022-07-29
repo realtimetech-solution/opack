@@ -39,6 +39,7 @@ import com.realtimetech.opack.value.OpackArray;
 import com.realtimetech.opack.value.OpackObject;
 import com.realtimetech.opack.value.OpackValue;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
@@ -112,10 +113,10 @@ public class Opacker {
 
     private final @NotNull TypeBaker typeBaker;
 
-    private final @NotNull FastStack<Object> objectStack;
-    private final @NotNull FastStack<BakedType> typeStack;
-    private final @NotNull FastStack<OpackValue> valueStack;
-    private final @NotNull HashSet<Object> overlapSet;
+    private final @NotNull FastStack<@NotNull Object> objectStack;
+    private final @NotNull FastStack<@NotNull BakedType> typeStack;
+    private final @NotNull FastStack<@NotNull OpackValue> valueStack;
+    private final @NotNull HashSet<@NotNull Object> overlapSet;
 
     private final boolean enableConvertEnumToOrdinal;
     private final boolean enableConvertRecursiveDependencyToNull;
@@ -128,7 +129,7 @@ public class Opacker {
      * @param builder the builder of Opacker
      * @throws IllegalStateException if the predefined transformer cannot be instanced
      */
-    private Opacker(Builder builder) {
+    private Opacker(@NotNull Builder builder) {
         this.typeBaker = new TypeBaker(this);
 
         this.objectStack = new FastStack<>(builder.contextStackInitialSize);
@@ -157,6 +158,10 @@ public class Opacker {
         this.enableConvertRecursiveDependencyToNull = builder.enableConvertRecursiveDependencyToNull;
     }
 
+    public @NotNull TypeBaker getTypeBaker() {
+        return this.typeBaker;
+    }
+
     /**
      * Serializes the object to {@link OpackValue OpackValue}.
      *
@@ -164,12 +169,12 @@ public class Opacker {
      * @return opack value
      * @throws SerializeException if a problem occurs during serializing; if this opacker is deserializing
      */
-    public synchronized OpackValue serialize(Object object) throws SerializeException {
+    public synchronized OpackValue serialize(@NotNull Object object) throws SerializeException {
         if (this.state == State.DESERIALIZE)
             throw new SerializeException("Opacker is deserializing.");
 
         int separatorStack = this.objectStack.getSize();
-        OpackValue value = (OpackValue) this.prepareObjectSerialize(object.getClass(), object.getClass(), object);
+        OpackValue value = (OpackValue) this.prepareObjectSerialize(object.getClass(), object);
 
         State lastState = this.state;
         try {
@@ -189,22 +194,21 @@ public class Opacker {
     /**
      * Store information needed for serialization in stacks.
      *
-     * @param baseType     the class of object to be serialized
-     * @param originalType the class of original object
-     * @param object       the object to be serialized
+     * @param baseType the class of object to be serialized
+     * @param object   the object to be serialized
      * @return prepared opack value
      * @throws SerializeException if a problem occurs during serializing; if the baseType cannot be baked into {@link BakedType BakedType}
      */
-    private Object prepareObjectSerialize(Class<?> baseType, Class<?> originalType, Object object) throws SerializeException {
-        if (baseType == null || originalType == null || object == null) {
-            return null;
-        }
-
+    private @Nullable Object prepareObjectSerialize(@NotNull Class<?> baseType, @NotNull Object object) throws SerializeException {
         try {
             BakedType bakedType = this.typeBaker.get(baseType);
 
             for (Transformer transformer : bakedType.getTransformers()) {
                 object = transformer.serialize(this, object);
+
+                if (object == null) {
+                    return null;
+                }
             }
 
             Class<?> objectType = object.getClass();
@@ -216,10 +220,8 @@ public class Opacker {
                 /*
                     If directly pass opack value, deep clone
                  */
-                if (OpackValue.class.isAssignableFrom(originalType)) {
-                    if (object instanceof OpackValue) {
-                        object = ((OpackValue) object).clone();
-                    }
+                if (object instanceof OpackValue) {
+                    object = ((OpackValue) object).clone();
                 }
 
                 return object;
@@ -299,28 +301,31 @@ public class Opacker {
 
                 for (int index = 0; index < length; index++) {
                     Object element = ReflectionUtil.getArrayItem(object, index);
-                    Class<?> elementType = element == null ? null : element.getClass();
 
-                    Object serializedValue = this.prepareObjectSerialize(elementType, elementType, element);
-
-                    opackArray.add(serializedValue);
+                    if (element != null) {
+                        opackArray.add(this.prepareObjectSerialize(element.getClass(), element));
+                    } else {
+                        opackArray.add(null);
+                    }
                 }
             } else if (opackValue instanceof OpackObject) {
                 OpackObject<Object, Object> opackObject = (OpackObject<Object, Object>) opackValue;
+
                 for (BakedType.Property property : bakedType.getFields()) {
                     try {
                         Object element = property.get(object);
                         Class<?> fieldType = property.getType();
-                        Class<?> originalType = element == null ? null : element.getClass();
 
                         if (property.getTransformer() != null) {
                             element = property.getTransformer().serialize(this, element);
-                            fieldType = element.getClass();
                         }
 
-                        Object serializedValue = this.prepareObjectSerialize(fieldType, originalType, element);
+                        if (element != null) {
+                            opackObject.put(property.getName(), this.prepareObjectSerialize(fieldType, element));
+                        } else {
+                            opackObject.put(property.getName(), null);
+                        }
 
-                        opackObject.put(property.getName(), serializedValue);
                     } catch (IllegalAccessException exception) {
                         throw new SerializeException("Can't get " + property.getName() + " field data in " + bakedType.getType().getSimpleName() + ".", exception);
                     }
@@ -337,12 +342,18 @@ public class Opacker {
      * @return deserialized object
      * @throws DeserializeException if a problem occurs during deserializing; if this opacker is serializing
      */
-    public synchronized <T> T deserialize(Class<T> type, OpackValue opackValue) throws DeserializeException {
+    public synchronized <T> T deserialize(@NotNull Class<T> type, @NotNull OpackValue opackValue) throws DeserializeException {
         if (this.state == State.SERIALIZE)
             throw new DeserializeException("Opacker is serializing.");
 
         int separatorStack = this.objectStack.getSize();
-        T value = type.cast(this.prepareObjectDeserialize(type, opackValue));
+        Object object = this.prepareObjectDeserialize(type, opackValue);
+
+        if (object == null) {
+            return null;
+        }
+
+        T value = type.cast(object);
 
         State lastState = this.state;
         try {
@@ -367,16 +378,16 @@ public class Opacker {
      * @return prepared object
      * @throws DeserializeException if a problem occurs during deserializing
      */
-    public synchronized Object prepareObjectDeserialize(Class<?> goalType, Object object) throws DeserializeException {
-        if (goalType == null || object == null) {
-            return null;
-        }
-
+    private synchronized @Nullable Object prepareObjectDeserialize(@NotNull Class<?> goalType, @NotNull Object object) throws DeserializeException {
         try {
             BakedType bakedType = this.typeBaker.get(goalType);
 
             for (Transformer transformer : bakedType.getTransformers()) {
                 object = transformer.deserialize(this, goalType, object);
+
+                if (object == null) {
+                    return null;
+                }
             }
 
             /*
@@ -440,7 +451,8 @@ public class Opacker {
 
                         try {
                             targetObject = ReflectionUtil.createInstanceUnsafe(goalType);
-                        } catch (InvocationTargetException | IllegalAccessException | InstantiationException exception) {
+                        } catch (InvocationTargetException | IllegalAccessException |
+                                 InstantiationException exception) {
                             throw new DeserializeException("Can't create instance using unsafe method.", exception);
                         }
                     } else {
@@ -481,9 +493,18 @@ public class Opacker {
 
                 for (int index = 0; index < length; index++) {
                     Object element = opackArray.get(index);
-                    Object deserializedValue = this.prepareObjectDeserialize(componentType, element);
 
-                    ReflectionUtil.setArrayItem(object, index, deserializedValue == null ? null : ReflectionUtil.cast(componentType, deserializedValue));
+                    if (element != null) {
+                        Object deserializedValue = this.prepareObjectDeserialize(componentType, element);
+
+                        if (deserializedValue != null) {
+                            ReflectionUtil.setArrayItem(object, index, ReflectionUtil.cast(componentType, deserializedValue));
+                        } else {
+                            ReflectionUtil.setArrayItem(object, index, null);
+                        }
+                    } else {
+                        ReflectionUtil.setArrayItem(object, index, null);
+                    }
                 }
             } else if (opackValue instanceof OpackObject) {
                 OpackObject<Object, Object> opackObject = (OpackObject<Object, Object>) opackValue;
@@ -497,9 +518,17 @@ public class Opacker {
                             element = property.getTransformer().deserialize(this, fieldType, element);
                         }
 
-                        Object deserializedValue = this.prepareObjectDeserialize(fieldType, element);
+                        if (element != null) {
+                            Object deserializedValue = this.prepareObjectDeserialize(fieldType, element);
 
-                        property.set(object, deserializedValue == null ? null : ReflectionUtil.cast(actualFieldType, deserializedValue));
+                            if (deserializedValue != null) {
+                                property.set(object, ReflectionUtil.cast(actualFieldType, deserializedValue));
+                            } else {
+                                property.set(object, null);
+                            }
+                        } else {
+                            property.set(object, null);
+                        }
                     } catch (IllegalAccessException | IllegalArgumentException exception) {
                         throw new DeserializeException("Can't set " + property.getName() + " field in " + bakedType.getType().getSimpleName() + ".", exception);
                     }

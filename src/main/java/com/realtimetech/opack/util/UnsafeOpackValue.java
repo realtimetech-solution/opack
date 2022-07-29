@@ -24,6 +24,7 @@ package com.realtimetech.opack.util;
 
 import com.realtimetech.opack.value.OpackArray;
 import com.realtimetech.opack.value.OpackObject;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -31,7 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 public class UnsafeOpackValue {
-    private static final Method OPACK_GETTER_METHOD;
+    private static final @NotNull Method OPACK_GETTER_METHOD;
 
     static {
         Method method;
@@ -52,7 +53,7 @@ public class UnsafeOpackValue {
      * @throws InvocationTargetException if exception occurs during invoke opack array getter method
      * @throws IllegalAccessException    if the getter method object in opack array is enforcing Java language access control and cannot access that method
      */
-    public static <E> List<E> getList(OpackArray<E> opackArray) throws InvocationTargetException, IllegalAccessException {
+    public static <E> List<E> getList(@NotNull OpackArray<E> opackArray) throws InvocationTargetException, IllegalAccessException {
         return (List<E>) OPACK_GETTER_METHOD.invoke(opackArray);
     }
 
@@ -64,7 +65,7 @@ public class UnsafeOpackValue {
      * @throws InvocationTargetException if exception occurs during invoke opack map getter method
      * @throws IllegalAccessException    if the getter method object in opack map is enforcing Java language access control and cannot access that method
      */
-    public static <K, V> Map<K, V> getMap(OpackObject<K, V> opackObject) throws InvocationTargetException, IllegalAccessException {
+    public static <K, V> Map<K, V> getMap(@NotNull OpackObject<K, V> opackObject) throws InvocationTargetException, IllegalAccessException {
         return (Map<K, V>) OPACK_GETTER_METHOD.invoke(opackObject);
     }
 }

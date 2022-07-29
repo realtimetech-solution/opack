@@ -22,18 +22,20 @@
 
 package com.realtimetech.opack.codec.dense.reader;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 import java.io.InputStream;
 
 public class InputStreamReader implements Reader {
-    private final InputStream inputStream;
+    private final @NotNull InputStream inputStream;
 
     /**
      * Constructs the InputStreamReader.
      *
      * @param inputStream an InputStream
      */
-    public InputStreamReader(InputStream inputStream) {
+    public InputStreamReader(@NotNull InputStream inputStream) {
         this.inputStream = inputStream;
     }
 
@@ -126,7 +128,7 @@ public class InputStreamReader implements Reader {
      * @param bytes the byte array to write the bytes read
      * @throws IOException if an I/O exception occurs
      */
-    public void readBytes(byte[] bytes) throws IOException {
+    public void readBytes(byte @NotNull [] bytes) throws IOException {
         this.inputStream.readNBytes(bytes, 0, bytes.length);
     }
 }

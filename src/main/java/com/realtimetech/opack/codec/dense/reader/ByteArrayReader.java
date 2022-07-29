@@ -171,7 +171,7 @@ public class ByteArrayReader implements Reader {
      * @param bytes the byte array to write the bytes read
      * @throws IOException if an I/O exception occurs
      */
-    public void readBytes(byte[] bytes) throws IOException {
+    public void readBytes(byte @NotNull [] bytes) throws IOException {
         this.assertSize(bytes.length);
 
         System.arraycopy(this.bytes, this.currentIndex, bytes, 0, bytes.length);

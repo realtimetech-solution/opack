@@ -30,11 +30,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
 public class TransformerFactory {
-    @NotNull
-    private final Opacker opacker;
+    private final @NotNull Opacker opacker;
 
-    @NotNull
-    private final HashMap<Class<? extends Transformer>, Transformer> transformerMap;
+    private final @NotNull HashMap<@NotNull Class<? extends Transformer>, @NotNull Transformer> transformerMap;
 
     /**
      * Constructs a TransformerFactory with the opacker.

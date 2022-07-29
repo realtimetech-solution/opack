@@ -22,19 +22,21 @@
 
 package com.realtimetech.opack.exception;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Thrown when a problem occurs during deserializing.
  */
 public class DeserializeException extends Exception {
-    public DeserializeException(String message, Throwable cause) {
+    public DeserializeException(@NotNull String message, @NotNull Throwable cause) {
         super(message, cause);
     }
 
-    public DeserializeException(String message) {
+    public DeserializeException(@NotNull String message) {
         super(message);
     }
 
-    public DeserializeException(Throwable cause) {
+    public DeserializeException(@NotNull Throwable cause) {
         super(cause);
     }
 }

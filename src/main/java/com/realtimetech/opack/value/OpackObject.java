@@ -22,6 +22,8 @@
 
 package com.realtimetech.opack.value;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -50,7 +52,7 @@ public final class OpackObject<K, V> extends AbstractOpackValue<HashMap<K, V>> {
      * @return underlying map
      */
     @Override
-    protected HashMap<K, V> createLazyValue() {
+    protected @NotNull HashMap<K, V> createLazyValue() {
         return new HashMap<>();
     }
 

@@ -29,7 +29,7 @@ import java.lang.reflect.Array;
 import java.util.*;
 
 public final class NativeList implements List<Object> {
-    final Object arrayObject;
+    final @NotNull Object arrayObject;
 
     /**
      * Constructs a NativeList with array object.
@@ -37,7 +37,7 @@ public final class NativeList implements List<Object> {
      * @param arrayObject the array object for create
      * @throws IllegalArgumentException if this object does not represent an array class
      */
-    public NativeList(Object arrayObject) {
+    public NativeList(@NotNull Object arrayObject) {
         if (!arrayObject.getClass().isArray()) {
             throw new IllegalArgumentException(arrayObject + " is not array object.");
         }
@@ -48,7 +48,7 @@ public final class NativeList implements List<Object> {
     /**
      * @return the underlying array object of this list.
      */
-    public Object getArrayObject() {
+    public @NotNull Object getArrayObject() {
         return arrayObject;
     }
 
