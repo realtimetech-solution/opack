@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 REALTIMETECH All Rights Reserved
+ * Copyright (C) 2023 REALTIMETECH All Rights Reserved
  *
  * Licensed either under the Apache License, Version 2.0, or (at your option)
  * under the terms of the GNU General Public License as published by
@@ -20,57 +20,40 @@
  * limitations under the License.
  */
 
-package com.realtimetech.opack.test.opacker.single;
+package com.realtimetech.opack.test.opacker.transform.time;
 
 import com.realtimetech.opack.Opacker;
 import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.test.OpackAssert;
 import com.realtimetech.opack.value.OpackValue;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
-import java.util.Random;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 
-public class PrimitiveTest {
-    static final Random RANDOM = new Random();
+public class Java8TimeTransformTest {
+    public static class Java8TimeTransformClass {
+        private @NotNull LocalDate localDate;
+        private @NotNull LocalTime localTime;
+        private @NotNull LocalDateTime localDateTime;
 
-    public static class PrimitiveClass {
-        private boolean booleanValue;
-
-        private byte byteValue;
-        private char charValue;
-
-        private short shortValue;
-
-        private int intValue;
-        private float floatValue;
-
-        private double doubleValue;
-        private long longValue;
-
-        public PrimitiveClass() {
-            this.booleanValue = RANDOM.nextBoolean();
-
-            this.byteValue = (byte) RANDOM.nextInt();
-            this.charValue = (char) RANDOM.nextInt();
-
-            this.shortValue = (short) RANDOM.nextInt();
-
-            this.intValue = RANDOM.nextInt();
-            this.floatValue = RANDOM.nextFloat();
-
-            this.doubleValue = RANDOM.nextDouble();
-            this.longValue = RANDOM.nextLong();
+        public Java8TimeTransformClass() {
+            this.localDate = LocalDate.now();
+            this.localTime = LocalTime.now();
+            this.localDateTime = LocalDateTime.now();
         }
     }
 
     @Test
     public void test() throws SerializeException, DeserializeException, OpackAssert.AssertException {
         Opacker opacker = new Opacker.Builder().create();
-        PrimitiveClass originalObject = new PrimitiveClass();
+        Java8TimeTransformClass originalObject = new Java8TimeTransformClass();
 
         OpackValue serialized = opacker.serialize(originalObject);
-        PrimitiveClass deserialized = opacker.deserialize(PrimitiveClass.class, serialized);
+        Java8TimeTransformClass deserialized = opacker.deserialize(Java8TimeTransformClass.class, serialized);
 
         OpackAssert.assertEquals(originalObject, deserialized);
     }

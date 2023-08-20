@@ -22,11 +22,14 @@
 
 package com.realtimetech.opack.value;
 
-import com.realtimetech.opack.util.structure.NativeList;
 import com.realtimetech.opack.util.ReflectionUtil;
+import com.realtimetech.opack.util.structure.NativeList;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 public final class OpackArray<E> extends AbstractOpackValue<List<E>> {
     /**

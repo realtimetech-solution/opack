@@ -28,10 +28,17 @@ import com.realtimetech.opack.exception.BakeException;
 import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.transformer.Transformer;
+import com.realtimetech.opack.transformer.impl.file.FileTransformer;
 import com.realtimetech.opack.transformer.impl.list.ListTransformer;
 import com.realtimetech.opack.transformer.impl.list.WrapListTransformer;
 import com.realtimetech.opack.transformer.impl.map.MapTransformer;
 import com.realtimetech.opack.transformer.impl.map.WrapMapTransformer;
+import com.realtimetech.opack.transformer.impl.path.PathTransformer;
+import com.realtimetech.opack.transformer.impl.time.CalendarTransformer;
+import com.realtimetech.opack.transformer.impl.time.DateTransformer;
+import com.realtimetech.opack.transformer.impl.time.java8.LocalDateTimeTransformer;
+import com.realtimetech.opack.transformer.impl.time.java8.LocalDateTransformer;
+import com.realtimetech.opack.transformer.impl.time.java8.LocalTimeTransformer;
 import com.realtimetech.opack.util.OpackArrayConverter;
 import com.realtimetech.opack.util.ReflectionUtil;
 import com.realtimetech.opack.util.structure.FastStack;
@@ -41,11 +48,14 @@ import com.realtimetech.opack.value.OpackValue;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.nio.file.Path;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.*;
 
 public class Opacker {
     public static class Builder {
@@ -150,6 +160,16 @@ public class Opacker {
             } else {
                 this.typeBaker.registerPredefinedTransformer(Map.class, MapTransformer.class, true);
             }
+
+            this.typeBaker.registerPredefinedTransformer(File.class, FileTransformer.class, true);
+            this.typeBaker.registerPredefinedTransformer(Path.class, PathTransformer.class, true);
+
+            this.typeBaker.registerPredefinedTransformer(Date.class, DateTransformer.class, true);
+            this.typeBaker.registerPredefinedTransformer(Calendar.class, CalendarTransformer.class, true);
+
+            this.typeBaker.registerPredefinedTransformer(LocalDate.class, LocalDateTransformer.class, true);
+            this.typeBaker.registerPredefinedTransformer(LocalTime.class, LocalTimeTransformer.class, true);
+            this.typeBaker.registerPredefinedTransformer(LocalDateTime.class, LocalDateTimeTransformer.class, true);
         } catch (InstantiationException exception) {
             throw new IllegalStateException(exception);
         }
@@ -204,7 +224,7 @@ public class Opacker {
             BakedType bakedType = this.typeBaker.get(baseType);
 
             for (Transformer transformer : bakedType.getTransformers()) {
-                object = transformer.serialize(this, object);
+                object = transformer.serialize(this, baseType, object);
 
                 if (object == null) {
                     return null;
@@ -317,7 +337,7 @@ public class Opacker {
                         Class<?> fieldType = property.getType();
 
                         if (property.getTransformer() != null) {
-                            element = property.getTransformer().serialize(this, element);
+                            element = property.getTransformer().serialize(this, fieldType, element);
                         }
 
                         if (element != null) {
@@ -347,7 +367,8 @@ public class Opacker {
             throw new DeserializeException("Opacker is serializing.");
 
         int separatorStack = this.objectStack.getSize();
-        Object object = this.prepareObjectDeserialize(type, opackValue);
+
+        Object object = this.prepareObjectDeserialize(type, opackValue, null);
 
         if (object == null) {
             return null;
@@ -378,12 +399,22 @@ public class Opacker {
      * @return prepared object
      * @throws DeserializeException if a problem occurs during deserializing
      */
-    private synchronized @Nullable Object prepareObjectDeserialize(@NotNull Class<?> goalType, @NotNull Object object) throws DeserializeException {
+    private synchronized @Nullable Object prepareObjectDeserialize(@NotNull Class<?> goalType, @NotNull Object object, @Nullable Transformer fieldTransformer) throws DeserializeException {
         try {
             BakedType bakedType = this.typeBaker.get(goalType);
 
-            for (Transformer transformer : bakedType.getTransformers()) {
-                object = transformer.deserialize(this, goalType, object);
+            Transformer[] transformers = bakedType.getTransformers();
+
+            for (int index = transformers.length - 1; index >= 0; index--) {
+                object = transformers[index].deserialize(this, goalType, object);
+
+                if (object == null) {
+                    return null;
+                }
+            }
+
+            if (fieldTransformer != null) {
+                object = fieldTransformer.deserialize(this, goalType, object);
 
                 if (object == null) {
                     return null;
@@ -465,7 +496,7 @@ public class Opacker {
                 this.typeStack.push(bakedType);
 
                 return targetObject;
-            } else if (object.getClass() == goalType) {
+            } else if (goalType.isAssignableFrom(object.getClass())) {
                 return object;
             } else {
                 throw new DeserializeException("Found object, stack corruption.");
@@ -495,7 +526,7 @@ public class Opacker {
                     Object element = opackArray.get(index);
 
                     if (element != null) {
-                        Object deserializedValue = this.prepareObjectDeserialize(componentType, element);
+                        Object deserializedValue = this.prepareObjectDeserialize(componentType, element, null);
 
                         if (deserializedValue != null) {
                             ReflectionUtil.setArrayItem(object, index, ReflectionUtil.cast(componentType, deserializedValue));
@@ -514,21 +545,17 @@ public class Opacker {
                         Class<?> fieldType = property.getType();
                         Class<?> actualFieldType = property.getField().getType();
 
-                        if (property.getTransformer() != null) {
-                            element = property.getTransformer().deserialize(this, fieldType, element);
-                        }
+                        Object propertyValue = null;
 
                         if (element != null) {
-                            Object deserializedValue = this.prepareObjectDeserialize(fieldType, element);
+                            Object deserializedValue = this.prepareObjectDeserialize(fieldType, element, property.getTransformer());
 
                             if (deserializedValue != null) {
-                                property.set(object, ReflectionUtil.cast(actualFieldType, deserializedValue));
-                            } else {
-                                property.set(object, null);
+                                propertyValue = ReflectionUtil.cast(actualFieldType, deserializedValue);
                             }
-                        } else {
-                            property.set(object, null);
                         }
+
+                        property.set(object, propertyValue);
                     } catch (IllegalAccessException | IllegalArgumentException exception) {
                         throw new DeserializeException("Can't set " + property.getName() + " field in " + bakedType.getType().getSimpleName() + ".", exception);
                     }

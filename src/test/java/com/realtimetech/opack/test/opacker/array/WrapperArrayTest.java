@@ -51,49 +51,49 @@ public class WrapperArrayTest {
             int length = RANDOM.nextInt(1024) + 512;
 
             this.booleanArrayValue = new Boolean[length];
-            for(int index = 0; index < length; index++){
+            for (int index = 0; index < length; index++) {
                 this.booleanArrayValue[index] = RANDOM.nextBoolean();
             }
             this.booleanArrayValue[length / 2] = null;
 
             this.byteArrayValue = new Byte[length];
-            for(int index = 0; index < length; index++){
+            for (int index = 0; index < length; index++) {
                 this.byteArrayValue[index] = (byte) RANDOM.nextInt();
             }
             this.byteArrayValue[length / 2] = null;
 
             this.charArrayValue = new Character[length];
-            for(int index = 0; index < length; index++){
+            for (int index = 0; index < length; index++) {
                 this.charArrayValue[index] = (char) RANDOM.nextInt();
             }
             this.charArrayValue[length / 2] = null;
 
             this.shortArrayValue = new Short[length];
-            for(int index = 0; index < length; index++){
+            for (int index = 0; index < length; index++) {
                 this.shortArrayValue[index] = (short) RANDOM.nextInt();
             }
             this.shortArrayValue[length / 2] = null;
 
             this.intArrayValue = new Integer[length];
-            for(int index = 0; index < length; index++){
+            for (int index = 0; index < length; index++) {
                 this.intArrayValue[index] = RANDOM.nextInt();
             }
             this.intArrayValue[length / 2] = null;
 
             this.floatArrayValue = new Float[length];
-            for(int index = 0; index < length; index++){
+            for (int index = 0; index < length; index++) {
                 this.floatArrayValue[index] = RANDOM.nextFloat();
             }
             this.floatArrayValue[length / 2] = null;
 
             this.doubleArrayValue = new Double[length];
-            for(int index = 0; index < length; index++){
+            for (int index = 0; index < length; index++) {
                 this.doubleArrayValue[index] = RANDOM.nextDouble();
             }
             this.doubleArrayValue[length / 2] = null;
 
             this.longArrayValue = new Long[length];
-            for(int index = 0; index < length; index++){
+            for (int index = 0; index < length; index++) {
                 this.longArrayValue[index] = RANDOM.nextLong();
             }
             this.longArrayValue[length / 2] = null;

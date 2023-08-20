@@ -65,7 +65,7 @@ public class WrapMapTransformer extends MapTransformer {
      */
     @Override
     protected @Nullable Object deserializeObject(@NotNull Opacker opacker, @Nullable Object element) throws ClassNotFoundException, DeserializeException {
-        if (element != null && element instanceof OpackObject) {
+        if (element instanceof OpackObject) {
             OpackObject<Object, Object> opackObject = (OpackObject<Object, Object>) element;
 
             if (opackObject.containsKey("type") && opackObject.containsKey("value")) {

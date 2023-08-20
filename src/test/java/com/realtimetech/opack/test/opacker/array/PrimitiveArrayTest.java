@@ -52,42 +52,42 @@ public class PrimitiveArrayTest {
             int length = RANDOM.nextInt(1024) + 512;
 
             this.booleanArrayValue = new boolean[length];
-            for(int index = 0; index < length; index++){
+            for (int index = 0; index < length; index++) {
                 this.booleanArrayValue[index] = RANDOM.nextBoolean();
             }
 
             this.byteArrayValue = new byte[length];
-            for(int index = 0; index < length; index++){
+            for (int index = 0; index < length; index++) {
                 this.byteArrayValue[index] = (byte) RANDOM.nextInt();
             }
 
             this.charArrayValue = new char[length];
-            for(int index = 0; index < length; index++){
+            for (int index = 0; index < length; index++) {
                 this.charArrayValue[index] = (char) RANDOM.nextInt();
             }
 
             this.shortArrayValue = new short[length];
-            for(int index = 0; index < length; index++){
+            for (int index = 0; index < length; index++) {
                 this.shortArrayValue[index] = (short) RANDOM.nextInt();
             }
 
             this.intArrayValue = new int[length];
-            for(int index = 0; index < length; index++){
+            for (int index = 0; index < length; index++) {
                 this.intArrayValue[index] = RANDOM.nextInt();
             }
 
             this.floatArrayValue = new float[length];
-            for(int index = 0; index < length; index++){
+            for (int index = 0; index < length; index++) {
                 this.floatArrayValue[index] = RANDOM.nextFloat();
             }
 
             this.doubleArrayValue = new double[length];
-            for(int index = 0; index < length; index++){
+            for (int index = 0; index < length; index++) {
                 this.doubleArrayValue[index] = RANDOM.nextDouble();
             }
 
             this.longArrayValue = new long[length];
-            for(int index = 0; index < length; index++){
+            for (int index = 0; index < length; index++) {
                 this.longArrayValue[index] = RANDOM.nextLong();
             }
         }

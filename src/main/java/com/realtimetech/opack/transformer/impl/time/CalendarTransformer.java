@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 REALTIMETECH All Rights Reserved
+ * Copyright (C) 2022 REALTIMETECH All Rights Reserved
  *
  * Licensed either under the Apache License, Version 2.0, or (at your option)
  * under the terms of the GNU General Public License as published by
@@ -20,15 +20,19 @@
  * limitations under the License.
  */
 
-package com.realtimetech.opack.transformer;
+package com.realtimetech.opack.transformer.impl.time;
 
 import com.realtimetech.opack.Opacker;
 import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
+import com.realtimetech.opack.transformer.Transformer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface Transformer {
+import java.util.Calendar;
+import java.util.Date;
+
+public class CalendarTransformer implements Transformer {
     /**
      * Serialize specific value to opack value.
      *
@@ -38,16 +42,34 @@ public interface Transformer {
      * @return opack value
      * @throws SerializeException if a problem occurs during serializing
      */
-    @Nullable Object serialize(@NotNull Opacker opacker, @NotNull Class<?> originalType, @Nullable Object value) throws SerializeException;
+    @Override
+    public @Nullable Object serialize(@NotNull Opacker opacker, @NotNull Class<?> originalType, @Nullable Object value) throws SerializeException {
+        if (value instanceof Calendar) {
+            return ((Calendar) value).getTime().getTime();
+        }
+
+        return value;
+    }
 
     /**
      * Deserialize opack value.
      *
      * @param opacker  the opacker
-     * @param value    the opack value to be deserialized
      * @param goalType the goal type to deserialize
+     * @param value    the opack value to be deserialized
      * @return deserialized value
      * @throws DeserializeException if a problem occurs during deserializing
      */
-    @Nullable Object deserialize(@NotNull Opacker opacker, @NotNull Class<?> goalType, @Nullable Object value) throws DeserializeException;
+    @Override
+    public @Nullable Object deserialize(@NotNull Opacker opacker, @NotNull Class<?> goalType, @Nullable Object value) throws DeserializeException {
+        if (value instanceof Long) {
+            Calendar calendar = Calendar.getInstance();
+
+            calendar.setTime(new Date((Long) value));
+
+            return calendar;
+        }
+
+        return value;
+    }
 }

@@ -23,8 +23,8 @@
 package com.realtimetech.opack.test.opacker.transform;
 
 import com.realtimetech.opack.Opacker;
-import com.realtimetech.opack.annotation.Type;
 import com.realtimetech.opack.annotation.Transform;
+import com.realtimetech.opack.annotation.Type;
 import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.test.OpackAssert;
@@ -32,6 +32,8 @@ import com.realtimetech.opack.transformer.Transformer;
 import com.realtimetech.opack.util.ReflectionUtil;
 import com.realtimetech.opack.value.OpackObject;
 import com.realtimetech.opack.value.OpackValue;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -41,7 +43,7 @@ import java.nio.charset.StandardCharsets;
 public class TransformClassTest {
     public static class ClassTransformer implements Transformer {
         @Override
-        public Object serialize(Opacker opacker, Object value) throws SerializeException {
+        public @Nullable Object serialize(@NotNull Opacker opacker, @NotNull Class<?> originalType, @Nullable Object value) throws SerializeException {
             if (value instanceof ClassTransformInheritable) {
                 ClassTransformInheritable classTransformInheritable = (ClassTransformInheritable) value;
                 return new String(classTransformInheritable.bytes, StandardCharsets.UTF_8);
@@ -55,7 +57,7 @@ public class TransformClassTest {
         }
 
         @Override
-        public Object deserialize(Opacker opacker, Class<?> goalType, Object value) throws DeserializeException {
+        public Object deserialize(@NotNull Opacker opacker, @NotNull Class<?> goalType, Object value) throws DeserializeException {
             if (value instanceof String && ClassTransformInheritable.class.isAssignableFrom(goalType)) {
                 try {
                     ClassTransformInheritable classTransformInheritable = (ClassTransformInheritable) ReflectionUtil.createInstanceUnsafe(goalType);
