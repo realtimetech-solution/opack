@@ -29,14 +29,25 @@ import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.test.OpackAssert;
 import com.realtimetech.opack.transformer.Transformer;
 import com.realtimetech.opack.value.OpackValue;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
 
 public class TransformFieldTest {
     public static class ByteToStringTransformer implements Transformer {
+        /**
+         * Serialize specific value to opack value.
+         *
+         * @param opacker      the opacker
+         * @param originalType the original type
+         * @param value        the value to be serialized
+         * @return opack value
+         * @throws SerializeException if a problem occurs during serializing
+         */
         @Override
-        public Object serialize(Opacker opacker, Object value) throws SerializeException {
+        public @Nullable Object serialize(@NotNull Opacker opacker, @NotNull Class<?> originalType, @Nullable Object value) throws SerializeException {
             if (value instanceof byte[]) {
                 return new String(((byte[]) value), StandardCharsets.UTF_8);
             }
@@ -45,7 +56,7 @@ public class TransformFieldTest {
         }
 
         @Override
-        public Object deserialize(Opacker opacker, Class<?> goalType, Object value) throws DeserializeException {
+        public Object deserialize(@NotNull Opacker opacker, @NotNull Class<?> goalType, Object value) throws DeserializeException {
             if (value instanceof String && goalType == byte[].class) {
                 return ((String) value).getBytes(StandardCharsets.UTF_8);
             }

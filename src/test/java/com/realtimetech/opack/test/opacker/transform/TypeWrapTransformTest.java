@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 REALTIMETECH All Rights Reserved
+ * Copyright (C) 2023 REALTIMETECH All Rights Reserved
  *
  * Licensed either under the Apache License, Version 2.0, or (at your option)
  * under the terms of the GNU General Public License as published by
@@ -20,57 +20,49 @@
  * limitations under the License.
  */
 
-package com.realtimetech.opack.test.opacker.single;
+package com.realtimetech.opack.test.opacker.transform;
 
 import com.realtimetech.opack.Opacker;
+import com.realtimetech.opack.annotation.Transform;
+import com.realtimetech.opack.annotation.Type;
 import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.test.OpackAssert;
+import com.realtimetech.opack.transformer.impl.TypeWrapTransformer;
 import com.realtimetech.opack.value.OpackValue;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
-import java.util.Random;
+import java.util.LinkedList;
+import java.util.List;
 
-public class PrimitiveTest {
-    static final Random RANDOM = new Random();
+public class TypeWrapTransformTest {
+    public static class TypeWrapTransformClass {
+        @Transform(transformer = TypeWrapTransformer.class)
+        private @NotNull List<Double> listWithTransformer;
 
-    public static class PrimitiveClass {
-        private boolean booleanValue;
+        @Type(LinkedList.class)
+        private @NotNull List<Double> listWithAnnotation;
 
-        private byte byteValue;
-        private char charValue;
+        public TypeWrapTransformClass() {
+            this.listWithTransformer = new LinkedList<>();
+            this.listWithAnnotation = new LinkedList<>();
+        }
 
-        private short shortValue;
-
-        private int intValue;
-        private float floatValue;
-
-        private double doubleValue;
-        private long longValue;
-
-        public PrimitiveClass() {
-            this.booleanValue = RANDOM.nextBoolean();
-
-            this.byteValue = (byte) RANDOM.nextInt();
-            this.charValue = (char) RANDOM.nextInt();
-
-            this.shortValue = (short) RANDOM.nextInt();
-
-            this.intValue = RANDOM.nextInt();
-            this.floatValue = RANDOM.nextFloat();
-
-            this.doubleValue = RANDOM.nextDouble();
-            this.longValue = RANDOM.nextLong();
+        private void addItemsRandomly(@NotNull List<Double> list) {
+            for (int index = 0; index < 32; index++) {
+                list.add(Math.random());
+            }
         }
     }
 
     @Test
     public void test() throws SerializeException, DeserializeException, OpackAssert.AssertException {
         Opacker opacker = new Opacker.Builder().create();
-        PrimitiveClass originalObject = new PrimitiveClass();
+        TypeWrapTransformClass originalObject = new TypeWrapTransformClass();
 
         OpackValue serialized = opacker.serialize(originalObject);
-        PrimitiveClass deserialized = opacker.deserialize(PrimitiveClass.class, serialized);
+        TypeWrapTransformClass deserialized = opacker.deserialize(TypeWrapTransformClass.class, serialized);
 
         OpackAssert.assertEquals(originalObject, deserialized);
     }

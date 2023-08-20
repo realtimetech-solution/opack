@@ -23,10 +23,10 @@
 package com.realtimetech.opack.bake;
 
 import com.realtimetech.opack.Opacker;
-import com.realtimetech.opack.annotation.Type;
 import com.realtimetech.opack.annotation.Ignore;
 import com.realtimetech.opack.annotation.Name;
 import com.realtimetech.opack.annotation.Transform;
+import com.realtimetech.opack.annotation.Type;
 import com.realtimetech.opack.exception.BakeException;
 import com.realtimetech.opack.transformer.Transformer;
 import com.realtimetech.opack.transformer.TransformerFactory;
@@ -203,7 +203,7 @@ public final class TypeBaker {
 
                 if (predefinedTransformers != null) {
                     for (PredefinedTransformer predefinedTransformer : predefinedTransformers) {
-                        if (root || predefinedTransformer.isInheritable()) {
+                        if (root || predefinedTransformer.isInheritable() && !transformers.contains(predefinedTransformer.getTransformer())) {
                             transformers.add(predefinedTransformer.getTransformer());
                         }
                     }
@@ -233,9 +233,11 @@ public final class TypeBaker {
      * @return transformers
      * @throws BakeException if transformer class object cannot be instantiated
      */
-    private @NotNull Transformer @NotNull[] getTransformer(@NotNull AnnotatedElement annotatedElement) throws BakeException {
+    private @NotNull Transformer @NotNull [] getTransformer(@NotNull AnnotatedElement annotatedElement) throws BakeException {
         List<Transformer> transformers = new LinkedList<>();
+
         this.addTransformer(transformers, annotatedElement, true);
+
         return transformers.toArray(new Transformer[0]);
     }
 

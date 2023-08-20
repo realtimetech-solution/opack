@@ -32,11 +32,7 @@ import com.realtimetech.opack.exception.EncodeException;
 import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.value.OpackValue;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 public class JacksonPerformanceTest {
     @Test

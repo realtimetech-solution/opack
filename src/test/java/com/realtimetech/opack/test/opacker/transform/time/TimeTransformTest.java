@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 REALTIMETECH All Rights Reserved
+ * Copyright (C) 2023 REALTIMETECH All Rights Reserved
  *
  * Licensed either under the Apache License, Version 2.0, or (at your option)
  * under the terms of the GNU General Public License as published by
@@ -20,40 +20,40 @@
  * limitations under the License.
  */
 
-package com.realtimetech.opack.transformer.impl.date;
+package com.realtimetech.opack.test.opacker.transform.time;
 
 import com.realtimetech.opack.Opacker;
 import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
-import com.realtimetech.opack.transformer.Transformer;
+import com.realtimetech.opack.test.OpackAssert;
+import com.realtimetech.opack.value.OpackValue;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.junit.jupiter.api.Test;
 
-public class DateToLongTransformer implements Transformer {
-    /**
-     * Serialize specific value to opack value.
-     *
-     * @param opacker
-     * @param value   the value to be serialized
-     * @return opack value
-     * @throws SerializeException if a problem occurs during serializing
-     */
-    @Override
-    public @Nullable Object serialize(@NotNull Opacker opacker, @Nullable Object value) throws SerializeException {
-        return null;
+import java.util.Calendar;
+import java.util.Date;
+
+public class TimeTransformTest {
+    public static class TimeTransformClass {
+        private @NotNull Date date;
+        private @NotNull Calendar calendar;
+
+        public TimeTransformClass() {
+            this.date = new Date();
+
+            this.calendar = Calendar.getInstance();
+            this.calendar.setTime(new Date());
+        }
     }
 
-    /**
-     * Deserialize opack value.
-     *
-     * @param opacker
-     * @param goalType the goal type to deserialize
-     * @param value    the opack value to be deserialized
-     * @return deserialized value
-     * @throws DeserializeException if a problem occurs during deserializing
-     */
-    @Override
-    public @Nullable Object deserialize(@NotNull Opacker opacker, @NotNull Class<?> goalType, @Nullable Object value) throws DeserializeException {
-        return null;
+    @Test
+    public void test() throws SerializeException, DeserializeException, OpackAssert.AssertException {
+        Opacker opacker = new Opacker.Builder().create();
+        TimeTransformClass originalObject = new TimeTransformClass();
+
+        OpackValue serialized = opacker.serialize(originalObject);
+        TimeTransformClass deserialized = opacker.deserialize(TimeTransformClass.class, serialized);
+
+        OpackAssert.assertEquals(originalObject, deserialized);
     }
 }

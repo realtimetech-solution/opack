@@ -39,13 +39,14 @@ public class MapTransformer extends DataStructureTransformer {
     /**
      * Serialize specific value to opack value.
      *
-     * @param opacker
-     * @param value   the value to be serialized
+     * @param opacker      the opacker
+     * @param originalType the original type
+     * @param value        the value to be serialized
      * @return opack value
      * @throws SerializeException if a problem occurs during serializing
      */
     @Override
-    public @Nullable Object serialize(@NotNull Opacker opacker, @Nullable Object value) throws SerializeException {
+    public @Nullable Object serialize(@NotNull Opacker opacker, @NotNull Class<?> originalType, @Nullable Object value) throws SerializeException {
         if (value instanceof Map) {
             Map<?, ?> map = (Map<?, ?>) value;
             OpackObject<Object, Object> opackObject = new OpackObject<>(map.size());
@@ -69,7 +70,7 @@ public class MapTransformer extends DataStructureTransformer {
     /**
      * Deserialize opack value.
      *
-     * @param opacker
+     * @param opacker  the opacker
      * @param goalType the goal type to deserialize
      * @param value    the opack value to be deserialized
      * @return deserialized value
@@ -94,7 +95,8 @@ public class MapTransformer extends DataStructureTransformer {
                     }
 
                     return map;
-                } catch (InvocationTargetException | InstantiationException | IllegalAccessException | ClassNotFoundException exception) {
+                } catch (InvocationTargetException | InstantiationException | IllegalAccessException |
+                         ClassNotFoundException exception) {
                     throw new DeserializeException(exception);
                 }
             }

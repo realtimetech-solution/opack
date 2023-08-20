@@ -20,66 +20,72 @@
  * limitations under the License.
  */
 
-package com.realtimetech.opack.transformer.impl.list;
+package com.realtimetech.opack.transformer.impl;
 
 import com.realtimetech.opack.Opacker;
 import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
+import com.realtimetech.opack.transformer.Transformer;
 import com.realtimetech.opack.value.OpackObject;
 import com.realtimetech.opack.value.OpackValue;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class WrapListTransformer extends ListTransformer {
+public class TypeWrapTransformer implements Transformer {
     /**
-     * Serializes the element to {@link OpackValue OpackValue}.
+     * Serialize specific value to opack value.
      *
-     * @param opacker the opacker
-     * @param element the element to be serialized
-     * @return serialized value
+     * @param opacker      the opacker
+     * @param originalType the original type
+     * @param value        the value to be serialized
+     * @return opack value
      * @throws SerializeException if a problem occurs during serializing
      */
     @Override
-    protected @Nullable Object serializeObject(@NotNull Opacker opacker, @Nullable Object element) throws SerializeException {
-        if (element != null && !OpackValue.isAllowType(element.getClass())) {
-            OpackValue opackValue = opacker.serialize(element);
+    public @Nullable Object serialize(@NotNull Opacker opacker, @NotNull Class<?> originalType, @Nullable Object value) throws SerializeException {
+        if (value != null) {
+            OpackValue opackValue = opacker.serialize(value);
             OpackObject<Object, Object> opackObject = new OpackObject<>();
 
-            opackObject.put("type", element.getClass().getName());
+            opackObject.put("type", value.getClass().getName());
             opackObject.put("value", opackValue);
 
             return opackObject;
         }
 
-        return element;
+        return value;
     }
 
     /**
-     * Deserializes the {@link OpackValue OpackValue}.
+     * Deserialize opack value.
      *
-     * @param opacker the opacker
-     * @param element the opack value to be deserialized
-     * @return deserialized element
-     * @throws ClassNotFoundException if the class cannot be located
-     * @throws DeserializeException   if a problem occurs during deserializing
+     * @param opacker  the opacker
+     * @param goalType the goal type to deserialize
+     * @param value    the opack value to be deserialized
+     * @return deserialized value
+     * @throws DeserializeException if a problem occurs during deserializing
      */
     @Override
-    protected @Nullable Object deserializeObject(@NotNull Opacker opacker, @Nullable Object element) throws ClassNotFoundException, DeserializeException {
-        if (element instanceof OpackObject) {
-            OpackObject<Object, Object> opackObject = (OpackObject<Object, Object>) element;
+    public @Nullable Object deserialize(@NotNull Opacker opacker, @NotNull Class<?> goalType, @Nullable Object value) throws DeserializeException {
+        if (value instanceof OpackObject) {
+            OpackObject<Object, Object> opackObject = (OpackObject<Object, Object>) value;
 
             if (opackObject.containsKey("type") && opackObject.containsKey("value")) {
                 String type = (String) opackObject.get("type");
-                Object value = opackObject.get("value");
+                Object opackValue = opackObject.get("value");
 
-                Class<?> objectClass = Class.forName(type);
+                try {
+                    Class<?> objectClass = Class.forName(type);
 
-                if (value instanceof OpackValue) {
-                    return opacker.deserialize(objectClass, (OpackValue) value);
+                    if (opackValue instanceof OpackValue) {
+                        return opacker.deserialize(objectClass, (OpackValue) value);
+                    }
+                } catch (ClassNotFoundException classNotFoundException) {
+                    throw new DeserializeException(classNotFoundException);
                 }
             }
         }
 
-        return element;
+        return value;
     }
 }
