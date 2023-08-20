@@ -46,7 +46,7 @@ Opack is a Java library that can serialize/deserialize between Java objects and 
 Gradle:
 ```gradle
 dependencies {
-  implementation 'com.realtimetech:opack:0.0.10'
+  implementation 'com.realtimetech:opack:0.0.11'
 }
 ```
 
@@ -55,7 +55,7 @@ Maven:
 <dependency>
   <groupId>com.realtimetech</groupId>
   <artifactId>opack</artifactId>
-  <version>0.0.10</version>
+  <version>0.0.11</version>
 </dependency>
 ```
 
@@ -275,39 +275,39 @@ public class SomeObject {
 ```java
 OpackObject<String, OpackValue> rootObject = new OpackObject<>();
 
-        {
-        OpackArray<Integer> opackArray = new OpackArray<>();
-        opackArray.add(Integer.MAX_VALUE);
-        rootObject.put("array", opackArray);
-        }
+{
+    OpackArray<Integer> opackArray = new OpackArray<>();
+    opackArray.add(Integer.MAX_VALUE);
+    rootObject.put("array", opackArray);
+}
 
-        {
-        OpackArray opackArray = OpackArray.createWithArrayObject(new int[]{1, 2, 3, 4, 5, 6});
-        rootObject.put("unmodifiable(but, really fast) array", opackArray);
-        }
+{
+    OpackArray opackArray = OpackArray.createWithArrayObject(new int[]{1, 2, 3, 4, 5, 6});
+    rootObject.put("unmodifiable(but, really fast) array", opackArray);
+}
 
-        {
-        OpackObject opackObject = new OpackObject<>();
-        opackObject.put("int", 1);
-        opackObject.put("float", 1.1f);
-        opackObject.put("long", Long.MAX_VALUE);
-        opackObject.put("double", 1.1d);
+{
+    OpackObject opackObject = new OpackObject<>();
+    opackObject.put("int", 1);
+    opackObject.put("float", 1.1f);
+    opackObject.put("long", Long.MAX_VALUE);
+    opackObject.put("double", 1.1d);
 
-        opackObject.put(1024, "2^10");
-        opackObject.put(
-        OpackArray.createWithArrayObject(new byte[]{1,2,3,4,5}),
-        "a lot of bytes"
-        );
+    opackObject.put(1024, "2^10");
+    opackObject.put(
+    OpackArray.createWithArrayObject(new byte[]{1,2,3,4,5}),
+    "a lot of bytes"
+    );
 
-        rootObject.put("number_map", opackObject);
-        }
+    rootObject.put("number_map", opackObject);
+}
 
-        OpackArray opackArray = (OpackArray) rootObject.get("array");
-        OpackObject opackObject = (OpackObject) rootObject.get("number_map");
+OpackArray opackArray = (OpackArray) rootObject.get("array");
+OpackObject opackObject = (OpackObject) rootObject.get("number_map");
 
-        System.out.println("1024 is " + (opackObject.get(1024)));
-        System.out.println("Array length is " + (opackArray.length()));
-        System.out.println("First element is " + (opackArray.get(0)));
+System.out.println("1024 is " + (opackObject.get(1024)));
+System.out.println("Array length is " + (opackArray.length()));
+System.out.println("First element is " + (opackArray.get(0)));
 ```
 
 ### To-Do
