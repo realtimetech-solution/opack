@@ -30,6 +30,9 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.nio.file.Path;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -163,7 +166,10 @@ public class OpackAssert {
             } else if (originalObject instanceof File && targetObject instanceof File ||
                     originalObject instanceof Path && targetObject instanceof Path ||
                     originalObject instanceof Date && targetObject instanceof Date ||
-                    originalObject instanceof Calendar && targetObject instanceof Calendar) {
+                    originalObject instanceof Calendar && targetObject instanceof Calendar ||
+                    originalObject instanceof LocalDate && targetObject instanceof LocalDate ||
+                    originalObject instanceof LocalTime && targetObject instanceof LocalTime ||
+                    originalObject instanceof LocalDateTime && targetObject instanceof LocalDateTime) {
                 OpackAssert.assertEquals(originalObject.toString(), targetObject.toString());
             } else {
                 OpackAssert.assertObject(originalObject, targetObject);
