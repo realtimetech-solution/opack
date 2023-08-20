@@ -76,6 +76,36 @@ public class JsonTest {
     }
 
     @Test
+    public void empty_object() throws DecodeException, EncodeException {
+        String targetData = "{\"object\":{},\"value\":2147483648}";
+
+        JsonCodec jsonCodec = new JsonCodec.Builder().create();
+
+        OpackValue opackValue1 = jsonCodec.decode(targetData);
+
+        String middle = jsonCodec.encode(opackValue1);
+        OpackValue opackValue2 = jsonCodec.decode(middle);
+
+        Assertions.assertEquals(opackValue1, opackValue2);
+        Assertions.assertEquals(opackValue1.toString(), opackValue2.toString());
+    }
+
+    @Test
+    public void empty_array() throws DecodeException, EncodeException {
+        String targetData = "{\"array\":[],\"value\":2147483648}";
+
+        JsonCodec jsonCodec = new JsonCodec.Builder().create();
+
+        OpackValue opackValue1 = jsonCodec.decode(targetData);
+
+        String middle = jsonCodec.encode(opackValue1);
+        OpackValue opackValue2 = jsonCodec.decode(middle);
+
+        Assertions.assertEquals(opackValue1, opackValue2);
+        Assertions.assertEquals(opackValue1.toString(), opackValue2.toString());
+    }
+
+    @Test
     public void string_to_object_to_string_object() throws DecodeException, EncodeException {
         OpackValue opackValue = CommonOpackValue.create();
         JsonCodec jsonCodec = new JsonCodec.Builder().create();
