@@ -165,19 +165,19 @@ public class SomeObject {
     private byte[] bytesField;
 
     /*
-        This field is not serialized/deserialized
+        This field will not serialize/deserialize
      */
     @Ignore
     private String verySecretField;
 
     /*
-        This field is serialized/deserialized to explicit type `ArrayList` instead of ambiguous field type `List`
+        This field will serialize/deserialize to explicit type `ArrayList` instead of ambiguous field type `List`
      */
     @Type(ArrayList.class)
     private List<String> listField;
 
     /*
-        This field is serialized/deserialized to `newFieldName` name instead of actual field name `oldFieldName`
+        This field will serialize/deserialize to `newFieldName` name instead of actual field name `oldFieldName`
      */
     @Name("newFieldName")
     private String oldFieldName;
@@ -209,14 +209,32 @@ public class ByteToBase64Transformer implements Transformer {
 
 public class SomeObject {
     /*
-        This field is serialized/deserialized via Base64
+        This field will serialize/deserialize to Base64
      */
     @Transform(transformer = ByteToBase64Transformer.class)
     private byte[] bytesField;
 }
 ```
 
-#### 3. Class Transformer
+#### 3. Field With Type
+
+```java
+public class SomeObject {
+    /*
+        This field will serialize with runtime type, and deserialize actual type instead of ambiguous field type `List`
+     */
+    @WithType
+    private List<String> stringListField;
+
+    /*
+        This field will serialize with runtime type, and deserialize actual type instead of ambiguous field type `Object`
+     */
+    @WithType
+    private Object[] objectArrayField;
+}
+```
+
+#### 4. Class Transformer
 
 ```java
 public class AnimalTransformer implements Transformer {
@@ -286,7 +304,7 @@ public class SomeObject {
 }
 ```
 
-#### 4. Handling Opack Value
+#### 5. Handling Opack Value
 
 ```java
 OpackObject<String, OpackValue> rootObject=new OpackObject<>();
@@ -332,6 +350,7 @@ OpackObject<String, OpackValue> rootObject=new OpackObject<>();
 - [ ] Add generic into transformer for type safety
 - [ ] Add field pre/post transformer
 - [ ] Remove `fieldTransformer` argument of `Opacker.prepareObjectDeserialize`
+- [ ] Remove `withType` argument of `Opacker.prepareObjectDeserialize`
 
 ### License
 
