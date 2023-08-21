@@ -9,8 +9,7 @@
   <a href="https://maven-badges.herokuapp.com/maven-central/com.realtimetech/opack"><img src="https://maven-badges.herokuapp.com/maven-central/com.realtimetech/opack/badge.svg"/></a>
 </p>
 
-Opack is a Java library that can serialize/deserialize between Java objects and common objects(OpackValue). Also, common
-objects can be encoded or decoded as JSON or Bytes(Dense).
+Opack is a Java library that can serialize/deserialize between Java objects and common objects(OpackValue). Also, common objects can be encoded or decoded as JSON or Bytes(Dense).
 
 **We faster then GSON and Kryo.** (See [tests](./src/test/java/com/realtimetech/opack/test/performance))
 <details>
@@ -29,11 +28,10 @@ objects can be encoded or decoded as JSON or Bytes(Dense).
  Jackson: 6412ms
  Opack  : 6404ms
 ```
-
 </details>
 
-### Simple flow
 
+### Simple flow
 <p align="center" style="max-width: 100%;">
   <a href="#"><img width="484" src=".readme/1_serialize_deserialize.png"/></a>
 </p>
@@ -42,123 +40,114 @@ objects can be encoded or decoded as JSON or Bytes(Dense).
   <a href="#"><img width="484" src=".readme/2_encode_decode.png"/></a>
 </p>
 
+
 ### Download
 
 Gradle:
-
 ```gradle
 dependencies {
-  implementation 'com.realtimetech:opack:0.0.9'
+  implementation 'com.realtimetech:opack:0.0.11'
 }
 ```
 
 Maven:
-
 ```xml
-
 <dependency>
-    <groupId>com.realtimetech</groupId>
-    <artifactId>opack</artifactId>
-    <version>0.0.9</version>
+  <groupId>com.realtimetech</groupId>
+  <artifactId>opack</artifactId>
+  <version>0.0.11</version>
 </dependency>
 ```
 
 ### Usage
-
 #### 1. Serialize
-
 ```java
-Opacker opacker=new Opacker.Builder().create();
+Opacker opacker = new Opacker.Builder().create();
 
-        SomeObject someObject=new SomeObject();
+SomeObject someObject = new SomeObject();
 
-        OpackValue opackValue=opacker.serialize(someObject);
+OpackValue opackValue = opacker.serialize(someObject);
 ```
 
 #### 2. Deserialize
-
 ```java
-Opacker opacker=new Opacker.Builder()
+Opacker opacker = new Opacker.Builder()
         .setContextStackInitialSize(128)                    // (Optional) Creation size of stack for processing
         .setValueStackInitialSize(512)                      // (Optional) Creation size of stack for processing
-
+        
         .setEnableWrapListElementType(false)                // (Optional) When converting elements of a list, record the type as well
         .setEnableWrapMapElementType(false)                 // (Optional) When converting elements of a map, record the type as well
         .setEnableConvertEnumToOrdinal(false)               // (Optional) Convert enum to ordinal or name
         .setEnableConvertRecursiveDependencyToNull(false);  // (Optional) Convert recursive depandency, record null
-
+        
         .create();
 
-        OpackValue serializedSomeObject= /** See Serialize Usage **/;
+OpackValue serializedSomeObject = /** See Serialize Usage **/;
 
-        SomeObject someObject=opacker.deserialize(SomeObject.class,serializedSomeObject);
+SomeObject someObject = opacker.deserialize(SomeObject.class, serializedSomeObject);
 ```
 
 #### 3. Json Codec
-
 ```java
-JsonCodec jsonCodec=new JsonCodec.Builder()
+JsonCodec jsonCodec = new JsonCodec.Builder()
         .setEncodeStackInitialSize(128)             // (Optional) Creation size of stack for processing
         .setEncodeStringBufferSize(1024)            // (Optional) Creation size of stack for processing
         .setDecodeStackInitialSize(128)             // (Optional) Creation size of stack for processing
-
+        
         .setAllowOpackValueToKeyValue(false)        // (Optional) Accepts Objct or Array as Key of Json Object
         .setEnableConvertCharacterToString(false)   // (Optional) Convert character to string instead of character int value
         .setUsePrettyFormat(false)                  // (Optional) When encoding, it prints formatted
-
+        
         .create();
 
-        OpackValue opackValue= /** See Serialize Usage **/;
+OpackValue opackValue = /** See Serialize Usage **/;
 
 /*
     Encode
  */
-        String json=jsonCodec.encode(opackValue);
+String json = jsonCodec.encode(opackValue);
 // Or
-        Writer writer=new StringWriter();
-        jsonCodec.encode(writer,opackValue);
+Writer writer = new StringWriter(); 
+jsonCodec.encode(writer, opackValue);
 
 /*
     Decode
  */
-        OpackValue decodedOpackValue=jsonCodec.decode(json);
+OpackValue decodedOpackValue = jsonCodec.decode(json);
 ```
 
 #### 4. Dense Codec
-
 ```java
-DenseCodec denseCodec=new DenseCodec.Builder()
+DenseCodec denseCodec = new DenseCodec.Builder()
         .setEncodeStackInitialSize(128)         // (Optional) Creation size of stack for processing
         .setEncodeOutputBufferInitialSize(1024) // (Optional) Creation size of stack for processing
         .setDecodeStackInitialSize(128)         // (Optional) Creation size of stack for processing
-
+        
         .setIgnoreVersionCompare(false)         // (Optional) Ignore compare dense codec version in data
-
+        
         .create();
 
-        OpackValue opackValue= /** See Serialize Usage **/;
+OpackValue opackValue = /** See Serialize Usage **/;
 
 /*
     Encode
  */
-        byte[]bytes=denseCodec.encode(opackValue);
+byte[] bytes = denseCodec.encode(opackValue);
 // Or
-        OutputStream outputStream=new ByteArrayOutputStream();
-        denseCodec.encode(outputStream,opackValue);
+OutputStream outputStream = new ByteArrayOutputStream();
+denseCodec.encode(outputStream, opackValue);
 
 /*
     Decode
  */
-        OpackValue decodedOpackValue1=denseCodec.decode(bytes);
+OpackValue decodedOpackValue1 = denseCodec.decode(bytes);
 // Or
-        InputStream inputStream=new ByteArrayInputStream(bytes);
-        OpackValue decodedOpackValue2=denseCodec.decode(inputStream);
+InputStream inputStream = new ByteArrayInputStream(bytes);
+OpackValue decodedOpackValue2 = denseCodec.decode(inputStream);
 ```
 
 ### Advanced Usage
-
 #### 1. Ignore and Type and Name
-
 ```java
 public class SomeObject {
     private String stringField;
@@ -183,9 +172,7 @@ public class SomeObject {
     private String oldFieldName;
 }
 ```
-
 #### 2. Field Transformer
-
 ```java
 public class ByteToBase64Transformer implements Transformer {
     @Override
@@ -215,9 +202,7 @@ public class SomeObject {
     private byte[] bytesField;
 }
 ```
-
 #### 3. Class Transformer
-
 ```java
 public class AnimalTransformer implements Transformer {
     /*
@@ -287,43 +272,42 @@ public class SomeObject {
 ```
 
 #### 4. Handling Opack Value
-
 ```java
-OpackObject<String, OpackValue> rootObject=new OpackObject<>();
+OpackObject<String, OpackValue> rootObject = new OpackObject<>();
 
-        {
-        OpackArray<Integer> opackArray=new OpackArray<>();
-        opackArray.add(Integer.MAX_VALUE);
-        rootObject.put("array",opackArray);
-        }
+{
+    OpackArray<Integer> opackArray = new OpackArray<>();
+    opackArray.add(Integer.MAX_VALUE);
+    rootObject.put("array", opackArray);
+}
 
-        {
-        OpackArray opackArray=OpackArray.createWithArrayObject(new int[]{1,2,3,4,5,6});
-        rootObject.put("unmodifiable(but, really fast) array",opackArray);
-        }
+{
+    OpackArray opackArray = OpackArray.createWithArrayObject(new int[]{1, 2, 3, 4, 5, 6});
+    rootObject.put("unmodifiable(but, really fast) array", opackArray);
+}
 
-        {
-        OpackObject opackObject=new OpackObject<>();
-        opackObject.put("int",1);
-        opackObject.put("float",1.1f);
-        opackObject.put("long",Long.MAX_VALUE);
-        opackObject.put("double",1.1d);
+{
+    OpackObject opackObject = new OpackObject<>();
+    opackObject.put("int", 1);
+    opackObject.put("float", 1.1f);
+    opackObject.put("long", Long.MAX_VALUE);
+    opackObject.put("double", 1.1d);
 
-        opackObject.put(1024,"2^10");
-        opackObject.put(
-        OpackArray.createWithArrayObject(new byte[]{1,2,3,4,5}),
-        "a lot of bytes"
-        );
+    opackObject.put(1024, "2^10");
+    opackObject.put(
+    OpackArray.createWithArrayObject(new byte[]{1,2,3,4,5}),
+    "a lot of bytes"
+    );
 
-        rootObject.put("number_map",opackObject);
-        }
+    rootObject.put("number_map", opackObject);
+}
 
-        OpackArray opackArray=(OpackArray)rootObject.get("array");
-        OpackObject opackObject=(OpackObject)rootObject.get("number_map");
+OpackArray opackArray = (OpackArray) rootObject.get("array");
+OpackObject opackObject = (OpackObject) rootObject.get("number_map");
 
-        System.out.println("1024 is "+(opackObject.get(1024)));
-        System.out.println("Array length is "+(opackArray.length()));
-        System.out.println("First element is "+(opackArray.get(0)));
+System.out.println("1024 is " + (opackObject.get(1024)));
+System.out.println("Array length is " + (opackArray.length()));
+System.out.println("First element is " + (opackArray.get(0)));
 ```
 
 ### To-Do
