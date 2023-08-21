@@ -38,14 +38,14 @@ public class LocalDateTimeTransformer implements Transformer {
      *
      * @param opacker      the opacker
      * @param originalType the original type
-     * @param value        the value to be serialized
+     * @param object       the object to be serialized
      * @return opack value
      * @throws SerializeException if a problem occurs during serializing
      */
     @Override
-    public @Nullable Object serialize(@NotNull Opacker opacker, @NotNull Class<?> originalType, @Nullable Object value) throws SerializeException {
-        if (value instanceof LocalDateTime) {
-            LocalDateTime localDateTime = (LocalDateTime) value;
+    public @Nullable Object serialize(@NotNull Opacker opacker, @NotNull Class<?> originalType, @Nullable Object object) throws SerializeException {
+        if (object instanceof LocalDateTime) {
+            LocalDateTime localDateTime = (LocalDateTime) object;
 
             return OpackArray.createWithArrayObject(
                     new int[]{
@@ -60,7 +60,7 @@ public class LocalDateTimeTransformer implements Transformer {
             );
         }
 
-        return value;
+        return object;
     }
 
     /**
@@ -68,14 +68,14 @@ public class LocalDateTimeTransformer implements Transformer {
      *
      * @param opacker  the opacker
      * @param goalType the goal type to deserialize
-     * @param value    the opack value to be deserialized
+     * @param object   the object to be deserialized
      * @return deserialized value
      * @throws DeserializeException if a problem occurs during deserializing
      */
     @Override
-    public @Nullable Object deserialize(@NotNull Opacker opacker, @NotNull Class<?> goalType, @Nullable Object value) throws DeserializeException {
-        if (value instanceof OpackArray) {
-            OpackArray<Integer> opackArray = (OpackArray<Integer>) value;
+    public @Nullable Object deserialize(@NotNull Opacker opacker, @NotNull Class<?> goalType, @Nullable Object object) throws DeserializeException {
+        if (object instanceof OpackArray) {
+            OpackArray<Integer> opackArray = (OpackArray<Integer>) object;
 
             if (opackArray.length() == 7) {
                 return LocalDateTime.of(
@@ -90,6 +90,6 @@ public class LocalDateTimeTransformer implements Transformer {
             }
         }
 
-        return value;
+        return object;
     }
 }

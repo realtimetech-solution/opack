@@ -31,8 +31,7 @@ import com.realtimetech.opack.value.OpackValue;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashMap;
-import java.util.Random;
+import java.util.*;
 
 public class WrapMapElementTest {
     static final Random RANDOM = new Random();
@@ -48,6 +47,30 @@ public class WrapMapElementTest {
 
             this.wrappedTypeMap.put("object_value", new WrapListElementTest.TestElement());
             this.wrappedTypeMap.put(new WrapListElementTest.TestElement(), "object_key");
+
+            {
+                HashMap<String, Object> hashMap = new HashMap<String, Object>();
+
+                hashMap.put("inner_object_value", new WrapListElementTest.TestElement());
+
+                this.wrappedTypeMap.put("inner_map", hashMap);
+            }
+
+            {
+                Map<String, Object>[] hashMapArray = new Map[4];
+
+                for (int index = 0; index < hashMapArray.length; index++) {
+                    if (index % 2 == 0) {
+                        hashMapArray[index] = new HashMap<>();
+                    } else {
+                        hashMapArray[index] = new TreeMap<>();
+                    }
+
+                    hashMapArray[index].put("inner_object_value", new WrapListElementTest.TestElement());
+                }
+
+                this.wrappedTypeMap.put("inner_map_array", hashMapArray);
+            }
         }
     }
 

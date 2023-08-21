@@ -41,19 +41,19 @@ public class MapTransformer extends DataStructureTransformer {
      *
      * @param opacker      the opacker
      * @param originalType the original type
-     * @param value        the value to be serialized
+     * @param object       the object to be serialized
      * @return opack value
      * @throws SerializeException if a problem occurs during serializing
      */
     @Override
-    public @Nullable Object serialize(@NotNull Opacker opacker, @NotNull Class<?> originalType, @Nullable Object value) throws SerializeException {
-        if (value instanceof Map) {
-            Map<?, ?> map = (Map<?, ?>) value;
+    public @Nullable Object serialize(@NotNull Opacker opacker, @NotNull Class<?> originalType, @Nullable Object object) throws SerializeException {
+        if (object instanceof Map) {
+            Map<?, ?> map = (Map<?, ?>) object;
             OpackObject<Object, Object> opackObject = new OpackObject<>(map.size());
 
-            for (Object object : map.keySet()) {
-                Object keyObject = object;
-                Object valueObject = map.get(object);
+            for (Object element : map.keySet()) {
+                Object keyObject = element;
+                Object valueObject = map.get(element);
 
                 keyObject = serializeObject(opacker, keyObject);
                 valueObject = serializeObject(opacker, valueObject);
@@ -64,7 +64,7 @@ public class MapTransformer extends DataStructureTransformer {
             return opackObject;
         }
 
-        return value;
+        return object;
     }
 
     /**
@@ -72,14 +72,14 @@ public class MapTransformer extends DataStructureTransformer {
      *
      * @param opacker  the opacker
      * @param goalType the goal type to deserialize
-     * @param value    the opack value to be deserialized
+     * @param object   the object to be deserialized
      * @return deserialized value
      * @throws DeserializeException if a problem occurs during deserializing
      */
     @Override
-    public @Nullable Object deserialize(@NotNull Opacker opacker, @NotNull Class<?> goalType, @Nullable Object value) throws DeserializeException {
-        if (value instanceof OpackObject) {
-            OpackObject<Object, Object> opackObject = (OpackObject<Object, Object>) value;
+    public @Nullable Object deserialize(@NotNull Opacker opacker, @NotNull Class<?> goalType, @Nullable Object object) throws DeserializeException {
+        if (object instanceof OpackObject) {
+            OpackObject<Object, Object> opackObject = (OpackObject<Object, Object>) object;
             if (Map.class.isAssignableFrom(goalType)) {
                 try {
                     Map<Object, Object> map = (Map<Object, Object>) ReflectionUtil.createInstance(goalType);
@@ -102,7 +102,7 @@ public class MapTransformer extends DataStructureTransformer {
             }
         }
 
-        return value;
+        return object;
     }
 
     /**
@@ -126,7 +126,7 @@ public class MapTransformer extends DataStructureTransformer {
      * Deserializes the {@link OpackValue OpackValue}.
      *
      * @param opacker the opacker
-     * @param element the opack value to be deserialized
+     * @param element the element to be deserialized
      * @return deserialized element
      * @throws ClassNotFoundException if the class cannot be located
      * @throws DeserializeException   if a problem occurs during deserializing

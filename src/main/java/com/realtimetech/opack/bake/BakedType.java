@@ -33,13 +33,15 @@ public final class BakedType {
         private final @NotNull Field field;
         private final @NotNull String name;
         private final @NotNull Class<?> type;
+        private final boolean withType;
 
         private final @Nullable Transformer transformer;
 
-        public Property(@NotNull Field field, @Nullable String name, @Nullable Transformer transformer, @Nullable Class<?> type) {
+        public Property(@NotNull Field field, @Nullable String name, @Nullable Class<?> type, boolean withType, @Nullable Transformer transformer) {
             this.field = field;
             this.name = name == null ? this.field.getName() : name;
             this.type = type == null ? this.field.getType() : type;
+            this.withType = withType;
 
             this.transformer = transformer;
         }
@@ -54,6 +56,10 @@ public final class BakedType {
 
         public @NotNull Class<?> getType() {
             return type;
+        }
+
+        public boolean isWithType() {
+            return withType;
         }
 
         public @Nullable Transformer getTransformer() {
