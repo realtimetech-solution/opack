@@ -202,7 +202,19 @@ public class SomeObject {
     private byte[] bytesField;
 }
 ```
-#### 3. Class Transformer
+#### 3. Field With Type
+```java
+public class SomeObject {
+    // This field will serialize with runtime type, and deserialize actual type instead of ambiguous field type `List`
+    @WithType
+    private List<String> stringListField;
+
+    // This field will serialize with runtime type, and deserialize actual type instead of ambiguous field type `Object`
+    @WithType
+    private Object[] objectArrayField;
+}
+```
+#### 4. Class Transformer
 ```java
 public class AnimalTransformer implements Transformer {
     /*
@@ -271,7 +283,7 @@ public class SomeObject {
 }
 ```
 
-#### 4. Handling Opack Value
+#### 5. Handling Opack Value
 ```java
 OpackObject<String, OpackValue> rootObject = new OpackObject<>();
 
@@ -316,6 +328,7 @@ System.out.println("First element is " + (opackArray.get(0)));
 - [ ] Add generic into transformer for type safety
 - [ ] Add field pre/post transformer
 - [ ] Remove `fieldTransformer` argument of `Opacker.prepareObjectDeserialize`
+- [ ] Remove `withType` argument of `Opacker.prepareObjectDeserialize`
 
 ### License
 
