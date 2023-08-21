@@ -9,8 +9,7 @@
   <a href="https://maven-badges.herokuapp.com/maven-central/com.realtimetech/opack"><img src="https://maven-badges.herokuapp.com/maven-central/com.realtimetech/opack/badge.svg"/></a>
 </p>
 
-Opack is a Java library that can serialize/deserialize between Java objects and common objects(OpackValue). Also, common
-objects can be encoded or decoded as JSON or Bytes(Dense).
+Opack is a Java library that can serialize/deserialize between Java objects and common objects(OpackValue). Also, common objects can be encoded or decoded as JSON or Bytes(Dense).
 
 **We faster then GSON and Kryo.** (See [tests](./src/test/java/com/realtimetech/opack/test/performance))
 <details>
@@ -189,7 +188,7 @@ public class SomeObject {
     // This field will serialize/deserialize to explicit type `ArrayList` instead of ambiguous field type `List`
     @Type(ArrayList.class)
     private List<String> listField;
-    
+
     // This field will serialize/deserialize to `newFieldName` name instead of actual field name `oldFieldName`
     @Name("newFieldName")
     private String oldFieldName;
