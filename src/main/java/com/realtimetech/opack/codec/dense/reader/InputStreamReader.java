@@ -28,6 +28,10 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class InputStreamReader implements Reader {
+    public static @NotNull InputStreamReader of(@NotNull InputStream inputStream) {
+        return new InputStreamReader(inputStream);
+    }
+
     private final @NotNull InputStream inputStream;
 
     /**
@@ -35,7 +39,7 @@ public class InputStreamReader implements Reader {
      *
      * @param inputStream an InputStream
      */
-    public InputStreamReader(@NotNull InputStream inputStream) {
+    InputStreamReader(@NotNull InputStream inputStream) {
         this.inputStream = inputStream;
     }
 

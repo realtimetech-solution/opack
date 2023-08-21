@@ -68,91 +68,109 @@ Maven:
 #### 1. Serialize
 
 ```java
-Opacker opacker=new Opacker.Builder().create();
+public class Usage {
+    public static void main(String[] arguments) {
+        Opacker opacker = new Opacker.Builder().create();
 
-        SomeObject someObject=new SomeObject();
+        SomeObject someObject = new SomeObject();
 
-        OpackValue opackValue=opacker.serialize(someObject);
+        OpackValue opackValue = opacker.serialize(someObject);
+    }
+}
 ```
 
 #### 2. Deserialize
 
 ```java
-Opacker opacker=new Opacker.Builder()
-        .setContextStackInitialSize(128)                    // (Optional) Creation size of stack for processing
-        .setValueStackInitialSize(512)                      // (Optional) Creation size of stack for processing
+public class Usage {
+    public static void main(String[] arguments) {
+        Opacker opacker = new Opacker.Builder()
+                .setContextStackInitialSize(128)                    // (Optional) Creation size of stack for processing
+                .setValueStackInitialSize(512)                      // (Optional) Creation size of stack for processing
 
-        .setEnableWrapListElementType(false)                // (Optional) When converting elements of a list, record the type as well
-        .setEnableWrapMapElementType(false)                 // (Optional) When converting elements of a map, record the type as well
-        .setEnableConvertEnumToOrdinal(false)               // (Optional) Convert enum to ordinal or name
-        .setEnableConvertRecursiveDependencyToNull(false);  // (Optional) Convert recursive depandency, record null
+                .setEnableWrapListElementType(false)                // (Optional) When converting elements of a list, record the type as well
+                .setEnableWrapMapElementType(false)                 // (Optional) When converting elements of a map, record the type as well
+                .setEnableConvertEnumToOrdinal(false)               // (Optional) Convert enum to ordinal or name
+                .setEnableConvertRecursiveDependencyToNull(false)   // (Optional) Convert recursive depandency, record null
+                .create();
 
-        .create();
+        OpackValue serializedSomeObject = null;
 
-        OpackValue serializedSomeObject= /** See Serialize Usage **/;
-
-        SomeObject someObject=opacker.deserialize(SomeObject.class,serializedSomeObject);
+        SomeObject someObject = opacker.deserialize(SomeObject.class, serializedSomeObject);
+    }
+}
 ```
 
 #### 3. Json Codec
 
 ```java
-JsonCodec jsonCodec=new JsonCodec.Builder()
-        .setEncodeStackInitialSize(128)             // (Optional) Creation size of stack for processing
-        .setEncodeStringBufferSize(1024)            // (Optional) Creation size of stack for processing
-        .setDecodeStackInitialSize(128)             // (Optional) Creation size of stack for processing
+public class Usage {
+    public static void main(String[] arguments) {
+        JsonCodec jsonCodec = new JsonCodec.Builder()
+                .setEncodeStackInitialSize(128)             // (Optional) Creation size of stack for processing
+                .setEncodeStringBufferSize(1024)            // (Optional) Creation size of stack for processing
+                .setDecodeStackInitialSize(128)             // (Optional) Creation size of stack for processing
 
-        .setAllowOpackValueToKeyValue(false)        // (Optional) Accepts Objct or Array as Key of Json Object
-        .setEnableConvertCharacterToString(false)   // (Optional) Convert character to string instead of character int value
-        .setUsePrettyFormat(false)                  // (Optional) When encoding, it prints formatted
+                .setAllowOpackValueToKeyValue(false)        // (Optional) Accepts Object or Array as Key of Json Object
+                .setEnableConvertCharacterToString(false)   // (Optional) Convert character to string instead of character int value
+                .setUsePrettyFormat(false)                  // (Optional) When encoding, it prints formatted
 
-        .create();
+                .create();
 
-        OpackValue opackValue= /** See Serialize Usage **/;
+        OpackValue opackValue = /* See Serialize Usage */;
 
-/*
-    Encode
- */
-        String json=jsonCodec.encode(opackValue);
-// Or
-        Writer writer=new StringWriter();
-        jsonCodec.encode(writer,opackValue);
+        // Encode Basic
+        String json = jsonCodec.encode(opackValue);
 
-/*
-    Decode
- */
-        OpackValue decodedOpackValue=jsonCodec.decode(json);
+        // Encode with Java IO Writer
+        Writer writer = /* Java IO Writer */;
+        jsonCodec.encode(writer, opackValue);
+
+        // Decode Basic
+        OpackValue decodedOpackValue = jsonCodec.decode(json);
+    }
+}
 ```
 
 #### 4. Dense Codec
 
 ```java
-DenseCodec denseCodec=new DenseCodec.Builder()
-        .setEncodeStackInitialSize(128)         // (Optional) Creation size of stack for processing
-        .setEncodeOutputBufferInitialSize(1024) // (Optional) Creation size of stack for processing
-        .setDecodeStackInitialSize(128)         // (Optional) Creation size of stack for processing
+public class Usage {
+    public static void main(String[] arguments) {
+        DenseCodec denseCodec = new DenseCodec.Builder()
+                .setEncodeStackInitialSize(128)         // (Optional) Creation size of stack for processing
+                .setDecodeStackInitialSize(128)         // (Optional) Creation size of stack for processing
 
-        .setIgnoreVersionCompare(false)         // (Optional) Ignore compare dense codec version in data
+                .setIgnoreVersionCompare(false)         // (Optional) Ignore compare dense codec version in data
 
-        .create();
+                .create();
 
-        OpackValue opackValue= /** See Serialize Usage **/;
+        OpackValue opackValue = /* See Serialize Usage */;
 
-/*
-    Encode
- */
-        byte[]bytes=denseCodec.encode(opackValue);
-// Or
-        OutputStream outputStream=new ByteArrayOutputStream();
-        denseCodec.encode(outputStream,opackValue);
+        // Encode Basic
+        byte[] bytes = denseCodec.encode(opackValue);
 
-/*
-    Decode
- */
-        OpackValue decodedOpackValue1=denseCodec.decode(bytes);
-// Or
-        InputStream inputStream=new ByteArrayInputStream(bytes);
-        OpackValue decodedOpackValue2=denseCodec.decode(inputStream);
+        // Encode with Java IO OutputStream
+        OutputStream outputStream = /* Java IO OutputStream */;
+        denseCodec.encode(OutputStreamWriter.of(outputStream), opackValue);
+
+        // Encode with ByteArrayWriter
+        ByteArrayWriter byteArrayWriter = new ByteArrayWriter();
+        denseCodec.encode(byteArrayWriter, opackValue);
+        byte[] bytes = byteArrayWriter.toByteArray();
+
+        // Decode Basic
+        OpackValue decodedOpackValue = denseCodec.decode(bytes);
+
+        // Decode with Java IO InputStream
+        InputStream inputStream = /* Java IO InputStream */;
+        OpackValue decodedOpackValue = denseCodec.decode(InputStreamReader.of(inputStream));
+
+        // Decode with ByteArrayReader
+        ByteArrayReader byteArrayReader = new ByteArrayReader(bytes);
+        OpackValue decodedOpackValue = denseCodec.decode(byteArrayReader);
+    }
+}
 ```
 
 ### Advanced Usage
@@ -164,21 +182,15 @@ public class SomeObject {
     private String stringField;
     private byte[] bytesField;
 
-    /*
-        This field will not serialize/deserialize
-     */
+    // This field will not serialize/deserialize
     @Ignore
     private String verySecretField;
 
-    /*
-        This field will serialize/deserialize to explicit type `ArrayList` instead of ambiguous field type `List`
-     */
+    // This field will serialize/deserialize to explicit type `ArrayList` instead of ambiguous field type `List`
     @Type(ArrayList.class)
     private List<String> listField;
-
-    /*
-        This field will serialize/deserialize to `newFieldName` name instead of actual field name `oldFieldName`
-     */
+    
+    // This field will serialize/deserialize to `newFieldName` name instead of actual field name `oldFieldName`
     @Name("newFieldName")
     private String oldFieldName;
 }
@@ -208,9 +220,7 @@ public class ByteToBase64Transformer implements Transformer {
 }
 
 public class SomeObject {
-    /*
-        This field will serialize/deserialize to Base64
-     */
+    // This field will serialize/deserialize to Base64
     @Transform(transformer = ByteToBase64Transformer.class)
     private byte[] bytesField;
 }
@@ -220,15 +230,11 @@ public class SomeObject {
 
 ```java
 public class SomeObject {
-    /*
-        This field will serialize with runtime type, and deserialize actual type instead of ambiguous field type `List`
-     */
+    // This field will serialize with runtime type, and deserialize actual type instead of ambiguous field type `List`
     @WithType
     private List<String> stringListField;
 
-    /*
-        This field will serialize with runtime type, and deserialize actual type instead of ambiguous field type `Object`
-     */
+    // This field will serialize with runtime type, and deserialize actual type instead of ambiguous field type `Object`
     @WithType
     private Object[] objectArrayField;
 }
@@ -238,9 +244,7 @@ public class SomeObject {
 
 ```java
 public class AnimalTransformer implements Transformer {
-    /*
-        Remove a `sound` from a serialized `Animal`
-    */
+    // Remove a `sound` from a serialized `Animal`
     @Override
     public Object serialize(Opacker opacker, Object value) throws SerializeException {
         if (value instanceof Animal) {
@@ -257,9 +261,7 @@ public class AnimalTransformer implements Transformer {
         return value;
     }
 
-    /*
-        Restore `sound` from `Animal` before deserialization
-    */
+    // Restore `sound` from `Animal` before deserialization
     @Override
     public Object deserialize(Opacker opacker, Class<?> goalType, Object value) throws DeserializeException {
         if (value instanceof OpackObject) {
@@ -274,9 +276,7 @@ public class AnimalTransformer implements Transformer {
     }
 }
 
-/*
-    When `inheritable` is set to true, it applies to child classes.
-*/
+// When `inheritable` is set to true, it applies to child classes.
 @Transform(transformer = AnimalTransformer.class, inheritable = true)
 abstract class Animal {
     private String sound;
@@ -307,41 +307,45 @@ public class SomeObject {
 #### 5. Handling Opack Value
 
 ```java
-OpackObject<String, OpackValue> rootObject=new OpackObject<>();
+public class Usage {
+    public static void main(String[] arguments) {
+        OpackObject<String, OpackValue> rootObject = new OpackObject<>();
 
         {
-        OpackArray<Integer> opackArray=new OpackArray<>();
-        opackArray.add(Integer.MAX_VALUE);
-        rootObject.put("array",opackArray);
+            OpackArray<Integer> opackArray = new OpackArray<>();
+            opackArray.add(Integer.MAX_VALUE);
+            rootObject.put("array", opackArray);
         }
 
         {
-        OpackArray opackArray=OpackArray.createWithArrayObject(new int[]{1,2,3,4,5,6});
-        rootObject.put("unmodifiable(but, really fast) array",opackArray);
+            OpackArray<?> opackArray = OpackArray.createWithArrayObject(new int[]{1, 2, 3, 4, 5, 6});
+            rootObject.put("unmodifiable(but, really fast) array", opackArray);
         }
 
         {
-        OpackObject opackObject=new OpackObject<>();
-        opackObject.put("int",1);
-        opackObject.put("float",1.1f);
-        opackObject.put("long",Long.MAX_VALUE);
-        opackObject.put("double",1.1d);
+            OpackObject<Object, Object> opackObject = new OpackObject<>();
+            opackObject.put("int", 1);
+            opackObject.put("float", 1.1f);
+            opackObject.put("long", Long.MAX_VALUE);
+            opackObject.put("double", 1.1d);
 
-        opackObject.put(1024,"2^10");
-        opackObject.put(
-        OpackArray.createWithArrayObject(new byte[]{1,2,3,4,5}),
-        "a lot of bytes"
-        );
+            opackObject.put(1024, "2^10");
+            opackObject.put(
+                    OpackArray.createWithArrayObject(new byte[]{1, 2, 3, 4, 5}),
+                    "a lot of bytes"
+            );
 
-        rootObject.put("number_map",opackObject);
+            rootObject.put("number_map", opackObject);
         }
 
-        OpackArray opackArray=(OpackArray)rootObject.get("array");
-        OpackObject opackObject=(OpackObject)rootObject.get("number_map");
+        OpackArray<Integer> opackArray = (OpackArray) rootObject.get("array");
+        OpackObject<Object, Object> opackObject = (OpackObject) rootObject.get("number_map");
 
-        System.out.println("1024 is "+(opackObject.get(1024)));
-        System.out.println("Array length is "+(opackArray.length()));
-        System.out.println("First element is "+(opackArray.get(0)));
+        System.out.println("1024 is " + (opackObject.get(1024)));
+        System.out.println("Array length is " + (opackArray.length()));
+        System.out.println("First element is " + (opackArray.get(0)));
+    }
+}
 ```
 
 ### To-Do

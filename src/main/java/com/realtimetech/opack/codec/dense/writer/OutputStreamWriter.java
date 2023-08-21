@@ -28,6 +28,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 public class OutputStreamWriter implements Writer {
+    public static @NotNull OutputStreamWriter of(@NotNull OutputStream outputStream) {
+        return new OutputStreamWriter(outputStream);
+    }
+
     private final @NotNull OutputStream outputStream;
 
     /**
@@ -35,7 +39,7 @@ public class OutputStreamWriter implements Writer {
      *
      * @param outputStream an outputStream
      */
-    public OutputStreamWriter(@NotNull OutputStream outputStream) {
+    OutputStreamWriter(@NotNull OutputStream outputStream) {
         this.outputStream = outputStream;
     }
 
