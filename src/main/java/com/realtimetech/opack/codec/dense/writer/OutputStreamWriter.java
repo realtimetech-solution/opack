@@ -28,14 +28,23 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 public class OutputStreamWriter implements Writer {
+    /**
+     * Create OutputStreamWriter
+     *
+     * @param outputStream the output stream
+     */
+    public static @NotNull OutputStreamWriter of(@NotNull OutputStream outputStream) {
+        return new OutputStreamWriter(outputStream);
+    }
+
     private final @NotNull OutputStream outputStream;
 
     /**
-     * Constructs a OutputStreamWriter
+     * Constructs OutputStreamWriter
      *
-     * @param outputStream an outputStream
+     * @param outputStream the output stream
      */
-    public OutputStreamWriter(@NotNull OutputStream outputStream) {
+    OutputStreamWriter(@NotNull OutputStream outputStream) {
         this.outputStream = outputStream;
     }
 
