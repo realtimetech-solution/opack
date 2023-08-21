@@ -45,7 +45,7 @@ public abstract class DataStructureTransformer implements Transformer {
      * Deserializes the {@link OpackValue OpackValue}.
      *
      * @param opacker the opacker
-     * @param element the opack value to be deserialized
+     * @param element the element to be deserialized
      * @return deserialized element
      * @throws ClassNotFoundException if the class cannot be located
      * @throws DeserializeException   if a problem occurs during deserializing

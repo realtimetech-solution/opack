@@ -28,6 +28,7 @@ import com.realtimetech.opack.exception.BakeException;
 import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.transformer.Transformer;
+import com.realtimetech.opack.transformer.impl.TypeWrapper;
 import com.realtimetech.opack.transformer.impl.file.FileTransformer;
 import com.realtimetech.opack.transformer.impl.list.ListTransformer;
 import com.realtimetech.opack.transformer.impl.list.WrapListTransformer;
@@ -189,7 +190,7 @@ public class Opacker {
      * @return opack value
      * @throws SerializeException if a problem occurs during serializing; if this opacker is deserializing
      */
-    public synchronized OpackValue serialize(@NotNull Object object) throws SerializeException {
+    public synchronized @Nullable OpackValue serialize(@NotNull Object object) throws SerializeException {
         if (this.state == State.DESERIALIZE)
             throw new SerializeException("Opacker is deserializing.");
 
@@ -336,6 +337,10 @@ public class Opacker {
                         Object element = property.get(object);
                         Class<?> fieldType = property.getType();
 
+                        if (property.isWithType()) {
+                            element = TypeWrapper.wrapObject(this, element);
+                        }
+
                         if (property.getTransformer() != null) {
                             element = property.getTransformer().serialize(this, fieldType, element);
                         }
@@ -362,13 +367,13 @@ public class Opacker {
      * @return deserialized object
      * @throws DeserializeException if a problem occurs during deserializing; if this opacker is serializing
      */
-    public synchronized <T> T deserialize(@NotNull Class<T> type, @NotNull OpackValue opackValue) throws DeserializeException {
+    public synchronized <T> @Nullable T deserialize(@NotNull Class<T> type, @NotNull OpackValue opackValue) throws DeserializeException {
         if (this.state == State.SERIALIZE)
             throw new DeserializeException("Opacker is serializing.");
 
         int separatorStack = this.objectStack.getSize();
 
-        Object object = this.prepareObjectDeserialize(type, opackValue, null);
+        Object object = this.prepareObjectDeserialize(type, opackValue, false, null);
 
         if (object == null) {
             return null;
@@ -399,7 +404,7 @@ public class Opacker {
      * @return prepared object
      * @throws DeserializeException if a problem occurs during deserializing
      */
-    private synchronized @Nullable Object prepareObjectDeserialize(@NotNull Class<?> goalType, @NotNull Object object, @Nullable Transformer fieldTransformer) throws DeserializeException {
+    private synchronized @Nullable Object prepareObjectDeserialize(@NotNull Class<?> goalType, @NotNull Object object, boolean withType, @Nullable Transformer fieldTransformer) throws DeserializeException {
         try {
             BakedType bakedType = this.typeBaker.get(goalType);
 
@@ -415,6 +420,14 @@ public class Opacker {
 
             if (fieldTransformer != null) {
                 object = fieldTransformer.deserialize(this, goalType, object);
+
+                if (object == null) {
+                    return null;
+                }
+            }
+
+            if (withType) {
+                object = TypeWrapper.unwrapObject(this, object);
 
                 if (object == null) {
                     return null;
@@ -526,7 +539,7 @@ public class Opacker {
                     Object element = opackArray.get(index);
 
                     if (element != null) {
-                        Object deserializedValue = this.prepareObjectDeserialize(componentType, element, null);
+                        Object deserializedValue = this.prepareObjectDeserialize(componentType, element, false, null);
 
                         if (deserializedValue != null) {
                             ReflectionUtil.setArrayItem(object, index, ReflectionUtil.cast(componentType, deserializedValue));
@@ -548,7 +561,7 @@ public class Opacker {
                         Object propertyValue = null;
 
                         if (element != null) {
-                            Object deserializedValue = this.prepareObjectDeserialize(fieldType, element, property.getTransformer());
+                            Object deserializedValue = this.prepareObjectDeserialize(fieldType, element, property.isWithType(), property.getTransformer());
 
                             if (deserializedValue != null) {
                                 propertyValue = ReflectionUtil.cast(actualFieldType, deserializedValue);

@@ -20,33 +20,49 @@
  * limitations under the License.
  */
 
-package com.realtimetech.opack.test.opacker.transform;
+package com.realtimetech.opack.test.opacker.annotation;
 
 import com.realtimetech.opack.Opacker;
-import com.realtimetech.opack.annotation.Transform;
-import com.realtimetech.opack.annotation.Type;
+import com.realtimetech.opack.annotation.WithType;
 import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.test.OpackAssert;
-import com.realtimetech.opack.transformer.impl.TypeWrapTransformer;
 import com.realtimetech.opack.value.OpackValue;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-public class TypeWrapTransformTest {
-    public static class TypeWrapTransformClass {
-        @Transform(transformer = TypeWrapTransformer.class)
+public class AnnotationWithTypeTest {
+    public static class WithTypeClass {
+        @WithType
         private @NotNull List<Double> listWithTransformer;
 
-        @Type(LinkedList.class)
+        @WithType
+        private @NotNull List<Double> @NotNull [] listArrayWithTransformer;
+
+        @WithType
         private @NotNull List<Double> listWithAnnotation;
 
-        public TypeWrapTransformClass() {
+        public WithTypeClass() {
             this.listWithTransformer = new LinkedList<>();
+            this.listArrayWithTransformer = new List[8];
             this.listWithAnnotation = new LinkedList<>();
+
+            this.addItemsRandomly(this.listWithTransformer);
+            this.addItemsRandomly(this.listWithAnnotation);
+
+            for(int index = 0; index < this.listArrayWithTransformer.length; index++) {
+                if(index % 2 == 0) {
+                    this.listArrayWithTransformer[index] = new ArrayList<>();
+                } else {
+                    this.listArrayWithTransformer[index] = new LinkedList<>();
+                }
+
+                this.addItemsRandomly(this.listArrayWithTransformer[index]);
+            }
         }
 
         private void addItemsRandomly(@NotNull List<Double> list) {
@@ -59,10 +75,10 @@ public class TypeWrapTransformTest {
     @Test
     public void test() throws SerializeException, DeserializeException, OpackAssert.AssertException {
         Opacker opacker = new Opacker.Builder().create();
-        TypeWrapTransformClass originalObject = new TypeWrapTransformClass();
+        WithTypeClass originalObject = new WithTypeClass();
 
         OpackValue serialized = opacker.serialize(originalObject);
-        TypeWrapTransformClass deserialized = opacker.deserialize(TypeWrapTransformClass.class, serialized);
+        WithTypeClass deserialized = opacker.deserialize(WithTypeClass.class, serialized);
 
         OpackAssert.assertEquals(originalObject, deserialized);
     }

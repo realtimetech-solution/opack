@@ -30,9 +30,7 @@ import com.realtimetech.opack.value.OpackValue;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.LinkedList;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 
 public class WrapListElementTest {
     static final Random RANDOM = new Random();
@@ -45,6 +43,30 @@ public class WrapListElementTest {
             this.wrappedTypeList.add(null);
             this.wrappedTypeList.add("test 1");
             this.wrappedTypeList.add(new TestElement());
+
+            {
+                LinkedList<Object> linkedList = new LinkedList<Object>();
+
+                linkedList.add(new WrapListElementTest.TestElement());
+
+                this.wrappedTypeList.add(linkedList);
+            }
+
+            {
+                List<Object>[] linkedListArray = new List[4];
+
+                for (int index = 0; index < linkedListArray.length; index++) {
+                    if (index % 2 == 0) {
+                        linkedListArray[index] = new ArrayList<>();
+                    } else {
+                        linkedListArray[index] = new LinkedList<>();
+                    }
+
+                    linkedListArray[index].add(new WrapListElementTest.TestElement());
+                }
+
+                this.wrappedTypeList.add(linkedListArray);
+            }
         }
     }
 

@@ -41,24 +41,24 @@ public class ListTransformer extends DataStructureTransformer {
      *
      * @param opacker      the opacker
      * @param originalType the original type
-     * @param value        the value to be serialized
+     * @param object       the object to be serialized
      * @return opack value
      * @throws SerializeException if a problem occurs during serializing
      */
     @Override
-    public @Nullable Object serialize(@NotNull Opacker opacker, @NotNull Class<?> originalType, @Nullable Object value) throws SerializeException {
-        if (value instanceof List) {
-            List<?> list = (List<?>) value;
+    public @Nullable Object serialize(@NotNull Opacker opacker, @NotNull Class<?> originalType, @Nullable Object object) throws SerializeException {
+        if (object instanceof List) {
+            List<?> list = (List<?>) object;
             OpackArray<Object> opackArray = new OpackArray<>(list.size());
 
-            for (Object object : list) {
-                opackArray.add(this.serializeObject(opacker, object));
+            for (Object element : list) {
+                opackArray.add(this.serializeObject(opacker, element));
             }
 
             return opackArray;
         }
 
-        return value;
+        return object;
     }
 
     /**
@@ -66,14 +66,15 @@ public class ListTransformer extends DataStructureTransformer {
      *
      * @param opacker  the opacker
      * @param goalType the goal type to deserialize
-     * @param value    the opack value to be deserialized
+     * @param object   the object to be deserialized
      * @return deserialized value
      * @throws DeserializeException if a problem occurs during deserializing
      */
     @Override
-    public @Nullable Object deserialize(@NotNull Opacker opacker, @NotNull Class<?> goalType, @Nullable Object value) throws DeserializeException {
-        if (value instanceof OpackArray) {
-            OpackArray<Object> opackArray = (OpackArray<Object>) value;
+    public @Nullable Object deserialize(@NotNull Opacker opacker, @NotNull Class<?> goalType, @Nullable Object object) throws DeserializeException {
+        if (object instanceof OpackArray) {
+            OpackArray<Object> opackArray = (OpackArray<Object>) object;
+            
             if (List.class.isAssignableFrom(goalType)) {
                 try {
                     List<Object> list = (List<Object>) ReflectionUtil.createInstance(goalType);
@@ -92,7 +93,7 @@ public class ListTransformer extends DataStructureTransformer {
             }
         }
 
-        return value;
+        return object;
     }
 
     /**
@@ -116,7 +117,7 @@ public class ListTransformer extends DataStructureTransformer {
      * Deserializes the {@link OpackValue OpackValue}.
      *
      * @param opacker the opacker
-     * @param element the opack value to be deserialized
+     * @param element the element to be deserialized
      * @return deserialized element
      * @throws ClassNotFoundException if the class cannot be located
      * @throws DeserializeException   if a problem occurs during deserializing

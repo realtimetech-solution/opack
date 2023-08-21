@@ -23,10 +23,7 @@
 package com.realtimetech.opack.bake;
 
 import com.realtimetech.opack.Opacker;
-import com.realtimetech.opack.annotation.Ignore;
-import com.realtimetech.opack.annotation.Name;
-import com.realtimetech.opack.annotation.Transform;
-import com.realtimetech.opack.annotation.Type;
+import com.realtimetech.opack.annotation.*;
 import com.realtimetech.opack.exception.BakeException;
 import com.realtimetech.opack.transformer.Transformer;
 import com.realtimetech.opack.transformer.TransformerFactory;
@@ -296,8 +293,9 @@ public final class TypeBaker {
                 Transformer[] fieldTransformers = this.getTransformer(field);
                 Class<?> type = this.getAnnotatedType(field);
                 String name = this.getAnnotatedName(field);
+                boolean withType = field.isAnnotationPresent(WithType.class);
 
-                properties.add(new BakedType.Property(field, name, fieldTransformers.length > 0 ? fieldTransformers[0] : null, type));
+                properties.add(new BakedType.Property(field, name, type, withType, fieldTransformers.length > 0 ? fieldTransformers[0] : null));
             }
 
             transformers = this.getTransformer(bakeType);

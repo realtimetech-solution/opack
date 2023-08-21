@@ -25,6 +25,7 @@ package com.realtimetech.opack.transformer.impl.list;
 import com.realtimetech.opack.Opacker;
 import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
+import com.realtimetech.opack.transformer.impl.TypeWrapper;
 import com.realtimetech.opack.value.OpackObject;
 import com.realtimetech.opack.value.OpackValue;
 import org.jetbrains.annotations.NotNull;
@@ -41,45 +42,20 @@ public class WrapListTransformer extends ListTransformer {
      */
     @Override
     protected @Nullable Object serializeObject(@NotNull Opacker opacker, @Nullable Object element) throws SerializeException {
-        if (element != null && !OpackValue.isAllowType(element.getClass())) {
-            OpackValue opackValue = opacker.serialize(element);
-            OpackObject<Object, Object> opackObject = new OpackObject<>();
-
-            opackObject.put("type", element.getClass().getName());
-            opackObject.put("value", opackValue);
-
-            return opackObject;
-        }
-
-        return element;
+        return TypeWrapper.wrapObject(opacker, element);
     }
 
     /**
      * Deserializes the {@link OpackValue OpackValue}.
      *
      * @param opacker the opacker
-     * @param element the opack value to be deserialized
+     * @param element the element to be deserialized
      * @return deserialized element
      * @throws ClassNotFoundException if the class cannot be located
      * @throws DeserializeException   if a problem occurs during deserializing
      */
     @Override
     protected @Nullable Object deserializeObject(@NotNull Opacker opacker, @Nullable Object element) throws ClassNotFoundException, DeserializeException {
-        if (element instanceof OpackObject) {
-            OpackObject<Object, Object> opackObject = (OpackObject<Object, Object>) element;
-
-            if (opackObject.containsKey("type") && opackObject.containsKey("value")) {
-                String type = (String) opackObject.get("type");
-                Object value = opackObject.get("value");
-
-                Class<?> objectClass = Class.forName(type);
-
-                if (value instanceof OpackValue) {
-                    return opacker.deserialize(objectClass, (OpackValue) value);
-                }
-            }
-        }
-
-        return element;
+        return TypeWrapper.unwrapObject(opacker, element);
     }
 }

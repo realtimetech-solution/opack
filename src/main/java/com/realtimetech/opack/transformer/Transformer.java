@@ -34,20 +34,20 @@ public interface Transformer {
      *
      * @param opacker      the opacker
      * @param originalType the original type
-     * @param value        the value to be serialized
+     * @param object       the object to be serialized
      * @return opack value
      * @throws SerializeException if a problem occurs during serializing
      */
-    @Nullable Object serialize(@NotNull Opacker opacker, @NotNull Class<?> originalType, @Nullable Object value) throws SerializeException;
+    @Nullable Object serialize(@NotNull Opacker opacker, @NotNull Class<?> originalType, @Nullable Object object) throws SerializeException;
 
     /**
      * Deserialize opack value.
      *
      * @param opacker  the opacker
-     * @param value    the opack value to be deserialized
+     * @param object   the object to be deserialized
      * @param goalType the goal type to deserialize
      * @return deserialized value
      * @throws DeserializeException if a problem occurs during deserializing
      */
-    @Nullable Object deserialize(@NotNull Opacker opacker, @NotNull Class<?> goalType, @Nullable Object value) throws DeserializeException;
+    @Nullable Object deserialize(@NotNull Opacker opacker, @NotNull Class<?> goalType, @Nullable Object object) throws DeserializeException;
 }
