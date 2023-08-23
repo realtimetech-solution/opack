@@ -32,6 +32,7 @@ public class OutputStreamWriter implements Writer {
      * Create OutputStreamWriter
      *
      * @param outputStream the output stream
+     * @return the output stream writer
      */
     public static @NotNull OutputStreamWriter of(@NotNull OutputStream outputStream) {
         return new OutputStreamWriter(outputStream);

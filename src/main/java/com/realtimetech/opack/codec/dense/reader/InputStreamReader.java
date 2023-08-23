@@ -32,6 +32,7 @@ public class InputStreamReader implements Reader {
      * Create InputStreamReader
      *
      * @param inputStream the input stream
+     * @return the input stream reader
      */
     public static @NotNull InputStreamReader of(@NotNull InputStream inputStream) {
         return new InputStreamReader(inputStream);

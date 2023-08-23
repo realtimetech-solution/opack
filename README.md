@@ -47,7 +47,7 @@ Gradle:
 
 ```gradle
 dependencies {
-  implementation 'com.realtimetech:opack:0.0.9'
+  implementation 'com.realtimetech:opack:0.0.12'
 }
 ```
 
@@ -58,7 +58,7 @@ Maven:
 <dependency>
     <groupId>com.realtimetech</groupId>
     <artifactId>opack</artifactId>
-    <version>0.0.9</version>
+    <version>0.0.12</version>
 </dependency>
 ```
 
@@ -116,13 +116,13 @@ public class Usage {
 
                 .create();
 
-        OpackValue opackValue = /* See Serialize Usage */;
+        OpackValue opackValue;
 
         // Encode Basic
         String json = jsonCodec.encode(opackValue);
 
         // Encode with Java IO Writer
-        Writer writer = /* Java IO Writer */;
+        Writer writer;
         jsonCodec.encode(writer, opackValue);
 
         // Decode Basic
@@ -144,13 +144,13 @@ public class Usage {
 
                 .create();
 
-        OpackValue opackValue = /* See Serialize Usage */;
+        OpackValue opackValue;
 
         // Encode Basic
         byte[] bytes = denseCodec.encode(opackValue);
 
         // Encode with Java IO OutputStream
-        OutputStream outputStream = /* Java IO OutputStream */;
+        OutputStream outputStream;
         denseCodec.encode(OutputStreamWriter.of(outputStream), opackValue);
 
         // Encode with ByteArrayWriter
@@ -162,7 +162,7 @@ public class Usage {
         OpackValue decodedOpackValue = denseCodec.decode(bytes);
 
         // Decode with Java IO InputStream
-        InputStream inputStream = /* Java IO InputStream */;
+        InputStream inputStream;
         OpackValue decodedOpackValue = denseCodec.decode(InputStreamReader.of(inputStream));
 
         // Decode with ByteArrayReader
