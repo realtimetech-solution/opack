@@ -27,7 +27,6 @@ import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.test.OpackAssert;
 import com.realtimetech.opack.value.OpackValue;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -36,9 +35,9 @@ import java.time.LocalTime;
 
 public class Java8TimeTransformTest {
     public static class Java8TimeTransformClass {
-        private @NotNull LocalDate localDate;
-        private @NotNull LocalTime localTime;
-        private @NotNull LocalDateTime localDateTime;
+        private LocalDate localDate;
+        private LocalTime localTime;
+        private LocalDateTime localDateTime;
 
         public Java8TimeTransformClass() {
             this.localDate = LocalDate.now();
@@ -53,6 +52,7 @@ public class Java8TimeTransformTest {
         Java8TimeTransformClass originalObject = new Java8TimeTransformClass();
 
         OpackValue serialized = opacker.serialize(originalObject);
+        assert serialized != null;
         Java8TimeTransformClass deserialized = opacker.deserialize(Java8TimeTransformClass.class, serialized);
 
         OpackAssert.assertEquals(originalObject, deserialized);

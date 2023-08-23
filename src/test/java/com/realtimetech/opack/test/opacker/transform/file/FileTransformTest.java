@@ -27,14 +27,13 @@ import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.test.OpackAssert;
 import com.realtimetech.opack.value.OpackValue;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 
 public class FileTransformTest {
     public static class FileTransformClass {
-        private @NotNull File file;
+        private File file;
 
         public FileTransformClass() {
             this.file = new File("src/test/java/com/realtimetech/opack/test/opacker/transform/FileTransformTest.java");
@@ -47,6 +46,7 @@ public class FileTransformTest {
         FileTransformClass originalObject = new FileTransformClass();
 
         OpackValue serialized = opacker.serialize(originalObject);
+        assert serialized != null;
         FileTransformClass deserialized = opacker.deserialize(FileTransformClass.class, serialized);
 
         OpackAssert.assertEquals(originalObject, deserialized);

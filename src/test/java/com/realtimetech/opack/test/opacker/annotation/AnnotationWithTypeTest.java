@@ -27,24 +27,52 @@ import com.realtimetech.opack.annotation.WithType;
 import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.test.OpackAssert;
+import com.realtimetech.opack.test.opacker.single.ObjectTest;
 import com.realtimetech.opack.value.OpackValue;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
 public class AnnotationWithTypeTest {
+    static final Random RANDOM = new Random();
+
+    public static class ObjectClass {
+        private Object nullValue;
+
+        private String stringValue;
+        private int intValue;
+        private Integer integerValue;
+
+        public ObjectClass() {
+            this.nullValue = null;
+
+            this.stringValue = "object_string_value" + System.currentTimeMillis();
+            this.intValue = RANDOM.nextInt();
+            this.integerValue = RANDOM.nextInt();
+        }
+    }
+
     public static class WithTypeClass {
         @WithType
-        private @NotNull List<Double> listWithTransformer;
+        private List<Double> listWithTransformer;
 
         @WithType
-        private @NotNull List<Double> @NotNull [] listArrayWithTransformer;
+        private List<Double>[] listArrayWithTransformer;
 
         @WithType
-        private @NotNull List<Double> listWithAnnotation;
+        private List<Double> listWithAnnotation;
+
+        @WithType
+        private List<ObjectClass> objectListWithTransformer;
+
+        @WithType
+        private List<ObjectClass>[] objectListArrayWithTransformer;
+
+        @WithType
+        private List<ObjectClass> objectListWithAnnotation;
 
         public WithTypeClass() {
             this.listWithTransformer = new LinkedList<>();
@@ -54,8 +82,8 @@ public class AnnotationWithTypeTest {
             this.addItemsRandomly(this.listWithTransformer);
             this.addItemsRandomly(this.listWithAnnotation);
 
-            for(int index = 0; index < this.listArrayWithTransformer.length; index++) {
-                if(index % 2 == 0) {
+            for (int index = 0; index < this.listArrayWithTransformer.length; index++) {
+                if (index % 2 == 0) {
                     this.listArrayWithTransformer[index] = new ArrayList<>();
                 } else {
                     this.listArrayWithTransformer[index] = new LinkedList<>();
@@ -63,21 +91,49 @@ public class AnnotationWithTypeTest {
 
                 this.addItemsRandomly(this.listArrayWithTransformer[index]);
             }
+
+
+            this.objectListWithTransformer = new LinkedList<>();
+            this.objectListArrayWithTransformer = new List[8];
+            this.objectListWithAnnotation = new LinkedList<>();
+
+            this.addObjectItemsRandomly(this.objectListWithTransformer);
+            this.addObjectItemsRandomly(this.objectListWithAnnotation);
+
+            for (int index = 0; index < this.objectListArrayWithTransformer.length; index++) {
+                if (index % 2 == 0) {
+                    this.objectListArrayWithTransformer[index] = new ArrayList<>();
+                } else {
+                    this.objectListArrayWithTransformer[index] = new LinkedList<>();
+                }
+
+                this.addObjectItemsRandomly(this.objectListArrayWithTransformer[index]);
+            }
         }
 
-        private void addItemsRandomly(@NotNull List<Double> list) {
+        private void addItemsRandomly(List<Double> list) {
             for (int index = 0; index < 32; index++) {
                 list.add(Math.random());
+            }
+        }
+
+        private void addObjectItemsRandomly(List<ObjectClass> list) {
+            for (int index = 0; index < 32; index++) {
+                list.add(new ObjectClass());
             }
         }
     }
 
     @Test
     public void test() throws SerializeException, DeserializeException, OpackAssert.AssertException {
-        Opacker opacker = new Opacker.Builder().create();
+        Opacker opacker = new Opacker.Builder()
+                .setEnableWrapListElementType(true)
+                .setEnableWrapMapElementType(true)
+                .create();
         WithTypeClass originalObject = new WithTypeClass();
 
         OpackValue serialized = opacker.serialize(originalObject);
+        assert serialized != null;
         WithTypeClass deserialized = opacker.deserialize(WithTypeClass.class, serialized);
 
         OpackAssert.assertEquals(originalObject, deserialized);
