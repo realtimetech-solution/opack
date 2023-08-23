@@ -31,7 +31,10 @@ import com.realtimetech.opack.value.OpackValue;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
+import java.util.TreeMap;
 
 public class WrapMapElementTest {
     static final Random RANDOM = new Random();
@@ -91,6 +94,7 @@ public class WrapMapElementTest {
         WrapMapClass originalObject = new WrapMapClass();
 
         OpackValue serialized = opacker.serialize(originalObject);
+        assert serialized != null;
         WrapMapClass deserialized = opacker.deserialize(WrapMapClass.class, serialized);
 
         OpackAssert.assertEquals(originalObject, deserialized);

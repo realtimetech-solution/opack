@@ -80,6 +80,7 @@ public class TransformFieldTest {
         FieldTransformClass originalObject = new FieldTransformClass();
 
         OpackValue serialized = opacker.serialize(originalObject);
+        assert serialized != null;
         FieldTransformClass deserialized = opacker.deserialize(FieldTransformClass.class, serialized);
 
         OpackAssert.assertEquals(originalObject, deserialized);
