@@ -27,7 +27,6 @@ import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.test.OpackAssert;
 import com.realtimetech.opack.value.OpackValue;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
 import java.util.Calendar;
@@ -35,8 +34,8 @@ import java.util.Date;
 
 public class TimeTransformTest {
     public static class TimeTransformClass {
-        private @NotNull Date date;
-        private @NotNull Calendar calendar;
+        private Date date;
+        private Calendar calendar;
 
         public TimeTransformClass() {
             this.date = new Date();
@@ -52,6 +51,7 @@ public class TimeTransformTest {
         TimeTransformClass originalObject = new TimeTransformClass();
 
         OpackValue serialized = opacker.serialize(originalObject);
+        assert serialized != null;
         TimeTransformClass deserialized = opacker.deserialize(TimeTransformClass.class, serialized);
 
         OpackAssert.assertEquals(originalObject, deserialized);

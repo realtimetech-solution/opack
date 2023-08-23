@@ -27,14 +27,13 @@ import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.test.OpackAssert;
 import com.realtimetech.opack.value.OpackValue;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
 
 public class PathTransformTest {
     public static class PathTransformClass {
-        private @NotNull Path path;
+        private Path path;
 
         public PathTransformClass() {
             this.path = Path.of("src/test/java/com/realtimetech/opack/test/opacker/transform/FileTransformTest.java");
@@ -47,6 +46,7 @@ public class PathTransformTest {
         PathTransformClass originalObject = new PathTransformClass();
 
         OpackValue serialized = opacker.serialize(originalObject);
+        assert serialized != null;
         PathTransformClass deserialized = opacker.deserialize(PathTransformClass.class, serialized);
 
         OpackAssert.assertEquals(originalObject, deserialized);

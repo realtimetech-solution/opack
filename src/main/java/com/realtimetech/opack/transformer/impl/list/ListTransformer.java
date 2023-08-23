@@ -74,7 +74,7 @@ public class ListTransformer extends DataStructureTransformer {
     public @Nullable Object deserialize(@NotNull Opacker opacker, @NotNull Class<?> goalType, @Nullable Object object) throws DeserializeException {
         if (object instanceof OpackArray) {
             OpackArray<Object> opackArray = (OpackArray<Object>) object;
-            
+
             if (List.class.isAssignableFrom(goalType)) {
                 try {
                     List<Object> list = (List<Object>) ReflectionUtil.createInstance(goalType);

@@ -26,7 +26,6 @@ import com.realtimetech.opack.Opacker;
 import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.transformer.impl.TypeWrapper;
-import com.realtimetech.opack.value.OpackObject;
 import com.realtimetech.opack.value.OpackValue;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -42,7 +41,7 @@ public class WrapMapTransformer extends MapTransformer {
      */
     @Override
     protected @Nullable Object serializeObject(@NotNull Opacker opacker, @Nullable Object element) throws SerializeException {
-        return TypeWrapper.wrapObject(opacker,element);
+        return TypeWrapper.wrapObject(opacker, element);
     }
 
     /**
@@ -51,11 +50,10 @@ public class WrapMapTransformer extends MapTransformer {
      * @param opacker the opacker
      * @param element the element to be deserialized
      * @return deserialized element
-     * @throws ClassNotFoundException if the class cannot be located
      * @throws DeserializeException   if a problem occurs during deserializing
      */
     @Override
-    protected @Nullable Object deserializeObject(@NotNull Opacker opacker, @Nullable Object element) throws ClassNotFoundException, DeserializeException {
+    protected @Nullable Object deserializeObject(@NotNull Opacker opacker, @Nullable Object element) throws DeserializeException {
         return TypeWrapper.unwrapObject(opacker, element);
     }
 }
