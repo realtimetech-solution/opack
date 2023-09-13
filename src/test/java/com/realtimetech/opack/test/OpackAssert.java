@@ -169,7 +169,8 @@ public class OpackAssert {
                     originalObject instanceof Calendar && targetObject instanceof Calendar ||
                     originalObject instanceof LocalDate && targetObject instanceof LocalDate ||
                     originalObject instanceof LocalTime && targetObject instanceof LocalTime ||
-                    originalObject instanceof LocalDateTime && targetObject instanceof LocalDateTime) {
+                    originalObject instanceof LocalDateTime && targetObject instanceof LocalDateTime ||
+                    originalObject instanceof Class && targetObject instanceof Class) {
                 OpackAssert.assertEquals(originalObject.toString(), targetObject.toString());
             } else {
                 OpackAssert.assertObject(originalObject, targetObject);

@@ -25,7 +25,7 @@ package com.realtimetech.opack.exception;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Thrown when a problem occurs during decoding.
+ * Thrown when a problem occurs during decoding
  */
 public class DecodeException extends Exception {
     public DecodeException(@NotNull Throwable cause) {

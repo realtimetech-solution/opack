@@ -53,7 +53,7 @@ public class ByteArrayReader implements Reader {
     }
 
     /**
-     * Reads the next byte of data from the input stream.
+     * Reads the next byte of data from the input stream
      * The value byte is returned as an int in the range 0 to 255.
      *
      * @return the byte read, or -1 if the end of the stream has been reached
@@ -66,7 +66,7 @@ public class ByteArrayReader implements Reader {
     }
 
     /**
-     * Reads the next character of data from the input stream.
+     * Reads the next character of data from the input stream
      *
      * @return the character read
      * @throws IOException if an I/O exception occurs
@@ -82,7 +82,7 @@ public class ByteArrayReader implements Reader {
     }
 
     /**
-     * Reads the next short of data from the input stream.
+     * Reads the next short of data from the input stream
      *
      * @return the short read
      * @throws IOException if an I/O exception occurs
@@ -98,7 +98,7 @@ public class ByteArrayReader implements Reader {
     }
 
     /**
-     * Reads the next int of data from the input stream.
+     * Reads the next int of data from the input stream
      *
      * @return the int read
      * @throws IOException if an I/O exception occurs
@@ -118,7 +118,7 @@ public class ByteArrayReader implements Reader {
     }
 
     /**
-     * Reads the next float of data from the input stream.
+     * Reads the next float of data from the input stream
      *
      * @return the float read
      * @throws IOException if an I/O exception occurs
@@ -128,7 +128,7 @@ public class ByteArrayReader implements Reader {
     }
 
     /**
-     * Reads the next long of data from the input stream.
+     * Reads the next long of data from the input stream
      *
      * @return the long read
      * @throws IOException if an I/O exception occurs
@@ -156,7 +156,7 @@ public class ByteArrayReader implements Reader {
     }
 
     /**
-     * Reads the next double of data from the input stream.
+     * Reads the next double of data from the input stream
      *
      * @return the double read
      * @throws IOException if an I/O exception occurs
@@ -166,7 +166,7 @@ public class ByteArrayReader implements Reader {
     }
 
     /**
-     * Reads the next bytes of data from the input stream.
+     * Reads the next bytes of data from the input stream
      *
      * @param bytes the byte array to write the bytes read
      * @throws IOException if an I/O exception occurs

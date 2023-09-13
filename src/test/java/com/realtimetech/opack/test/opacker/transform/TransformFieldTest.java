@@ -38,7 +38,7 @@ import java.nio.charset.StandardCharsets;
 public class TransformFieldTest {
     public static class ByteToStringTransformer implements Transformer {
         /**
-         * Serialize specific value to opack value.
+         * Serialize specific value to opack value
          *
          * @param opacker      the opacker
          * @param originalType the original type

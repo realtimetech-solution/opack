@@ -46,7 +46,7 @@ public class UnsafeOpackValue {
     }
 
     /**
-     * Returns the underlying list of opack array.
+     * Returns the underlying list of opack array
      *
      * @param opackArray the opack array to be targeted
      * @return the underlying list
@@ -58,7 +58,7 @@ public class UnsafeOpackValue {
     }
 
     /**
-     * Returns the underlying map of opack object.
+     * Returns the underlying map of opack object
      *
      * @param opackObject the opack object to be targeted
      * @return the underlying map

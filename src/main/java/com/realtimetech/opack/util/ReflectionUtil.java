@@ -34,7 +34,7 @@ import java.util.List;
 public class ReflectionUtil {
     private static abstract class Allocator {
         /**
-         * Create new instance for specific class.
+         * Create new instance for specific class
          *
          * @param typeClass the class to create
          * @return created instance
@@ -57,7 +57,7 @@ public class ReflectionUtil {
     }
 
     /**
-     * Create new unsafe allocator for JVM, DalvikVM.
+     * Create new unsafe allocator for JVM, DalvikVM
      *
      * @return created unsafe allocator
      */
@@ -113,7 +113,7 @@ public class ReflectionUtil {
     }
 
     /**
-     * Casts an object to the specific class.
+     * Casts an object to the specific class
      *
      * @param type   the class to cast
      * @param object the object to be cast
@@ -154,7 +154,7 @@ public class ReflectionUtil {
     }
 
     /**
-     * Returns the value of the indexed component in the specified array object.
+     * Returns the value of the indexed component in the specified array object
      *
      * @param array the array object
      * @param index the index
@@ -185,7 +185,7 @@ public class ReflectionUtil {
     }
 
     /**
-     * Sets the value of the indexed component of the specified array object to the specified new value.
+     * Sets the value of the indexed component of the specified array object to the specified new value
      *
      * @param array the array object
      * @param index the index
@@ -220,7 +220,7 @@ public class ReflectionUtil {
     }
 
     /**
-     * Clones the array object.
+     * Clones the array object
      *
      * @param array the object to clone
      * @return cloned array object
@@ -239,7 +239,7 @@ public class ReflectionUtil {
     }
 
     /**
-     * Add accessible fields of the target Class to the field List.
+     * Add accessible fields of the target Class to the field List
      *
      * @param fieldList the field list to be added
      * @param type      the target class
@@ -259,7 +259,7 @@ public class ReflectionUtil {
     }
 
     /**
-     * Returns accessible fields of target class.
+     * Returns accessible fields of target class
      *
      * @param type the target class
      * @return accessible fields
@@ -272,7 +272,7 @@ public class ReflectionUtil {
     }
 
     /**
-     * Returns the dimension of the array through the class object of the array object.
+     * Returns the dimension of the array through the class object of the array object
      *
      * @param arrayType the class of the target array object
      * @return dimension
@@ -300,7 +300,7 @@ public class ReflectionUtil {
     }
 
     /**
-     * Returns the underlying component type of the array through the class object of the array object.
+     * Returns the underlying component type of the array through the class object of the array object
      *
      * @param arrayType the class of the array object
      * @return component type
@@ -345,7 +345,7 @@ public class ReflectionUtil {
     }
 
     /**
-     * Returns the primitive class corresponding to the wrapper class.
+     * Returns the primitive class corresponding to the wrapper class
      *
      * @param type the wrapper class
      * @return primitive class
@@ -393,7 +393,7 @@ public class ReflectionUtil {
     }
 
     /**
-     * Returns the wrapper class corresponding to the primitive class.
+     * Returns the wrapper class corresponding to the primitive class
      *
      * @param type the primitive class
      * @return wrapper class
@@ -422,7 +422,7 @@ public class ReflectionUtil {
     }
 
     /**
-     * Returns whether casting from the source class to the destination class is possible.
+     * Returns whether casting from the source class to the destination class is possible
      *
      * @param fromType the source class
      * @param toType   the destination class
@@ -441,7 +441,7 @@ public class ReflectionUtil {
     }
 
     /**
-     * Create a new instance of the class with unsafe allocator.
+     * Create a new instance of the class with unsafe allocator
      *
      * @param instanceType the class to create instance
      * @return created instance
@@ -464,7 +464,7 @@ public class ReflectionUtil {
     }
 
     /**
-     * Create a new instance of the class through constructor.
+     * Create a new instance of the class through constructor
      *
      * @param instanceType the class to create instance
      * @param objects      the argument of the constructor

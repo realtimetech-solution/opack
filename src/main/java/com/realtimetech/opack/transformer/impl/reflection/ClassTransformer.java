@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 REALTIMETECH All Rights Reserved
+ * Copyright (C) 2023 REALTIMETECH All Rights Reserved
  *
  * Licensed either under the Apache License, Version 2.0, or (at your option)
  * under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
  * limitations under the License.
  */
 
-package com.realtimetech.opack.transformer.impl.file;
+package com.realtimetech.opack.transformer.impl.reflection;
 
 import com.realtimetech.opack.Opacker;
 import com.realtimetech.opack.exception.DeserializeException;
@@ -29,9 +29,15 @@ import com.realtimetech.opack.transformer.Transformer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
+import java.util.Date;
 
-public class FileTransformer implements Transformer {
+public class ClassTransformer implements Transformer {
+    private final @NotNull ClassLoader classLoader;
+
+    public ClassTransformer(@NotNull ClassLoader classLoader) {
+        this.classLoader = classLoader;
+    }
+
     /**
      * Serialize specific value to opack value
      *
@@ -43,8 +49,8 @@ public class FileTransformer implements Transformer {
      */
     @Override
     public @Nullable Object serialize(@NotNull Opacker opacker, @NotNull Class<?> originalType, @Nullable Object object) throws SerializeException {
-        if (object instanceof File) {
-            return object.toString();
+        if (object instanceof Class<?>) {
+            return ((Class<?>) object).getName();
         }
 
         return object;
@@ -62,7 +68,11 @@ public class FileTransformer implements Transformer {
     @Override
     public @Nullable Object deserialize(@NotNull Opacker opacker, @NotNull Class<?> goalType, @Nullable Object object) throws DeserializeException {
         if (object instanceof String) {
-            return new File(String.valueOf(object));
+            try {
+                return this.classLoader.loadClass((String) object);
+            } catch (ClassNotFoundException classNotFoundException) {
+                throw new DeserializeException("Failed to load class with set class loader.", classNotFoundException);
+            }
         }
 
         return object;

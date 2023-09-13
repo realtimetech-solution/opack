@@ -33,7 +33,7 @@ import java.util.List;
 
 public class OpackArrayConverter {
     /**
-     * Convert the opack array to array.
+     * Convert the opack array to array
      *
      * @param componentType the component type of array
      * @param opackArray    the opack array to convert

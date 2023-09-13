@@ -31,7 +31,7 @@ import java.util.Set;
 
 public final class OpackObject<K, V> extends AbstractOpackValue<HashMap<K, V>> {
     /**
-     * Constructs an OpackObject with the specified initial capacity.
+     * Constructs an OpackObject with the specified initial capacity
      *
      * @param initialCapacity the initial capacity
      */
@@ -40,14 +40,14 @@ public final class OpackObject<K, V> extends AbstractOpackValue<HashMap<K, V>> {
     }
 
     /**
-     * Constructs an empty OpackObject without underlying map.
+     * Constructs an empty OpackObject without underlying map
      */
     public OpackObject() {
     }
 
     /**
-     * Create and return the underlying map of this opack object.
-     * This method will be called if {@link AbstractOpackValue#get() get()} method is called, when this opack object does not have an underlying map.
+     * Create and return the underlying map of this opack object
+     * This method will be called if {@link AbstractOpackValue#get() get()} method is called, when this opack object does not have an underlying map
      *
      * @return underlying map
      */
@@ -57,7 +57,7 @@ public final class OpackObject<K, V> extends AbstractOpackValue<HashMap<K, V>> {
     }
 
     /**
-     * Returns the number of items in this opack object.
+     * Returns the number of items in this opack object
      *
      * @return the number of items
      */
@@ -66,7 +66,7 @@ public final class OpackObject<K, V> extends AbstractOpackValue<HashMap<K, V>> {
     }
 
     /**
-     * Returns the value to which the specified key is mapped, or null if this map contains no mapping for the key.
+     * Returns the value to which the specified key is mapped, or null if this map contains no mapping for the key
      *
      * @param key the key
      * @return mapped value
@@ -76,8 +76,8 @@ public final class OpackObject<K, V> extends AbstractOpackValue<HashMap<K, V>> {
     }
 
     /**
-     * Put a pair of key and value into this opack object.
-     * If the opack object previously contained a mapping for the key, the old value is replaced.
+     * Put a pair of key and value into this opack object
+     * If the opack object previously contained a mapping for the key, the old value is replaced
      *
      * @param key   the key
      * @param value the value to put
@@ -96,7 +96,7 @@ public final class OpackObject<K, V> extends AbstractOpackValue<HashMap<K, V>> {
     }
 
     /**
-     * Removes the mapping for the specified key from this opack object.
+     * Removes the mapping for the specified key from this opack object
      *
      * @param key the key
      * @return the previous value associated with key, or null if there was no mapping for key
@@ -110,7 +110,7 @@ public final class OpackObject<K, V> extends AbstractOpackValue<HashMap<K, V>> {
     }
 
     /**
-     * Returns true if this opack object contains a mapping for the specified key.
+     * Returns true if this opack object contains a mapping for the specified key
      *
      * @param object the key
      * @return true if this opack object contains a mapping for the specified key
@@ -120,7 +120,7 @@ public final class OpackObject<K, V> extends AbstractOpackValue<HashMap<K, V>> {
     }
 
     /**
-     * Returns true if this opack object maps one or more keys to the specified value.
+     * Returns true if this opack object maps one or more keys to the specified value
      *
      * @param object the value
      * @return true if this opack object maps one or more keys to the specified value
@@ -130,7 +130,7 @@ public final class OpackObject<K, V> extends AbstractOpackValue<HashMap<K, V>> {
     }
 
     /**
-     * Returns a {@link Set Set} view of the keys contained in this opack object.
+     * Returns a {@link Set Set} view of the keys contained in this opack object
      *
      * @return a set view of the keys contained in this map
      */
@@ -140,7 +140,7 @@ public final class OpackObject<K, V> extends AbstractOpackValue<HashMap<K, V>> {
 
 
     /**
-     * Returns a {@link Set Set} view of the key and value pair in this opack object.
+     * Returns a {@link Set Set} view of the key and value pair in this opack object
      *
      * @return a set view of the key and value pair in this map
      */
@@ -149,7 +149,7 @@ public final class OpackObject<K, V> extends AbstractOpackValue<HashMap<K, V>> {
     }
 
     /**
-     * Returns a {@link Collection Collection} view of the values contained in this opack object.
+     * Returns a {@link Collection Collection} view of the values contained in this opack object
      *
      * @return a view of the values contained in this map
      */
@@ -158,7 +158,7 @@ public final class OpackObject<K, V> extends AbstractOpackValue<HashMap<K, V>> {
     }
 
     /**
-     * Returns a string representation of the {@link HashMap HashMap} that is the underlying of the opack object.
+     * Returns a string representation of the {@link HashMap HashMap} that is the underlying of the opack object
      *
      * @param value the underlying object of the opack object
      * @return a string representation of the HashMap
@@ -169,7 +169,7 @@ public final class OpackObject<K, V> extends AbstractOpackValue<HashMap<K, V>> {
     }
 
     /**
-     * Returns a deep copy of this opack object instance.
+     * Returns a deep copy of this opack object instance
      *
      * @return a deep copy of this opack object instance
      */
@@ -195,7 +195,7 @@ public final class OpackObject<K, V> extends AbstractOpackValue<HashMap<K, V>> {
     }
 
     /**
-     * Returns true if a specific object is the same as this opack object.
+     * Returns true if a specific object is the same as this opack object
      *
      * @param object the reference object with which to compare
      * @return true if a specific object is the same as this opack object
@@ -211,7 +211,7 @@ public final class OpackObject<K, V> extends AbstractOpackValue<HashMap<K, V>> {
     }
 
     /**
-     * Returns the hash code of this opack object.
+     * Returns the hash code of this opack object
      *
      * @return hash code
      */

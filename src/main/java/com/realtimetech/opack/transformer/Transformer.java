@@ -30,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
 
 public interface Transformer {
     /**
-     * Serialize specific value to opack value.
+     * Serialize specific value to opack value
      *
      * @param opacker      the opacker
      * @param originalType the original type
@@ -41,7 +41,7 @@ public interface Transformer {
     @Nullable Object serialize(@NotNull Opacker opacker, @NotNull Class<?> originalType, @Nullable Object object) throws SerializeException;
 
     /**
-     * Deserialize opack value.
+     * Deserialize opack value
      *
      * @param opacker  the opacker
      * @param object   the object to be deserialized

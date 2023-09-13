@@ -33,7 +33,7 @@ import java.util.List;
 
 public final class OpackArray<E> extends AbstractOpackValue<List<E>> {
     /**
-     * Returns whether component type for specific class of array object is primitive type.
+     * Returns whether component type for specific class of array object is primitive type
      *
      * @param arrayType the class of array object
      * @return true if component type for the class of array object is primitive class
@@ -49,7 +49,7 @@ public final class OpackArray<E> extends AbstractOpackValue<List<E>> {
     }
 
     /**
-     * Create the opack array through array object of which component type is the primitive type.
+     * Create the opack array through array object of which component type is the primitive type
      *
      * @param arrayObject the array object for create
      * @return created opack array
@@ -62,7 +62,7 @@ public final class OpackArray<E> extends AbstractOpackValue<List<E>> {
     private boolean nativeArray;
 
     /**
-     * Constructs an opack array with the specified array object of which component type is the primitive type.
+     * Constructs an opack array with the specified array object of which component type is the primitive type
      *
      * @param arrayObject the array object for create
      * @throws IllegalArgumentException if the component type for array object is not primitive type; if the array object is not 1 dimension
@@ -85,7 +85,7 @@ public final class OpackArray<E> extends AbstractOpackValue<List<E>> {
     }
 
     /**
-     * Constructs an opack array with the specified array.
+     * Constructs an opack array with the specified array
      *
      * @param array the array for create
      */
@@ -95,7 +95,7 @@ public final class OpackArray<E> extends AbstractOpackValue<List<E>> {
     }
 
     /**
-     * Constructs an opack array with the specified collection object.
+     * Constructs an opack array with the specified collection object
      *
      * @param collection the collection for create
      * @throws IllegalArgumentException if type of the element in collection is not allowed in opack value
@@ -114,7 +114,7 @@ public final class OpackArray<E> extends AbstractOpackValue<List<E>> {
     }
 
     /**
-     * Constructs an empty opack array with the specified initial capacity.
+     * Constructs an empty opack array with the specified initial capacity
      *
      * @param initialCapacity the initial capacity
      */
@@ -125,15 +125,15 @@ public final class OpackArray<E> extends AbstractOpackValue<List<E>> {
     }
 
     /**
-     * Constructs an empty opack array without underlying list.
+     * Constructs an empty opack array without underlying list
      */
     public OpackArray() {
         this.nativeArray = false;
     }
 
     /**
-     * Create and return the underlying list of this opack array.
-     * This method will be called if {@link AbstractOpackValue#get() get()} method is called, when this opack array does not have an underlying list.
+     * Create and return the underlying list of this opack array
+     * This method will be called if {@link AbstractOpackValue#get() get()} method is called, when this opack array does not have an underlying list
      *
      * @return underlying list
      */
@@ -156,7 +156,7 @@ public final class OpackArray<E> extends AbstractOpackValue<List<E>> {
     }
 
     /**
-     * Replaces the value at the specified position in this opack array with the specified value.
+     * Replaces the value at the specified position in this opack array with the specified value
      *
      * @param index index of the value to replace
      * @param value value to be stored at the specified position
@@ -174,7 +174,7 @@ public final class OpackArray<E> extends AbstractOpackValue<List<E>> {
     }
 
     /**
-     * Appends the specified value to the end of this opack array.
+     * Appends the specified value to the end of this opack array
      *
      * @param value the value to be appended to this list
      * @return true if this opack array changed as a result of the call
@@ -191,7 +191,7 @@ public final class OpackArray<E> extends AbstractOpackValue<List<E>> {
     }
 
     /**
-     * Removes the first occurrence of the specified value from this opack array, if it is present.
+     * Removes the first occurrence of the specified value from this opack array, if it is present
      *
      * @param value the value to be removed from this opack array, if present
      * @return true if this opack array contained the specified value
@@ -201,7 +201,7 @@ public final class OpackArray<E> extends AbstractOpackValue<List<E>> {
     }
 
     /**
-     * Returns the value at the specified position in this opack array.
+     * Returns the value at the specified position in this opack array
      *
      * @param index index of the value to replace
      * @return the value previously at the specified position
@@ -211,7 +211,7 @@ public final class OpackArray<E> extends AbstractOpackValue<List<E>> {
     }
 
     /**
-     * Returns the number of elements in this opack array.
+     * Returns the number of elements in this opack array
      *
      * @return the number of elements in this opack array
      */
@@ -220,7 +220,7 @@ public final class OpackArray<E> extends AbstractOpackValue<List<E>> {
     }
 
     /**
-     * Returns a string representation of the {@link List List} that is the underlying of the opack array.
+     * Returns a string representation of the {@link List List} that is the underlying of the opack array
      *
      * @param value the underlying object of the opack array
      * @return a string representation of the List
@@ -248,7 +248,7 @@ public final class OpackArray<E> extends AbstractOpackValue<List<E>> {
     }
 
     /**
-     * Returns a deep copy of this opack array instance.
+     * Returns a deep copy of this opack array instance
      *
      * @return a deep copy of this opack array instance
      */
@@ -270,7 +270,7 @@ public final class OpackArray<E> extends AbstractOpackValue<List<E>> {
     }
 
     /**
-     * Returns true if a specific object is the same as this opack array.
+     * Returns true if a specific object is the same as this opack array
      *
      * @param object the reference object with which to compare
      * @return true if a specific object is the same as this opack array
@@ -286,7 +286,7 @@ public final class OpackArray<E> extends AbstractOpackValue<List<E>> {
     }
 
     /**
-     * Returns the hash code of this opack array.
+     * Returns the hash code of this opack array
      *
      * @return hash code
      */

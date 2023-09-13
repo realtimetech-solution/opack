@@ -28,7 +28,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Fields annotated with @Ignore will not be serialized and deserialized.
+ * Fields annotated with @Ignore will not be serialized and deserialized
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({

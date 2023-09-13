@@ -31,7 +31,7 @@ import java.io.IOException;
 
 public abstract class OpackCodec<I, O> {
     /**
-     * Writes a code that encodes opack value by overriding this.
+     * Writes a code that encodes opack value by overriding this
      *
      * @param output     the output to encode
      * @param opackValue the opack value to encode
@@ -40,7 +40,7 @@ public abstract class OpackCodec<I, O> {
     protected abstract void doEncode(@NotNull O output, @NotNull OpackValue opackValue) throws IOException;
 
     /**
-     * Writes a code that decodes the value encoded by overriding this.
+     * Writes a code that decodes the value encoded by overriding this
      *
      * @param input the input to decode
      * @return decoded value
@@ -49,7 +49,7 @@ public abstract class OpackCodec<I, O> {
     protected abstract @NotNull OpackValue doDecode(@NotNull I input) throws IOException;
 
     /**
-     * Encodes the opack value through a specific codec.
+     * Encodes the opack value through a specific codec
      *
      * @param output     the output to encode
      * @param opackValue the opack value to encode
@@ -64,7 +64,7 @@ public abstract class OpackCodec<I, O> {
     }
 
     /**
-     * Decodes the value encoded through a specific codec.
+     * Decodes the value encoded through a specific codec
      *
      * @param input the input to decode
      * @return decoded value

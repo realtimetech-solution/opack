@@ -33,7 +33,7 @@ import java.nio.file.Path;
 
 public class PathTransformer implements Transformer {
     /**
-     * Serialize specific value to opack value.
+     * Serialize specific value to opack value
      *
      * @param opacker      the opacker
      * @param originalType the original type
@@ -51,7 +51,7 @@ public class PathTransformer implements Transformer {
     }
 
     /**
-     * Deserialize opack value.
+     * Deserialize opack value
      *
      * @param opacker  the opacker
      * @param goalType the goal type to deserialize

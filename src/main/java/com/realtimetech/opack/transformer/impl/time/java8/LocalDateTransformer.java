@@ -34,7 +34,7 @@ import java.time.LocalDate;
 
 public class LocalDateTransformer implements Transformer {
     /**
-     * Serialize specific value to opack value.
+     * Serialize specific value to opack value
      *
      * @param opacker      the opacker
      * @param originalType the original type
@@ -60,7 +60,7 @@ public class LocalDateTransformer implements Transformer {
     }
 
     /**
-     * Deserialize opack value.
+     * Deserialize opack value
      *
      * @param opacker  the opacker
      * @param goalType the goal type to deserialize
