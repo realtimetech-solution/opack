@@ -38,12 +38,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 public final class TypeBaker {
-    static final class PredefinedTransformer {
+    public static final class PredefinedTransformer {
         private final @NotNull Transformer transformer;
         private final boolean inheritable;
 
         /**
-         * Constructs the PredefinedTransformer.
+         * Constructs the PredefinedTransformer
          *
          * @param transformer the transformer to be registered
          * @param inheritable true if the transformer is inheritable
@@ -70,7 +70,7 @@ public final class TypeBaker {
     private final @NotNull HashMap<@NotNull Class<?>, @NotNull List<@NotNull PredefinedTransformer>> predefinedTransformerMap;
 
     /**
-     * Constructs an TypeBaker with the opacker.
+     * Constructs an TypeBaker with the opacker
      *
      * @param opacker the opacker
      */
@@ -84,7 +84,7 @@ public final class TypeBaker {
     }
 
     /**
-     * Returns predefined transformers for a specific class.
+     * Returns predefined transformers for a specific class
      *
      * @param type the class to be the target
      * @return found predefined transformers
@@ -100,6 +100,33 @@ public final class TypeBaker {
     }
 
     /**
+     * Register a predefined transformer for the specific class with transformer instance
+     *
+     * @param type        the class to be the target
+     * @param transformer the transformer to register
+     * @param inheritable whether transformer is inheritable
+     * @return true if the predefined transformer registration is successful
+     */
+    public synchronized boolean registerPredefinedTransformer(@NotNull Class<?> type, @NotNull Transformer transformer, boolean inheritable) {
+        if (!this.predefinedTransformerMap.containsKey(type)) {
+            this.predefinedTransformerMap.put(type, new LinkedList<>());
+        }
+
+        Class<? extends Transformer> transformerType = transformer.getClass();
+        List<PredefinedTransformer> predefinedTransformers = this.predefinedTransformerMap.get(type);
+
+        for (PredefinedTransformer predefinedTransformer : predefinedTransformers) {
+            if (predefinedTransformer.getTransformer().getClass() == transformerType) {
+                return false;
+            }
+        }
+
+        predefinedTransformers.add(new PredefinedTransformer(transformer, inheritable));
+
+        return true;
+    }
+
+    /**
      * Calls {@code registerPredefinedTransformer(type, transformerClass, false);}
      *
      * @param type            the class to be the target
@@ -112,7 +139,7 @@ public final class TypeBaker {
     }
 
     /**
-     * Register a predefined transformer for the specific class.
+     * Register a predefined transformer for the specific class
      *
      * @param type            the class to be the target
      * @param transformerType the predefined transformer to register
@@ -140,7 +167,7 @@ public final class TypeBaker {
     }
 
     /**
-     * Unregister a predefined transformer for the specific class.
+     * Unregister a predefined transformer for the specific class
      *
      * @param type            the targeted type class
      * @param transformerType the predefined transformer to unregister
@@ -171,7 +198,7 @@ public final class TypeBaker {
     }
 
     /**
-     * Add transformers of the element to the transformer list.
+     * Add transformers of the element to the transformer list
      *
      * @param transformers     the transformer list for add
      * @param annotatedElement the element to be targeted
@@ -224,7 +251,7 @@ public final class TypeBaker {
     }
 
     /**
-     * Returns transformers registered through {@link Transform Transform} annotation.
+     * Returns transformers registered through {@link Transform Transform} annotation
      *
      * @param annotatedElement the element that annotated {@link Transform Transform}
      * @return transformers
@@ -239,7 +266,7 @@ public final class TypeBaker {
     }
 
     /**
-     * Returns the explicit type of specific element registered through {@link Type ExplicitType}.
+     * Returns the explicit type of specific element registered through {@link Type ExplicitType}
      *
      * @param annotatedElement the element that annotated {@link Type ExplicitType}
      * @return returns annotated type
@@ -254,7 +281,7 @@ public final class TypeBaker {
     }
 
     /**
-     * Returns the serialized type of specific element registered through {@link Name SerializedName}.
+     * Returns the serialized type of specific element registered through {@link Name SerializedName}
      *
      * @param annotatedElement the element that annotated {@link Type ExplicitType}
      * @return returns annotated type
@@ -269,7 +296,7 @@ public final class TypeBaker {
     }
 
     /**
-     * Bake the class into {@link BakedType BakedType}.
+     * Bake the class into {@link BakedType BakedType}
      *
      * @param bakeType the type to bake
      * @return baked type info
@@ -305,7 +332,7 @@ public final class TypeBaker {
     }
 
     /**
-     * Returns BakedType for target class.
+     * Returns BakedType for target class
      *
      * @param bakeType the class to be baked
      * @return class info

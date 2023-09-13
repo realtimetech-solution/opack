@@ -91,7 +91,7 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
         }
 
         /**
-         * Create the {@link JsonCodec JsonCodec}.
+         * Create the {@link JsonCodec JsonCodec}
          *
          * @return created json codec
          */
@@ -173,7 +173,7 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
     }
 
     /**
-     * Encodes the literal object.
+     * Encodes the literal object
      *
      * @param writer the string writer for writing encoded object
      * @param object the object to encode
@@ -498,7 +498,7 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
     }
 
     /**
-     * Encodes the {@link OpackValue OpackValue} to json string.
+     * Encodes the {@link OpackValue OpackValue} to json string
      *
      * @param opackValue the opack value to encode
      * @throws IllegalArgumentException if the type of data to be encoded is not allowed in json format
@@ -677,7 +677,7 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
     }
 
     /**
-     * Encodes the OpackValue to json string.
+     * Encodes the OpackValue to json string
      *
      * @param opackValue the opack value to encode
      * @return returns encoded string
@@ -691,7 +691,7 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
     }
 
     /**
-     * Decodes the json string to {@link OpackValue OpackValue}.
+     * Decodes the json string to {@link OpackValue OpackValue}
      *
      * @param data the json string to decode
      * @return OpackValue

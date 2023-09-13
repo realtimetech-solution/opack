@@ -35,7 +35,7 @@ public class TransformerFactory {
     private final @NotNull HashMap<@NotNull Class<? extends Transformer>, @NotNull Transformer> transformerMap;
 
     /**
-     * Constructs a TransformerFactory with the opacker.
+     * Constructs a TransformerFactory with the opacker
      *
      * @param opacker the opacker
      */
@@ -46,7 +46,7 @@ public class TransformerFactory {
     }
 
     /**
-     * Returns transformer instance.
+     * Returns transformer instance
      *
      * @param transformerType the transformer class
      * @return transformer instance

@@ -37,7 +37,7 @@ import java.util.Map;
 
 public class MapTransformer extends DataStructureTransformer {
     /**
-     * Serialize specific value to opack value.
+     * Serialize specific value to opack value
      *
      * @param opacker      the opacker
      * @param originalType the original type
@@ -68,7 +68,7 @@ public class MapTransformer extends DataStructureTransformer {
     }
 
     /**
-     * Deserialize opack value.
+     * Deserialize opack value
      *
      * @param opacker  the opacker
      * @param goalType the goal type to deserialize
@@ -106,7 +106,7 @@ public class MapTransformer extends DataStructureTransformer {
     }
 
     /**
-     * Serializes the element to {@link OpackValue OpackValue}.
+     * Serializes the element to {@link OpackValue OpackValue}
      *
      * @param opacker the opacker
      * @param element the element to be serialized
@@ -123,7 +123,7 @@ public class MapTransformer extends DataStructureTransformer {
     }
 
     /**
-     * Deserializes the {@link OpackValue OpackValue}.
+     * Deserializes the {@link OpackValue OpackValue}
      *
      * @param opacker the opacker
      * @param element the element to be deserialized

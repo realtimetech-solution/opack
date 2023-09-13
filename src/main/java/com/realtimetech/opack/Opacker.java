@@ -35,6 +35,7 @@ import com.realtimetech.opack.transformer.impl.list.WrapListTransformer;
 import com.realtimetech.opack.transformer.impl.map.MapTransformer;
 import com.realtimetech.opack.transformer.impl.map.WrapMapTransformer;
 import com.realtimetech.opack.transformer.impl.path.PathTransformer;
+import com.realtimetech.opack.transformer.impl.reflection.ClassTransformer;
 import com.realtimetech.opack.transformer.impl.time.CalendarTransformer;
 import com.realtimetech.opack.transformer.impl.time.DateTransformer;
 import com.realtimetech.opack.transformer.impl.time.java8.LocalDateTimeTransformer;
@@ -68,6 +69,8 @@ public class Opacker {
         private boolean enableConvertEnumToOrdinal;
         private boolean enableConvertRecursiveDependencyToNull;
 
+        private @Nullable ClassLoader classTransformerClassLoader;
+
         public Builder() {
             this.valueStackInitialSize = 512;
             this.contextStackInitialSize = 128;
@@ -76,6 +79,8 @@ public class Opacker {
             this.enableWrapMapElementType = false;
             this.enableConvertEnumToOrdinal = false;
             this.enableConvertRecursiveDependencyToNull = false;
+
+            this.classTransformerClassLoader = this.getClass().getClassLoader();
         }
 
         public Builder setValueStackInitialSize(int valueStackInitialSize) {
@@ -108,8 +113,13 @@ public class Opacker {
             return this;
         }
 
+        public Builder setClassTransformerClassLoader(@Nullable ClassLoader classTransformerClassLoader) {
+            this.classTransformerClassLoader = classTransformerClassLoader;
+            return this;
+        }
+
         /**
-         * Create the {@link Opacker Opacker} through this builder.
+         * Create the {@link Opacker Opacker} through this builder
          *
          * @return created opacker
          */
@@ -171,6 +181,12 @@ public class Opacker {
             this.typeBaker.registerPredefinedTransformer(LocalDate.class, LocalDateTransformer.class, true);
             this.typeBaker.registerPredefinedTransformer(LocalTime.class, LocalTimeTransformer.class, true);
             this.typeBaker.registerPredefinedTransformer(LocalDateTime.class, LocalDateTimeTransformer.class, true);
+
+            if (builder.classTransformerClassLoader != null) {
+                ClassTransformer classTransformer = new ClassTransformer(builder.classTransformerClassLoader);
+
+                this.typeBaker.registerPredefinedTransformer(Class.class, classTransformer, true);
+            }
         } catch (InstantiationException exception) {
             throw new IllegalStateException(exception);
         }
@@ -184,7 +200,7 @@ public class Opacker {
     }
 
     /**
-     * Serializes the object to {@link OpackValue OpackValue}.
+     * Serializes the object to {@link OpackValue OpackValue}
      *
      * @param object the object to be serialized
      * @return opack value
@@ -213,7 +229,7 @@ public class Opacker {
     }
 
     /**
-     * Store information needed for serialization in stacks.
+     * Store information needed for serialization in stacks
      *
      * @param baseType the class of object to be serialized
      * @param object   the object to be serialized
@@ -306,7 +322,7 @@ public class Opacker {
     }
 
     /**
-     * Serialize the elements of each opack value in the stack. (OpackObject: fields, OpackArray element : array elements)
+     * Serialize the elements of each opack value in the stack
      *
      * @throws SerializeException if a problem occurs during serializing; if the field in the class of instance to be serialized is not accessible
      */
@@ -360,7 +376,7 @@ public class Opacker {
     }
 
     /**
-     * Deserializes the opack value to object of the target class.
+     * Deserializes the opack value to object of the target class
      *
      * @param type       the target class
      * @param opackValue the opack value to be deserialized
@@ -397,7 +413,7 @@ public class Opacker {
     }
 
     /**
-     * Store information needed for deserialization in stacks.
+     * Store information needed for deserialization in stacks
      *
      * @param goalType the class of object to be deserialized
      * @param object   the object to be deserialized
@@ -520,7 +536,7 @@ public class Opacker {
     }
 
     /**
-     * Deserialize the elements of each opack value in the stack. (OpackObject element : fields, OpackArray element : array elements)
+     * Deserialize the elements of each opack value in the stack
      *
      * @throws DeserializeException if a problem occurs during deserializing; if the field in the class of instance to be deserialized is not accessible
      */

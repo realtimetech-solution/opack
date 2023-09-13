@@ -67,7 +67,7 @@ public final class BakedType {
         }
 
         /**
-         * Sets the field of the object to a specified value.
+         * Sets the field of the object to a specified value
          *
          * @param object the object whose field should be modified
          * @param value  the new value for the field of object being modified
@@ -82,7 +82,7 @@ public final class BakedType {
         }
 
         /**
-         * Returns the field value extracted from the object.
+         * Returns the field value extracted from the object
          *
          * @param object the object to extract the field value
          * @return field value

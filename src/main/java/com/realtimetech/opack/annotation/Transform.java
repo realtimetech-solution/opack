@@ -31,7 +31,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Types/Fields annotated with @Transform(transformer=xxxTransformer.class, inheritable= true | false) will serialize and deserialize as transformed by transformer.
+ * Types/Fields annotated with @Transform(transformer=xxxTransformer.class, inheritable= true | false) will serialize and deserialize as transformed by transformer
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({
@@ -40,15 +40,13 @@ import java.lang.annotation.Target;
 })
 public @interface Transform {
     /**
-     * Return the transformer for annotated class or field.
+     * Return the transformer for annotated class or field
      *
      * @return the transformer class
      */
     @NotNull Class<? extends Transformer> transformer();
 
     /**
-     * Returns whether transformer is inheritable.
-     *
      * @return true if transformer is inheritable
      */
     boolean inheritable() default false;

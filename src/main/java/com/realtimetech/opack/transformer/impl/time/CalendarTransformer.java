@@ -34,7 +34,7 @@ import java.util.Date;
 
 public class CalendarTransformer implements Transformer {
     /**
-     * Serialize specific value to opack value.
+     * Serialize specific value to opack value
      *
      * @param opacker      the opacker
      * @param originalType the original type
@@ -52,7 +52,7 @@ public class CalendarTransformer implements Transformer {
     }
 
     /**
-     * Deserialize opack value.
+     * Deserialize opack value
      *
      * @param opacker  the opacker
      * @param goalType the goal type to deserialize

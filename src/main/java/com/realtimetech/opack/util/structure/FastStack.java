@@ -41,7 +41,7 @@ public class FastStack<T> {
     }
 
     /**
-     * Constructs a FastStack with initial size.
+     * Constructs a FastStack with initial size
      *
      * @param initialSize the initial size
      */
@@ -55,7 +55,7 @@ public class FastStack<T> {
     }
 
     /**
-     * Double the stack size.
+     * Double the stack size
      */
     private void growArray() {
         T[] oldObjects = this.objects;
@@ -97,7 +97,7 @@ public class FastStack<T> {
     }
 
     /**
-     * Returns the element at the specified position in this stack.
+     * Returns the element at the specified position in this stack
      *
      * @param index the index of the element to return
      * @return the found element
@@ -107,7 +107,7 @@ public class FastStack<T> {
     }
 
     /**
-     * Swap position of A element and B element.
+     * Swap position of A element and B element
      *
      * @param index1 the index of the element to swap
      * @param index2 the index of the element to swap
@@ -120,7 +120,7 @@ public class FastStack<T> {
     }
 
     /**
-     * Reverse the position of elements in a specific range.
+     * Reverse the position of elements in a specific range
      *
      * @param start the start index of the range
      * @param end   the end index of the range
@@ -137,7 +137,7 @@ public class FastStack<T> {
     }
 
     /**
-     * Returns the element at the top of this stack without removing it from the stack.
+     * Returns the element at the top of this stack without removing it from the stack
      *
      * @return the element at the top of this stack
      */
@@ -149,7 +149,7 @@ public class FastStack<T> {
     }
 
     /**
-     * Returns the element at the top of this stack and removes it.
+     * Returns the element at the top of this stack and removes it
      *
      * @return The object at the top of this stack
      */
@@ -166,7 +166,7 @@ public class FastStack<T> {
     }
 
     /**
-     * Remove amount elements.
+     * Remove amount elements
      */
     public void remove(int amount) {
         if (this.currentIndex <= amount)
@@ -176,14 +176,14 @@ public class FastStack<T> {
     }
 
     /**
-     * Reset this stack.
+     * Reset this stack
      */
     public void reset() {
         this.currentIndex = 0;
     }
 
     /**
-     * Returns the number of elements in this stack.
+     * Returns the number of elements in this stack
      *
      * @return the number of elements
      */

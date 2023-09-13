@@ -30,7 +30,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Fields annotated with @Name("new name") will be serialized and deserialized to name.
+ * Fields annotated with @Name("new name") will be serialized and deserialized to name
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({

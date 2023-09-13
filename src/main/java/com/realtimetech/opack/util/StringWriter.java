@@ -41,7 +41,7 @@ public class StringWriter extends Writer {
     }
 
     /**
-     * Constructs a StringWriter with initial size.
+     * Constructs a StringWriter with initial size
      *
      * @param initialSize the initial size
      */
@@ -55,7 +55,7 @@ public class StringWriter extends Writer {
     }
 
     /**
-     * If the needSize is larger than the current size, double the capacity.
+     * If the needSize is larger than the current size, double the capacity
      *
      * @param requireSize the need more size
      */
@@ -77,7 +77,7 @@ public class StringWriter extends Writer {
     }
 
     /**
-     * Writes a string.
+     * Writes a string
      *
      * @param string String to be written
      * @throws IOException If an I/O error occurs
@@ -93,7 +93,7 @@ public class StringWriter extends Writer {
     }
 
     /**
-     * Writes a single character.
+     * Writes a single character
      *
      * @param object the character to write
      */
@@ -104,7 +104,7 @@ public class StringWriter extends Writer {
     }
 
     /**
-     * Writes an array of characters.
+     * Writes an array of characters
      *
      * @param src the source array to write
      */
@@ -114,7 +114,7 @@ public class StringWriter extends Writer {
     }
 
     /**
-     * Writes a portion of an array of characters.
+     * Writes a portion of an array of characters
      *
      * @param src    the source array to write
      * @param offset the starting position in the source array
@@ -166,7 +166,7 @@ public class StringWriter extends Writer {
     }
 
     /**
-     * Returns the current string length of this string writer.
+     * Returns the current string length of this string writer
      *
      * @return string length
      */
@@ -182,7 +182,7 @@ public class StringWriter extends Writer {
     }
 
     /**
-     * Returns a string created through this string writer.
+     * Returns a string created through this string writer
      *
      * @return created string
      */

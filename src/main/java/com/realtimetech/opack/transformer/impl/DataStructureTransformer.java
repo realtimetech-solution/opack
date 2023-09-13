@@ -32,7 +32,7 @@ import org.jetbrains.annotations.Nullable;
 
 public abstract class DataStructureTransformer implements Transformer {
     /**
-     * Serializes the element to {@link OpackValue OpackValue}.
+     * Serializes the element to {@link OpackValue OpackValue}
      *
      * @param opacker the opacker
      * @param element the element to be serialized
@@ -42,7 +42,7 @@ public abstract class DataStructureTransformer implements Transformer {
     protected abstract @Nullable Object serializeObject(@NotNull Opacker opacker, @Nullable Object element) throws SerializeException;
 
     /**
-     * Deserializes the {@link OpackValue OpackValue}.
+     * Deserializes the {@link OpackValue OpackValue}
      *
      * @param opacker the opacker
      * @param element the element to be deserialized

@@ -32,7 +32,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class WrapMapTransformer extends MapTransformer {
     /**
-     * Serializes the element to {@link OpackValue OpackValue}.
+     * Serializes the element to {@link OpackValue OpackValue}
      *
      * @param opacker the opacker
      * @param element the element to be serialized
@@ -45,7 +45,7 @@ public class WrapMapTransformer extends MapTransformer {
     }
 
     /**
-     * Deserializes the {@link OpackValue OpackValue}.
+     * Deserializes the {@link OpackValue OpackValue}
      *
      * @param opacker the opacker
      * @param element the element to be deserialized

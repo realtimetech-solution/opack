@@ -49,7 +49,7 @@ public class OutputStreamWriter implements Writer {
     }
 
     /**
-     * Writes the specified byte to this output stream.
+     * Writes the specified byte to this output stream
      *
      * @param value the byte
      * @throws IOException if an I/O error occurs; if the output stream has been closed.
@@ -59,7 +59,7 @@ public class OutputStreamWriter implements Writer {
     }
 
     /**
-     * Writes the specified character to this output stream.
+     * Writes the specified character to this output stream
      *
      * @param value the character
      * @throws IOException if an I/O error occurs; if the output stream has been closed.
@@ -70,7 +70,7 @@ public class OutputStreamWriter implements Writer {
     }
 
     /**
-     * Writes the specified short to this output stream.
+     * Writes the specified short to this output stream
      *
      * @param value the short
      * @throws IOException if an I/O error occurs; if the output stream has been closed.
@@ -81,7 +81,7 @@ public class OutputStreamWriter implements Writer {
     }
 
     /**
-     * Writes the specified int to this output stream.
+     * Writes the specified int to this output stream
      *
      * @param value the int
      * @throws IOException if an I/O error occurs; if the output stream has been closed.
@@ -94,7 +94,7 @@ public class OutputStreamWriter implements Writer {
     }
 
     /**
-     * Writes the specified float to this output stream.
+     * Writes the specified float to this output stream
      *
      * @param value the float
      * @throws IOException if an I/O error occurs; if the output stream has been closed.
@@ -104,7 +104,7 @@ public class OutputStreamWriter implements Writer {
     }
 
     /**
-     * Writes the specified long to this output stream.
+     * Writes the specified long to this output stream
      *
      * @param value the long
      * @throws IOException if an I/O error occurs; if the output stream has been closed.
@@ -121,7 +121,7 @@ public class OutputStreamWriter implements Writer {
     }
 
     /**
-     * Writes the specified double to this output stream.
+     * Writes the specified double to this output stream
      *
      * @param value the double
      * @throws IOException if an I/O error occurs; if the output stream has been closed.
@@ -131,7 +131,7 @@ public class OutputStreamWriter implements Writer {
     }
 
     /**
-     * Writes the specified bytes to this output stream.
+     * Writes the specified bytes to this output stream
      *
      * @param bytes the byte array to write
      * @throws IOException if an I/O error occurs; if the output stream has been closed.

@@ -135,7 +135,7 @@ public final class DenseCodec extends OpackCodec<Reader, Writer> {
     private final boolean ignoreVersionCompare;
 
     /**
-     * Constructs the DenseCodec with the builder of DenseCodec.
+     * Constructs the DenseCodec with the builder of DenseCodec
      *
      * @param builder the builder of DenseCodec
      */
@@ -151,7 +151,7 @@ public final class DenseCodec extends OpackCodec<Reader, Writer> {
     }
 
     /**
-     * Encodes the OpackValue to bytes through dense codec.
+     * Encodes the OpackValue to bytes through dense codec
      *
      * @param writer     the writer to write the encoded data
      * @param opackValue the OpackValue to encode
@@ -462,7 +462,7 @@ public final class DenseCodec extends OpackCodec<Reader, Writer> {
     }
 
     /**
-     * Encodes the OpackValue to bytes through dense codec.
+     * Encodes the OpackValue to bytes through dense codec
      *
      * @param opackValue the OpackValue to encode
      * @return returns encoded bytes
@@ -477,8 +477,8 @@ public final class DenseCodec extends OpackCodec<Reader, Writer> {
     }
 
     /**
-     * Decodes one block to OpackValue. (basic block protocol: header(1 byte), data (variable))
-     * If data of block to be decoded is OpackObject or OpackArray(excluding primitive array), returns CONTEXT_BRANCH_CONTEXT_OBJECT for linear decoding.
+     * Decodes one block to OpackValue (basic block protocol: header(1 byte), data (variable))
+     * If data of block to be decoded is OpackObject or OpackArray(excluding primitive array), returns CONTEXT_BRANCH_CONTEXT_OBJECT for linear decoding
      *
      * @param reader the byte reader that wraps the data
      * @return opack value or CONTEXT_BRANCH_CONTEXT_OBJECT
@@ -662,7 +662,7 @@ public final class DenseCodec extends OpackCodec<Reader, Writer> {
     }
 
     /**
-     * Decodes the byte array encoded through the dense codec to OpackValue.
+     * Decodes the byte array encoded through the dense codec to OpackValue
      *
      * @param reader the reader to decode
      * @return opack value
@@ -767,7 +767,7 @@ public final class DenseCodec extends OpackCodec<Reader, Writer> {
     }
 
     /**
-     * Decodes the byte array encoded through the dense codec to OpackValue.
+     * Decodes the byte array encoded through the dense codec to OpackValue
      *
      * @param bytes the bytes to decode
      * @return the decoded opack value

@@ -27,7 +27,7 @@ import org.jetbrains.annotations.NotNull;
 
 public interface OpackValue {
     /**
-     * Assert the specific class is allowed type in opack value.
+     * Assert the specific class is allowed type in opack value
      *
      * @param type the target class
      * @throws IllegalArgumentException if the class is not allowed type
@@ -39,7 +39,7 @@ public interface OpackValue {
     }
 
     /**
-     * Return whether the specific class is allowed type in opack value.
+     * Return whether the specific class is allowed type in opack value
      *
      * @param type the target class
      * @return whether class is allowed type
@@ -52,7 +52,7 @@ public interface OpackValue {
     }
 
     /**
-     * Clone this opack value.
+     * Clone this opack value
      *
      * @return cloned opack value
      */

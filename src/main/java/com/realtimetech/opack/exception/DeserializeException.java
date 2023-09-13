@@ -25,7 +25,7 @@ package com.realtimetech.opack.exception;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Thrown when a problem occurs during deserializing.
+ * Thrown when a problem occurs during deserializing
  */
 public class DeserializeException extends Exception {
     public DeserializeException(@NotNull String message, @NotNull Throwable cause) {
