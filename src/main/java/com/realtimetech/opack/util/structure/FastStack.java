@@ -167,6 +167,8 @@ public class FastStack<T> {
 
     /**
      * Remove amount elements
+     *
+     * @param amount the amount to remove elements
      */
     public void remove(int amount) {
         if (this.currentIndex <= amount)
