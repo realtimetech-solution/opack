@@ -681,7 +681,7 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
      *
      * @param opackValue the opack value to encode
      * @return returns encoded string
-     * @throws EncodeException if a problem occurs during encoding; if the type of data to be encoded is not allowed in specific codec
+     * @throws EncodeException if a problem occurs during encoding, if the type of data to be encoded is not allowed in specific codec
      */
     public synchronized @NotNull String encode(@NotNull OpackValue opackValue) throws EncodeException {
         this.encodeStringWriter.reset();
@@ -695,7 +695,7 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
      *
      * @param data the json string to decode
      * @return OpackValue
-     * @throws IOException if there is a syntax problem with the json string; if the json string has a unicode whose unknown pattern
+     * @throws IOException if there is a syntax problem with the json string, if the json string has a unicode whose unknown pattern
      */
     @Override
     protected @NotNull OpackValue doDecode(@NotNull String data) throws IOException {

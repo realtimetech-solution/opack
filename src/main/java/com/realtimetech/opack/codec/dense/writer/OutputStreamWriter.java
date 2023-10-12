@@ -53,7 +53,7 @@ public class OutputStreamWriter implements Writer {
      * Writes the specified byte to this output stream
      *
      * @param value the byte
-     * @throws IOException if an I/O error occurs; if the output stream has been closed.
+     * @throws IOException if an I/O error occurs, if the output stream has been closed.
      */
     public void writeByte(int value) throws IOException {
         this.outputStream.write(value);
@@ -63,7 +63,7 @@ public class OutputStreamWriter implements Writer {
      * Writes the specified character to this output stream
      *
      * @param value the character
-     * @throws IOException if an I/O error occurs; if the output stream has been closed.
+     * @throws IOException if an I/O error occurs, if the output stream has been closed.
      */
     public void writeChar(char value) throws IOException {
         this.outputStream.write((byte) ((value >> 8) & 0xff));
@@ -74,7 +74,7 @@ public class OutputStreamWriter implements Writer {
      * Writes the specified short to this output stream
      *
      * @param value the short
-     * @throws IOException if an I/O error occurs; if the output stream has been closed.
+     * @throws IOException if an I/O error occurs, if the output stream has been closed.
      */
     public void writeShort(short value) throws IOException {
         this.outputStream.write((byte) ((value >> 8) & 0xff));
@@ -85,7 +85,7 @@ public class OutputStreamWriter implements Writer {
      * Writes the specified int to this output stream
      *
      * @param value the int
-     * @throws IOException if an I/O error occurs; if the output stream has been closed.
+     * @throws IOException if an I/O error occurs, if the output stream has been closed.
      */
     public void writeInt(int value) throws IOException {
         this.outputStream.write((byte) ((value >> 24) & 0xff));
@@ -98,7 +98,7 @@ public class OutputStreamWriter implements Writer {
      * Writes the specified float to this output stream
      *
      * @param value the float
-     * @throws IOException if an I/O error occurs; if the output stream has been closed.
+     * @throws IOException if an I/O error occurs, if the output stream has been closed.
      */
     public void writeFloat(float value) throws IOException {
         this.writeInt(Float.floatToRawIntBits(value));
@@ -108,7 +108,7 @@ public class OutputStreamWriter implements Writer {
      * Writes the specified long to this output stream
      *
      * @param value the long
-     * @throws IOException if an I/O error occurs; if the output stream has been closed.
+     * @throws IOException if an I/O error occurs, if the output stream has been closed.
      */
     public void writeLong(long value) throws IOException {
         this.outputStream.write((byte) ((value >> 56) & 0xff));
@@ -125,7 +125,7 @@ public class OutputStreamWriter implements Writer {
      * Writes the specified double to this output stream
      *
      * @param value the double
-     * @throws IOException if an I/O error occurs; if the output stream has been closed.
+     * @throws IOException if an I/O error occurs, if the output stream has been closed.
      */
     public void writeDouble(double value) throws IOException {
         this.writeLong(Double.doubleToRawLongBits(value));
@@ -135,7 +135,7 @@ public class OutputStreamWriter implements Writer {
      * Writes the specified bytes to this output stream
      *
      * @param bytes the byte array to write
-     * @throws IOException if an I/O error occurs; if the output stream has been closed.
+     * @throws IOException if an I/O error occurs, if the output stream has been closed.
      */
     public void writeBytes(byte @NotNull [] bytes) throws IOException {
         this.outputStream.write(bytes);

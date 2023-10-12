@@ -53,7 +53,7 @@ public final class OpackArray<E> extends AbstractOpackValue<List<E>> {
      *
      * @param arrayObject the array object for create
      * @return created opack array
-     * @throws IllegalArgumentException if the component type for array object is not primitive type; if the array object is not 1 dimension
+     * @throws IllegalArgumentException if the component type for array object is not primitive type, if the array object is not 1 dimension
      */
     public static OpackArray<?> createWithArrayObject(@NotNull Object arrayObject) {
         return new OpackArray<>(arrayObject);
@@ -65,7 +65,7 @@ public final class OpackArray<E> extends AbstractOpackValue<List<E>> {
      * Constructs an opack array with the specified array object of which component type is the primitive type
      *
      * @param arrayObject the array object for create
-     * @throws IllegalArgumentException if the component type for array object is not primitive type; if the array object is not 1 dimension
+     * @throws IllegalArgumentException if the component type for array object is not primitive type, if the array object is not 1 dimension
      */
     private OpackArray(@NotNull Object arrayObject) {
         if (!arrayObject.getClass().isArray()) {

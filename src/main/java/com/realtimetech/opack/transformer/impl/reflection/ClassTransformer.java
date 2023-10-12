@@ -29,15 +29,7 @@ import com.realtimetech.opack.transformer.Transformer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Date;
-
 public class ClassTransformer implements Transformer {
-    private final @NotNull ClassLoader classLoader;
-
-    public ClassTransformer(@NotNull ClassLoader classLoader) {
-        this.classLoader = classLoader;
-    }
-
     /**
      * Serialize specific value to opack value
      *
@@ -69,7 +61,7 @@ public class ClassTransformer implements Transformer {
     public @Nullable Object deserialize(@NotNull Opacker opacker, @NotNull Class<?> goalType, @Nullable Object object) throws DeserializeException {
         if (object instanceof String) {
             try {
-                return this.classLoader.loadClass((String) object);
+                return Class.forName((String) object, true, opacker.getClassLoader());
             } catch (ClassNotFoundException classNotFoundException) {
                 throw new DeserializeException("Failed to load class with set class loader.", classNotFoundException);
             }

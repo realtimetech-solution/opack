@@ -58,14 +58,21 @@ public class JacksonPerformanceTest {
             String value = objectMapper.writeValueAsString(performanceClass);
             PerformanceClass deserialize = objectMapper.readValue(value, PerformanceClass.class);
 
+            assert deserialize != null;
+
             deserialize.hashCode();
         };
 
         PerformanceClass.ExceptionRunnable opackRunnable = () -> {
             OpackValue serialize = opacker.serialize(performanceClass);
+
+            assert serialize != null;
+
             String encode = jsonCodec.encode(serialize);
             OpackValue decode = jsonCodec.decode(encode);
             PerformanceClass deserialize = opacker.deserialize(PerformanceClass.class, decode);
+
+            assert deserialize != null;
 
             deserialize.hashCode();
         };

@@ -56,19 +56,26 @@ public class GsonPerformanceTest {
             JsonElement decode = gson.fromJson(encode, JsonElement.class);
             PerformanceClass deserialize = gson.fromJson(decode, PerformanceClass.class);
 
+            assert deserialize != null;
+
             deserialize.hashCode();
         };
         PerformanceClass.ExceptionRunnable gsonDirectRunnable = () -> {
             String encode = gson.toJson(performanceClass);
             PerformanceClass decode = gson.fromJson(encode, PerformanceClass.class);
 
+            assert decode != null;
+
             decode.hashCode();
         };
         PerformanceClass.ExceptionRunnable opackRunnable = () -> {
             OpackValue serialize = opacker.serialize(performanceClass);
+            assert serialize != null;
             String encode = jsonCodec.encode(serialize);
             OpackValue decode = jsonCodec.decode(encode);
             PerformanceClass deserialize = opacker.deserialize(PerformanceClass.class, decode);
+
+            assert deserialize != null;
 
             deserialize.hashCode();
         };
