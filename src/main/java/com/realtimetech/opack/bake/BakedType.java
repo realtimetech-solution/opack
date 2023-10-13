@@ -22,6 +22,7 @@
 
 package com.realtimetech.opack.bake;
 
+import com.realtimetech.opack.provider.DefaultValueProvider;
 import com.realtimetech.opack.transformer.Transformer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -36,14 +37,16 @@ public final class BakedType {
         private final boolean withType;
 
         private final @Nullable Transformer transformer;
+        private final @Nullable DefaultValueProvider defaultValueProvider;
 
-        public Property(@NotNull Field field, @Nullable String name, @Nullable Class<?> type, boolean withType, @Nullable Transformer transformer) {
+        public Property(@NotNull Field field, @Nullable String name, @Nullable Class<?> type, boolean withType, @Nullable Transformer transformer, @Nullable DefaultValueProvider defaultValueProvider) {
             this.field = field;
             this.name = name == null ? this.field.getName() : name;
             this.type = type == null ? this.field.getType() : type;
             this.withType = withType;
 
             this.transformer = transformer;
+            this.defaultValueProvider = defaultValueProvider;
         }
 
         public @NotNull Field getField() {
@@ -64,6 +67,10 @@ public final class BakedType {
 
         public @Nullable Transformer getTransformer() {
             return transformer;
+        }
+
+        public @Nullable DefaultValueProvider getDefaultValueProvider() {
+            return defaultValueProvider;
         }
 
         /**

@@ -596,10 +596,20 @@ public class Opacker {
             } else if (opackValue instanceof OpackObject) {
                 OpackObject<Object, Object> opackObject = (OpackObject<Object, Object>) opackValue;
                 for (BakedType.Property property : bakedType.getFields()) {
+                    String propertyName = property.getName();
+
                     try {
-                        Object element = opackObject.get(property.getName());
+                        Object element;
                         Class<?> fieldType = property.getType();
                         Class<?> actualFieldType = property.getField().getType();
+
+                        if (opackObject.containsKey(propertyName)) {
+                            element = opackObject.get(propertyName);
+                        } else if (property.getDefaultValueProvider() != null) {
+                            element = property.getDefaultValueProvider().provide(this, object, property);
+                        } else {
+                            throw new DeserializeException("Missing " + property.getName() + " property value of for " + bakedType.getType().getSimpleName() + " in given opack value.");
+                        }
 
                         Object propertyValue = null;
 
