@@ -95,7 +95,7 @@ public class ByteArrayWriter implements Writer {
      * Writes the specified byte to this output stream
      *
      * @param value the byte
-     * @throws IOException if an I/O error occurs; if the output stream has been closed.
+     * @throws IOException if an I/O error occurs, if the output stream has been closed.
      */
     public void writeByte(int value) throws IOException {
         this.increaseArray(1);
@@ -107,7 +107,7 @@ public class ByteArrayWriter implements Writer {
      * Writes the specified character to this output stream
      *
      * @param value the character
-     * @throws IOException if an I/O error occurs; if the output stream has been closed.
+     * @throws IOException if an I/O error occurs, if the output stream has been closed.
      */
     public void writeChar(char value) throws IOException {
         this.increaseArray(2);
@@ -120,7 +120,7 @@ public class ByteArrayWriter implements Writer {
      * Writes the specified short to this output stream
      *
      * @param value the short
-     * @throws IOException if an I/O error occurs; if the output stream has been closed.
+     * @throws IOException if an I/O error occurs, if the output stream has been closed.
      */
     public void writeShort(short value) throws IOException {
         this.increaseArray(2);
@@ -133,7 +133,7 @@ public class ByteArrayWriter implements Writer {
      * Writes the specified int to this output stream
      *
      * @param value the int
-     * @throws IOException if an I/O error occurs; if the output stream has been closed.
+     * @throws IOException if an I/O error occurs, if the output stream has been closed.
      */
     public void writeInt(int value) throws IOException {
         this.increaseArray(4);
@@ -148,7 +148,7 @@ public class ByteArrayWriter implements Writer {
      * Writes the specified float to this output stream
      *
      * @param value the float
-     * @throws IOException if an I/O error occurs; if the output stream has been closed.
+     * @throws IOException if an I/O error occurs, if the output stream has been closed.
      */
     public void writeFloat(float value) throws IOException {
         this.writeInt(Float.floatToRawIntBits(value));
@@ -158,7 +158,7 @@ public class ByteArrayWriter implements Writer {
      * Writes the specified long to this output stream
      *
      * @param value the long
-     * @throws IOException if an I/O error occurs; if the output stream has been closed.
+     * @throws IOException if an I/O error occurs, if the output stream has been closed.
      */
     public void writeLong(long value) throws IOException {
         this.increaseArray(8);
@@ -177,7 +177,7 @@ public class ByteArrayWriter implements Writer {
      * Writes the specified double to this output stream
      *
      * @param value the double
-     * @throws IOException if an I/O error occurs; if the output stream has been closed.
+     * @throws IOException if an I/O error occurs, if the output stream has been closed.
      */
     public void writeDouble(double value) throws IOException {
         this.writeLong(Double.doubleToRawLongBits(value));
@@ -187,7 +187,7 @@ public class ByteArrayWriter implements Writer {
      * Writes the specified bytes to this output stream
      *
      * @param bytes the byte array to write
-     * @throws IOException if an I/O error occurs; if the output stream has been closed.
+     * @throws IOException if an I/O error occurs, if the output stream has been closed.
      */
     public void writeBytes(byte @NotNull [] bytes) throws IOException {
         this.increaseArray(bytes.length);

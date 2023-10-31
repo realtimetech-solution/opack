@@ -69,7 +69,7 @@ public class Opacker {
         private boolean enableConvertEnumToOrdinal;
         private boolean enableConvertRecursiveDependencyToNull;
 
-        private @Nullable ClassLoader classTransformerClassLoader;
+        private @NotNull ClassLoader classLoader;
 
         public Builder() {
             this.valueStackInitialSize = 512;
@@ -80,41 +80,41 @@ public class Opacker {
             this.enableConvertEnumToOrdinal = false;
             this.enableConvertRecursiveDependencyToNull = false;
 
-            this.classTransformerClassLoader = this.getClass().getClassLoader();
+            this.classLoader = this.getClass().getClassLoader();
         }
 
-        public Builder setValueStackInitialSize(int valueStackInitialSize) {
+        public @NotNull Builder setValueStackInitialSize(int valueStackInitialSize) {
             this.valueStackInitialSize = valueStackInitialSize;
             return this;
         }
 
-        public Builder setContextStackInitialSize(int contextStackInitialSize) {
+        public @NotNull Builder setContextStackInitialSize(int contextStackInitialSize) {
             this.contextStackInitialSize = contextStackInitialSize;
             return this;
         }
 
-        public Builder setEnableWrapListElementType(boolean enableWrapListElementType) {
+        public @NotNull Builder setEnableWrapListElementType(boolean enableWrapListElementType) {
             this.enableWrapListElementType = enableWrapListElementType;
             return this;
         }
 
-        public Builder setEnableWrapMapElementType(boolean enableWrapMapElementType) {
+        public @NotNull Builder setEnableWrapMapElementType(boolean enableWrapMapElementType) {
             this.enableWrapMapElementType = enableWrapMapElementType;
             return this;
         }
 
-        public Builder setEnableConvertEnumToOrdinal(boolean enableConvertEnumToOrdinal) {
+        public @NotNull Builder setEnableConvertEnumToOrdinal(boolean enableConvertEnumToOrdinal) {
             this.enableConvertEnumToOrdinal = enableConvertEnumToOrdinal;
             return this;
         }
 
-        public Builder setEnableConvertRecursiveDependencyToNull(boolean enableConvertRecursiveDependencyToNull) {
+        public @NotNull Builder setEnableConvertRecursiveDependencyToNull(boolean enableConvertRecursiveDependencyToNull) {
             this.enableConvertRecursiveDependencyToNull = enableConvertRecursiveDependencyToNull;
             return this;
         }
 
-        public Builder setClassTransformerClassLoader(@Nullable ClassLoader classTransformerClassLoader) {
-            this.classTransformerClassLoader = classTransformerClassLoader;
+        public @NotNull Builder setClassLoader(@NotNull ClassLoader classLoader) {
+            this.classLoader = classLoader;
             return this;
         }
 
@@ -123,7 +123,7 @@ public class Opacker {
          *
          * @return created opacker
          */
-        public Opacker create() {
+        public @NotNull Opacker create() {
             return new Opacker(this);
         }
     }
@@ -132,6 +132,7 @@ public class Opacker {
         NONE, SERIALIZE, DESERIALIZE
     }
 
+    private final @NotNull ClassLoader classLoader;
     private final @NotNull TypeBaker typeBaker;
 
     private final @NotNull FastStack<@NotNull Object> objectStack;
@@ -151,6 +152,7 @@ public class Opacker {
      * @throws IllegalStateException if the predefined transformer cannot be instanced
      */
     private Opacker(@NotNull Builder builder) {
+        this.classLoader = builder.classLoader;
         this.typeBaker = new TypeBaker(this);
 
         this.objectStack = new FastStack<>(builder.contextStackInitialSize);
@@ -182,11 +184,7 @@ public class Opacker {
             this.typeBaker.registerPredefinedTransformer(LocalTime.class, LocalTimeTransformer.class, true);
             this.typeBaker.registerPredefinedTransformer(LocalDateTime.class, LocalDateTimeTransformer.class, true);
 
-            if (builder.classTransformerClassLoader != null) {
-                ClassTransformer classTransformer = new ClassTransformer(builder.classTransformerClassLoader);
-
-                this.typeBaker.registerPredefinedTransformer(Class.class, classTransformer, true);
-            }
+            this.typeBaker.registerPredefinedTransformer(Class.class, ClassTransformer.class, true);
         } catch (InstantiationException exception) {
             throw new IllegalStateException(exception);
         }
@@ -195,23 +193,39 @@ public class Opacker {
         this.enableConvertRecursiveDependencyToNull = builder.enableConvertRecursiveDependencyToNull;
     }
 
+    public @NotNull ClassLoader getClassLoader() {
+        return classLoader;
+    }
+
     public @NotNull TypeBaker getTypeBaker() {
         return this.typeBaker;
+    }
+
+
+    /**
+     * Serializes the object to {@link OpackValue OpackValue}
+     *
+     * @param object the object to be serialized
+     * @return the serialized opack value
+     * @throws SerializeException if a problem occurs during serializing, if this opacker is deserializing
+     */
+    public synchronized @Nullable OpackValue serialize(@NotNull Object object) throws SerializeException {
+        return (OpackValue) this.serializeObject(object);
     }
 
     /**
      * Serializes the object to {@link OpackValue OpackValue}
      *
      * @param object the object to be serialized
-     * @return opack value
-     * @throws SerializeException if a problem occurs during serializing; if this opacker is deserializing
+     * @return the serialized object
+     * @throws SerializeException if a problem occurs during serializing, if this opacker is deserializing
      */
-    public synchronized @Nullable OpackValue serialize(@NotNull Object object) throws SerializeException {
+    public synchronized @Nullable Object serializeObject(@NotNull Object object) throws SerializeException {
         if (this.state == State.DESERIALIZE)
             throw new SerializeException("Opacker is deserializing.");
 
         int separatorStack = this.objectStack.getSize();
-        OpackValue value = (OpackValue) this.prepareObjectSerialize(object.getClass(), object);
+        Object serializedObject = this.prepareObjectSerialize(object.getClass(), object);
 
         State lastState = this.state;
         try {
@@ -225,7 +239,7 @@ public class Opacker {
             }
         }
 
-        return value;
+        return serializedObject;
     }
 
     /**
@@ -234,7 +248,7 @@ public class Opacker {
      * @param baseType the class of object to be serialized
      * @param object   the object to be serialized
      * @return prepared opack value
-     * @throws SerializeException if a problem occurs during serializing; if the baseType cannot be baked into {@link BakedType BakedType}
+     * @throws SerializeException if a problem occurs during serializing, if the baseType cannot be baked into {@link BakedType BakedType}
      */
     private @Nullable Object prepareObjectSerialize(@NotNull Class<?> baseType, @NotNull Object object) throws SerializeException {
         try {
@@ -284,7 +298,7 @@ public class Opacker {
             }
 
             /*
-                Optimize algorithm for big array
+                Optimize algorithm for a big array
              */
             if (OpackArray.isAllowArray(objectType)) {
                 int dimensions = ReflectionUtil.getArrayDimension(objectType);
@@ -324,7 +338,7 @@ public class Opacker {
     /**
      * Serialize the elements of each opack value in the stack
      *
-     * @throws SerializeException if a problem occurs during serializing; if the field in the class of instance to be serialized is not accessible
+     * @throws SerializeException if a problem occurs during serializing, if the field in the class of instance to be serialized is not accessible
      */
     private void executeSerializeStack(int endOfStack) throws SerializeException {
         while (this.objectStack.getSize() > endOfStack) {
@@ -375,27 +389,40 @@ public class Opacker {
         }
     }
 
+
     /**
-     * Deserializes the opack value to object of the target class
+     * Deserializes the object to object of the target class
      *
      * @param type       the target class
      * @param opackValue the opack value to be deserialized
-     * @return deserialized object
-     * @throws DeserializeException if a problem occurs during deserializing; if this opacker is serializing
+     * @return the deserialized object
+     * @throws DeserializeException if a problem occurs during deserializing, if this opacker is serializing
      */
     public synchronized <T> @Nullable T deserialize(@NotNull Class<T> type, @NotNull OpackValue opackValue) throws DeserializeException {
+        return this.deserializeObject(type, opackValue);
+    }
+
+    /**
+     * Deserializes the object to object of the target class
+     *
+     * @param type   the target class
+     * @param object the object to be deserialized
+     * @return the deserialized object
+     * @throws DeserializeException if a problem occurs during deserializing, if this opacker is serializing
+     */
+    public synchronized <T> @Nullable T deserializeObject(@NotNull Class<T> type, @NotNull Object object) throws DeserializeException {
         if (this.state == State.SERIALIZE)
             throw new DeserializeException("Opacker is serializing.");
 
         int separatorStack = this.objectStack.getSize();
 
-        Object object = this.prepareObjectDeserialize(type, opackValue, false, null);
+        Object deserializedObject = this.prepareObjectDeserialize(type, object, false, null);
 
-        if (object == null) {
+        if (deserializedObject == null) {
             return null;
         }
 
-        T value = type.cast(object);
+        T value = type.cast(deserializedObject);
 
         State lastState = this.state;
         try {
@@ -538,7 +565,7 @@ public class Opacker {
     /**
      * Deserialize the elements of each opack value in the stack
      *
-     * @throws DeserializeException if a problem occurs during deserializing; if the field in the class of instance to be deserialized is not accessible
+     * @throws DeserializeException if a problem occurs during deserializing, if the field in the class of instance to be deserialized is not accessible
      */
     private void executeDeserializeStack(int endOfStack) throws DeserializeException {
         while (this.objectStack.getSize() > endOfStack) {
@@ -569,10 +596,20 @@ public class Opacker {
             } else if (opackValue instanceof OpackObject) {
                 OpackObject<Object, Object> opackObject = (OpackObject<Object, Object>) opackValue;
                 for (BakedType.Property property : bakedType.getFields()) {
+                    String propertyName = property.getName();
+
                     try {
-                        Object element = opackObject.get(property.getName());
+                        Object element;
                         Class<?> fieldType = property.getType();
                         Class<?> actualFieldType = property.getField().getType();
+
+                        if (opackObject.containsKey(propertyName)) {
+                            element = opackObject.get(propertyName);
+                        } else if (property.getDefaultValueProvider() != null) {
+                            element = property.getDefaultValueProvider().provide(this, object, property);
+                        } else {
+                            throw new DeserializeException("Missing " + property.getName() + " property value of for " + bakedType.getType().getSimpleName() + " in given opack value.");
+                        }
 
                         Object propertyValue = null;
 

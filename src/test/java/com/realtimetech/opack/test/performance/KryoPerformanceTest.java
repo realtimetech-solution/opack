@@ -105,16 +105,23 @@ public class KryoPerformanceTest {
             byte[] encode = byteBufferOutput.toBytes();
             PerformanceClass deserialize = kryo.readObject(new ByteBufferInput(encode), PerformanceClass.class);
 
+            assert deserialize != null;
+
             deserialize.hashCode();
         };
         PerformanceClass.ExceptionRunnable opackRunnable = () -> {
             byteArrayWriter.reset();
 
             OpackValue serialize = opacker.serialize(performanceClass);
+
+            assert serialize != null;
+
             denseCodec.encode(byteArrayWriter, serialize);
             byte[] encode = byteArrayWriter.toByteArray();
             OpackValue decode = denseCodec.decode(encode);
             PerformanceClass deserialize = opacker.deserialize(PerformanceClass.class, decode);
+
+            assert deserialize != null;
 
             deserialize.hashCode();
         };

@@ -466,7 +466,7 @@ public final class DenseCodec extends OpackCodec<Reader, Writer> {
      *
      * @param opackValue the OpackValue to encode
      * @return returns encoded bytes
-     * @throws EncodeException if a problem occurs during encoding; if the type of data to be encoded is not allowed in specific codec
+     * @throws EncodeException if a problem occurs during encoding, if the type of data to be encoded is not allowed in specific codec
      */
     public byte @NotNull [] encode(@NotNull OpackValue opackValue) throws EncodeException {
         ByteArrayWriter byteArrayWriter = new ByteArrayWriter();
@@ -771,7 +771,7 @@ public final class DenseCodec extends OpackCodec<Reader, Writer> {
      *
      * @param bytes the bytes to decode
      * @return the decoded opack value
-     * @throws DecodeException if a problem occurs during decoding; if the type of data to be decoded is not allowed in specific codec
+     * @throws DecodeException if a problem occurs during decoding, if the type of data to be decoded is not allowed in specific codec
      */
     public @NotNull OpackValue decode(byte @NotNull [] bytes) throws DecodeException {
         ByteArrayReader byteArrayReader = new ByteArrayReader(bytes);

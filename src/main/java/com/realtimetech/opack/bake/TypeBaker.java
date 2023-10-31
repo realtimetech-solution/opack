@@ -25,6 +25,8 @@ package com.realtimetech.opack.bake;
 import com.realtimetech.opack.Opacker;
 import com.realtimetech.opack.annotation.*;
 import com.realtimetech.opack.exception.BakeException;
+import com.realtimetech.opack.provider.DefaultValueProvider;
+import com.realtimetech.opack.provider.DefaultValueProviderFactory;
 import com.realtimetech.opack.transformer.Transformer;
 import com.realtimetech.opack.transformer.TransformerFactory;
 import com.realtimetech.opack.util.ReflectionUtil;
@@ -65,6 +67,7 @@ public final class TypeBaker {
     private final @NotNull Opacker opacker;
 
     private final @NotNull TransformerFactory transformerFactory;
+    private final @NotNull DefaultValueProviderFactory defaultValueProviderFactory;
 
     private final @NotNull HashMap<@NotNull Class<?>, @NotNull BakedType> backedTypeMap;
     private final @NotNull HashMap<@NotNull Class<?>, @NotNull List<@NotNull PredefinedTransformer>> predefinedTransformerMap;
@@ -78,6 +81,7 @@ public final class TypeBaker {
         this.opacker = opacker;
 
         this.transformerFactory = new TransformerFactory(opacker);
+        this.defaultValueProviderFactory = new DefaultValueProviderFactory(opacker);
 
         this.backedTypeMap = new HashMap<>();
         this.predefinedTransformerMap = new HashMap<>();
@@ -318,11 +322,25 @@ public final class TypeBaker {
                 }
 
                 Transformer[] fieldTransformers = this.getTransformer(field);
+                DefaultValueProvider defaultValueProvider = null;
+
                 Class<?> type = this.getAnnotatedType(field);
                 String name = this.getAnnotatedName(field);
+
                 boolean withType = field.isAnnotationPresent(WithType.class);
 
-                properties.add(new BakedType.Property(field, name, type, withType, fieldTransformers.length > 0 ? fieldTransformers[0] : null));
+                if (field.isAnnotationPresent(DefaultValue.class)) {
+                    DefaultValue defaultValue = field.getAnnotation(DefaultValue.class);
+                    Class<DefaultValueProvider> defaultValueProviderType = (Class<DefaultValueProvider>) defaultValue.provider();
+
+                    try {
+                        defaultValueProvider = this.defaultValueProviderFactory.get(defaultValueProviderType);
+                    } catch (InstantiationException e) {
+                        throw new BakeException(e);
+                    }
+                }
+
+                properties.add(new BakedType.Property(field, name, type, withType, fieldTransformers.length > 0 ? fieldTransformers[0] : null, defaultValueProvider));
             }
 
             transformers = this.getTransformer(bakeType);

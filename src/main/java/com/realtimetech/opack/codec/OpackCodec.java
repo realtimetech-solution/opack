@@ -53,7 +53,7 @@ public abstract class OpackCodec<I, O> {
      *
      * @param output     the output to encode
      * @param opackValue the opack value to encode
-     * @throws EncodeException if a problem occurs during encoding; if the type of data to be encoded is not allowed in specific codec
+     * @throws EncodeException if a problem occurs during encoding, if the type of data to be encoded is not allowed in specific codec
      */
     public final synchronized void encode(@NotNull O output, @NotNull OpackValue opackValue) throws EncodeException {
         try {
@@ -68,7 +68,7 @@ public abstract class OpackCodec<I, O> {
      *
      * @param input the input to decode
      * @return decoded value
-     * @throws DecodeException if a problem occurs during decoding; if the type of data to be decoded is not allowed in specific codec
+     * @throws DecodeException if a problem occurs during decoding, if the type of data to be decoded is not allowed in specific codec
      */
     public final synchronized OpackValue decode(@NotNull I input) throws DecodeException {
         try {

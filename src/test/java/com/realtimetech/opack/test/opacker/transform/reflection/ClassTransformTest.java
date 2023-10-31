@@ -26,11 +26,8 @@ import com.realtimetech.opack.Opacker;
 import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.test.OpackAssert;
-import com.realtimetech.opack.test.opacker.transform.path.PathTransformTest;
 import com.realtimetech.opack.value.OpackValue;
 import org.junit.jupiter.api.Test;
-
-import java.nio.file.Path;
 
 public class ClassTransformTest {
     public static class ClassTransformClass {

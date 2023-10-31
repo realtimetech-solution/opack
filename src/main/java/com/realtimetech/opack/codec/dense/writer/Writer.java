@@ -31,7 +31,7 @@ public interface Writer {
      * Writes the specified byte to this output stream
      *
      * @param value the byte
-     * @throws IOException if an I/O error occurs; if the output stream has been closed.
+     * @throws IOException if an I/O error occurs, if the output stream has been closed.
      */
     void writeByte(int value) throws IOException;
 
@@ -39,7 +39,7 @@ public interface Writer {
      * Writes the specified character to this output stream
      *
      * @param value the character
-     * @throws IOException if an I/O error occurs; if the output stream has been closed.
+     * @throws IOException if an I/O error occurs, if the output stream has been closed.
      */
     void writeChar(char value) throws IOException;
 
@@ -47,7 +47,7 @@ public interface Writer {
      * Writes the specified short to this output stream
      *
      * @param value the short
-     * @throws IOException if an I/O error occurs; if the output stream has been closed.
+     * @throws IOException if an I/O error occurs, if the output stream has been closed.
      */
     void writeShort(short value) throws IOException;
 
@@ -55,7 +55,7 @@ public interface Writer {
      * Writes the specified int to this output stream
      *
      * @param value the int
-     * @throws IOException if an I/O error occurs; if the output stream has been closed.
+     * @throws IOException if an I/O error occurs, if the output stream has been closed.
      */
     void writeInt(int value) throws IOException;
 
@@ -63,7 +63,7 @@ public interface Writer {
      * Writes the specified float to this output stream
      *
      * @param value the float
-     * @throws IOException if an I/O error occurs; if the output stream has been closed.
+     * @throws IOException if an I/O error occurs, if the output stream has been closed.
      */
     void writeFloat(float value) throws IOException;
 
@@ -71,7 +71,7 @@ public interface Writer {
      * Writes the specified long to this output stream
      *
      * @param value the long
-     * @throws IOException if an I/O error occurs; if the output stream has been closed.
+     * @throws IOException if an I/O error occurs, if the output stream has been closed.
      */
     void writeLong(long value) throws IOException;
 
@@ -79,7 +79,7 @@ public interface Writer {
      * Writes the specified double to this output stream
      *
      * @param value the double
-     * @throws IOException if an I/O error occurs; if the output stream has been closed.
+     * @throws IOException if an I/O error occurs, if the output stream has been closed.
      */
     void writeDouble(double value) throws IOException;
 
@@ -87,7 +87,7 @@ public interface Writer {
      * Writes the specified bytes to this output stream
      *
      * @param bytes the byte array to write
-     * @throws IOException if an I/O error occurs; if the output stream has been closed.
+     * @throws IOException if an I/O error occurs, if the output stream has been closed.
      */
     void writeBytes(byte @NotNull [] bytes) throws IOException;
 }

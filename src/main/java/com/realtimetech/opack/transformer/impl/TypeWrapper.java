@@ -67,9 +67,9 @@ public class TypeWrapper {
 
             opackObject.put("value", opackArray);
         } else {
-            OpackValue opackValue = opacker.serialize(object);
+            Object serializedObject = opacker.serializeObject(object);
 
-            opackObject.put("value", opackValue);
+            opackObject.put("value", serializedObject);
         }
 
         opackObject.put("type", object.getClass().getName());
@@ -108,7 +108,7 @@ public class TypeWrapper {
         }
 
         try {
-            Class<?> objectType = Class.forName((String) type);
+            Class<?> objectType = Class.forName((String) type, true, opacker.getClassLoader());
 
             if (objectType.isArray()) {
                 Class<?> componentType = objectType.getComponentType();
@@ -132,11 +132,13 @@ public class TypeWrapper {
 
                 return arrayObject;
             } else {
+                /*
                 if (!(value instanceof OpackValue)) {
                     throw new DeserializeException("Expected opack value as a `value` in wrapped object but " + value.getClass().getName() + ".");
                 }
+                */
 
-                return opacker.deserialize(objectType, (OpackValue) value);
+                return opacker.deserializeObject(objectType, value);
             }
         } catch (ClassNotFoundException classNotFoundException) {
             throw new DeserializeException(classNotFoundException);

@@ -116,7 +116,7 @@ public class MapTransformer extends DataStructureTransformer {
     @Override
     protected @Nullable Object serializeObject(@NotNull Opacker opacker, @Nullable Object element) throws SerializeException {
         if (element != null && !OpackValue.isAllowType(element.getClass())) {
-            return opacker.serialize(element);
+            return opacker.serializeObject(element);
         }
 
         return element;
