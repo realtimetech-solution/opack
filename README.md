@@ -47,18 +47,17 @@ Gradle:
 
 ```gradle
 dependencies {
-  implementation 'com.realtimetech:opack:0.0.12'
+  implementation 'com.realtimetech:opack:0.0.13'
 }
 ```
 
 Maven:
 
 ```xml
-
 <dependency>
     <groupId>com.realtimetech</groupId>
     <artifactId>opack</artifactId>
-    <version>0.0.12</version>
+    <version>0.0.13</version>
 </dependency>
 ```
 
