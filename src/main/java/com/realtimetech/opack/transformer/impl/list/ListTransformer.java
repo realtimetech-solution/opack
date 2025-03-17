@@ -49,7 +49,7 @@ public class ListTransformer extends DataStructureTransformer {
     public @Nullable Object serialize(@NotNull Opacker opacker, @NotNull Class<?> originalType, @Nullable Object object) throws SerializeException {
         if (object instanceof List) {
             List<?> list = (List<?>) object;
-            OpackArray<Object> opackArray = new OpackArray<>(list.size());
+            OpackArray opackArray = new OpackArray(list.size());
 
             for (Object element : list) {
                 opackArray.add(this.serializeObject(opacker, element));
@@ -73,7 +73,7 @@ public class ListTransformer extends DataStructureTransformer {
     @Override
     public @Nullable Object deserialize(@NotNull Opacker opacker, @NotNull Class<?> goalType, @Nullable Object object) throws DeserializeException {
         if (object instanceof OpackArray) {
-            OpackArray<Object> opackArray = (OpackArray<Object>) object;
+            OpackArray opackArray = (OpackArray) object;
 
             if (List.class.isAssignableFrom(goalType)) {
                 try {

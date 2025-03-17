@@ -163,14 +163,14 @@ public class OpackAssert {
                 if (!originalObject.equals(targetObject)) {
                     OpackAssert.throwException(originalObject, targetObject);
                 }
-            } else if (originalObject instanceof File && targetObject instanceof File ||
-                    originalObject instanceof Path && targetObject instanceof Path ||
-                    originalObject instanceof Date && targetObject instanceof Date ||
-                    originalObject instanceof Calendar && targetObject instanceof Calendar ||
-                    originalObject instanceof LocalDate && targetObject instanceof LocalDate ||
-                    originalObject instanceof LocalTime && targetObject instanceof LocalTime ||
-                    originalObject instanceof LocalDateTime && targetObject instanceof LocalDateTime ||
-                    originalObject instanceof Class && targetObject instanceof Class) {
+            } else if ((originalObject instanceof File && targetObject instanceof File) ||
+                    (originalObject instanceof Path && targetObject instanceof Path) ||
+                    (originalObject instanceof Date && targetObject instanceof Date) ||
+                    (originalObject instanceof Calendar && targetObject instanceof Calendar) ||
+                    originalObject instanceof LocalDate ||
+                    originalObject instanceof LocalTime ||
+                    originalObject instanceof LocalDateTime ||
+                    originalObject instanceof Class) {
                 OpackAssert.assertEquals(originalObject.toString(), targetObject.toString());
             } else {
                 OpackAssert.assertObject(originalObject, targetObject);

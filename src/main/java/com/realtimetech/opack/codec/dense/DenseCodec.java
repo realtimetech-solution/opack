@@ -180,7 +180,7 @@ public final class DenseCodec extends OpackCodec<Reader, Writer> {
             }
 
             if (objectType == OpackObject.class) {
-                OpackObject<Object, Object> opackObject = (OpackObject<Object, Object>) object;
+                OpackObject opackObject = (OpackObject) object;
                 int size = opackObject.size();
 
                 writer.writeByte(CONST_TYPE_OPACK_OBJECT);
@@ -192,7 +192,7 @@ public final class DenseCodec extends OpackCodec<Reader, Writer> {
                     this.encodeStack.push(key);
                 }
             } else if (objectType == OpackArray.class) {
-                OpackArray<Object> opackArray = (OpackArray<Object>) object;
+                OpackArray opackArray = (OpackArray) object;
                 int length = opackArray.length();
 
                 try {
@@ -513,7 +513,7 @@ public final class DenseCodec extends OpackCodec<Reader, Writer> {
             return new String(bytes, StandardCharsets.UTF_8);
         } else if (b == CONST_TYPE_OPACK_OBJECT) {
             int size = reader.readInt();
-            OpackObject<Object, Object> opackObject = new OpackObject<>(size);
+            OpackObject opackObject = new OpackObject(size);
 
             decodeContextStack.push(new Object[]{size, 0, CONTEXT_NULL_OBJECT, CONTEXT_NULL_OBJECT});
             decodeStack.push(opackObject);
@@ -525,7 +525,7 @@ public final class DenseCodec extends OpackCodec<Reader, Writer> {
             byte nativeType = (byte) reader.readByte();
 
             if (nativeType == CONST_NO_NATIVE_ARRAY) {
-                OpackArray<Object> opackArray = new OpackArray<>(length);
+                OpackArray opackArray = new OpackArray(length);
 
                 decodeContextStack.push(new Object[]{length, 0});
                 decodeStack.push(opackArray);
@@ -703,7 +703,7 @@ public final class DenseCodec extends OpackCodec<Reader, Writer> {
             int index = offset;
 
             if (opackValue instanceof OpackObject) {
-                OpackObject<Object, Object> opackObject = (OpackObject<Object, Object>) opackValue;
+                OpackObject opackObject = (OpackObject) opackValue;
 
                 for (; index < size; index++) {
                     Object key = context[2];
@@ -736,7 +736,7 @@ public final class DenseCodec extends OpackCodec<Reader, Writer> {
                     context[3] = CONTEXT_NULL_OBJECT;
                 }
             } else if (opackValue instanceof OpackArray) {
-                OpackArray<Object> opackArray = (OpackArray<Object>) opackValue;
+                OpackArray opackArray = (OpackArray) opackValue;
 
                 for (; index < size; index++) {
                     Object value = this.decodeBlock(reader);

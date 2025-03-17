@@ -24,7 +24,6 @@ package com.realtimetech.opack.provider;
 
 import com.realtimetech.opack.Opacker;
 import com.realtimetech.opack.bake.BakedType;
-import com.realtimetech.opack.exception.DeserializeException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

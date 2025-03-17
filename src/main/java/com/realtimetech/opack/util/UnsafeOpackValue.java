@@ -31,6 +31,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings("unchecked")
 public class UnsafeOpackValue {
     private static final @NotNull Method OPACK_GETTER_METHOD;
 
@@ -53,8 +54,8 @@ public class UnsafeOpackValue {
      * @throws InvocationTargetException if exception occurs during invoke opack array getter method
      * @throws IllegalAccessException    if the getter method object in opack array is enforcing Java language access control and cannot access that method
      */
-    public static <E> List<E> getList(@NotNull OpackArray<E> opackArray) throws InvocationTargetException, IllegalAccessException {
-        return (List<E>) OPACK_GETTER_METHOD.invoke(opackArray);
+    public static List<Object> getList(@NotNull OpackArray opackArray) throws InvocationTargetException, IllegalAccessException {
+        return (List<Object>) OPACK_GETTER_METHOD.invoke(opackArray);
     }
 
     /**
@@ -65,7 +66,7 @@ public class UnsafeOpackValue {
      * @throws InvocationTargetException if exception occurs during invoke opack map getter method
      * @throws IllegalAccessException    if the getter method object in opack map is enforcing Java language access control and cannot access that method
      */
-    public static <K, V> Map<K, V> getMap(@NotNull OpackObject<K, V> opackObject) throws InvocationTargetException, IllegalAccessException {
-        return (Map<K, V>) OPACK_GETTER_METHOD.invoke(opackObject);
+    public static Map<Object, Object> getMap(@NotNull OpackObject opackObject) throws InvocationTargetException, IllegalAccessException {
+        return (Map<Object, Object>) OPACK_GETTER_METHOD.invoke(opackObject);
     }
 }

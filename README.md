@@ -47,7 +47,7 @@ Gradle:
 
 ```gradle
 dependencies {
-  implementation 'com.realtimetech:opack:0.0.13'
+  implementation 'com.realtimetech:opack:0.1.0'
 }
 ```
 
@@ -57,7 +57,7 @@ Maven:
 <dependency>
     <groupId>com.realtimetech</groupId>
     <artifactId>opack</artifactId>
-    <version>0.0.13</version>
+    <version>0.1.0</version>
 </dependency>
 ```
 

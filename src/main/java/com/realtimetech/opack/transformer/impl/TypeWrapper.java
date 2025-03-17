@@ -52,10 +52,10 @@ public class TypeWrapper {
             return object;
         }
 
-        OpackObject<Object, Object> opackObject = new OpackObject<>();
+        OpackObject opackObject = new OpackObject();
 
         if (object.getClass().isArray()) {
-            OpackArray<Object> opackArray = new OpackArray<>();
+            OpackArray opackArray = new OpackArray();
             int length = Array.getLength(object);
 
             for (int index = 0; index < length; index++) {
@@ -94,7 +94,7 @@ public class TypeWrapper {
             return object;
         }
 
-        OpackObject<Object, Object> opackObject = (OpackObject<Object, Object>) object;
+        OpackObject opackObject = (OpackObject) object;
 
         if (!opackObject.containsKey("type") || !opackObject.containsKey("value")) {
             throw new DeserializeException("Not exists properties in wrapped opack object.");
@@ -117,7 +117,7 @@ public class TypeWrapper {
                     throw new DeserializeException("Expected opack array as a `value` in wrapped object but " + value.getClass().getName() + ".");
                 }
 
-                OpackArray<Object> opackArray = (OpackArray<Object>) value;
+                OpackArray opackArray = (OpackArray) value;
                 Object arrayObject = Array.newInstance(componentType, opackArray.length());
 
                 for (int index = 0; index < opackArray.length(); index++) {
