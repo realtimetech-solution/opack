@@ -311,9 +311,9 @@ public class Opacker {
             OpackValue opackValue;
 
             if (objectType.isArray()) {
-                opackValue = new OpackArray<>(Array.getLength(object));
+                opackValue = new OpackArray(Array.getLength(object));
             } else {
-                opackValue = new OpackObject<>();
+                opackValue = new OpackObject();
             }
 
             if (this.overlapSet.contains(object)) {
@@ -347,7 +347,7 @@ public class Opacker {
             BakedType bakedType = this.typeStack.pop();
 
             if (opackValue instanceof OpackArray) {
-                OpackArray<Object> opackArray = (OpackArray<Object>) opackValue;
+                OpackArray opackArray = (OpackArray) opackValue;
                 int length = Array.getLength(object);
 
                 for (int index = 0; index < length; index++) {
@@ -360,7 +360,7 @@ public class Opacker {
                     }
                 }
             } else if (opackValue instanceof OpackObject) {
-                OpackObject<Object, Object> opackObject = (OpackObject<Object, Object>) opackValue;
+                OpackObject opackObject = (OpackObject) opackValue;
 
                 for (BakedType.Property property : bakedType.getFields()) {
                     try {
@@ -508,7 +508,7 @@ public class Opacker {
                 int dimensions = ReflectionUtil.getArrayDimension(goalType);
 
                 if (dimensions == 1 && object instanceof OpackArray) {
-                    OpackArray<?> opackArray = (OpackArray<?>) object;
+                    OpackArray opackArray = (OpackArray) object;
                     Class<?> componentType = goalType.getComponentType();
 
                     try {
@@ -526,7 +526,7 @@ public class Opacker {
 
                 if (goalType.isArray()) {
                     if (object instanceof OpackArray) {
-                        OpackArray<?> opackArray = (OpackArray<?>) object;
+                        OpackArray opackArray = (OpackArray) object;
 
                         targetObject = Array.newInstance(goalType.getComponentType(), opackArray.length());
                     } else {
@@ -534,7 +534,7 @@ public class Opacker {
                     }
                 } else {
                     if (object instanceof OpackObject) {
-                        OpackObject<?, ?> opackObject = (OpackObject<?, ?>) object;
+                        OpackObject opackObject = (OpackObject) object;
 
                         try {
                             targetObject = ReflectionUtil.createInstanceUnsafe(goalType);
@@ -574,7 +574,7 @@ public class Opacker {
             BakedType bakedType = this.typeStack.pop();
 
             if (opackValue instanceof OpackArray) {
-                OpackArray<Object> opackArray = (OpackArray<Object>) opackValue;
+                OpackArray opackArray = (OpackArray) opackValue;
                 Class<?> componentType = object.getClass().getComponentType();
                 int length = opackArray.length();
 
@@ -594,7 +594,7 @@ public class Opacker {
                     }
                 }
             } else if (opackValue instanceof OpackObject) {
-                OpackObject<Object, Object> opackObject = (OpackObject<Object, Object>) opackValue;
+                OpackObject opackObject = (OpackObject) opackValue;
                 for (BakedType.Property property : bakedType.getFields()) {
                     String propertyName = property.getName();
 

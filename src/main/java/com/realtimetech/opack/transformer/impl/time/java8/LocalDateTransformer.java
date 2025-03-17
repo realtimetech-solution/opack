@@ -71,13 +71,13 @@ public class LocalDateTransformer implements Transformer {
     @Override
     public @Nullable Object deserialize(@NotNull Opacker opacker, @NotNull Class<?> goalType, @Nullable Object object) throws DeserializeException {
         if (object instanceof OpackArray) {
-            OpackArray<Integer> opackArray = (OpackArray<Integer>) object;
+            OpackArray opackArray = (OpackArray) object;
 
             if (opackArray.length() == 3) {
                 return LocalDate.of(
-                        opackArray.get(0),
-                        opackArray.get(1),
-                        opackArray.get(2)
+                        opackArray.getAsInt(0),
+                        opackArray.getAsInt(1),
+                        opackArray.getAsInt(2)
                 );
             }
         }

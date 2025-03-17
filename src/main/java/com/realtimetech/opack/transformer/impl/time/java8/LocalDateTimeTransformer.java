@@ -75,17 +75,17 @@ public class LocalDateTimeTransformer implements Transformer {
     @Override
     public @Nullable Object deserialize(@NotNull Opacker opacker, @NotNull Class<?> goalType, @Nullable Object object) throws DeserializeException {
         if (object instanceof OpackArray) {
-            OpackArray<Integer> opackArray = (OpackArray<Integer>) object;
+            OpackArray opackArray = (OpackArray) object;
 
             if (opackArray.length() == 7) {
                 return LocalDateTime.of(
-                        opackArray.get(0),
-                        opackArray.get(1),
-                        opackArray.get(2),
-                        opackArray.get(3),
-                        opackArray.get(4),
-                        opackArray.get(5),
-                        opackArray.get(6)
+                        opackArray.getAsInt(0),
+                        opackArray.getAsInt(1),
+                        opackArray.getAsInt(2),
+                        opackArray.getAsInt(3),
+                        opackArray.getAsInt(4),
+                        opackArray.getAsInt(5),
+                        opackArray.getAsInt(6)
                 );
             }
         }

@@ -49,7 +49,7 @@ public class MapTransformer extends DataStructureTransformer {
     public @Nullable Object serialize(@NotNull Opacker opacker, @NotNull Class<?> originalType, @Nullable Object object) throws SerializeException {
         if (object instanceof Map) {
             Map<?, ?> map = (Map<?, ?>) object;
-            OpackObject<Object, Object> opackObject = new OpackObject<>(map.size());
+            OpackObject opackObject = new OpackObject(map.size());
 
             for (Object element : map.keySet()) {
                 Object keyObject = element;
@@ -79,7 +79,7 @@ public class MapTransformer extends DataStructureTransformer {
     @Override
     public @Nullable Object deserialize(@NotNull Opacker opacker, @NotNull Class<?> goalType, @Nullable Object object) throws DeserializeException {
         if (object instanceof OpackObject) {
-            OpackObject<Object, Object> opackObject = (OpackObject<Object, Object>) object;
+            OpackObject opackObject = (OpackObject) object;
             if (Map.class.isAssignableFrom(goalType)) {
                 try {
                     Map<Object, Object> map = (Map<Object, Object>) ReflectionUtil.createInstance(goalType);

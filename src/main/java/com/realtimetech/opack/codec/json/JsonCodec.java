@@ -526,7 +526,7 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
             if (objectType == char[].class) {
                 writer.write((char[]) object);
             } else if (objectType == OpackObject.class) {
-                OpackObject<Object, Object> opackObject = (OpackObject<Object, Object>) object;
+                OpackObject opackObject = (OpackObject) object;
                 Map<Object, Object> opackObjectMap = null;
 
                 try {
@@ -601,7 +601,7 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
                     index++;
                 }
             } else if (objectType == OpackArray.class) {
-                OpackArray<Object> opackArray = (OpackArray<Object>) object;
+                OpackArray opackArray = (OpackArray) object;
                 int size = opackArray.length();
                 List<Object> opackArrayList = null;
 
@@ -722,14 +722,14 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
                  */
                 case '{':
                     currentContextIndex = this.decodeBaseStack.push(this.decodeValueStack.getSize());
-                    currentContext = this.decodeValueStack.push(new OpackObject<>());
+                    currentContext = this.decodeValueStack.push(new OpackObject());
                     currentContextType = currentContext.getClass();
                     literalMode = true;
 
                     break;
                 case '[':
                     currentContextIndex = this.decodeBaseStack.push(this.decodeValueStack.getSize());
-                    currentContext = this.decodeValueStack.push(new OpackArray<>());
+                    currentContext = this.decodeValueStack.push(new OpackArray());
                     currentContextType = currentContext.getClass();
                     literalMode = true;
 
@@ -739,7 +739,7 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
                     int valueSize = this.decodeValueStack.getSize() - currentContextIndex - 1;
 
                     if (currentContextType == OpackObject.class) {
-                        OpackObject<Object, Object> opackObject = (OpackObject<Object, Object>) currentContext;
+                        OpackObject opackObject = (OpackObject) currentContext;
 
                         Map<Object, Object> opackObjectMap = null;
 
@@ -761,7 +761,7 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
                             }
                         }
                     } else if (currentContextType == OpackArray.class) {
-                        OpackArray<Object> opackArray = (OpackArray<Object>) currentContext;
+                        OpackArray opackArray = (OpackArray) currentContext;
                         int currentSize = this.decodeValueStack.getSize();
 
                         List<Object> opackArrayList = null;

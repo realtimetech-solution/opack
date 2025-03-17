@@ -42,7 +42,7 @@ public class OpackArrayConverter {
      * @throws IllegalAccessException    if the getter method object in opack array is enforcing Java language access control and cannot access that method.
      * @throws IllegalArgumentException  if component type is now allowed or invalid
      */
-    public static @NotNull Object convertToArray(@NotNull Class<?> componentType, @NotNull OpackArray<?> opackArray) throws InvocationTargetException, IllegalAccessException {
+    public static @NotNull Object convertToArray(@NotNull Class<?> componentType, @NotNull OpackArray opackArray) throws InvocationTargetException, IllegalAccessException {
         if (!OpackValue.isAllowType(componentType)) {
             throw new IllegalArgumentException(componentType + " type is not allowed");
         }
