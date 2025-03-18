@@ -102,7 +102,7 @@ public class FastStack<T> {
      * @param index the index of the element to return
      * @return the found element
      */
-    public @NotNull T get(int index) {
+    public T get(int index) {
         return this.objects[index];
     }
 

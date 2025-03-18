@@ -109,7 +109,7 @@ public class Usage {
                 .setEncodeStringBufferSize(1024)            // (Optional) Creation size of stack for processing
                 .setDecodeStackInitialSize(128)             // (Optional) Creation size of stack for processing
 
-                .setAllowOpackValueToKeyValue(false)        // (Optional) Accepts Object or Array as Key of Json Object
+                .setAllowAnyValueToKey(false)               // (Optional) Accepts non-string value as Key of Json Object
                 .setEnableConvertCharacterToString(false)   // (Optional) Convert character to string instead of character int value
                 .setUsePrettyFormat(false)                  // (Optional) When encoding, it prints formatted
 

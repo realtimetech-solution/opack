@@ -35,6 +35,9 @@ import com.realtimetech.opack.value.OpackValue;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
 public class JsonTest {
     @Test
     public void object_to_string_to_object() throws DecodeException, EncodeException {
@@ -135,7 +138,9 @@ public class JsonTest {
     @Test
     public void with_object() throws DecodeException, EncodeException, SerializeException, DeserializeException, OpackAssert.AssertException {
         Opacker opacker = new Opacker.Builder().create();
-        JsonCodec jsonCodec = new JsonCodec.Builder().create();
+        JsonCodec jsonCodec = new JsonCodec.Builder()
+                .setEnableConvertCharacterToString(false)
+                .create();
 
         ComplexTest.ComplexClass originalObject = new ComplexTest.ComplexClass();
         OpackValue serialized = opacker.serialize(originalObject);
@@ -144,5 +149,32 @@ public class JsonTest {
         ComplexTest.ComplexClass deserialized = opacker.deserialize(ComplexTest.ComplexClass.class, decoded);
 
         OpackAssert.assertEquals(originalObject, deserialized);
+    }
+
+    @Test
+    public void with_long_miss_double_cause_big_decimal() throws DecodeException, EncodeException, SerializeException, DeserializeException, OpackAssert.AssertException {
+        JsonCodec jsonCodec = new JsonCodec.Builder().create();
+
+        OpackObject originalObject = new OpackObject();
+        originalObject.put("long", -5026738480679942478L);
+
+        String encoded = jsonCodec.encode(originalObject);
+        OpackValue decodedObject = jsonCodec.decode(encoded);
+
+        OpackAssert.assertEquals(originalObject, decodedObject);
+    }
+
+    @Test
+    public void with_big_integer_decimal() throws DecodeException, EncodeException, SerializeException, DeserializeException, OpackAssert.AssertException {
+        JsonCodec jsonCodec = new JsonCodec.Builder().create();
+
+        OpackObject originalObject = new OpackObject();
+        originalObject.put("big_integer", new BigInteger("1" + Long.MAX_VALUE));
+        originalObject.put("big_decimal", new BigDecimal("1e400"));
+
+        String encoded = jsonCodec.encode(originalObject);
+        OpackValue decodedObject = jsonCodec.decode(encoded);
+
+        OpackAssert.assertEquals(originalObject, decodedObject);
     }
 }

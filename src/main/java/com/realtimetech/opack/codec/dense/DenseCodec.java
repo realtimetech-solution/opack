@@ -129,7 +129,7 @@ public final class DenseCodec extends OpackCodec<Reader, Writer> {
 
     private final @NotNull FastStack<@Nullable Object> encodeStack;
 
-    private final @NotNull FastStack<@NotNull OpackValue> decodeStack;
+    private final @NotNull FastStack<@Nullable Object> decodeStack;
     private final @NotNull FastStack<@NotNull Object @NotNull []> decodeContextStack;
 
     private final boolean ignoreVersionCompare;
@@ -153,17 +153,17 @@ public final class DenseCodec extends OpackCodec<Reader, Writer> {
     /**
      * Encodes the OpackValue to bytes through dense codec
      *
-     * @param writer     the writer to write the encoded data
-     * @param opackValue the OpackValue to encode
+     * @param writer the writer to write the encoded data
+     * @param input  the input object to encode
      * @throws IOException              if an I/O error occurs when writing to byte stream
      * @throws IllegalArgumentException if the type of data to be encoded is not allowed in dense format
      */
     @Override
-    protected void doEncode(@NotNull Writer writer, @NotNull OpackValue opackValue) throws IOException {
+    protected void encodeObject(@NotNull Writer writer, @Nullable Object input) throws IOException {
         writer.writeBytes(CONST_DENSE_CODEC_CLASSIFIER);
         writer.writeBytes(CONST_DENSE_CODEC_VERSION);
 
-        this.encodeStack.push(opackValue);
+        this.encodeStack.push(input);
 
         while (!this.encodeStack.isEmpty()) {
             Object object = this.encodeStack.pop();
@@ -669,7 +669,7 @@ public final class DenseCodec extends OpackCodec<Reader, Writer> {
      * @throws IllegalArgumentException if the decoded value is not a opack value
      */
     @Override
-    protected @NotNull OpackValue doDecode(@NotNull Reader reader) throws IOException {
+    protected @Nullable Object decodeObject(@NotNull Reader reader) throws IOException {
         byte[] classifier = new byte[CONST_DENSE_CODEC_CLASSIFIER.length];
         reader.readBytes(classifier);
 
@@ -689,11 +689,15 @@ public final class DenseCodec extends OpackCodec<Reader, Writer> {
         this.decodeStack.reset();
         this.decodeContextStack.reset();
 
-        this.decodeBlock(reader);
-        OpackValue rootValue = this.decodeStack.peek();
+        Object decodeResult = this.decodeBlock(reader);
+        Object rootValue = this.decodeStack.peek();
+
+        if (decodeResult != CONTEXT_BRANCH_CONTEXT_OBJECT) {
+            return rootValue;
+        }
 
         while (!this.decodeStack.isEmpty()) {
-            OpackValue opackValue = this.decodeStack.peek();
+            Object currentValue = this.decodeStack.peek();
             Object[] context = this.decodeContextStack.peek();
 
             Integer size = (Integer) context[0];
@@ -702,8 +706,8 @@ public final class DenseCodec extends OpackCodec<Reader, Writer> {
             boolean bypass = false;
             int index = offset;
 
-            if (opackValue instanceof OpackObject) {
-                OpackObject opackObject = (OpackObject) opackValue;
+            if (currentValue instanceof OpackObject) {
+                OpackObject opackObject = (OpackObject) currentValue;
 
                 for (; index < size; index++) {
                     Object key = context[2];
@@ -735,8 +739,8 @@ public final class DenseCodec extends OpackCodec<Reader, Writer> {
                     context[2] = CONTEXT_NULL_OBJECT;
                     context[3] = CONTEXT_NULL_OBJECT;
                 }
-            } else if (opackValue instanceof OpackArray) {
-                OpackArray opackArray = (OpackArray) opackValue;
+            } else if (currentValue instanceof OpackArray) {
+                OpackArray opackArray = (OpackArray) currentValue;
 
                 for (; index < size; index++) {
                     Object value = this.decodeBlock(reader);
@@ -752,7 +756,7 @@ public final class DenseCodec extends OpackCodec<Reader, Writer> {
                     }
                 }
             } else {
-                throw new IllegalArgumentException(opackValue.getClass() + " is not a type of opack value. (unknown opack value type)");
+                throw new IllegalArgumentException(currentValue.getClass() + " is not a type of opack value. (unknown opack value type)");
             }
 
             if (!bypass) {

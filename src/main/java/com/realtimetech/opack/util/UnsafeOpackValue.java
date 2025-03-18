@@ -39,7 +39,7 @@ public class UnsafeOpackValue {
         Method method;
         try {
             method = Class.forName("com.realtimetech.opack.value.AbstractOpackValue").getDeclaredMethod("get");
-        } catch (NoSuchMethodException | ClassNotFoundException e) {
+        } catch (NoSuchMethodException | ClassNotFoundException exception) {
             throw new ExceptionInInitializerError("No getter method found in OpackValue.");
         }
         OPACK_GETTER_METHOD = method;

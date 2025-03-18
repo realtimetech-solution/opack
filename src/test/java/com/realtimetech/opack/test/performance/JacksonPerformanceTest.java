@@ -49,7 +49,9 @@ public class JacksonPerformanceTest {
             Opack Contexts
          */
         Opacker opacker = new Opacker.Builder().create();
-        JsonCodec jsonCodec = new JsonCodec.Builder().create();
+        JsonCodec jsonCodec = new JsonCodec.Builder()
+                .setEnableConvertCharacterToString(false)
+                .create();
 
         int warmLoop = 128;
         int loop = 256;
