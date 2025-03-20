@@ -53,6 +53,7 @@ dependencies {
 Maven:
 
 ```xml
+
 <dependency>
     <groupId>com.realtimetech</groupId>
     <artifactId>opack</artifactId>
@@ -186,7 +187,7 @@ public class SomeObject {
     // This field will serialize/deserialize to explicit type `ArrayList` instead of ambiguous field type `List`
     @Type(ArrayList.class)
     private List<String> listField;
- 
+
     // This field will serialize/deserialize to `newFieldName` name instead of actual field name `oldFieldName`
     @Name("newFieldName")
     private String oldFieldName;

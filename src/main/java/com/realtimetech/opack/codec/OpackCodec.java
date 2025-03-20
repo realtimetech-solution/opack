@@ -123,7 +123,7 @@ public abstract class OpackCodec<I, O> {
      * @param opackValue the opack value to encode
      * @throws EncodeException if a problem occurs during encoding, if the type of data to be encoded is not allowed in specific codec
      */
-    @Deprecated(forRemoval=true)
+    @Deprecated(forRemoval = true)
     public final synchronized void encode(@NotNull O output, @NotNull OpackValue opackValue) throws EncodeException {
         try {
             this.encodeObject(output, opackValue);
@@ -139,7 +139,7 @@ public abstract class OpackCodec<I, O> {
      * @return decoded value
      * @throws DecodeException if a problem occurs during decoding, if the type of data to be decoded is not allowed in specific codec
      */
-    @Deprecated(forRemoval=true)
+    @Deprecated(forRemoval = true)
     public final synchronized OpackValue decode(@NotNull I input) throws DecodeException {
         try {
             Object decodedObject = this.decodeObject(input);
