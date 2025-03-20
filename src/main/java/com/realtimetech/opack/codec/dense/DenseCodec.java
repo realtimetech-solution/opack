@@ -217,7 +217,7 @@ public final class DenseCodec extends OpackCodec<Reader, Writer> {
      * @throws EncodeException if a problem occurs during encoding
      */
     @Override
-    protected void encodeObject(@NotNull Writer writer, @Nullable Object object) throws EncodeException {
+    public synchronized void encodeObject(@NotNull Writer writer, @Nullable Object object) throws EncodeException {
         try {
             writer.writeBytes(CONST_DENSE_CODEC_CLASSIFIER);
             writer.writeBytes(CONST_DENSE_CODEC_VERSION);
@@ -527,7 +527,7 @@ public final class DenseCodec extends OpackCodec<Reader, Writer> {
      * @return the decoded result
      * @throws DecodeException if a problem occurs during decoding, if the type of data to be decoded is not allowed in a specific codec
      */
-    public @NotNull OpackValue decode(byte @NotNull [] bytes) throws DecodeException {
+    public synchronized @NotNull OpackValue decode(byte @NotNull [] bytes) throws DecodeException {
         ByteArrayReader byteArrayReader = new ByteArrayReader(bytes);
 
         return this.decode(byteArrayReader);
@@ -540,7 +540,7 @@ public final class DenseCodec extends OpackCodec<Reader, Writer> {
      * @return the decoded result
      * @throws DecodeException if a problem occurs during decoding, if the type of data to be decoded is not allowed in a specific codec
      */
-    public @Nullable Object decodeObject(byte @NotNull [] bytes) throws DecodeException {
+    public synchronized @Nullable Object decodeObject(byte @NotNull [] bytes) throws DecodeException {
         ByteArrayReader byteArrayReader = new ByteArrayReader(bytes);
 
         return this.decodeObject(byteArrayReader);
@@ -555,7 +555,7 @@ public final class DenseCodec extends OpackCodec<Reader, Writer> {
      * @throws DecodeException if a problem occurs during decoding
      */
     @Override
-    protected @Nullable Object decodeObject(@NotNull Reader reader) throws DecodeException {
+    public synchronized @Nullable Object decodeObject(@NotNull Reader reader) throws DecodeException {
         try {
             byte[] classifier = new byte[CONST_DENSE_CODEC_CLASSIFIER.length];
             reader.readBytes(classifier);

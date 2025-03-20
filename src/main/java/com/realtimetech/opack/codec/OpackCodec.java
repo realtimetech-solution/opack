@@ -47,7 +47,7 @@ public abstract class OpackCodec<I, Writer> {
      * @param object the object to encode
      * @throws EncodeException if a problem occurs during encoding
      */
-    protected abstract void encodeObject(@NotNull Writer writer, @Nullable Object object) throws EncodeException;
+    public abstract void encodeObject(@NotNull Writer writer, @Nullable Object object) throws EncodeException;
 
     /**
      * Decodes the input through a codec into {@link OpackValue OpackValue}
@@ -73,5 +73,5 @@ public abstract class OpackCodec<I, Writer> {
      * @return the decoded result
      * @throws DecodeException if a problem occurs during decoding
      */
-    protected abstract @Nullable Object decodeObject(@NotNull I input) throws DecodeException;
+    public abstract @Nullable Object decodeObject(@NotNull I input) throws DecodeException;
 }

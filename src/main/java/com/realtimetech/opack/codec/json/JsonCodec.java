@@ -369,7 +369,7 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
      * @throws EncodeException if a problem occurs during encoding
      */
     @Override
-    protected void encodeObject(@NotNull Writer writer, @Nullable Object object) throws EncodeException {
+    public synchronized void encodeObject(@NotNull Writer writer, @Nullable Object object) throws EncodeException {
         try {
             this.encodeLiteralStringWriter.reset();
             this.encodeStack.reset();
@@ -865,7 +865,7 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
      * @throws DecodeException if a problem occurs during decoding
      */
     @Override
-    protected @Nullable Object decodeObject(@NotNull String input) throws DecodeException {
+    public synchronized @Nullable Object decodeObject(@NotNull String input) throws DecodeException {
         this.decodeBaseStack.reset();
         this.decodeValueStack.reset();
         this.decodeStringWriter.reset();
