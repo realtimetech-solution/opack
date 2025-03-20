@@ -39,106 +39,108 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class KryoPerformanceTest {
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     @Test
-    public void kryo_bytes() throws Exception {
+    public void kryo_bytes() {
         PerformanceClass performanceClass = new PerformanceClass();
 
         /*
             Kryo Contexts
          */
         Kryo kryo = new Kryo();
-        ByteBufferOutput byteBufferOutput = new ByteBufferOutput(4096 * 256);
 
-        kryo.register(PerformanceClass.class);
-        kryo.register(ObjectTest.SubObjectClass.class);
+        try (ByteBufferOutput byteBufferOutput = new ByteBufferOutput(4096 * 256)) {
+            kryo.register(PerformanceClass.class);
+            kryo.register(ObjectTest.SubObjectClass.class);
 
-        kryo.register(ObjectTest.ObjectClass.class);
-        kryo.register(ObjectTest.ObjectClass[].class);
+            kryo.register(ObjectTest.ObjectClass.class);
+            kryo.register(ObjectTest.ObjectClass[].class);
 
-        kryo.register(WrapperTest.WrapperClass.class);
-        kryo.register(WrapperTest.WrapperClass[].class);
+            kryo.register(WrapperTest.WrapperClass.class);
+            kryo.register(WrapperTest.WrapperClass[].class);
 
-        kryo.register(WrapperArrayTest.WrapperArrayClass.class);
-        kryo.register(WrapperArrayTest.WrapperArrayClass[].class);
+            kryo.register(WrapperArrayTest.WrapperArrayClass.class);
+            kryo.register(WrapperArrayTest.WrapperArrayClass[].class);
 
-        kryo.register(PrimitiveTest.PrimitiveClass.class);
-        kryo.register(PrimitiveTest.PrimitiveClass[].class);
+            kryo.register(PrimitiveTest.PrimitiveClass.class);
+            kryo.register(PrimitiveTest.PrimitiveClass[].class);
 
-        kryo.register(PrimitiveArrayTest.PrimitiveArrayClass.class);
-        kryo.register(PrimitiveArrayTest.PrimitiveArrayClass[].class);
+            kryo.register(PrimitiveArrayTest.PrimitiveArrayClass.class);
+            kryo.register(PrimitiveArrayTest.PrimitiveArrayClass[].class);
 
-        kryo.register(StringTest.StringClass.class);
-        kryo.register(StringTest.StringClass[].class);
+            kryo.register(StringTest.StringClass.class);
+            kryo.register(StringTest.StringClass[].class);
 
-        kryo.register(boolean[].class);
-        kryo.register(byte[].class);
-        kryo.register(char[].class);
-        kryo.register(double[].class);
-        kryo.register(float[].class);
-        kryo.register(int[].class);
-        kryo.register(long[].class);
-        kryo.register(short[].class);
+            kryo.register(boolean[].class);
+            kryo.register(byte[].class);
+            kryo.register(char[].class);
+            kryo.register(double[].class);
+            kryo.register(float[].class);
+            kryo.register(int[].class);
+            kryo.register(long[].class);
+            kryo.register(short[].class);
 
-        kryo.register(Boolean[].class);
-        kryo.register(Byte[].class);
-        kryo.register(Character[].class);
-        kryo.register(Double[].class);
-        kryo.register(Float[].class);
-        kryo.register(Integer[].class);
-        kryo.register(Long[].class);
-        kryo.register(Short[].class);
+            kryo.register(Boolean[].class);
+            kryo.register(Byte[].class);
+            kryo.register(Character[].class);
+            kryo.register(Double[].class);
+            kryo.register(Float[].class);
+            kryo.register(Integer[].class);
+            kryo.register(Long[].class);
+            kryo.register(Short[].class);
 
         /*
             Opack Contexts
          */
-        Opacker opacker = new Opacker.Builder().create();
-        ByteArrayWriter byteArrayWriter = new ByteArrayWriter();
-        DenseCodec denseCodec = new DenseCodec.Builder().create();
+            Opacker opacker = new Opacker.Builder().create();
+            ByteArrayWriter byteArrayWriter = new ByteArrayWriter();
+            DenseCodec denseCodec = new DenseCodec.Builder().create();
 
-        int warmLoop = 512;
-        int loop = 512 * 2;
+            int warmLoop = 512;
+            int loop = 512 * 2;
 
-        PerformanceClass.ExceptionRunnable kryoRunnable = () -> {
-            byteBufferOutput.reset();
+            PerformanceClass.ExceptionRunnable kryoRunnable = () -> {
+                byteBufferOutput.reset();
 
-            kryo.writeObject(byteBufferOutput, performanceClass);
-            byte[] encode = byteBufferOutput.toBytes();
-            PerformanceClass deserialize = kryo.readObject(new ByteBufferInput(encode), PerformanceClass.class);
+                kryo.writeObject(byteBufferOutput, performanceClass);
+                byte[] encode = byteBufferOutput.toBytes();
+                PerformanceClass deserialize = kryo.readObject(new ByteBufferInput(encode), PerformanceClass.class);
 
-            assert deserialize != null;
+                assert deserialize != null;
 
-            deserialize.hashCode();
-        };
-        PerformanceClass.ExceptionRunnable opackRunnable = () -> {
-            byteArrayWriter.reset();
+                deserialize.hashCode();
+            };
+            PerformanceClass.ExceptionRunnable opackRunnable = () -> {
+                byteArrayWriter.reset();
 
-            OpackValue serialize = opacker.serialize(performanceClass);
+                OpackValue serialize = opacker.serialize(performanceClass);
 
-            assert serialize != null;
+                assert serialize != null;
 
-            denseCodec.encode(byteArrayWriter, serialize);
-            byte[] encode = byteArrayWriter.toByteArray();
-            OpackValue decode = denseCodec.decode(encode);
-            PerformanceClass deserialize = opacker.deserialize(PerformanceClass.class, decode);
+                denseCodec.encode(byteArrayWriter, serialize);
+                byte[] encode = byteArrayWriter.toByteArray();
+                OpackValue decode = denseCodec.decode(encode);
+                PerformanceClass deserialize = opacker.deserialize(PerformanceClass.class, decode);
 
-            assert deserialize != null;
+                assert deserialize != null;
 
-            deserialize.hashCode();
-        };
+                deserialize.hashCode();
+            };
 
-        // Warm up!
-        PerformanceClass.measureRunningTime(warmLoop, kryoRunnable);
-        PerformanceClass.measureRunningTime(warmLoop, opackRunnable);
+            // Warm up!
+            PerformanceClass.measureRunningTime(warmLoop, kryoRunnable);
+            PerformanceClass.measureRunningTime(warmLoop, opackRunnable);
 
-        long kryoTime = PerformanceClass.measureRunningTime(loop, kryoRunnable);
-        long opackTime = PerformanceClass.measureRunningTime(loop, opackRunnable);
+            long kryoTime = PerformanceClass.measureRunningTime(loop, kryoRunnable);
+            long opackTime = PerformanceClass.measureRunningTime(loop, opackRunnable);
 
-        System.out.println("# " + this.getClass().getSimpleName());
-        System.out.println("\tKryo \t: " + kryoTime + "ms");
-        System.out.println("\tOpack\t: " + opackTime + "ms");
+            System.out.println("# " + this.getClass().getSimpleName());
+            System.out.println("\tKryo \t: " + kryoTime + "ms");
+            System.out.println("\tOpack\t: " + opackTime + "ms");
 
-        if (opackTime > kryoTime) {
-            Assertions.fail("Opack must faster then kryo");
+            if (opackTime > kryoTime) {
+                Assertions.fail("Opack must faster then kryo");
+            }
         }
     }
 }

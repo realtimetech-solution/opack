@@ -36,10 +36,11 @@ import java.util.Random;
 public class EnumTest {
     static final Random RANDOM = new Random();
 
-    public static enum EnumData {
+    public enum EnumData {
         TYPE_A, TYPE_B, TYPE_1, TYPE_2
     }
 
+    @SuppressWarnings("ALL")
     public static class EnumClass {
         private EnumData enumData;
 
@@ -55,6 +56,7 @@ public class EnumTest {
             EnumTest.EnumClass originalObject = new EnumTest.EnumClass();
 
             OpackValue serialized = opacker.serialize(originalObject);
+            assert serialized != null;
             Assertions.assertEquals(((OpackObject) serialized).get("enumData"), originalObject.enumData.toString());
             EnumTest.EnumClass deserialized = opacker.deserialize(EnumTest.EnumClass.class, serialized);
 
@@ -65,6 +67,7 @@ public class EnumTest {
             EnumTest.EnumClass originalObject = new EnumTest.EnumClass();
 
             OpackValue serialized = opacker.serialize(originalObject);
+            assert serialized != null;
             Assertions.assertEquals(((OpackObject) serialized).get("enumData"), originalObject.enumData.ordinal());
             EnumTest.EnumClass deserialized = opacker.deserialize(EnumTest.EnumClass.class, serialized);
 

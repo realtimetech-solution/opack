@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MapTest {
+    @SuppressWarnings("ALL")
     public static class MapClass {
         private HashMap<String, String> hashMapValue;
 
@@ -63,6 +64,7 @@ public class MapTest {
         MapClass originalObject = new MapClass();
 
         OpackValue serialized = opacker.serialize(originalObject);
+        assert serialized != null;
         MapClass deserialized = opacker.deserialize(MapClass.class, serialized);
 
         OpackAssert.assertEquals(originalObject, deserialized);

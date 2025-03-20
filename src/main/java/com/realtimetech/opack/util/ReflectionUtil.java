@@ -72,41 +72,47 @@ public class ReflectionUtil {
             final Method allocateMethod = unsafeClass.getMethod("allocateInstance", Class.class);
             return new Allocator() {
                 @Override
-                public <T> T allocate(Class<T> typeClass) throws InvocationTargetException, IllegalAccessException {
+                public <T> @NotNull T allocate(@NotNull Class<T> typeClass) throws InvocationTargetException, IllegalAccessException {
                     return typeClass.cast(allocateMethod.invoke(unsafeObject, typeClass));
                 }
             };
         } catch (Exception exception) {
+            // Ignore exception
         }
 
         // for DalvikVM (> 2.3)
         try {
+            //noinspection JavaReflectionMemberAccess
             final Method getterMethod = ObjectStreamClass.class.getDeclaredMethod("getConstructorId", Class.class);
             getterMethod.setAccessible(true);
 
             final int constructorId = (Integer) getterMethod.invoke(null, Object.class);
+            //noinspection JavaReflectionMemberAccess
             final Method allocateMethod = ObjectStreamClass.class.getDeclaredMethod("newInstance", Class.class, int.class);
             allocateMethod.setAccessible(true);
             return new Allocator() {
                 @Override
-                public <T> T allocate(Class<T> typeClass) throws InvocationTargetException, IllegalAccessException {
+                public <T> @NotNull T allocate(@NotNull Class<T> typeClass) throws InvocationTargetException, IllegalAccessException {
                     return typeClass.cast(allocateMethod.invoke(null, typeClass, constructorId));
                 }
             };
         } catch (Exception exception) {
+            // Ignore exception
         }
 
         // for DalvikVM (< 2.3)
         try {
+            //noinspection JavaReflectionMemberAccess
             final Method allocateMethod = ObjectInputStream.class.getDeclaredMethod("newInstance", Class.class, Class.class);
             allocateMethod.setAccessible(true);
             return new Allocator() {
                 @Override
-                public <T> T allocate(Class<T> typeClass) throws InvocationTargetException, IllegalAccessException {
+                public <T> @NotNull T allocate(@NotNull Class<T> typeClass) throws InvocationTargetException, IllegalAccessException {
                     return typeClass.cast(allocateMethod.invoke(null, typeClass, Object.class));
                 }
             };
         } catch (Exception exception) {
+            // Ignore exception
         }
 
         return null;
@@ -233,6 +239,7 @@ public class ReflectionUtil {
 
         int length = Array.getLength(array);
         Object newArray = Array.newInstance(array.getClass().getComponentType(), length);
+        //noinspection SuspiciousSystemArraycopy
         System.arraycopy(array, 0, newArray, 0, length);
 
         return newArray;

@@ -35,6 +35,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class ListTest {
+    @SuppressWarnings("ALL")
     public static class ListClass {
         private LinkedList<String> linkedListValue;
 
@@ -64,6 +65,7 @@ public class ListTest {
         ListClass originalObject = new ListClass();
 
         OpackValue serialized = opacker.serialize(originalObject);
+        assert serialized != null;
         ListClass deserialized = opacker.deserialize(ListClass.class, serialized);
 
         OpackAssert.assertEquals(originalObject, deserialized);

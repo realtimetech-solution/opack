@@ -33,12 +33,10 @@ import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 import java.util.TreeMap;
 
 public class WrapMapElementTest {
-    static final Random RANDOM = new Random();
-
+    @SuppressWarnings("ALL")
     public static class WrapMapClass {
         private HashMap<Object, Object> wrappedTypeMap;
 
@@ -84,9 +82,7 @@ public class WrapMapElementTest {
 
     @Test
     public void testWithNoWrapMapTransformer() {
-        Assertions.assertThrows(OpackAssert.AssertException.class, () -> {
-            this.common(false);
-        });
+        Assertions.assertThrows(OpackAssert.AssertException.class, () -> this.common(false));
     }
 
     private void common(boolean enableWrapMapElementType) throws SerializeException, DeserializeException, OpackAssert.AssertException {

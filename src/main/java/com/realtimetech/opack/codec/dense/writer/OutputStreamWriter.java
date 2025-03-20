@@ -67,7 +67,7 @@ public class OutputStreamWriter implements Writer {
      */
     public void writeChar(char value) throws IOException {
         this.outputStream.write((byte) ((value >> 8) & 0xff));
-        this.outputStream.write((byte) ((value >> 0) & 0xff));
+        this.outputStream.write((byte) ((value) & 0xff));
     }
 
     /**
@@ -78,7 +78,7 @@ public class OutputStreamWriter implements Writer {
      */
     public void writeShort(short value) throws IOException {
         this.outputStream.write((byte) ((value >> 8) & 0xff));
-        this.outputStream.write((byte) ((value >> 0) & 0xff));
+        this.outputStream.write((byte) ((value) & 0xff));
     }
 
     /**
@@ -91,7 +91,7 @@ public class OutputStreamWriter implements Writer {
         this.outputStream.write((byte) ((value >> 24) & 0xff));
         this.outputStream.write((byte) ((value >> 16) & 0xff));
         this.outputStream.write((byte) ((value >> 8) & 0xff));
-        this.outputStream.write((byte) ((value >> 0) & 0xff));
+        this.outputStream.write((byte) ((value) & 0xff));
     }
 
     /**
@@ -118,7 +118,7 @@ public class OutputStreamWriter implements Writer {
         this.outputStream.write((byte) ((value >> 24) & 0xff));
         this.outputStream.write((byte) ((value >> 16) & 0xff));
         this.outputStream.write((byte) ((value >> 8) & 0xff));
-        this.outputStream.write((byte) ((value >> 0) & 0xff));
+        this.outputStream.write((byte) ((value) & 0xff));
     }
 
     /**

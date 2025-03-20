@@ -65,10 +65,10 @@ abstract class AbstractOpackValue<T> implements OpackValue {
     }
 
     /**
-     * Returns a string representation of the underlying object of opack value
+     * Returns a string representation of opack value
      *
      * @param value the underlying object of opack value
-     * @return a string representation of the underlying object of opack value
+     * @return a string representation of opack value
      */
     protected abstract String toString(T value);
 

@@ -32,6 +32,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class GsonPerformanceTest {
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     @Test
     public void gson_json() {
         PerformanceClass performanceClass = new PerformanceClass();
@@ -45,7 +46,9 @@ public class GsonPerformanceTest {
             Opack Contexts
          */
         Opacker opacker = new Opacker.Builder().create();
-        JsonCodec jsonCodec = new JsonCodec.Builder().create();
+        JsonCodec jsonCodec = new JsonCodec.Builder()
+                .setEnableConvertCharacterToString(false)
+                .create();
 
         int warmLoop = 64;
         int loop = 128;

@@ -78,7 +78,13 @@ public final class NativeList implements List<Object> {
      */
     @Override
     public boolean contains(Object o) {
-            return this.indexOf(o) != -1;
+        for (int i = 0; i < this.size(); i++) {
+            if (this.get(i).equals(o)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -114,9 +120,11 @@ public final class NativeList implements List<Object> {
      */
     @Override
     public <T> T @NotNull [] toArray(T @NotNull [] array) {
+        //noinspection unchecked
         T[] arrayObject = (T[]) Array.newInstance(array.getClass().getComponentType(), this.size());
 
         for (int i = 0; i < array.length; i++) {
+            //noinspection unchecked
             arrayObject[i] = (T) this.get(i);
         }
 
@@ -166,7 +174,7 @@ public final class NativeList implements List<Object> {
      * @throws UnsupportedOperationException if this method is called
      */
     @Override
-    public boolean addAll(@NotNull Collection<? extends Object> c) {
+    public boolean addAll(@NotNull Collection<?> c) {
         throw new UnsupportedOperationException("NativeList can't modify element.");
     }
 
@@ -176,7 +184,7 @@ public final class NativeList implements List<Object> {
      * @throws UnsupportedOperationException if this method is called
      */
     @Override
-    public boolean addAll(int index, @NotNull Collection<? extends Object> c) {
+    public boolean addAll(int index, @NotNull Collection<?> c) {
         throw new UnsupportedOperationException("NativeList can't modify element.");
     }
 
@@ -300,7 +308,7 @@ public final class NativeList implements List<Object> {
             return false;
         }
 
-        List list = (List) object;
+        List<?> list = (List<?>) object;
 
         if (list.size() != this.size()) {
             return false;

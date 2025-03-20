@@ -31,6 +31,7 @@ import com.realtimetech.opack.value.OpackValue;
 import org.junit.jupiter.api.Test;
 
 public class AnnotationNameFieldTest {
+    @SuppressWarnings("ALL")
     public static class SerializedNameFieldTestClass {
         @Name("newName")
         private String oldName;
@@ -46,6 +47,7 @@ public class AnnotationNameFieldTest {
         SerializedNameFieldTestClass originalObject = new SerializedNameFieldTestClass();
 
         OpackValue serialized = opacker.serialize(originalObject);
+        assert serialized != null;
         SerializedNameFieldTestClass deserialized = opacker.deserialize(SerializedNameFieldTestClass.class, serialized);
 
         OpackAssert.assertEquals(originalObject, deserialized);

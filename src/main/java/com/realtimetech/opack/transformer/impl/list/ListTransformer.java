@@ -77,6 +77,7 @@ public class ListTransformer extends DataStructureTransformer {
 
             if (List.class.isAssignableFrom(goalType)) {
                 try {
+                    //noinspection unchecked
                     List<Object> list = (List<Object>) ReflectionUtil.createInstance(goalType);
 
                     for (int index = 0; index < opackArray.length(); index++) {
@@ -86,8 +87,7 @@ public class ListTransformer extends DataStructureTransformer {
                     }
 
                     return list;
-                } catch (InvocationTargetException | InstantiationException | IllegalAccessException |
-                         ClassNotFoundException exception) {
+                } catch (InvocationTargetException | InstantiationException | IllegalAccessException exception) {
                     throw new DeserializeException(exception);
                 }
             }
@@ -119,11 +119,9 @@ public class ListTransformer extends DataStructureTransformer {
      * @param opacker the opacker
      * @param element the element to be deserialized
      * @return deserialized element
-     * @throws ClassNotFoundException if the class cannot be located
-     * @throws DeserializeException   if a problem occurs during deserializing
      */
     @Override
-    protected @Nullable Object deserializeObject(@NotNull Opacker opacker, @Nullable Object element) throws ClassNotFoundException, DeserializeException {
+    protected @Nullable Object deserializeObject(@NotNull Opacker opacker, @Nullable Object element) throws DeserializeException {
         return element;
     }
 }

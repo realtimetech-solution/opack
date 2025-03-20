@@ -44,10 +44,9 @@ public class TransformFieldTest {
          * @param originalType the original type
          * @param value        the value to be serialized
          * @return opack value
-         * @throws SerializeException if a problem occurs during serializing
          */
         @Override
-        public @Nullable Object serialize(@NotNull Opacker opacker, @NotNull Class<?> originalType, @Nullable Object value) throws SerializeException {
+        public @Nullable Object serialize(@NotNull Opacker opacker, @NotNull Class<?> originalType, @Nullable Object value) {
             if (value instanceof byte[]) {
                 return new String(((byte[]) value), StandardCharsets.UTF_8);
             }
@@ -56,7 +55,7 @@ public class TransformFieldTest {
         }
 
         @Override
-        public Object deserialize(@NotNull Opacker opacker, @NotNull Class<?> goalType, Object value) throws DeserializeException {
+        public Object deserialize(@NotNull Opacker opacker, @NotNull Class<?> goalType, Object value) {
             if (value instanceof String && goalType == byte[].class) {
                 return ((String) value).getBytes(StandardCharsets.UTF_8);
             }
@@ -65,6 +64,7 @@ public class TransformFieldTest {
         }
     }
 
+    @SuppressWarnings("ALL")
     public static class FieldTransformClass {
         @Transform(transformer = ByteToStringTransformer.class)
         private byte[] transformValue;

@@ -37,6 +37,7 @@ import java.util.Random;
 public class AnnotationTypeObjectTest {
     static final Random RANDOM = new Random();
 
+    @SuppressWarnings("ALL")
     public static class ExplicitObjectClass {
         private Object nullValue;
 
@@ -65,6 +66,7 @@ public class AnnotationTypeObjectTest {
         ExplicitObjectClass originalObject = new ExplicitObjectClass();
 
         OpackValue serialized = opacker.serialize(originalObject);
+        assert serialized != null;
         ExplicitObjectClass deserialized = opacker.deserialize(ExplicitObjectClass.class, serialized);
 
         OpackAssert.assertEquals(originalObject, deserialized);

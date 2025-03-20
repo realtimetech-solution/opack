@@ -65,6 +65,7 @@ public class DenseTest {
 
         ComplexTest.ComplexClass originalObject = new ComplexTest.ComplexClass();
         OpackValue serialized = opacker.serialize(originalObject);
+        assert serialized != null;
         byte[] encoded = denseCodec.encode(serialized);
         OpackValue decoded = denseCodec.decode(encoded);
         ComplexTest.ComplexClass deserialized = opacker.deserialize(ComplexTest.ComplexClass.class, decoded);

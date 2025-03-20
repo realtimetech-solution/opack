@@ -497,6 +497,7 @@ public class Opacker {
                 if (this.enableConvertEnumToOrdinal) {
                     return goalType.getEnumConstants()[(int) ReflectionUtil.cast(Integer.class, object)];
                 } else {
+                    //noinspection unchecked,rawtypes
                     return Enum.valueOf((Class<? extends Enum>) goalType, object.toString());
                 }
             }
@@ -511,11 +512,7 @@ public class Opacker {
                     OpackArray opackArray = (OpackArray) object;
                     Class<?> componentType = goalType.getComponentType();
 
-                    try {
-                        return OpackArrayConverter.convertToArray(componentType, opackArray);
-                    } catch (InvocationTargetException | IllegalAccessException exception) {
-                        throw new DeserializeException("Can't convert OpackArray to native array.", exception);
-                    }
+                    return OpackArrayConverter.convertToArray(componentType, opackArray);
                 }
             }
 

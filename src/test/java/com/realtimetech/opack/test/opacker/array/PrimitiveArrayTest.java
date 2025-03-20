@@ -34,6 +34,7 @@ import java.util.Random;
 public class PrimitiveArrayTest {
     static final Random RANDOM = new Random();
 
+    @SuppressWarnings("ALL")
     public static class PrimitiveArrayClass {
         private boolean[] booleanArrayValue;
 
@@ -99,6 +100,7 @@ public class PrimitiveArrayTest {
         PrimitiveArrayClass originalObject = new PrimitiveArrayClass();
 
         OpackValue serialized = opacker.serialize(originalObject);
+        assert serialized != null;
         PrimitiveArrayClass deserialized = opacker.deserialize(PrimitiveArrayClass.class, serialized);
 
         OpackAssert.assertEquals(originalObject, deserialized);

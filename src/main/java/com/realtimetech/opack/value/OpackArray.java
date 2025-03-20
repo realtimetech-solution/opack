@@ -36,7 +36,7 @@ public final class OpackArray extends AbstractOpackValue<List<Object>> {
      * Returns whether component type for specific class of array object is primitive type
      *
      * @param arrayType the class of array object
-     * @return true if component type for the class of array object is primitive class
+     * @return true if component type for the class of array object is a primitive class
      */
     public static boolean isAllowArray(@NotNull Class<?> arrayType) {
         if (arrayType.isArray()) {
@@ -147,7 +147,7 @@ public final class OpackArray extends AbstractOpackValue<List<Object>> {
             List<Object> list = this.get();
 
             if (list.getClass() == NativeList.class) {
-                list = (List<Object>) Arrays.asList(list.toArray());
+                list = Arrays.asList(list.toArray());
                 this.set(list);
             }
 

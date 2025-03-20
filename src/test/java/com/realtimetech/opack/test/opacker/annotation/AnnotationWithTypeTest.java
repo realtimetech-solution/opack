@@ -38,6 +38,7 @@ import java.util.Random;
 public class AnnotationWithTypeTest {
     static final Random RANDOM = new Random();
 
+    @SuppressWarnings("ALL")
     public static class ObjectClass {
         private Object nullValue;
 
@@ -54,6 +55,7 @@ public class AnnotationWithTypeTest {
         }
     }
 
+    @SuppressWarnings("ALL")
     public static class WithTypeClass {
         @WithType
         private List<Double> listWithTransformer;

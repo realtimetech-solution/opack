@@ -31,6 +31,7 @@ import com.realtimetech.opack.value.OpackValue;
 import org.junit.jupiter.api.Test;
 
 public class StringTest {
+    @SuppressWarnings("ALL")
     public static class StringClass {
         private String stringValue;
 
@@ -54,6 +55,7 @@ public class StringTest {
         StringArrayTest.StringArrayClass originalObject = new StringArrayTest.StringArrayClass();
 
         OpackValue serialized = opacker.serialize(originalObject);
+        assert serialized != null;
         StringArrayTest.StringArrayClass deserialized = opacker.deserialize(StringArrayTest.StringArrayClass.class, serialized);
 
         OpackAssert.assertEquals(originalObject, deserialized);

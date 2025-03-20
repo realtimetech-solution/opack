@@ -27,16 +27,14 @@ import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.realtimetech.opack.Opacker;
 import com.realtimetech.opack.codec.json.JsonCodec;
-import com.realtimetech.opack.exception.DecodeException;
-import com.realtimetech.opack.exception.EncodeException;
-import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.value.OpackValue;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class JacksonPerformanceTest {
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     @Test
-    public void jackson_bytes() throws SerializeException, EncodeException, DecodeException {
+    public void jackson_bytes() {
         PerformanceClass performanceClass = new PerformanceClass();
 
         /*
@@ -49,7 +47,9 @@ public class JacksonPerformanceTest {
             Opack Contexts
          */
         Opacker opacker = new Opacker.Builder().create();
-        JsonCodec jsonCodec = new JsonCodec.Builder().create();
+        JsonCodec jsonCodec = new JsonCodec.Builder()
+                .setEnableConvertCharacterToString(false)
+                .create();
 
         int warmLoop = 128;
         int loop = 256;

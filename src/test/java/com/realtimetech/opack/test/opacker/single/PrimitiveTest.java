@@ -34,6 +34,7 @@ import java.util.Random;
 public class PrimitiveTest {
     static final Random RANDOM = new Random();
 
+    @SuppressWarnings("ALL")
     public static class PrimitiveClass {
         private boolean booleanValue;
 
@@ -70,6 +71,7 @@ public class PrimitiveTest {
         PrimitiveClass originalObject = new PrimitiveClass();
 
         OpackValue serialized = opacker.serialize(originalObject);
+        assert serialized != null;
         PrimitiveClass deserialized = opacker.deserialize(PrimitiveClass.class, serialized);
 
         OpackAssert.assertEquals(originalObject, deserialized);

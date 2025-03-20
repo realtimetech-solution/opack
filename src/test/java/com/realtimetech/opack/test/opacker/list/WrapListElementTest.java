@@ -35,6 +35,7 @@ import java.util.*;
 public class WrapListElementTest {
     static final Random RANDOM = new Random();
 
+    @SuppressWarnings("ALL")
     public static class WrapListClass {
         private LinkedList<Object> wrappedTypeList;
 
@@ -70,6 +71,7 @@ public class WrapListElementTest {
         }
     }
 
+    @SuppressWarnings("ALL")
     public static class TestElement {
         private int intValue;
         private String stringValue;
@@ -100,9 +102,7 @@ public class WrapListElementTest {
 
     @Test
     public void testWithNoWrapListTransformer() {
-        Assertions.assertThrows(OpackAssert.AssertException.class, () -> {
-            this.common(false);
-        });
+        Assertions.assertThrows(OpackAssert.AssertException.class, () -> this.common(false));
     }
 
     private void common(boolean enableWrapListElementType) throws SerializeException, DeserializeException, OpackAssert.AssertException {
@@ -110,6 +110,7 @@ public class WrapListElementTest {
         WrapListClass originalObject = new WrapListClass();
 
         OpackValue serialized = opacker.serialize(originalObject);
+        assert serialized != null;
         WrapListClass deserialized = opacker.deserialize(WrapListClass.class, serialized);
 
         OpackAssert.assertEquals(originalObject, deserialized);

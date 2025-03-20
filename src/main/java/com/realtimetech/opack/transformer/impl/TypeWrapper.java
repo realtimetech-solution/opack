@@ -132,12 +132,6 @@ public class TypeWrapper {
 
                 return arrayObject;
             } else {
-                /*
-                if (!(value instanceof OpackValue)) {
-                    throw new DeserializeException("Expected opack value as a `value` in wrapped object but " + value.getClass().getName() + ".");
-                }
-                */
-
                 return opacker.deserializeObject(objectType, value);
             }
         } catch (ClassNotFoundException classNotFoundException) {

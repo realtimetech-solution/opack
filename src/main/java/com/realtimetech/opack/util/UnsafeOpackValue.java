@@ -31,42 +31,62 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 
-@SuppressWarnings("unchecked")
 public class UnsafeOpackValue {
     private static final @NotNull Method OPACK_GETTER_METHOD;
 
     static {
         Method method;
+
         try {
             method = Class.forName("com.realtimetech.opack.value.AbstractOpackValue").getDeclaredMethod("get");
-        } catch (NoSuchMethodException | ClassNotFoundException e) {
+        } catch (NoSuchMethodException | ClassNotFoundException exception) {
             throw new ExceptionInInitializerError("No getter method found in OpackValue.");
         }
+
         OPACK_GETTER_METHOD = method;
         OPACK_GETTER_METHOD.setAccessible(true);
+
+        // Test to avoid runtime exception
+        OpackArray opackArray = new OpackArray();
+        OpackObject opackObject = new OpackObject();
+
+        try {
+            OPACK_GETTER_METHOD.invoke(opackArray);
+            OPACK_GETTER_METHOD.invoke(opackObject);
+        } catch (Throwable throwable) {
+            throw new ExceptionInInitializerError("This virtual machine doesn't support invoke opack value getter method.");
+        }
     }
 
     /**
-     * Returns the underlying list of opack array
+     * Get the native list of an opack array
      *
-     * @param opackArray the opack array to be targeted
-     * @return the underlying list
-     * @throws InvocationTargetException if exception occurs during invoke opack array getter method
-     * @throws IllegalAccessException    if the getter method object in opack array is enforcing Java language access control and cannot access that method
+     * @param opackArray the opack array
+     * @return the native list
      */
-    public static List<Object> getList(@NotNull OpackArray opackArray) throws InvocationTargetException, IllegalAccessException {
-        return (List<Object>) OPACK_GETTER_METHOD.invoke(opackArray);
+    public static List<Object> getList(@NotNull OpackArray opackArray) {
+        try {
+            //noinspection unchecked
+            return (List<Object>) OPACK_GETTER_METHOD.invoke(opackArray);
+        } catch (IllegalAccessException | InvocationTargetException exception) {
+            // Not reachable
+            throw new RuntimeException(exception);
+        }
     }
 
     /**
-     * Returns the underlying map of opack object
+     * Get the native map of an opack object
      *
-     * @param opackObject the opack object to be targeted
-     * @return the underlying map
-     * @throws InvocationTargetException if exception occurs during invoke opack map getter method
-     * @throws IllegalAccessException    if the getter method object in opack map is enforcing Java language access control and cannot access that method
+     * @param opackObject the opack object
+     * @return the native map
      */
-    public static Map<Object, Object> getMap(@NotNull OpackObject opackObject) throws InvocationTargetException, IllegalAccessException {
-        return (Map<Object, Object>) OPACK_GETTER_METHOD.invoke(opackObject);
+    public static Map<Object, Object> getMap(@NotNull OpackObject opackObject) {
+        try {
+            //noinspection unchecked
+            return (Map<Object, Object>) OPACK_GETTER_METHOD.invoke(opackObject);
+        } catch (IllegalAccessException | InvocationTargetException exception) {
+            // Not reachable
+            throw new RuntimeException(exception);
+        }
     }
 }

@@ -36,10 +36,8 @@ public class CommonOpackValue {
                 OpackObject sample = new OpackObject();
                 sample.put("string", "hello, " + i + " times!");
 
-                sample.put("int", (int) 10 * i);
-                sample.put("integer", (Integer) 10 * i);
-
-                sample.put("double", (Double) 1.990218E8 + i);
+                sample.put("int", 10 * i);
+                sample.put("double", 1.990218E8 + i);
                 sample.put("float", (float) 1.990218E8 + i);
 
                 opackArray.add(sample);

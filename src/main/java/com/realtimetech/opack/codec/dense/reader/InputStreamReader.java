@@ -68,7 +68,7 @@ public class InputStreamReader implements Reader {
      */
     public char readChar() throws IOException {
         return (char) (((this.inputStream.read() & 0xFF) << 8) |
-                ((this.inputStream.read() & 0xFF) << 0));
+                ((this.inputStream.read() & 0xFF)));
     }
 
     /**
@@ -79,7 +79,7 @@ public class InputStreamReader implements Reader {
      */
     public short readShort() throws IOException {
         return (short) (((this.inputStream.read() & 0xFF) << 8) |
-                ((this.inputStream.read() & 0xFF) << 0));
+                ((this.inputStream.read() & 0xFF)));
     }
 
     /**
@@ -92,7 +92,7 @@ public class InputStreamReader implements Reader {
         return (((this.inputStream.read() & 0xFF) << 24) |
                 ((this.inputStream.read() & 0xFF) << 16) |
                 ((this.inputStream.read() & 0xFF) << 8) |
-                ((this.inputStream.read() & 0xFF) << 0));
+                ((this.inputStream.read() & 0xFF)));
     }
 
     /**
@@ -119,7 +119,7 @@ public class InputStreamReader implements Reader {
                 (((long) this.inputStream.read() & 0xFF) << 24) |
                 (((long) this.inputStream.read() & 0xFF) << 16) |
                 (((long) this.inputStream.read() & 0xFF) << 8) |
-                (((long) this.inputStream.read() & 0xFF) << 0));
+                (((long) this.inputStream.read() & 0xFF)));
     }
 
     /**

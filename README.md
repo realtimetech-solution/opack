@@ -1,12 +1,11 @@
 <h1 align="center" style="max-width: 100%; font-weight: bold;">
-  <a href="https://github.com/realtimetech-solution/opack"><img width="100px" src=".readme/logo.png" style="max-width: 100%;"></a></br>
+  <a href="https://github.com/realtimetech-solution/opack"><img width="100px" src=".readme/logo.png" style="max-width: 100%;" alt="logo"/></a><br/>
   Opack
 </h1>
 
 <p align="center" style="max-width: 100%;">
-  <a href="#"><img src="https://img.shields.io/github/license/realtimetech-solution/opack"/></a>
-  <a href="./actions/workflows/windows-x64.yml"><img src="https://github.com/realtimetech-solution/opack/actions/workflows/windows-x64.yml/badge.svg"/></a>
-  <a href="https://maven-badges.herokuapp.com/maven-central/com.realtimetech/opack"><img src="https://maven-badges.herokuapp.com/maven-central/com.realtimetech/opack/badge.svg"/></a>
+  <a href="#"><img src="https://img.shields.io/github/license/realtimetech-solution/opack" alt="license"/></a>
+  <a href="https://maven-badges.herokuapp.com/maven-central/com.realtimetech/opack"><img src="https://maven-badges.herokuapp.com/maven-central/com.realtimetech/opack/badge.svg" alt="maven-central-version"/></a>
 </p>
 
 Opack is a Java library that can serialize/deserialize between Java objects and common objects(OpackValue). Also, common objects can be encoded or decoded as JSON or Bytes(Dense).
@@ -34,11 +33,11 @@ Opack is a Java library that can serialize/deserialize between Java objects and 
 ### Simple flow
 
 <p align="center" style="max-width: 100%;">
-  <a href="#"><img width="484" src=".readme/1_serialize_deserialize.png"/></a>
+  <a href="#"><img width="484" src=".readme/1_serialize_deserialize.png" alt="sample_1"/></a>
 </p>
 
 <p align="center" style="max-width: 100%;">
-  <a href="#"><img width="484" src=".readme/2_encode_decode.png"/></a>
+  <a href="#"><img width="484" src=".readme/2_encode_decode.png" alt="sample_2"/></a>
 </p>
 
 ### Download
@@ -54,6 +53,7 @@ dependencies {
 Maven:
 
 ```xml
+
 <dependency>
     <groupId>com.realtimetech</groupId>
     <artifactId>opack</artifactId>
@@ -109,7 +109,7 @@ public class Usage {
                 .setEncodeStringBufferSize(1024)            // (Optional) Creation size of stack for processing
                 .setDecodeStackInitialSize(128)             // (Optional) Creation size of stack for processing
 
-                .setAllowOpackValueToKeyValue(false)        // (Optional) Accepts Object or Array as Key of Json Object
+                .setAllowAnyValueToKey(false)               // (Optional) Accepts non-string value as Key of Json Object
                 .setEnableConvertCharacterToString(false)   // (Optional) Convert character to string instead of character int value
                 .setUsePrettyFormat(false)                  // (Optional) When encoding, it prints formatted
 
@@ -187,7 +187,7 @@ public class SomeObject {
     // This field will serialize/deserialize to explicit type `ArrayList` instead of ambiguous field type `List`
     @Type(ArrayList.class)
     private List<String> listField;
- 
+
     // This field will serialize/deserialize to `newFieldName` name instead of actual field name `oldFieldName`
     @Name("newFieldName")
     private String oldFieldName;
@@ -356,7 +356,7 @@ public class Usage {
 
 ### License
 
-Opack uses [Apache License 2.0](./LICENSE.txt). Please, leave your feedback if you have any suggestions!
+Opack uses [Apache License 2.0](./LICENSE). Please leave your feedback if you have any suggestions!
 
 ```
 Jeonghwan, Park

@@ -32,6 +32,7 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 
 public class FileTransformTest {
+    @SuppressWarnings("ALL")
     public static class FileTransformClass {
         private File file;
 

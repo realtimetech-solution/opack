@@ -23,8 +23,6 @@
 package com.realtimetech.opack.transformer.impl.file;
 
 import com.realtimetech.opack.Opacker;
-import com.realtimetech.opack.exception.DeserializeException;
-import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.transformer.Transformer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -39,10 +37,9 @@ public class FileTransformer implements Transformer {
      * @param originalType the original type
      * @param object       the object to be serialized
      * @return opack value
-     * @throws SerializeException if a problem occurs during serializing
      */
     @Override
-    public @Nullable Object serialize(@NotNull Opacker opacker, @NotNull Class<?> originalType, @Nullable Object object) throws SerializeException {
+    public @Nullable Object serialize(@NotNull Opacker opacker, @NotNull Class<?> originalType, @Nullable Object object) {
         if (object instanceof File) {
             return object.toString();
         }
@@ -57,10 +54,9 @@ public class FileTransformer implements Transformer {
      * @param goalType the goal type to deserialize
      * @param object   the object to be deserialized
      * @return deserialized value
-     * @throws DeserializeException if a problem occurs during deserializing
      */
     @Override
-    public @Nullable Object deserialize(@NotNull Opacker opacker, @NotNull Class<?> goalType, @Nullable Object object) throws DeserializeException {
+    public @Nullable Object deserialize(@NotNull Opacker opacker, @NotNull Class<?> goalType, @Nullable Object object) {
         if (object instanceof String) {
             return new File(String.valueOf(object));
         }

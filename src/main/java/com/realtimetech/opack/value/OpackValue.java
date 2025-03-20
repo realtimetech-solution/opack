@@ -25,6 +25,9 @@ package com.realtimetech.opack.value;
 import com.realtimetech.opack.util.ReflectionUtil;
 import org.jetbrains.annotations.NotNull;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
 public interface OpackValue {
     /**
      * Assert the specific class is allowed type in opack value
@@ -47,6 +50,8 @@ public interface OpackValue {
     static boolean isAllowType(@NotNull Class<?> type) {
         return ReflectionUtil.isWrapperType(type) ||
                 ReflectionUtil.isPrimitiveType(type) ||
+                (type == BigInteger.class) ||
+                (type == BigDecimal.class) ||
                 (type == String.class) ||
                 (AbstractOpackValue.class.isAssignableFrom(type));
     }
