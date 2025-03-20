@@ -24,7 +24,6 @@ package com.realtimetech.opack.transformer.impl.reflection;
 
 import com.realtimetech.opack.Opacker;
 import com.realtimetech.opack.exception.DeserializeException;
-import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.transformer.Transformer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -37,10 +36,9 @@ public class ClassTransformer implements Transformer {
      * @param originalType the original type
      * @param object       the object to be serialized
      * @return opack value
-     * @throws SerializeException if a problem occurs during serializing
      */
     @Override
-    public @Nullable Object serialize(@NotNull Opacker opacker, @NotNull Class<?> originalType, @Nullable Object object) throws SerializeException {
+    public @Nullable Object serialize(@NotNull Opacker opacker, @NotNull Class<?> originalType, @Nullable Object object) {
         if (object instanceof Class<?>) {
             return ((Class<?>) object).getName();
         }

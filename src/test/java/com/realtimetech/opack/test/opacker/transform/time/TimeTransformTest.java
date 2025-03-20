@@ -33,6 +33,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class TimeTransformTest {
+    @SuppressWarnings("ALL")
     public static class TimeTransformClass {
         private Date date;
         private Calendar calendar;

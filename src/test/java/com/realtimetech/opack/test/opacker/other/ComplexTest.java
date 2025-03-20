@@ -44,6 +44,7 @@ import java.util.Random;
 public class ComplexTest {
     static final Random RANDOM = new Random();
 
+    @SuppressWarnings("ALL")
     public static class ComplexClass {
         private WrapperTest.WrapperClass wrapperClassValue;
         private WrapperTest.WrapperClass[] wrapperClassArrayValue;
@@ -146,6 +147,7 @@ public class ComplexTest {
         ComplexClass originalObject = new ComplexClass();
 
         OpackValue serialized = opacker.serialize(originalObject);
+        assert serialized != null;
         ComplexClass deserialized = opacker.deserialize(ComplexClass.class, serialized);
 
         OpackAssert.assertEquals(originalObject, deserialized);

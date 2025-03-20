@@ -32,6 +32,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class GsonPerformanceTest {
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     @Test
     public void gson_json() {
         PerformanceClass performanceClass = new PerformanceClass();

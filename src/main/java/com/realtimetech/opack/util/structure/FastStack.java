@@ -46,6 +46,7 @@ public class FastStack<T> {
      * @param initialSize the initial size
      */
     public FastStack(int initialSize) {
+        //noinspection unchecked
         this.objects = (T[]) new Object[0];
 
         this.currentIndex = 0;
@@ -61,6 +62,7 @@ public class FastStack<T> {
         T[] oldObjects = this.objects;
 
         this.currentSize = this.currentSize << 1;
+        //noinspection unchecked
         this.objects = (T[]) new Object[this.currentSize];
 
         if (oldObjects.length != 0) {

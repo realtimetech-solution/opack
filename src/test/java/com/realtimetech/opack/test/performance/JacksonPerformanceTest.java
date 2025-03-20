@@ -27,16 +27,14 @@ import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.realtimetech.opack.Opacker;
 import com.realtimetech.opack.codec.json.JsonCodec;
-import com.realtimetech.opack.exception.DecodeException;
-import com.realtimetech.opack.exception.EncodeException;
-import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.value.OpackValue;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class JacksonPerformanceTest {
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     @Test
-    public void jackson_bytes() throws SerializeException, EncodeException, DecodeException {
+    public void jackson_bytes() {
         PerformanceClass performanceClass = new PerformanceClass();
 
         /*

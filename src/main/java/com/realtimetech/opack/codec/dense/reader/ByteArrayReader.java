@@ -78,7 +78,7 @@ public class ByteArrayReader implements Reader {
         byte byte2 = this.bytes[this.currentIndex++];
 
         return (char) (((byte1 & 0xFF) << 8) |
-                ((byte2 & 0xFF) << 0));
+                ((byte2 & 0xFF)));
     }
 
     /**
@@ -94,7 +94,7 @@ public class ByteArrayReader implements Reader {
         byte byte2 = this.bytes[this.currentIndex++];
 
         return (short) (((byte1 & 0xFF) << 8) |
-                ((byte2 & 0xFF) << 0));
+                ((byte2 & 0xFF)));
     }
 
     /**
@@ -114,7 +114,7 @@ public class ByteArrayReader implements Reader {
         return ((byte1 & 0xFF) << 24) |
                 ((byte2 & 0xFF) << 16) |
                 ((byte3 & 0xFF) << 8) |
-                ((byte4 & 0xFF) << 0);
+                ((byte4 & 0xFF));
     }
 
     /**
@@ -152,7 +152,7 @@ public class ByteArrayReader implements Reader {
                 (((long) byte5 & 0xFF) << 24) |
                 (((long) byte6 & 0xFF) << 16) |
                 (((long) byte7 & 0xFF) << 8) |
-                (((long) byte8 & 0xFF) << 0));
+                (((long) byte8 & 0xFF)));
     }
 
     /**

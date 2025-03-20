@@ -72,10 +72,11 @@ public final class TypeBaker {
     private final @NotNull HashMap<@NotNull Class<?>, @NotNull BakedType> backedTypeMap;
     private final @NotNull HashMap<@NotNull Class<?>, @NotNull List<@NotNull PredefinedTransformer>> predefinedTransformerMap;
 
+
     /**
-     * Constructs an TypeBaker with the opacker
+     * Constructs a new instance of TypeBaker.
      *
-     * @param opacker the opacker
+     * @param opacker the Opacker instance used for managing serialization and deserialization processes
      */
     public TypeBaker(@NotNull Opacker opacker) {
         this.opacker = opacker;
@@ -85,6 +86,10 @@ public final class TypeBaker {
 
         this.backedTypeMap = new HashMap<>();
         this.predefinedTransformerMap = new HashMap<>();
+    }
+
+    public @NotNull Opacker getOpacker() {
+        return opacker;
     }
 
     /**
@@ -243,6 +248,7 @@ public final class TypeBaker {
             Transform transform = annotatedElement.getAnnotation(Transform.class);
 
             if (root || transform.inheritable()) {
+                //noinspection unchecked
                 Class<Transformer> transformerType = (Class<Transformer>) transform.transformer();
 
                 try {
@@ -331,6 +337,7 @@ public final class TypeBaker {
 
                 if (field.isAnnotationPresent(DefaultValue.class)) {
                     DefaultValue defaultValue = field.getAnnotation(DefaultValue.class);
+                    //noinspection unchecked
                     Class<DefaultValueProvider> defaultValueProviderType = (Class<DefaultValueProvider>) defaultValue.provider();
 
                     try {

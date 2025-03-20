@@ -28,7 +28,6 @@ import com.realtimetech.opack.value.OpackValue;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Array;
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 public class OpackArrayConverter {
@@ -38,11 +37,9 @@ public class OpackArrayConverter {
      * @param componentType the component type of array
      * @param opackArray    the opack array to convert
      * @return the converted array
-     * @throws InvocationTargetException if exception occurs during invoke opack array getter method
-     * @throws IllegalAccessException    if the getter method object in opack array is enforcing Java language access control and cannot access that method.
      * @throws IllegalArgumentException  if component type is now allowed or invalid
      */
-    public static @NotNull Object convertToArray(@NotNull Class<?> componentType, @NotNull OpackArray opackArray) throws InvocationTargetException, IllegalAccessException {
+    public static @NotNull Object convertToArray(@NotNull Class<?> componentType, @NotNull OpackArray opackArray) {
         if (!OpackValue.isAllowType(componentType)) {
             throw new IllegalArgumentException(componentType + " type is not allowed");
         }
@@ -67,6 +64,7 @@ public class OpackArrayConverter {
             int length = opackArray.length();
             Object dest = Array.newInstance(componentType, length);
 
+            //noinspection SuspiciousSystemArraycopy
             System.arraycopy(object, 0, dest, 0, opackArray.length());
 
             return dest;

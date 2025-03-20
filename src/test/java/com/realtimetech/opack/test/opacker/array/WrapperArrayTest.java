@@ -34,6 +34,7 @@ import java.util.Random;
 public class WrapperArrayTest {
     static final Random RANDOM = new Random();
 
+    @SuppressWarnings("ALL")
     public static class WrapperArrayClass {
         private Boolean[] booleanArrayValue;
         private Byte[] byteArrayValue;
@@ -106,6 +107,7 @@ public class WrapperArrayTest {
         WrapperArrayClass originalObject = new WrapperArrayClass();
 
         OpackValue serialized = opacker.serialize(originalObject);
+        assert serialized != null;
         WrapperArrayClass deserialized = opacker.deserialize(WrapperArrayClass.class, serialized);
 
         OpackAssert.assertEquals(originalObject, deserialized);

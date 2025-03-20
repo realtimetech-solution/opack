@@ -24,8 +24,6 @@ package com.realtimetech.opack.codec.dense.writer;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
-
 public class ByteArrayWriter implements Writer {
     private byte @NotNull [] bytes;
 
@@ -95,9 +93,8 @@ public class ByteArrayWriter implements Writer {
      * Writes the specified byte to this output stream
      *
      * @param value the byte
-     * @throws IOException if an I/O error occurs, if the output stream has been closed.
      */
-    public void writeByte(int value) throws IOException {
+    public void writeByte(int value) {
         this.increaseArray(1);
 
         this.bytes[this.currentIndex++] = (byte) value;
@@ -107,50 +104,46 @@ public class ByteArrayWriter implements Writer {
      * Writes the specified character to this output stream
      *
      * @param value the character
-     * @throws IOException if an I/O error occurs, if the output stream has been closed.
      */
-    public void writeChar(char value) throws IOException {
+    public void writeChar(char value) {
         this.increaseArray(2);
 
         this.bytes[this.currentIndex++] = (byte) ((value >> 8) & 0xff);
-        this.bytes[this.currentIndex++] = (byte) ((value >> 0) & 0xff);
+        this.bytes[this.currentIndex++] = (byte) ((value) & 0xff);
     }
 
     /**
      * Writes the specified short to this output stream
      *
      * @param value the short
-     * @throws IOException if an I/O error occurs, if the output stream has been closed.
      */
-    public void writeShort(short value) throws IOException {
+    public void writeShort(short value) {
         this.increaseArray(2);
 
         this.bytes[this.currentIndex++] = (byte) ((value >> 8) & 0xff);
-        this.bytes[this.currentIndex++] = (byte) ((value >> 0) & 0xff);
+        this.bytes[this.currentIndex++] = (byte) ((value) & 0xff);
     }
 
     /**
      * Writes the specified int to this output stream
      *
      * @param value the int
-     * @throws IOException if an I/O error occurs, if the output stream has been closed.
      */
-    public void writeInt(int value) throws IOException {
+    public void writeInt(int value) {
         this.increaseArray(4);
 
         this.bytes[this.currentIndex++] = (byte) ((value >> 24) & 0xff);
         this.bytes[this.currentIndex++] = (byte) ((value >> 16) & 0xff);
         this.bytes[this.currentIndex++] = (byte) ((value >> 8) & 0xff);
-        this.bytes[this.currentIndex++] = (byte) ((value >> 0) & 0xff);
+        this.bytes[this.currentIndex++] = (byte) ((value) & 0xff);
     }
 
     /**
      * Writes the specified float to this output stream
      *
      * @param value the float
-     * @throws IOException if an I/O error occurs, if the output stream has been closed.
      */
-    public void writeFloat(float value) throws IOException {
+    public void writeFloat(float value) {
         this.writeInt(Float.floatToRawIntBits(value));
     }
 
@@ -158,9 +151,8 @@ public class ByteArrayWriter implements Writer {
      * Writes the specified long to this output stream
      *
      * @param value the long
-     * @throws IOException if an I/O error occurs, if the output stream has been closed.
      */
-    public void writeLong(long value) throws IOException {
+    public void writeLong(long value) {
         this.increaseArray(8);
 
         this.bytes[this.currentIndex++] = (byte) ((value >> 56) & 0xff);
@@ -170,16 +162,15 @@ public class ByteArrayWriter implements Writer {
         this.bytes[this.currentIndex++] = (byte) ((value >> 24) & 0xff);
         this.bytes[this.currentIndex++] = (byte) ((value >> 16) & 0xff);
         this.bytes[this.currentIndex++] = (byte) ((value >> 8) & 0xff);
-        this.bytes[this.currentIndex++] = (byte) ((value >> 0) & 0xff);
+        this.bytes[this.currentIndex++] = (byte) ((value) & 0xff);
     }
 
     /**
      * Writes the specified double to this output stream
      *
      * @param value the double
-     * @throws IOException if an I/O error occurs, if the output stream has been closed.
      */
-    public void writeDouble(double value) throws IOException {
+    public void writeDouble(double value) {
         this.writeLong(Double.doubleToRawLongBits(value));
     }
 
@@ -187,9 +178,8 @@ public class ByteArrayWriter implements Writer {
      * Writes the specified bytes to this output stream
      *
      * @param bytes the byte array to write
-     * @throws IOException if an I/O error occurs, if the output stream has been closed.
      */
-    public void writeBytes(byte @NotNull [] bytes) throws IOException {
+    public void writeBytes(byte @NotNull [] bytes) {
         this.increaseArray(bytes.length);
 
         System.arraycopy(bytes, 0, this.bytes, this.currentIndex, bytes.length);

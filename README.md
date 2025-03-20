@@ -1,12 +1,11 @@
 <h1 align="center" style="max-width: 100%; font-weight: bold;">
-  <a href="https://github.com/realtimetech-solution/opack"><img width="100px" src=".readme/logo.png" style="max-width: 100%;"></a></br>
+  <a href="https://github.com/realtimetech-solution/opack"><img width="100px" src=".readme/logo.png" style="max-width: 100%;" alt="logo"/></a><br/>
   Opack
 </h1>
 
 <p align="center" style="max-width: 100%;">
-  <a href="#"><img src="https://img.shields.io/github/license/realtimetech-solution/opack"/></a>
-  <a href="./actions/workflows/windows-x64.yml"><img src="https://github.com/realtimetech-solution/opack/actions/workflows/windows-x64.yml/badge.svg"/></a>
-  <a href="https://maven-badges.herokuapp.com/maven-central/com.realtimetech/opack"><img src="https://maven-badges.herokuapp.com/maven-central/com.realtimetech/opack/badge.svg"/></a>
+  <a href="#"><img src="https://img.shields.io/github/license/realtimetech-solution/opack" alt="license"/></a>
+  <a href="https://maven-badges.herokuapp.com/maven-central/com.realtimetech/opack"><img src="https://maven-badges.herokuapp.com/maven-central/com.realtimetech/opack/badge.svg" alt="maven-central-version"/></a>
 </p>
 
 Opack is a Java library that can serialize/deserialize between Java objects and common objects(OpackValue). Also, common objects can be encoded or decoded as JSON or Bytes(Dense).
@@ -34,11 +33,11 @@ Opack is a Java library that can serialize/deserialize between Java objects and 
 ### Simple flow
 
 <p align="center" style="max-width: 100%;">
-  <a href="#"><img width="484" src=".readme/1_serialize_deserialize.png"/></a>
+  <a href="#"><img width="484" src=".readme/1_serialize_deserialize.png" alt="sample_1"/></a>
 </p>
 
 <p align="center" style="max-width: 100%;">
-  <a href="#"><img width="484" src=".readme/2_encode_decode.png"/></a>
+  <a href="#"><img width="484" src=".readme/2_encode_decode.png" alt="sample_2"/></a>
 </p>
 
 ### Download
@@ -356,7 +355,7 @@ public class Usage {
 
 ### License
 
-Opack uses [Apache License 2.0](./LICENSE.txt). Please, leave your feedback if you have any suggestions!
+Opack uses [Apache License 2.0](./LICENSE). Please leave your feedback if you have any suggestions!
 
 ```
 Jeonghwan, Park

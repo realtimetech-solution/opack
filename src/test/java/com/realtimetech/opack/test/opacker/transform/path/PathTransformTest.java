@@ -32,6 +32,7 @@ import org.junit.jupiter.api.Test;
 import java.nio.file.Path;
 
 public class PathTransformTest {
+    @SuppressWarnings("ALL")
     public static class PathTransformClass {
         private Path path;
 

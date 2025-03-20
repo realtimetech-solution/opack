@@ -31,6 +31,7 @@ import com.realtimetech.opack.test.opacker.single.WrapperTest;
 
 import java.util.Random;
 
+@SuppressWarnings("ALL")
 public class PerformanceClass {
     @FunctionalInterface
     public interface ExceptionRunnable {

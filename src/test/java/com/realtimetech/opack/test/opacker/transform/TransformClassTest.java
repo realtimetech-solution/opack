@@ -32,6 +32,7 @@ import com.realtimetech.opack.transformer.Transformer;
 import com.realtimetech.opack.util.ReflectionUtil;
 import com.realtimetech.opack.value.OpackObject;
 import com.realtimetech.opack.value.OpackValue;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -42,7 +43,7 @@ import java.nio.charset.StandardCharsets;
 public class TransformClassTest {
     public static class ClassTransformer implements Transformer {
         @Override
-        public @Nullable Object serialize(Opacker opacker, Class<?> originalType, @Nullable Object value) throws SerializeException {
+        public @Nullable Object serialize(@NotNull Opacker opacker, @NotNull Class<?> originalType, @Nullable Object value) {
             if (value instanceof ClassTransformInheritable) {
                 ClassTransformInheritable classTransformInheritable = (ClassTransformInheritable) value;
                 return new String(classTransformInheritable.bytes, StandardCharsets.UTF_8);
@@ -56,7 +57,7 @@ public class TransformClassTest {
         }
 
         @Override
-        public Object deserialize(Opacker opacker, Class<?> goalType, Object value) throws DeserializeException {
+        public @Nullable Object deserialize(@NotNull Opacker opacker, @NotNull Class<?> goalType, @Nullable Object value) throws DeserializeException {
             if (value instanceof String && ClassTransformInheritable.class.isAssignableFrom(goalType)) {
                 try {
                     ClassTransformInheritable classTransformInheritable = (ClassTransformInheritable) ReflectionUtil.createInstanceUnsafe(goalType);
@@ -128,18 +129,23 @@ public class TransformClassTest {
         }
     }
 
+    @SuppressWarnings("ALL")
     public static class ClassTransformClass {
         private ClassTransformInheritable classTransformInheritableValue;
         private ClassTransformInheritableChild classTransformInheritableChildValue;
+
         @Type(ClassTransformInheritable.class)
         private Object explicitClassTransformInheritableValue;
+
         @Type(ClassTransformInheritableChild.class)
         private Object explicitClassTransformInheritableChildValue;
 
         private ClassTransformNoInheritable classTransformNoInheritableValue;
         private ClassTransformNoInheritableChild classTransformNoInheritableChildValue;
+
         @Type(ClassTransformNoInheritable.class)
         private Object explicitClassTransformNoInheritableValue;
+
         @Type(ClassTransformNoInheritableChild.class)
         private Object explicitClassTransformNoInheritableChildValue;
 

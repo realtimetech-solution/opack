@@ -34,6 +34,7 @@ import java.util.Random;
 public class ObjectTest {
     static final Random RANDOM = new Random();
 
+    @SuppressWarnings("ALL")
     public static class SubObjectClass {
         private Object nullValue;
 
@@ -50,6 +51,7 @@ public class ObjectTest {
         }
     }
 
+    @SuppressWarnings("ALL")
     public static class ObjectClass {
         private Object nullValue;
 
@@ -70,6 +72,7 @@ public class ObjectTest {
         ObjectClass originalObject = new ObjectClass();
 
         OpackValue serialized = opacker.serialize(originalObject);
+        assert serialized != null;
         ObjectClass deserialized = opacker.deserialize(ObjectClass.class, serialized);
 
         OpackAssert.assertEquals(originalObject, deserialized);

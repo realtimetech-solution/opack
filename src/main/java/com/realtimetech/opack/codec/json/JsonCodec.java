@@ -36,7 +36,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
@@ -141,6 +140,21 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
         CONST_REPLACEMENT_CHARACTERS['\f'] = new char[]{'\\', 'f'};
     }
 
+    private static char @Nullable [] getReplacementCharacter(char character) {
+        char[] replacement = null;
+
+        // Find escapable character
+        if (character < CONST_REPLACEMENT_CHARACTERS.length) {
+            replacement = CONST_REPLACEMENT_CHARACTERS[character];
+        } else if (character == '\u2028') {
+            replacement = CONST_U2028;
+        } else if (character == '\u2029') {
+            replacement = CONST_U2029;
+        }
+
+        return replacement;
+    }
+
     private final @NotNull StringWriter encodeLiteralStringWriter;
     private final @NotNull StringWriter encodeStringWriter;
     private final @NotNull FastStack<@Nullable Object> encodeStack;
@@ -211,16 +225,7 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
 
             for (int index = 0; index < length; index++) {
                 char character = charArray[index];
-                char[] replacement = null;
-
-                // Find escapable character
-                if (character < CONST_REPLACEMENT_CHARACTERS.length) {
-                    replacement = CONST_REPLACEMENT_CHARACTERS[character];
-                } else if (character == '\u2028') {
-                    replacement = CONST_U2028;
-                } else if (character == '\u2029') {
-                    replacement = CONST_U2029;
-                }
+                char[] replacement = JsonCodec.getReplacementCharacter(character);
 
                 if (replacement != null) {
                     if (last < index) {
@@ -326,15 +331,7 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
 
                 if (enableConvertCharacterToString) {
                     char character = array[index];
-                    char[] replacement = null;
-
-                    if (character < CONST_REPLACEMENT_CHARACTERS.length) {
-                        replacement = CONST_REPLACEMENT_CHARACTERS[character];
-                    } else if (character == '\u2028') {
-                        replacement = CONST_U2028;
-                    } else if (character == '\u2029') {
-                        replacement = CONST_U2029;
-                    }
+                    char[] replacement = JsonCodec.getReplacementCharacter(character);
 
                     writer.write(CONST_STRING_OPEN_CHARACTER);
                     if (replacement != null) {
@@ -468,15 +465,7 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
                 } else {
                     if (enableConvertCharacterToString) {
                         Character character = array[index];
-                        char[] replacement = null;
-
-                        if (character < CONST_REPLACEMENT_CHARACTERS.length) {
-                            replacement = CONST_REPLACEMENT_CHARACTERS[character];
-                        } else if (character == '\u2028') {
-                            replacement = CONST_U2028;
-                        } else if (character == '\u2029') {
-                            replacement = CONST_U2029;
-                        }
+                        char[] replacement = JsonCodec.getReplacementCharacter(character);
 
                         writer.write(CONST_STRING_OPEN_CHARACTER);
                         if (replacement != null) {
@@ -554,14 +543,7 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
                 writer.write((char[]) object);
             } else if (objectType == OpackObject.class) {
                 OpackObject opackObject = (OpackObject) object;
-                Map<Object, Object> opackObjectMap = null;
-
-                try {
-                    opackObjectMap = UnsafeOpackValue.getMap(opackObject);
-                } catch (InvocationTargetException | IllegalAccessException exception) {
-                    throw new IOException("Can't access opack object map.", exception);
-                }
-
+                Map<Object, Object> opackObjectMap = UnsafeOpackValue.getMap(opackObject);
                 int currentIndent = -1;
 
                 if (this.usePrettyFormat) {
@@ -630,13 +612,7 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
             } else if (objectType == OpackArray.class) {
                 OpackArray opackArray = (OpackArray) object;
                 int size = opackArray.length();
-                List<Object> opackArrayList = null;
-
-                try {
-                    opackArrayList = UnsafeOpackValue.getList(opackArray);
-                } catch (InvocationTargetException | IllegalAccessException exception) {
-                    throw new IOException("Can't access opack array list.", exception);
-                }
+                List<Object> opackArrayList = UnsafeOpackValue.getList(opackArray);
 
                 this.encodeLiteralStringWriter.reset();
 
@@ -883,33 +859,17 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
                         }
 
                         OpackObject opackObject = (OpackObject) currentContext;
+                        Map<Object, Object> opackObjectMap = UnsafeOpackValue.getMap(opackObject);
 
-                        Map<Object, Object> opackObjectMap = null;
+                        for (int i = 0; i < valueSize; i += 2) {
+                            Object value = this.decodeValueStack.pop();
+                            Object key = this.decodeValueStack.pop();
 
-                        try {
-                            opackObjectMap = UnsafeOpackValue.getMap(opackObject);
-
-                            for (int i = 0; i < valueSize; i += 2) {
-                                Object value = this.decodeValueStack.pop();
-                                Object key = this.decodeValueStack.pop();
-
-                                if (!allowAnyValueToKey && !(key instanceof String)) {
-                                    throw new IllegalArgumentException("Only string value allowed in json format. Key: " + key);
-                                }
-
-                                opackObjectMap.put(key, value);
+                            if (!allowAnyValueToKey && !(key instanceof String)) {
+                                throw new IllegalArgumentException("Only string value allowed in json format. Key: " + key);
                             }
-                        } catch (InvocationTargetException | IllegalAccessException exception) {
-                            for (int i = 0; i < valueSize; i += 2) {
-                                Object value = this.decodeValueStack.pop();
-                                Object key = this.decodeValueStack.pop();
 
-                                if (!allowAnyValueToKey && !(key instanceof String)) {
-                                    throw new IllegalArgumentException("Only string value allowed in json format. Key: " + key);
-                                }
-
-                                opackObject.put(key, value);
-                            }
+                            opackObjectMap.put(key, value);
                         }
                     } else if (currentContextType == OpackArray.class) {
                         if (currentChar != ']') {
@@ -917,20 +877,11 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
                         }
 
                         OpackArray opackArray = (OpackArray) currentContext;
+                        List<Object> opackArrayList = UnsafeOpackValue.getList(opackArray);
                         int currentSize = this.decodeValueStack.getSize();
 
-                        List<Object> opackArrayList = null;
-
-                        try {
-                            opackArrayList = UnsafeOpackValue.getList(opackArray);
-
-                            for (int i = currentSize - valueSize; i < currentSize; i++) {
-                                opackArrayList.add(this.decodeValueStack.get(i));
-                            }
-                        } catch (InvocationTargetException | IllegalAccessException exception) {
-                            for (int i = currentSize - valueSize; i < currentSize; i++) {
-                                opackArray.add(this.decodeValueStack.get(i));
-                            }
+                        for (int i = currentSize - valueSize; i < currentSize; i++) {
+                            opackArrayList.add(this.decodeValueStack.get(i));
                         }
 
                         this.decodeValueStack.remove(valueSize);

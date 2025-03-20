@@ -28,13 +28,15 @@ import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.test.OpackAssert;
 import com.realtimetech.opack.value.OpackValue;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
 public class AnnotationIgnoreFieldTest {
+    @SuppressWarnings("ALL")
     public static class IgnoreFieldTestClass {
         @Ignore
-        private String ignoredField;
-        private String notIgnoredField;
+        private @NotNull String ignoredField;
+        private @NotNull String notIgnoredField;
 
         public IgnoreFieldTestClass() {
             this.ignoredField = "This is ignored field";
@@ -42,6 +44,7 @@ public class AnnotationIgnoreFieldTest {
         }
     }
 
+    @SuppressWarnings("ConstantValue")
     @Test
     public void test() throws SerializeException, DeserializeException, OpackAssert.AssertException {
         Opacker opacker = new Opacker.Builder().create();
@@ -49,7 +52,7 @@ public class AnnotationIgnoreFieldTest {
 
         OpackValue serialized = opacker.serialize(originalObject);
         IgnoreFieldTestClass deserialized = opacker.deserialize(IgnoreFieldTestClass.class, serialized);
-
+        assert deserialized != null;
         OpackAssert.assertEquals(originalObject, deserialized);
 
         if (deserialized.ignoredField != null) {

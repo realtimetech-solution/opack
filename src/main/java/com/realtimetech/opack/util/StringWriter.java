@@ -24,7 +24,6 @@ package com.realtimetech.opack.util;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.io.Writer;
 
 public class StringWriter extends Writer {
@@ -80,10 +79,9 @@ public class StringWriter extends Writer {
      * Writes a string
      *
      * @param string String to be written
-     * @throws IOException If an I/O error occurs
      */
     @Override
-    public void write(@NotNull String string) throws IOException {
+    public void write(@NotNull String string) {
         int length = string.length();
         this.increaseArray(length);
 
@@ -133,22 +131,22 @@ public class StringWriter extends Writer {
 
             switch (length) {
                 case 4:
-                    this.chars[this.currentIndex + 0] = src[offset + 0];
+                    this.chars[this.currentIndex] = src[offset];
                     this.chars[this.currentIndex + 1] = src[offset + 1];
                     this.chars[this.currentIndex + 2] = src[offset + 2];
                     this.chars[this.currentIndex + 3] = src[offset + 3];
                     break;
                 case 3:
-                    this.chars[this.currentIndex + 0] = src[offset + 0];
+                    this.chars[this.currentIndex] = src[offset];
                     this.chars[this.currentIndex + 1] = src[offset + 1];
                     this.chars[this.currentIndex + 2] = src[offset + 2];
                     break;
                 case 2:
-                    this.chars[this.currentIndex + 0] = src[offset + 0];
+                    this.chars[this.currentIndex] = src[offset];
                     this.chars[this.currentIndex + 1] = src[offset + 1];
                     break;
                 case 1:
-                    this.chars[this.currentIndex + 0] = src[offset + 0];
+                    this.chars[this.currentIndex] = src[offset];
                     break;
             }
         }
@@ -157,11 +155,11 @@ public class StringWriter extends Writer {
     }
 
     @Override
-    public void flush() throws IOException {
+    public void flush() {
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         this.reset();
     }
 

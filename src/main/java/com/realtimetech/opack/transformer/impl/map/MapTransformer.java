@@ -82,6 +82,7 @@ public class MapTransformer extends DataStructureTransformer {
             OpackObject opackObject = (OpackObject) object;
             if (Map.class.isAssignableFrom(goalType)) {
                 try {
+                    //noinspection unchecked
                     Map<Object, Object> map = (Map<Object, Object>) ReflectionUtil.createInstance(goalType);
 
                     for (Map.Entry<Object, Object> element : opackObject.entrySet()) {
@@ -95,8 +96,7 @@ public class MapTransformer extends DataStructureTransformer {
                     }
 
                     return map;
-                } catch (InvocationTargetException | InstantiationException | IllegalAccessException |
-                         ClassNotFoundException exception) {
+                } catch (InvocationTargetException | InstantiationException | IllegalAccessException exception) {
                     throw new DeserializeException(exception);
                 }
             }
@@ -128,11 +128,9 @@ public class MapTransformer extends DataStructureTransformer {
      * @param opacker the opacker
      * @param element the element to be deserialized
      * @return deserialized element
-     * @throws ClassNotFoundException if the class cannot be located
-     * @throws DeserializeException   if a problem occurs during deserializing
      */
     @Override
-    protected @Nullable Object deserializeObject(@NotNull Opacker opacker, @Nullable Object element) throws ClassNotFoundException, DeserializeException {
+    protected @Nullable Object deserializeObject(@NotNull Opacker opacker, @Nullable Object element) throws DeserializeException {
         return element;
     }
 }

@@ -40,7 +40,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
@@ -195,232 +194,228 @@ public final class DenseCodec extends OpackCodec<Reader, Writer> {
                 OpackArray opackArray = (OpackArray) object;
                 int length = opackArray.length();
 
-                try {
-                    List<?> opackArrayList = UnsafeOpackValue.getList(opackArray);
+                List<?> opackArrayList = UnsafeOpackValue.getList(opackArray);
 
-                    writer.writeByte(CONST_TYPE_OPACK_ARRAY);
-                    writer.writeInt(length);
+                writer.writeByte(CONST_TYPE_OPACK_ARRAY);
+                writer.writeInt(length);
 
-                    boolean optimized = false;
+                boolean optimized = false;
 
-                    if (opackArrayList instanceof NativeList) {
-                        NativeList nativeList = (NativeList) opackArrayList;
-                        Object arrayObject = nativeList.getArrayObject();
-                        Class<?> arrayType = arrayObject.getClass();
+                if (opackArrayList instanceof NativeList) {
+                    NativeList nativeList = (NativeList) opackArrayList;
+                    Object arrayObject = nativeList.getArrayObject();
+                    Class<?> arrayType = arrayObject.getClass();
 
-                        if (arrayType == boolean[].class) {
-                            boolean[] array = (boolean[]) arrayObject;
+                    if (arrayType == boolean[].class) {
+                        boolean[] array = (boolean[]) arrayObject;
 
-                            writer.writeByte(CONST_PRIMITIVE_BOOLEAN_NATIVE_ARRAY);
+                        writer.writeByte(CONST_PRIMITIVE_BOOLEAN_NATIVE_ARRAY);
 
-                            for (boolean value : array) {
+                        for (boolean value : array) {
+                            writer.writeByte(value ? 1 : 0);
+                        }
+
+                        optimized = true;
+                    } else if (arrayType == byte[].class) {
+                        byte[] array = (byte[]) arrayObject;
+
+                        writer.writeByte(CONST_PRIMITIVE_BYTE_NATIVE_ARRAY);
+
+                        for (byte value : array) {
+                            writer.writeByte(value);
+                        }
+
+                        optimized = true;
+                    } else if (arrayType == char[].class) {
+                        char[] array = (char[]) arrayObject;
+
+                        writer.writeByte(CONST_PRIMITIVE_CHARACTER_NATIVE_ARRAY);
+
+                        for (char value : array) {
+                            writer.writeChar(value);
+                        }
+
+                        optimized = true;
+                    } else if (arrayType == short[].class) {
+                        short[] array = (short[]) arrayObject;
+
+                        writer.writeByte(CONST_PRIMITIVE_SHORT_NATIVE_ARRAY);
+
+                        for (short value : array) {
+                            writer.writeShort(value);
+                        }
+
+                        optimized = true;
+                    } else if (arrayType == int[].class) {
+                        int[] array = (int[]) arrayObject;
+
+                        writer.writeByte(CONST_PRIMITIVE_INTEGER_NATIVE_ARRAY);
+
+                        for (int value : array) {
+                            writer.writeInt(value);
+                        }
+
+                        optimized = true;
+                    } else if (arrayType == float[].class) {
+                        float[] array = (float[]) arrayObject;
+
+                        writer.writeByte(CONST_PRIMITIVE_FLOAT_NATIVE_ARRAY);
+
+                        for (float value : array) {
+                            writer.writeFloat(value);
+                        }
+
+                        optimized = true;
+                    } else if (arrayType == long[].class) {
+                        long[] array = (long[]) arrayObject;
+
+                        writer.writeByte(CONST_PRIMITIVE_LONG_NATIVE_ARRAY);
+
+                        for (long value : array) {
+                            writer.writeLong(value);
+                        }
+
+                        optimized = true;
+                    } else if (arrayType == double[].class) {
+                        double[] array = (double[]) arrayObject;
+
+                        writer.writeByte(CONST_PRIMITIVE_DOUBLE_NATIVE_ARRAY);
+
+                        for (double value : array) {
+                            writer.writeDouble(value);
+                        }
+
+                        optimized = true;
+                    } else if (arrayType == Boolean[].class) {
+                        Boolean[] array = (Boolean[]) arrayObject;
+
+                        writer.writeByte(CONST_WRAPPER_BOOLEAN_NATIVE_ARRAY);
+
+                        for (Boolean value : array) {
+                            if (value == null) {
+                                writer.writeByte(0);
+                            } else {
+                                writer.writeByte(1);
                                 writer.writeByte(value ? 1 : 0);
                             }
+                        }
 
-                            optimized = true;
-                        } else if (arrayType == byte[].class) {
-                            byte[] array = (byte[]) arrayObject;
+                        optimized = true;
+                    } else if (arrayType == Byte[].class) {
+                        Byte[] array = (Byte[]) arrayObject;
 
-                            writer.writeByte(CONST_PRIMITIVE_BYTE_NATIVE_ARRAY);
+                        writer.writeByte(CONST_WRAPPER_BYTE_NATIVE_ARRAY);
 
-                            for (byte value : array) {
+                        for (Byte value : array) {
+                            if (value == null) {
+                                writer.writeByte(0);
+                            } else {
+                                writer.writeByte(1);
                                 writer.writeByte(value);
                             }
+                        }
 
-                            optimized = true;
-                        } else if (arrayType == char[].class) {
-                            char[] array = (char[]) arrayObject;
+                        optimized = true;
+                    } else if (arrayType == Character[].class) {
+                        Character[] array = (Character[]) arrayObject;
 
-                            writer.writeByte(CONST_PRIMITIVE_CHARACTER_NATIVE_ARRAY);
+                        writer.writeByte(CONST_WRAPPER_CHARACTER_NATIVE_ARRAY);
 
-                            for (char value : array) {
+                        for (Character value : array) {
+                            if (value == null) {
+                                writer.writeByte(0);
+                            } else {
+                                writer.writeByte(1);
                                 writer.writeChar(value);
                             }
+                        }
 
-                            optimized = true;
-                        } else if (arrayType == short[].class) {
-                            short[] array = (short[]) arrayObject;
+                        optimized = true;
+                    } else if (arrayType == Short[].class) {
+                        Short[] array = (Short[]) arrayObject;
 
-                            writer.writeByte(CONST_PRIMITIVE_SHORT_NATIVE_ARRAY);
+                        writer.writeByte(CONST_WRAPPER_SHORT_NATIVE_ARRAY);
 
-                            for (short value : array) {
+                        for (Short value : array) {
+                            if (value == null) {
+                                writer.writeByte(0);
+                            } else {
+                                writer.writeByte(1);
                                 writer.writeShort(value);
                             }
+                        }
 
-                            optimized = true;
-                        } else if (arrayType == int[].class) {
-                            int[] array = (int[]) arrayObject;
+                        optimized = true;
+                    } else if (arrayType == Integer[].class) {
+                        Integer[] array = (Integer[]) arrayObject;
 
-                            writer.writeByte(CONST_PRIMITIVE_INTEGER_NATIVE_ARRAY);
+                        writer.writeByte(CONST_WRAPPER_INTEGER_NATIVE_ARRAY);
 
-                            for (int value : array) {
+                        for (Integer value : array) {
+                            if (value == null) {
+                                writer.writeByte(0);
+                            } else {
+                                writer.writeByte(1);
                                 writer.writeInt(value);
                             }
+                        }
 
-                            optimized = true;
-                        } else if (arrayType == float[].class) {
-                            float[] array = (float[]) arrayObject;
+                        optimized = true;
+                    } else if (arrayType == Float[].class) {
+                        Float[] array = (Float[]) arrayObject;
 
-                            writer.writeByte(CONST_PRIMITIVE_FLOAT_NATIVE_ARRAY);
+                        writer.writeByte(CONST_WRAPPER_FLOAT_NATIVE_ARRAY);
 
-                            for (float value : array) {
+                        for (Float value : array) {
+                            if (value == null) {
+                                writer.writeByte(0);
+                            } else {
+                                writer.writeByte(1);
                                 writer.writeFloat(value);
                             }
+                        }
 
-                            optimized = true;
-                        } else if (arrayType == long[].class) {
-                            long[] array = (long[]) arrayObject;
+                        optimized = true;
+                    } else if (arrayType == Long[].class) {
+                        Long[] array = (Long[]) arrayObject;
 
-                            writer.writeByte(CONST_PRIMITIVE_LONG_NATIVE_ARRAY);
+                        writer.writeByte(CONST_WRAPPER_LONG_NATIVE_ARRAY);
 
-                            for (long value : array) {
+                        for (Long value : array) {
+                            if (value == null) {
+                                writer.writeByte(0);
+                            } else {
+                                writer.writeByte(1);
                                 writer.writeLong(value);
                             }
+                        }
 
-                            optimized = true;
-                        } else if (arrayType == double[].class) {
-                            double[] array = (double[]) arrayObject;
+                        optimized = true;
+                    } else if (arrayType == Double[].class) {
+                        Double[] array = (Double[]) arrayObject;
 
-                            writer.writeByte(CONST_PRIMITIVE_DOUBLE_NATIVE_ARRAY);
+                        writer.writeByte(CONST_WRAPPER_DOUBLE_NATIVE_ARRAY);
 
-                            for (double value : array) {
+                        for (Double value : array) {
+                            if (value == null) {
+                                writer.writeByte(0);
+                            } else {
+                                writer.writeByte(1);
                                 writer.writeDouble(value);
                             }
-
-                            optimized = true;
-                        } else if (arrayType == Boolean[].class) {
-                            Boolean[] array = (Boolean[]) arrayObject;
-
-                            writer.writeByte(CONST_WRAPPER_BOOLEAN_NATIVE_ARRAY);
-
-                            for (Boolean value : array) {
-                                if (value == null) {
-                                    writer.writeByte(0);
-                                } else {
-                                    writer.writeByte(1);
-                                    writer.writeByte(value ? 1 : 0);
-                                }
-                            }
-
-                            optimized = true;
-                        } else if (arrayType == Byte[].class) {
-                            Byte[] array = (Byte[]) arrayObject;
-
-                            writer.writeByte(CONST_WRAPPER_BYTE_NATIVE_ARRAY);
-
-                            for (Byte value : array) {
-                                if (value == null) {
-                                    writer.writeByte(0);
-                                } else {
-                                    writer.writeByte(1);
-                                    writer.writeByte(value);
-                                }
-                            }
-
-                            optimized = true;
-                        } else if (arrayType == Character[].class) {
-                            Character[] array = (Character[]) arrayObject;
-
-                            writer.writeByte(CONST_WRAPPER_CHARACTER_NATIVE_ARRAY);
-
-                            for (Character value : array) {
-                                if (value == null) {
-                                    writer.writeByte(0);
-                                } else {
-                                    writer.writeByte(1);
-                                    writer.writeChar(value);
-                                }
-                            }
-
-                            optimized = true;
-                        } else if (arrayType == Short[].class) {
-                            Short[] array = (Short[]) arrayObject;
-
-                            writer.writeByte(CONST_WRAPPER_SHORT_NATIVE_ARRAY);
-
-                            for (Short value : array) {
-                                if (value == null) {
-                                    writer.writeByte(0);
-                                } else {
-                                    writer.writeByte(1);
-                                    writer.writeShort(value);
-                                }
-                            }
-
-                            optimized = true;
-                        } else if (arrayType == Integer[].class) {
-                            Integer[] array = (Integer[]) arrayObject;
-
-                            writer.writeByte(CONST_WRAPPER_INTEGER_NATIVE_ARRAY);
-
-                            for (Integer value : array) {
-                                if (value == null) {
-                                    writer.writeByte(0);
-                                } else {
-                                    writer.writeByte(1);
-                                    writer.writeInt(value);
-                                }
-                            }
-
-                            optimized = true;
-                        } else if (arrayType == Float[].class) {
-                            Float[] array = (Float[]) arrayObject;
-
-                            writer.writeByte(CONST_WRAPPER_FLOAT_NATIVE_ARRAY);
-
-                            for (Float value : array) {
-                                if (value == null) {
-                                    writer.writeByte(0);
-                                } else {
-                                    writer.writeByte(1);
-                                    writer.writeFloat(value);
-                                }
-                            }
-
-                            optimized = true;
-                        } else if (arrayType == Long[].class) {
-                            Long[] array = (Long[]) arrayObject;
-
-                            writer.writeByte(CONST_WRAPPER_LONG_NATIVE_ARRAY);
-
-                            for (Long value : array) {
-                                if (value == null) {
-                                    writer.writeByte(0);
-                                } else {
-                                    writer.writeByte(1);
-                                    writer.writeLong(value);
-                                }
-                            }
-
-                            optimized = true;
-                        } else if (arrayType == Double[].class) {
-                            Double[] array = (Double[]) arrayObject;
-
-                            writer.writeByte(CONST_WRAPPER_DOUBLE_NATIVE_ARRAY);
-
-                            for (Double value : array) {
-                                if (value == null) {
-                                    writer.writeByte(0);
-                                } else {
-                                    writer.writeByte(1);
-                                    writer.writeDouble(value);
-                                }
-                            }
-
-                            optimized = true;
                         }
-                    }
 
-                    if (!optimized) {
-                        writer.writeByte(CONST_NO_NATIVE_ARRAY);
-
-                        for (int index = length - 1; index >= 0; index--) {
-                            Object value = opackArray.get(index);
-                            encodeStack.push(value);
-                        }
+                        optimized = true;
                     }
-                } catch (InvocationTargetException | IllegalAccessException e) {
-                    throw new IllegalStateException("Failed to access the native list object in OpackArray.");
+                }
+
+                if (!optimized) {
+                    writer.writeByte(CONST_NO_NATIVE_ARRAY);
+
+                    for (int index = length - 1; index >= 0; index--) {
+                        Object value = opackArray.get(index);
+                        encodeStack.push(value);
+                    }
                 }
             } else {
                 if (objectType == boolean.class) {
@@ -669,7 +664,7 @@ public final class DenseCodec extends OpackCodec<Reader, Writer> {
      * @throws IllegalArgumentException if the decoded value is not a opack value
      */
     @Override
-    protected @Nullable Object decodeObject(@NotNull Reader reader) throws IOException {
+    protected @NotNull Object decodeObject(@NotNull Reader reader) throws IOException {
         byte[] classifier = new byte[CONST_DENSE_CODEC_CLASSIFIER.length];
         reader.readBytes(classifier);
 

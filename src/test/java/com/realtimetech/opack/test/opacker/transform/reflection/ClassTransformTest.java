@@ -30,6 +30,7 @@ import com.realtimetech.opack.value.OpackValue;
 import org.junit.jupiter.api.Test;
 
 public class ClassTransformTest {
+    @SuppressWarnings("ALL")
     public static class ClassTransformClass {
         private Class<?> targetClass;
 

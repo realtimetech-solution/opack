@@ -34,6 +34,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 public class Java8TimeTransformTest {
+    @SuppressWarnings("ALL")
     public static class Java8TimeTransformClass {
         private LocalDate localDate;
         private LocalTime localTime;

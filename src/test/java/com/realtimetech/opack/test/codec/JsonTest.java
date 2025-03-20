@@ -41,8 +41,7 @@ import java.math.BigInteger;
 public class JsonTest {
     @Test
     public void object_to_string_to_object() throws DecodeException, EncodeException {
-        String targetData = "" +
-                "{\n" +
+        String targetData = "{\n" +
                 "\t\"unicode\": \"\\u003d is = and \\u0041 is A\",\n" +
                 "\t\"users\": [\n" +
                 "\t\t{\n" +
@@ -144,6 +143,7 @@ public class JsonTest {
 
         ComplexTest.ComplexClass originalObject = new ComplexTest.ComplexClass();
         OpackValue serialized = opacker.serialize(originalObject);
+        assert serialized != null;
         String encoded = jsonCodec.encode(serialized);
         OpackValue decoded = jsonCodec.decode(encoded);
         ComplexTest.ComplexClass deserialized = opacker.deserialize(ComplexTest.ComplexClass.class, decoded);
@@ -152,7 +152,7 @@ public class JsonTest {
     }
 
     @Test
-    public void with_long_miss_double_cause_big_decimal() throws DecodeException, EncodeException, SerializeException, DeserializeException, OpackAssert.AssertException {
+    public void with_long_miss_double_cause_big_decimal() throws DecodeException, EncodeException, OpackAssert.AssertException {
         JsonCodec jsonCodec = new JsonCodec.Builder().create();
 
         OpackObject originalObject = new OpackObject();
@@ -165,7 +165,7 @@ public class JsonTest {
     }
 
     @Test
-    public void with_big_integer_decimal() throws DecodeException, EncodeException, SerializeException, DeserializeException, OpackAssert.AssertException {
+    public void with_big_integer_decimal() throws DecodeException, EncodeException, OpackAssert.AssertException {
         JsonCodec jsonCodec = new JsonCodec.Builder().create();
 
         OpackObject originalObject = new OpackObject();

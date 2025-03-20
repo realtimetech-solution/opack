@@ -52,6 +52,7 @@ public class CharArrayVsCharAtBenchmark {
         return sb.toString();
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     private static void benchmark(String str, int iterations) {
         // Warm-up
         charAtMethod(str);
@@ -84,8 +85,7 @@ public class CharArrayVsCharAtBenchmark {
         int sum = 0;
         char[] chars = str.toCharArray();
         int len = chars.length;
-        for (int i = 0; i < len; i++)
-            sum += chars[i];
+        for (char aChar : chars) sum += aChar;
         return sum;
     }
 }

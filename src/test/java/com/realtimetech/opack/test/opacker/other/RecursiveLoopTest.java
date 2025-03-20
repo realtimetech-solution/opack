@@ -23,14 +23,13 @@
 package com.realtimetech.opack.test.opacker.other;
 
 import com.realtimetech.opack.Opacker;
-import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
-import com.realtimetech.opack.test.OpackAssert;
 import com.realtimetech.opack.value.OpackValue;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class RecursiveLoopTest {
+    @SuppressWarnings("ALL")
     public static class RecursiveClass {
         private RecursiveClass recursiveClass;
 
@@ -43,7 +42,7 @@ public class RecursiveLoopTest {
     }
 
     @Test
-    public void test() throws SerializeException, DeserializeException, OpackAssert.AssertException {
+    public void test() {
         Opacker opacker = new Opacker.Builder()
                 .setEnableConvertRecursiveDependencyToNull(false)
                 .create();
