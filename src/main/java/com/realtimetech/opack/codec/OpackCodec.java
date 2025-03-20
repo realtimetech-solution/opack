@@ -30,24 +30,6 @@ import org.jetbrains.annotations.Nullable;
 
 public abstract class OpackCodec<I, Writer> {
     /**
-     * Encodes the {@link OpackValue#isAllowType(Class) Objects of the type allowed by OpackValue} through a codec
-     *
-     * @param writer the writer to store an encoded result
-     * @param object the object to encode
-     * @throws EncodeException if a problem occurs during encoding
-     */
-    protected abstract void encodeObject(@NotNull Writer writer, @Nullable Object object) throws EncodeException;
-
-    /**
-     * Decodes the input through a codec into {@link OpackValue#isAllowType(Class) Objects of the type allowed by OpackValue}
-     *
-     * @param input the input to decode
-     * @return the decoded result
-     * @throws DecodeException if a problem occurs during decoding
-     */
-    protected abstract @Nullable Object decodeObject(@NotNull I input) throws DecodeException;
-
-    /**
      * Encodes the {@link OpackValue OpackValue} through a codec
      *
      * @param writer the writer to store an encoded result
@@ -57,6 +39,15 @@ public abstract class OpackCodec<I, Writer> {
     public final synchronized void encode(@NotNull Writer writer, @NotNull OpackValue object) throws EncodeException {
         this.encodeObject(writer, object);
     }
+
+    /**
+     * Encodes the {@link OpackValue#isAllowType(Class) Objects of the type allowed by OpackValue} through a codec
+     *
+     * @param writer the writer to store an encoded result
+     * @param object the object to encode
+     * @throws EncodeException if a problem occurs during encoding
+     */
+    protected abstract void encodeObject(@NotNull Writer writer, @Nullable Object object) throws EncodeException;
 
     /**
      * Decodes the input through a codec into {@link OpackValue OpackValue}
@@ -74,4 +65,13 @@ public abstract class OpackCodec<I, Writer> {
 
         throw new DecodeException("Successfully decoded but given input is not an OpackValue.");
     }
+
+    /**
+     * Decodes the input through a codec into {@link OpackValue#isAllowType(Class) Objects of the type allowed by OpackValue}
+     *
+     * @param input the input to decode
+     * @return the decoded result
+     * @throws DecodeException if a problem occurs during decoding
+     */
+    protected abstract @Nullable Object decodeObject(@NotNull I input) throws DecodeException;
 }
