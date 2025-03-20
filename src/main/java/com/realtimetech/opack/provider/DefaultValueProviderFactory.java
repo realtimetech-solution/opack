@@ -48,10 +48,12 @@ public class DefaultValueProviderFactory {
     /**
      * Returns default value provider instance
      *
+     * @param <P>                      The type parameter extending {@link DefaultValueProvider}.
      * @param defaultValueProviderType the default value provider class
      * @return the default value provider instance
      * @throws InstantiationException if the default value provider class object cannot be instantiated; if the default value provider is not in the default value provider class
      */
+    @SuppressWarnings("ConstantValue")
     public <P extends DefaultValueProvider> @NotNull P get(@NotNull Class<P> defaultValueProviderType) throws InstantiationException {
         if (!this.defaultValueProviderMap.containsKey(defaultValueProviderType)) {
             synchronized (this.defaultValueProviderMap) {
@@ -59,20 +61,16 @@ public class DefaultValueProviderFactory {
                     P instance = null;
 
                     try {
-                        // Create instance using DefaultValueProvider(Opacker) constructor
+                        // Create an instance using DefaultValueProvider(Opacker) constructor
                         try {
                             instance = ReflectionUtil.createInstance(defaultValueProviderType, this.opacker);
                         } catch (IllegalArgumentException exception) {
                             // Ok, let's find no parameter constructor
                         }
 
-                        // Create instance using DefaultValueProvider() constructor
-                        try {
-                            if (instance == null) {
-                                instance = ReflectionUtil.createInstance(defaultValueProviderType);
-                            }
-                        } catch (IllegalArgumentException exception) {
-                            // Ok, let's throw exception
+                        // Create an instance using DefaultValueProvider() constructor
+                        if (instance == null) {
+                            instance = ReflectionUtil.createInstance(defaultValueProviderType);
                         }
                     } catch (InvocationTargetException | IllegalAccessException exception) {
                         InstantiationException instantiationException = new InstantiationException(defaultValueProviderType.getSimpleName() + " default value provider can't instantiation.");

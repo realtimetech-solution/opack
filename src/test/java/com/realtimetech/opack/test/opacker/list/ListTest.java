@@ -61,7 +61,7 @@ public class ListTest {
 
     @Test
     public void test() throws SerializeException, DeserializeException, OpackAssert.AssertException {
-        Opacker opacker = new Opacker.Builder().create();
+        Opacker opacker = Opacker.Builder.create().build();
         ListClass originalObject = new ListClass();
 
         OpackValue serialized = opacker.serialize(originalObject);

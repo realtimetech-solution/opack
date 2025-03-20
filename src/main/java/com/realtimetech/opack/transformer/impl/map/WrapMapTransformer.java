@@ -36,7 +36,7 @@ public class WrapMapTransformer extends MapTransformer {
      *
      * @param opacker the opacker
      * @param element the element to be serialized
-     * @return serialized value
+     * @return the serialized value
      * @throws SerializeException if a problem occurs during serializing
      */
     @Override
@@ -49,7 +49,7 @@ public class WrapMapTransformer extends MapTransformer {
      *
      * @param opacker the opacker
      * @param element the element to be deserialized
-     * @return deserialized element
+     * @return the deserialized element
      * @throws DeserializeException if a problem occurs during deserializing
      */
     @Override

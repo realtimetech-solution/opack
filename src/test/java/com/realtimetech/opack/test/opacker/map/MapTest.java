@@ -60,7 +60,7 @@ public class MapTest {
 
     @Test
     public void test() throws SerializeException, DeserializeException, OpackAssert.AssertException {
-        Opacker opacker = new Opacker.Builder().create();
+        Opacker opacker = Opacker.Builder.create().build();
         MapClass originalObject = new MapClass();
 
         OpackValue serialized = opacker.serialize(originalObject);

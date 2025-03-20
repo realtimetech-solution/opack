@@ -37,16 +37,16 @@ public final class OpackObject extends AbstractOpackValue<LinkedHashMap<Object, 
     }
 
     /**
-     * Constructs an empty OpackObject without underlying map
+     * Constructs an empty OpackObject without an underlying map
      */
     public OpackObject() {
     }
 
     /**
-     * Create and return the underlying map of this opack object
+     * Creates and return the underlying map of this opack object
      * This method will be called if {@link AbstractOpackValue#get() get()} method is called, when this opack object does not have an underlying map
      *
-     * @return underlying map
+     * @return the underlying map
      */
     @Override
     protected @NotNull LinkedHashMap<Object, Object> createLazyValue() {
@@ -278,7 +278,7 @@ public final class OpackObject extends AbstractOpackValue<LinkedHashMap<Object, 
      *
      * @param key   the key
      * @param value the value to put
-     * @return the previous value associated with key, or null if there was no mapping for key
+     * @return the previous value associated with a key, or null if there was no mapping for a key
      */
     public Object put(Object key, Object value) {
         if (key != null) {
@@ -296,7 +296,7 @@ public final class OpackObject extends AbstractOpackValue<LinkedHashMap<Object, 
      * Removes the mapping for the specified key from this opack object
      *
      * @param key the key
-     * @return the previous value associated with key, or null if there was no mapping for key
+     * @return the previous value associated with a key, or null if there was no mapping for a key
      */
     public Object remove(Object key) {
         if (key != null) {
@@ -360,7 +360,7 @@ public final class OpackObject extends AbstractOpackValue<LinkedHashMap<Object, 
      * @return a string representation of the HashMap
      */
     @Override
-    protected String toString(LinkedHashMap<Object, Object> value) {
+    protected @NotNull String toString(LinkedHashMap<Object, Object> value) {
         return value.toString();
     }
 
@@ -370,7 +370,7 @@ public final class OpackObject extends AbstractOpackValue<LinkedHashMap<Object, 
      * @return a deep copy of this opack object instance
      */
     @Override
-    public OpackObject clone() {
+    public @NotNull OpackObject clone() {
         OpackObject opackObject = new OpackObject(this.size());
 
         for (Object key : this.get().keySet()) {
@@ -409,7 +409,7 @@ public final class OpackObject extends AbstractOpackValue<LinkedHashMap<Object, 
     /**
      * Returns the hash code of this opack object
      *
-     * @return hash code
+     * @return the hash code
      */
     @Override
     public int hashCode() {

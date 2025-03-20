@@ -29,7 +29,7 @@ import java.io.InputStream;
 
 public class InputStreamReader implements Reader {
     /**
-     * Create InputStreamReader
+     * Creates InputStreamReader
      *
      * @param inputStream the input stream
      * @return the input stream reader
@@ -135,7 +135,7 @@ public class InputStreamReader implements Reader {
     /**
      * Reads the next bytes of data from the input stream
      *
-     * @param bytes the byte array to write the bytes read
+     * @param bytes the byte array to write
      * @throws IOException if an I/O exception occurs
      */
     public void readBytes(byte @NotNull [] bytes) throws IOException {

@@ -29,28 +29,33 @@ abstract class AbstractOpackValue<T> implements OpackValue {
     private volatile @Nullable T value;
 
     /**
-     * Create and return the underlying object of this opack value
+     * Creates and return the underlying object of this opack value
      * This method will be called if {@link AbstractOpackValue#get() get()} method is called, when this opack value does not have an underlying object
      *
-     * @return underlying object
+     * @return the underlying object
      */
     protected abstract @NotNull T createLazyValue();
 
     /**
      * Returns the underlying object of this opack value
      *
-     * @return underlying object
+     * @return the underlying object
      */
-    protected T get() {
-        if (this.value == null) {
+    protected @NotNull T get() {
+        T value = this.value;
+
+        if (value == null) {
             synchronized (this) {
-                if (this.value == null) {
-                    this.value = createLazyValue();
+                value = this.value;
+
+                if (value == null) {
+                    value = createLazyValue();
+                    this.value = value;
                 }
             }
         }
 
-        return this.value;
+        return value;
     }
 
     /**
@@ -70,7 +75,7 @@ abstract class AbstractOpackValue<T> implements OpackValue {
      * @param value the underlying object of opack value
      * @return a string representation of opack value
      */
-    protected abstract String toString(T value);
+    protected abstract @NotNull String toString(T value);
 
     /**
      * Returns true if a specific object is the same as this opack value
@@ -83,17 +88,17 @@ abstract class AbstractOpackValue<T> implements OpackValue {
     /**
      * Returns the hash code of this opack value
      *
-     * @return hash code
+     * @return the hash code
      */
     public abstract int hashCode();
 
     /**
      * Clone this opack value
      *
-     * @return cloned opack value
+     * @return the cloned opack value
      */
     @Override
-    public abstract OpackValue clone();
+    public abstract @NotNull OpackValue clone();
 
     /**
      * Returns a string representation of this opack value
@@ -101,7 +106,7 @@ abstract class AbstractOpackValue<T> implements OpackValue {
      * @return a string representation of this opack value
      */
     @Override
-    public final String toString() {
+    public final @NotNull String toString() {
         return this.getClass().getSimpleName() + "(" + this.toString(get()) + ")";
     }
 }

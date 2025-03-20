@@ -37,7 +37,7 @@ public class OpackArrayConverter {
      * @param componentType the component type of array
      * @param opackArray    the opack array to convert
      * @return the converted array
-     * @throws IllegalArgumentException if component type is now allowed or invalid
+     * @throws IllegalArgumentException if a component type is now allowed or invalid
      */
     public static @NotNull Object convertToArray(@NotNull Class<?> componentType, @NotNull OpackArray opackArray) {
         if (!OpackValue.isAllowType(componentType)) {

@@ -33,7 +33,7 @@ public interface DefaultValueProvider {
      *
      * @param opacker  the opacker
      * @param object   the property owner
-     * @param property the property to provide default value
+     * @param property the property to provide a default value
      * @return the default value
      */
     @Nullable Object provide(@NotNull Opacker opacker, @NotNull Object object, @NotNull BakedType.Property property);

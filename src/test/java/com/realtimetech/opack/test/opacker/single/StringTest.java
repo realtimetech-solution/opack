@@ -51,7 +51,7 @@ public class StringTest {
 
     @Test
     public void test() throws SerializeException, DeserializeException, OpackAssert.AssertException {
-        Opacker opacker = new Opacker.Builder().create();
+        Opacker opacker = Opacker.Builder.create().build();
         StringArrayTest.StringArrayClass originalObject = new StringArrayTest.StringArrayClass();
 
         OpackValue serialized = opacker.serialize(originalObject);

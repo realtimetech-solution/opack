@@ -43,7 +43,7 @@ public class FileTransformTest {
 
     @Test
     public void test() throws SerializeException, DeserializeException, OpackAssert.AssertException {
-        Opacker opacker = new Opacker.Builder().create();
+        Opacker opacker = Opacker.Builder.create().build();
         FileTransformClass originalObject = new FileTransformClass();
 
         OpackValue serialized = opacker.serialize(originalObject);

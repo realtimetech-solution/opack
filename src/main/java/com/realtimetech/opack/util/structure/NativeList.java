@@ -32,9 +32,9 @@ public final class NativeList implements List<Object> {
     final @NotNull Object arrayObject;
 
     /**
-     * Constructs a NativeList with array object
+     * Constructs a NativeList with an array object
      *
-     * @param arrayObject the array object for create
+     * @param arrayObject the array object
      * @throws IllegalArgumentException if this object does not represent an array class
      */
     public NativeList(@NotNull Object arrayObject) {
@@ -88,7 +88,7 @@ public final class NativeList implements List<Object> {
     }
 
     /**
-     * @return an iterator over the elements in this list in proper sequence
+     * @return an iterator over the elements in this list
      */
     @Override
     public @NotNull Iterator<Object> iterator() {
@@ -96,9 +96,7 @@ public final class NativeList implements List<Object> {
     }
 
     /**
-     * Returns an array containing all the elements in this list in proper sequence
-     *
-     * @return all elements of this list
+     * @return an array containing all elements of this list
      */
     @Override
     public Object @NotNull [] toArray() {
@@ -112,7 +110,7 @@ public final class NativeList implements List<Object> {
     }
 
     /**
-     * Returns an array containing all the elements in this list in proper sequence (from first to last element)
+     * Returns an array containing all the elements in this list in a proper sequence (from first to the last element)
      * The runtime type of the returned array is that of the specified array
      *
      * @param array the array to get type
@@ -335,7 +333,7 @@ public final class NativeList implements List<Object> {
     /**
      * Returns the hash code of this list
      *
-     * @return hash code
+     * @return the hash code
      */
     @Override
     public int hashCode() {
@@ -348,7 +346,7 @@ public final class NativeList implements List<Object> {
     }
 
     /**
-     * @return a list iterator over the elements in this list (in proper sequence)
+     * @return a list iterator over the elements in this list (in a proper sequence)
      */
     @NotNull
     @Override
@@ -357,12 +355,14 @@ public final class NativeList implements List<Object> {
     }
 
     /**
-     * Returns a list iterator over the elements in this list (in proper sequence), starting at the specified position in the list
-     * The specified index indicates the first element that would be returned by an initial call to {@link ListIterator#next() next}
+     * Returns a list iterator over the elements in this list (in a proper sequence),
+     * starting at the specified position in the list
+     * The specified index indicates the first element
+     * that would be returned by an initial call to {@link ListIterator#next() next}
      * An initial call to {@link ListIterator#previous previous}previous would return the element with the specified index minus one
      *
      * @param index index of the first element to be returned from the list iterator (by a call to {@link ListIterator#next next})
-     * @return a list iterator over the elements in this list (in proper sequence), starting at the specified position in the list
+     * @return a list iterator over the elements in this list (in a proper sequence), starting at the specified position in the list
      */
     @NotNull
     @Override

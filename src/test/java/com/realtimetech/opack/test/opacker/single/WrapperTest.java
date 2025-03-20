@@ -82,7 +82,7 @@ public class WrapperTest {
 
     @Test
     public void test() throws SerializeException, DeserializeException, OpackAssert.AssertException {
-        Opacker opacker = new Opacker.Builder().create();
+        Opacker opacker = Opacker.Builder.create().build();
         WrapperClass originalObject = new WrapperClass();
 
         OpackValue serialized = opacker.serialize(originalObject);

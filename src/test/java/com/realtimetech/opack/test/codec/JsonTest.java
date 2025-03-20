@@ -136,7 +136,7 @@ public class JsonTest {
 
     @Test
     public void with_object() throws DecodeException, EncodeException, SerializeException, DeserializeException, OpackAssert.AssertException {
-        Opacker opacker = new Opacker.Builder().create();
+        Opacker opacker = Opacker.Builder.create().build();
         JsonCodec jsonCodec = new JsonCodec.Builder()
                 .setEnableConvertCharacterToString(false)
                 .create();

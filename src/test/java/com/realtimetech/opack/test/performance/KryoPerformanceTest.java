@@ -92,7 +92,7 @@ public class KryoPerformanceTest {
         /*
             Opack Contexts
          */
-            Opacker opacker = new Opacker.Builder().create();
+            Opacker opacker = Opacker.Builder.create().build();
             ByteArrayWriter byteArrayWriter = new ByteArrayWriter();
             DenseCodec denseCodec = new DenseCodec.Builder().create();
 

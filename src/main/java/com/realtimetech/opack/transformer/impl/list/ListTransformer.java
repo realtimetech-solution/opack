@@ -42,7 +42,7 @@ public class ListTransformer extends DataStructureTransformer {
      * @param opacker      the opacker
      * @param originalType the original type
      * @param object       the object to be serialized
-     * @return opack value
+     * @return the opack value
      * @throws SerializeException if a problem occurs during serializing
      */
     @Override
@@ -67,7 +67,7 @@ public class ListTransformer extends DataStructureTransformer {
      * @param opacker  the opacker
      * @param goalType the goal type to deserialize
      * @param object   the object to be deserialized
-     * @return deserialized value
+     * @return the deserialized value
      * @throws DeserializeException if a problem occurs during deserializing
      */
     @Override
@@ -101,7 +101,7 @@ public class ListTransformer extends DataStructureTransformer {
      *
      * @param opacker the opacker
      * @param element the element to be serialized
-     * @return serialized value
+     * @return the serialized value
      * @throws SerializeException if a problem occurs during serializing
      */
     @Override
@@ -118,7 +118,7 @@ public class ListTransformer extends DataStructureTransformer {
      *
      * @param opacker the opacker
      * @param element the element to be deserialized
-     * @return deserialized element
+     * @return the deserialized element
      */
     @Override
     protected @Nullable Object deserializeObject(@NotNull Opacker opacker, @Nullable Object element) throws DeserializeException {

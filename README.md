@@ -10,7 +10,7 @@
 
 Opack is a Java library that can serialize/deserialize between Java objects and common objects(OpackValue). Also, common objects can be encoded or decoded as JSON or Bytes(Dense).
 
-**We faster then GSON and Kryo.** (See [tests](./src/test/java/com/realtimetech/opack/test/performance))
+**We faster than GSON and Kryo.** (See [tests](./src/test/java/com/realtimetech/opack/test/performance))
 <details>
   <summary>Click to see performance result</summary>
 
@@ -349,7 +349,7 @@ public class Usage {
 ### To-Do
 
 - [ ] Separate field transformer and class transformer
-- [ ] Add generic into transformer for type safety
+- [ ] Add generic into the transformer for type safety
 - [ ] Add field pre/post transformer
 - [ ] Remove `fieldTransformer` argument of `Opacker.prepareObjectDeserialize`
 - [ ] Remove `withType` argument of `Opacker.prepareObjectDeserialize`

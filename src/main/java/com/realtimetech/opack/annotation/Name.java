@@ -38,7 +38,7 @@ import java.lang.annotation.Target;
 })
 public @interface Name {
     /**
-     * @return returns name to be serialized/deserialized
+     * @return the name to be serialized or deserialized
      */
     @NotNull String value();
 }

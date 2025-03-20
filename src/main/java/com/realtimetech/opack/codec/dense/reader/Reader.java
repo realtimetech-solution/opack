@@ -87,7 +87,7 @@ public interface Reader {
     /**
      * Reads the next bytes of data from the input stream
      *
-     * @param bytes the byte array to write the bytes read
+     * @param bytes the byte array to write
      * @throws IOException if an I/O exception occurs
      */
     void readBytes(byte @NotNull [] bytes) throws IOException;

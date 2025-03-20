@@ -48,9 +48,10 @@ public class TransformerFactory {
     /**
      * Returns transformer instance
      *
+     * @param <T>             the type of the transformer
      * @param transformerType the transformer class
-     * @return transformer instance
-     * @throws InstantiationException if transformer class object cannot be instantiated; if the constructor is not in the transformer class
+     * @return the transformer instance
+     * @throws InstantiationException if a transformer class object cannot be instantiated; if the constructor is not in the transformer class
      */
     public <T extends Transformer> T get(@NotNull Class<T> transformerType) throws InstantiationException {
         if (!this.transformerMap.containsKey(transformerType)) {
@@ -59,7 +60,7 @@ public class TransformerFactory {
                     T instance = null;
 
                     try {
-                        // Create instance using Transformer(Opacker) constructor
+                        // Create an instance using Transformer(Opacker) constructor
                         try {
                             instance = ReflectionUtil.createInstance(transformerType, this.opacker);
                         } catch (IllegalArgumentException exception) {
@@ -67,22 +68,14 @@ public class TransformerFactory {
                         }
 
                         // Create instance using Transformer() constructor
-                        try {
-                            if (instance == null) {
-                                instance = ReflectionUtil.createInstance(transformerType);
-                            }
-                        } catch (IllegalArgumentException exception) {
-                            // Ok, let's throw exception
+                        if (instance == null) {
+                            instance = ReflectionUtil.createInstance(transformerType);
                         }
                     } catch (InvocationTargetException | IllegalAccessException exception) {
                         InstantiationException instantiationException = new InstantiationException(transformerType.getSimpleName() + " transformer can't instantiation.");
                         instantiationException.initCause(exception);
 
                         throw instantiationException;
-                    }
-
-                    if (instance == null) {
-                        throw new InstantiationException(transformerType.getSimpleName() + " transformer must be implemented constructor(Opacker) or constructor().");
                     }
 
                     this.transformerMap.put(transformerType, instance);

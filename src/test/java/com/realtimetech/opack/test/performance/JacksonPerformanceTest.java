@@ -46,7 +46,7 @@ public class JacksonPerformanceTest {
         /*
             Opack Contexts
          */
-        Opacker opacker = new Opacker.Builder().create();
+        Opacker opacker = Opacker.Builder.create().build();
         JsonCodec jsonCodec = new JsonCodec.Builder()
                 .setEnableConvertCharacterToString(false)
                 .create();

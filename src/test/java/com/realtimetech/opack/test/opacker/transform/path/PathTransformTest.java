@@ -43,7 +43,7 @@ public class PathTransformTest {
 
     @Test
     public void test() throws SerializeException, DeserializeException, OpackAssert.AssertException {
-        Opacker opacker = new Opacker.Builder().create();
+        Opacker opacker = Opacker.Builder.create().build();
         PathTransformClass originalObject = new PathTransformClass();
 
         OpackValue serialized = opacker.serialize(originalObject);
