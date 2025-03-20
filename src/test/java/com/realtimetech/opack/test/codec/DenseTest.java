@@ -39,7 +39,7 @@ public class DenseTest {
     @Test
     public void bytes_to_object_to_bytes_object() throws DecodeException, EncodeException {
         OpackValue opackValue = CommonOpackValue.create();
-        DenseCodec denseCodec = new DenseCodec.Builder().create();
+        DenseCodec denseCodec = DenseCodec.Builder.create().build();
 
         byte[] bytes1 = denseCodec.encode(opackValue);
         OpackValue opackValue1 = denseCodec.decode(bytes1);
@@ -61,7 +61,7 @@ public class DenseTest {
     @Test
     public void with_object() throws DecodeException, EncodeException, SerializeException, DeserializeException, OpackAssert.AssertException {
         Opacker opacker = Opacker.Builder.create().build();
-        DenseCodec denseCodec = new DenseCodec.Builder().create();
+        DenseCodec denseCodec = DenseCodec.Builder.create().build();
 
         ComplexTest.ComplexClass originalObject = new ComplexTest.ComplexClass();
         OpackValue serialized = opacker.serialize(originalObject);

@@ -46,34 +46,66 @@ import java.util.List;
 
 public final class DenseCodec extends OpackCodec<Reader, Writer> {
     public final static class Builder {
+        /**
+         * Creates a new instance of the builder class
+         *
+         * @return the created builder
+         */
+        public static @NotNull Builder create() {
+            return new Builder();
+        }
+
         private int encodeStackInitialSize;
         private int decodeStackInitialSize;
 
         boolean ignoreVersionCompare;
 
-        public Builder() {
+        Builder() {
             this.encodeStackInitialSize = 128;
             this.decodeStackInitialSize = 128;
 
             this.ignoreVersionCompare = false;
         }
 
+        /**
+         * Sets the initial size of the encoder stack
+         *
+         * @param encodeStackInitialSize the initial size to set for the encode stack
+         * @return the current instance of the builder for method chaining
+         */
         public @NotNull Builder setEncodeStackInitialSize(int encodeStackInitialSize) {
             this.encodeStackInitialSize = encodeStackInitialSize;
             return this;
         }
 
+        /**
+         * Sets the initial size for the decode stack
+         *
+         * @param decodeStackInitialSize the initial size to set for the decode stack
+         * @return the current instance of the builder for method chaining
+         */
         public @NotNull Builder setDecodeStackInitialSize(int decodeStackInitialSize) {
             this.decodeStackInitialSize = decodeStackInitialSize;
             return this;
         }
 
+        /**
+         * Sets whether version comparison should be ignored
+         *
+         * @param ignoreVersionCompare the flag indicating whether to ignore version comparison
+         * @return the current instance of the builder for method chaining
+         */
         public @NotNull Builder setIgnoreVersionCompare(boolean ignoreVersionCompare) {
             this.ignoreVersionCompare = ignoreVersionCompare;
             return this;
         }
 
-        public @NotNull DenseCodec create() {
+        /**
+         * Build the {@link DenseCodec DenseCodec}
+         *
+         * @return the created {@link DenseCodec DenseCodec}
+         */
+        public @NotNull DenseCodec build() {
             return new DenseCodec(this);
         }
     }
@@ -138,7 +170,7 @@ public final class DenseCodec extends OpackCodec<Reader, Writer> {
      *
      * @param builder the builder of DenseCodec
      */
-    private DenseCodec(@NotNull Builder builder) {
+    DenseCodec(@NotNull Builder builder) {
         super();
 
         this.encodeStack = new FastStack<>(builder.encodeStackInitialSize);

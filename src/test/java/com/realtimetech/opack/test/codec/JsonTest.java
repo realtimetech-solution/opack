@@ -65,7 +65,7 @@ public class JsonTest {
                 "\t]\n" +
                 "}";
 
-        JsonCodec jsonCodec = new JsonCodec.Builder().create();
+        JsonCodec jsonCodec = JsonCodec.Builder.create().build();
 
         OpackValue opackValue1 = jsonCodec.decode(targetData);
         Assertions.assertEquals("\u003d is = and \u0041 is A", ((OpackObject) opackValue1).get("unicode"));
@@ -81,7 +81,7 @@ public class JsonTest {
     public void empty_object() throws DecodeException, EncodeException {
         String targetData = "{\"object\":{},\"value\":2147483648}";
 
-        JsonCodec jsonCodec = new JsonCodec.Builder().create();
+        JsonCodec jsonCodec = JsonCodec.Builder.create().build();
 
         OpackValue opackValue1 = jsonCodec.decode(targetData);
 
@@ -96,7 +96,7 @@ public class JsonTest {
     public void empty_array() throws DecodeException, EncodeException {
         String targetData = "{\"array\":[],\"value\":2147483648}";
 
-        JsonCodec jsonCodec = new JsonCodec.Builder().create();
+        JsonCodec jsonCodec = JsonCodec.Builder.create().build();
 
         OpackValue opackValue1 = jsonCodec.decode(targetData);
 
@@ -110,7 +110,7 @@ public class JsonTest {
     @Test
     public void string_to_object_to_string_object() throws DecodeException, EncodeException {
         OpackValue opackValue = CommonOpackValue.create();
-        JsonCodec jsonCodec = new JsonCodec.Builder().create();
+        JsonCodec jsonCodec = JsonCodec.Builder.create().build();
 
         String json1 = jsonCodec.encode(opackValue);
         Assertions.assertTrue(json1.contains("\"unicode\":\"\\u0000\\u0001̂ݷ\\u0000\""));
@@ -137,9 +137,9 @@ public class JsonTest {
     @Test
     public void with_object() throws DecodeException, EncodeException, SerializeException, DeserializeException, OpackAssert.AssertException {
         Opacker opacker = Opacker.Builder.create().build();
-        JsonCodec jsonCodec = new JsonCodec.Builder()
+        JsonCodec jsonCodec = JsonCodec.Builder.create()
                 .setEnableConvertCharacterToString(false)
-                .create();
+                .build();
 
         ComplexTest.ComplexClass originalObject = new ComplexTest.ComplexClass();
         OpackValue serialized = opacker.serialize(originalObject);
@@ -153,7 +153,7 @@ public class JsonTest {
 
     @Test
     public void with_long_miss_double_cause_big_decimal() throws DecodeException, EncodeException, OpackAssert.AssertException {
-        JsonCodec jsonCodec = new JsonCodec.Builder().create();
+        JsonCodec jsonCodec = JsonCodec.Builder.create().build();
 
         OpackObject originalObject = new OpackObject();
         originalObject.put("long", -5026738480679942478L);
@@ -166,7 +166,7 @@ public class JsonTest {
 
     @Test
     public void with_big_integer_decimal() throws DecodeException, EncodeException, OpackAssert.AssertException {
-        JsonCodec jsonCodec = new JsonCodec.Builder().create();
+        JsonCodec jsonCodec = JsonCodec.Builder.create().build();
 
         OpackObject originalObject = new OpackObject();
         originalObject.put("big_integer", new BigInteger("1" + Long.MAX_VALUE));

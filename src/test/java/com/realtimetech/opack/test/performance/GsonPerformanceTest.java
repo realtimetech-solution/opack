@@ -46,9 +46,9 @@ public class GsonPerformanceTest {
             Opack Contexts
          */
         Opacker opacker = Opacker.Builder.create().build();
-        JsonCodec jsonCodec = new JsonCodec.Builder()
+        JsonCodec jsonCodec = JsonCodec.Builder.create()
                 .setEnableConvertCharacterToString(false)
-                .create();
+                .build();
 
         int warmLoop = 64;
         int loop = 128;

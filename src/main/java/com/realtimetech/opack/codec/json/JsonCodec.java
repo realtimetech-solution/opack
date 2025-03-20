@@ -43,6 +43,15 @@ import java.util.Map;
 
 public final class JsonCodec extends OpackCodec<String, Writer> {
     public final static class Builder {
+        /**
+         * Creates a new instance of the builder class
+         *
+         * @return the created builder
+         */
+        public static @NotNull Builder create() {
+            return new Builder();
+        }
+
         private int encodeStackInitialSize;
         private int encodeStringBufferSize;
         private int decodeStackInitialSize;
@@ -51,9 +60,9 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
         private boolean enableConvertCharacterToString;
         private boolean usePrettyFormat;
 
-        public Builder() {
-            this.allowAnyValueToKey = false;
-            this.enableConvertCharacterToString = true;
+        Builder() {
+            this.allowAnyValueToKey = true;
+            this.enableConvertCharacterToString = false;
             this.usePrettyFormat = false;
 
             this.encodeStringBufferSize = 1024;
@@ -61,42 +70,82 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
             this.decodeStackInitialSize = 128;
         }
 
+        /**
+         * Sets the size of the buffer used for encoding strings
+         *
+         * @param encodeStringBufferSize the new buffer size for encoding strings
+         * @return the current builder instance for method chaining
+         */
         public @NotNull Builder setEncodeStringBufferSize(int encodeStringBufferSize) {
             this.encodeStringBufferSize = encodeStringBufferSize;
             return this;
         }
 
+        /**
+         * Sets the initial size of the stack used during the encoding process
+         *
+         * @param encodeStackInitialSize the new initial size for the encoding stack
+         * @return the current builder instance for method chaining
+         */
         public @NotNull Builder setEncodeStackInitialSize(int encodeStackInitialSize) {
             this.encodeStackInitialSize = encodeStackInitialSize;
             return this;
         }
 
+        /**
+         * Sets the initial size of the stack used during the decoding process
+         *
+         * @param decodeStackInitialSize the new initial size for the decoding stack
+         * @return the current builder instance for method chaining
+         */
         public @NotNull Builder setDecodeStackInitialSize(int decodeStackInitialSize) {
             this.decodeStackInitialSize = decodeStackInitialSize;
             return this;
         }
 
+        /**
+         * Sets whether any value is allowed for a key during the encoding or decoding process
+         *
+         * @param allowAnyValueToKey the flag indicating if any value is allowed for a key.
+         *                           If true, any value is permitted; if false, stricter rules might apply.
+         * @return the current builder instance for method chaining.
+         */
         public @NotNull Builder setAllowAnyValueToKey(boolean allowAnyValueToKey) {
             this.allowAnyValueToKey = allowAnyValueToKey;
             return this;
         }
 
+        /**
+         * Sets whether characters should be converted to strings during the encoding or decoding process
+         *
+         * @param enableConvertCharacterToString the flag indicating if characters should be converted to strings.
+         *                                       If true, characters are converted to strings; if false, they remain as characters.
+         * @return the current builder instance for method chaining.
+         */
         public @NotNull Builder setEnableConvertCharacterToString(boolean enableConvertCharacterToString) {
             this.enableConvertCharacterToString = enableConvertCharacterToString;
             return this;
         }
 
+        /**
+         * Sets whether the output should be formatted in a "pretty" style, meaning it will include
+         * line breaks and indentation for improved readability
+         *
+         * @param usePrettyFormat the flag indicating if the output should use pretty formatting.
+         *                        If true, pretty formatting is enabled; if false, compact formatting is used.
+         * @return the current builder instance for method chaining.
+         */
         public @NotNull Builder setUsePrettyFormat(boolean usePrettyFormat) {
             this.usePrettyFormat = usePrettyFormat;
             return this;
         }
 
         /**
-         * Creates the {@link JsonCodec JsonCodec}
+         * Build the {@link JsonCodec JsonCodec}
          *
-         * @return the created JSON codec
+         * @return the created {@link JsonCodec JsonCodec}
          */
-        public @NotNull JsonCodec create() {
+        public @NotNull JsonCodec build() {
             return new JsonCodec(this);
         }
     }
@@ -172,7 +221,7 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
      *
      * @param builder the builder of JsonCodec
      */
-    private JsonCodec(@NotNull Builder builder) {
+    JsonCodec(@NotNull Builder builder) {
         super();
 
         this.encodeLiteralStringWriter = new StringWriter(builder.encodeStringBufferSize);

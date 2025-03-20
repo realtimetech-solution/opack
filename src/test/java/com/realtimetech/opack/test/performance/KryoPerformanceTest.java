@@ -94,7 +94,7 @@ public class KryoPerformanceTest {
          */
             Opacker opacker = Opacker.Builder.create().build();
             ByteArrayWriter byteArrayWriter = new ByteArrayWriter();
-            DenseCodec denseCodec = new DenseCodec.Builder().create();
+            DenseCodec denseCodec = DenseCodec.Builder.create().build();
 
             int warmLoop = 512;
             int loop = 512 * 2;
