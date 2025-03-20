@@ -24,12 +24,18 @@ package com.realtimetech.opack.exception;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
-
 /**
  * Thrown when a problem occurs during encoding
  */
-public class EncodeException extends IOException {
+public class EncodeException extends Exception {
+    public EncodeException(@NotNull String message, @NotNull Throwable cause) {
+        super(message, cause);
+    }
+
+    public EncodeException(@NotNull String message) {
+        super(message);
+    }
+
     public EncodeException(@NotNull Throwable cause) {
         super(cause);
     }

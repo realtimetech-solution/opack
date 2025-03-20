@@ -143,7 +143,7 @@ public class ComplexTest {
 
     @Test
     public void test() throws SerializeException, DeserializeException, OpackAssert.AssertException {
-        Opacker opacker = new Opacker.Builder().create();
+        Opacker opacker = Opacker.Builder.create().build();
         ComplexClass originalObject = new ComplexClass();
 
         OpackValue serialized = opacker.serialize(originalObject);

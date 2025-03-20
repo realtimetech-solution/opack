@@ -43,9 +43,9 @@ public class RecursiveLoopTest {
 
     @Test
     public void test() {
-        Opacker opacker = new Opacker.Builder()
+        Opacker opacker = Opacker.Builder.create()
                 .setEnableConvertRecursiveDependencyToNull(false)
-                .create();
+                .build();
         RecursiveClass originalObjectA = new RecursiveClass();
         RecursiveClass originalObjectB = new RecursiveClass();
 

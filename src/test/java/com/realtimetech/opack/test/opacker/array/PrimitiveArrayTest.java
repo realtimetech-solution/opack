@@ -96,7 +96,7 @@ public class PrimitiveArrayTest {
 
     @Test
     public void test() throws SerializeException, DeserializeException, OpackAssert.AssertException {
-        Opacker opacker = new Opacker.Builder().create();
+        Opacker opacker = Opacker.Builder.create().build();
         PrimitiveArrayClass originalObject = new PrimitiveArrayClass();
 
         OpackValue serialized = opacker.serialize(originalObject);

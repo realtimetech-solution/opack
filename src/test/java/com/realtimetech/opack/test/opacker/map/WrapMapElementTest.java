@@ -86,7 +86,9 @@ public class WrapMapElementTest {
     }
 
     private void common(boolean enableWrapMapElementType) throws SerializeException, DeserializeException, OpackAssert.AssertException {
-        Opacker opacker = new Opacker.Builder().setEnableWrapMapElementType(enableWrapMapElementType).create();
+        Opacker opacker = Opacker.Builder.create()
+                .setEnableWrapMapElementType(enableWrapMapElementType)
+                .build();
         WrapMapClass originalObject = new WrapMapClass();
 
         OpackValue serialized = opacker.serialize(originalObject);

@@ -78,7 +78,7 @@ public class StringWriter extends Writer {
     /**
      * Writes a string
      *
-     * @param string String to be written
+     * @param string the string
      */
     @Override
     public void write(@NotNull String string) {
@@ -166,7 +166,7 @@ public class StringWriter extends Writer {
     /**
      * Returns the current string length of this string writer
      *
-     * @return string length
+     * @return the string length
      */
     public int getLength() {
         return this.currentIndex;
@@ -182,7 +182,7 @@ public class StringWriter extends Writer {
     /**
      * Returns a string created through this string writer
      *
-     * @return created string
+     * @return the created string
      */
     @Override
     public String toString() {
@@ -190,7 +190,7 @@ public class StringWriter extends Writer {
     }
 
     /**
-     * @return an array containing all the characters in this writer in proper sequence
+     * @return a new character array containing the content written to this {@code StringWriter}.
      */
     public char @NotNull [] toCharArray() {
         char[] charArray = new char[this.currentIndex];

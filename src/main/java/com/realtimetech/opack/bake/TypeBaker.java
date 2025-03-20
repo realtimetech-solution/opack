@@ -96,7 +96,7 @@ public final class TypeBaker {
      * Returns predefined transformers for a specific class
      *
      * @param type the class to be the target
-     * @return found predefined transformers
+     * @return the found predefined transformers
      */
     public @NotNull PredefinedTransformer @NotNull [] getPredefinedTransformers(@NotNull Class<?> type) {
         List<PredefinedTransformer> predefinedTransformers = this.predefinedTransformerMap.get(type);
@@ -109,12 +109,12 @@ public final class TypeBaker {
     }
 
     /**
-     * Register a predefined transformer for the specific class with transformer instance
+     * Register a predefined transformer for the specific class with a transformer instance
      *
      * @param type        the class to be the target
      * @param transformer the transformer to register
-     * @param inheritable whether transformer is inheritable
-     * @return true if the predefined transformer registration is successful
+     * @param inheritable the flag indicating transformer is inheritable
+     * @return true if the predefined transformer registration is successful, false otherwise
      */
     public synchronized boolean registerPredefinedTransformer(@NotNull Class<?> type, @NotNull Transformer transformer, boolean inheritable) {
         if (!this.predefinedTransformerMap.containsKey(type)) {
@@ -140,8 +140,8 @@ public final class TypeBaker {
      *
      * @param type            the class to be the target
      * @param transformerType the predefined transformer class to register
-     * @return true if the predefined transformer registration is successful
-     * @throws InstantiationException if transformer class object cannot be instantiated
+     * @return true if the predefined transformer registration is successful, false otherwise
+     * @throws InstantiationException if a transformer class object cannot be instantiated
      */
     public boolean registerPredefinedTransformer(@NotNull Class<?> type, @NotNull Class<? extends Transformer> transformerType) throws InstantiationException {
         return this.registerPredefinedTransformer(type, transformerType, false);
@@ -152,9 +152,9 @@ public final class TypeBaker {
      *
      * @param type            the class to be the target
      * @param transformerType the predefined transformer to register
-     * @param inheritable     whether transformer is inheritable
-     * @return true if the predefined transformer registration is successful
-     * @throws InstantiationException if transformer class object cannot be instantiated
+     * @param inheritable     the flag indicating transformer is inheritable
+     * @return true if the predefined transformer registration is successful, false otherwise
+     * @throws InstantiationException if a transformer class object cannot be instantiated
      */
     public synchronized boolean registerPredefinedTransformer(@NotNull Class<?> type, @NotNull Class<? extends Transformer> transformerType, boolean inheritable) throws InstantiationException {
         if (!this.predefinedTransformerMap.containsKey(type)) {
@@ -180,7 +180,7 @@ public final class TypeBaker {
      *
      * @param type            the targeted type class
      * @param transformerType the predefined transformer to unregister
-     * @return true if the cancellation of predefined transformer registration is successful
+     * @return true if the cancellation of predefined transformer registration is successful, false otherwise
      */
     public synchronized boolean unregisterPredefinedTransformer(@NotNull Class<?> type, @NotNull Class<? extends Transformer> transformerType) {
         List<PredefinedTransformer> predefinedTransformers = this.predefinedTransformerMap.get(type);
@@ -209,10 +209,10 @@ public final class TypeBaker {
     /**
      * Add transformers of the element to the transformer list
      *
-     * @param transformers     the transformer list for add
+     * @param transformers     the transformer list for adding
      * @param annotatedElement the element to be targeted
-     * @param root             whether the element is not super class (whether the element is the root)
-     * @throws BakeException if transformer class object cannot be instantiated
+     * @param root             the flag indicating whether the element is not super class (whether the element is the root)
+     * @throws BakeException if a transformer class object cannot be instantiated
      */
     private void addTransformer(@NotNull List<@NotNull Transformer> transformers, @NotNull AnnotatedElement annotatedElement, boolean root) throws BakeException {
         if (annotatedElement instanceof Class) {
@@ -264,8 +264,8 @@ public final class TypeBaker {
      * Returns transformers registered through {@link Transform Transform} annotation
      *
      * @param annotatedElement the element that annotated {@link Transform Transform}
-     * @return transformers
-     * @throws BakeException if transformer class object cannot be instantiated
+     * @return the transformers
+     * @throws BakeException if a transformer class object cannot be instantiated
      */
     private @NotNull Transformer @NotNull [] getTransformer(@NotNull AnnotatedElement annotatedElement) throws BakeException {
         List<Transformer> transformers = new LinkedList<>();
@@ -279,7 +279,7 @@ public final class TypeBaker {
      * Returns the explicit type of specific element registered through {@link Type ExplicitType}
      *
      * @param annotatedElement the element that annotated {@link Type ExplicitType}
-     * @return returns annotated type
+     * @return the annotated type
      */
     private @Nullable Class<?> getAnnotatedType(@NotNull AnnotatedElement annotatedElement) {
         if (annotatedElement.isAnnotationPresent(Type.class)) {
@@ -294,7 +294,7 @@ public final class TypeBaker {
      * Returns the serialized type of specific element registered through {@link Name SerializedName}
      *
      * @param annotatedElement the element that annotated {@link Type ExplicitType}
-     * @return returns annotated type
+     * @return the annotated type
      */
     private @Nullable String getAnnotatedName(@NotNull AnnotatedElement annotatedElement) {
         if (annotatedElement.isAnnotationPresent(Name.class)) {
@@ -309,7 +309,7 @@ public final class TypeBaker {
      * Bake the class into {@link BakedType BakedType}
      *
      * @param bakeType the type to bake
-     * @return baked type info
+     * @return the baked type info
      * @throws BakeException if a problem occurs during baking a class into {@link BakedType BakedType}
      */
     private @NotNull BakedType bake(@NotNull Class<?> bakeType) throws BakeException {
@@ -360,7 +360,7 @@ public final class TypeBaker {
      * Returns BakedType for target class
      *
      * @param bakeType the class to be baked
-     * @return class info
+     * @return the class info
      * @throws BakeException if a problem occurs during baking a class into class info
      */
     public @NotNull BakedType get(@NotNull Class<?> bakeType) throws BakeException {

@@ -28,6 +28,14 @@ import org.jetbrains.annotations.NotNull;
  * Thrown when a problem occurs during decoding
  */
 public class DecodeException extends Exception {
+    public DecodeException(@NotNull String message, @NotNull Throwable cause) {
+        super(message, cause);
+    }
+
+    public DecodeException(@NotNull String message) {
+        super(message);
+    }
+
     public DecodeException(@NotNull Throwable cause) {
         super(cause);
     }

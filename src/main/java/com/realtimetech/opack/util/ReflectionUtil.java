@@ -34,10 +34,10 @@ import java.util.List;
 public class ReflectionUtil {
     private static abstract class Allocator {
         /**
-         * Create new instance for specific class
+         * Creates new instance for specific class
          *
          * @param typeClass the class to create
-         * @return created instance
+         * @return the created instance
          * @throws InvocationTargetException if exception occurs in invoked underlying method
          * @throws IllegalAccessException    if this Method object is enforcing Java language access control and the underlying method is inaccessible
          */
@@ -57,9 +57,9 @@ public class ReflectionUtil {
     }
 
     /**
-     * Create new unsafe allocator for JVM, DalvikVM
+     * Creates a new unsafe allocator for JVM, DalvikVM
      *
-     * @return created unsafe allocator
+     * @return the created unsafe allocator
      */
     private static @Nullable Allocator createAvailableAllocator() {
         // for JVM
@@ -191,11 +191,18 @@ public class ReflectionUtil {
     }
 
     /**
-     * Sets the value of the indexed component of the specified array object to the specified new value
+     * Sets the value of the specified index in the given array object
      *
-     * @param array the array object
-     * @param index the index
-     * @param value the new value of the indexed component
+     * @param array the target array object whose indexed component will be set
+     * @param index the index of the array element to set
+     * @param value the value to be set at the specified index; can be null for
+     *              arrays of reference types
+     * @throws IllegalArgumentException       if the provided object is not an array
+     * @throws ArrayIndexOutOfBoundsException if the index is out of bounds for the
+     *                                        given array
+     * @throws ClassCastException             if the value's type is incompatible with the
+     *                                        component type of the array
+     * @throws NullPointerException           if the array passed is null
      */
     public static void setArrayItem(@NotNull Object array, int index, @Nullable Object value) {
         Class<?> arrayType = array.getClass();
@@ -229,8 +236,8 @@ public class ReflectionUtil {
      * Clones the array object
      *
      * @param array the object to clone
-     * @return cloned array object
-     * @throws IllegalArgumentException if the object is not array object
+     * @return the cloned array object
+     * @throws IllegalArgumentException if the object is not an array object
      */
     public static @NotNull Object cloneArray(@NotNull Object array) {
         if (!array.getClass().isArray()) {
@@ -266,10 +273,10 @@ public class ReflectionUtil {
     }
 
     /**
-     * Returns accessible fields of target class
+     * Returns accessible fields of the target class
      *
      * @param type the target class
-     * @return accessible fields
+     * @return the accessible fields
      */
     public static @NotNull Field @NotNull [] getAccessibleFields(@NotNull Class<?> type) {
         List<Field> fields = new LinkedList<>();
@@ -282,7 +289,7 @@ public class ReflectionUtil {
      * Returns the dimension of the array through the class object of the array object
      *
      * @param arrayType the class of the target array object
-     * @return dimension
+     * @return the dimension
      * @throws IllegalArgumentException if the class is not the class of the array object
      */
     public static int getArrayDimension(@NotNull Class<?> arrayType) {
@@ -310,7 +317,7 @@ public class ReflectionUtil {
      * Returns the underlying component type of the array through the class object of the array object
      *
      * @param arrayType the class of the array object
-     * @return component type
+     * @return the component type
      */
     public static @NotNull Class<?> getArrayLastComponentType(@NotNull Class<?> arrayType) {
         if (!arrayType.isArray()) {
@@ -334,7 +341,7 @@ public class ReflectionUtil {
 
     /**
      * @param type the target class
-     * @return whether the target class is wrapper class
+     * @return whether the target class is a wrapper class
      */
     public static boolean isWrapperType(@NotNull Class<?> type) {
         return type == Boolean.class ||
@@ -355,7 +362,7 @@ public class ReflectionUtil {
      * Returns the primitive class corresponding to the wrapper class
      *
      * @param type the wrapper class
-     * @return primitive class
+     * @return the primitive class
      * @throws IllegalArgumentException if target class is not wrapper class
      */
     public static @NotNull Class<?> convertWrapperClassToPrimitiveClass(@NotNull Class<?> type) {
@@ -382,7 +389,7 @@ public class ReflectionUtil {
 
     /**
      * @param type the target class
-     * @return whether the target class is primitive class
+     * @return whether the target class is a primitive class
      */
     public static boolean isPrimitiveType(@NotNull Class<?> type) {
         return type == boolean.class ||
@@ -403,7 +410,7 @@ public class ReflectionUtil {
      * Returns the wrapper class corresponding to the primitive class
      *
      * @param type the primitive class
-     * @return wrapper class
+     * @return the wrapper class
      * @throws IllegalArgumentException if target class is not primitive class
      */
     public static @NotNull Class<?> convertPrimitiveTypeToWrapperType(@NotNull Class<?> type) {
@@ -433,7 +440,7 @@ public class ReflectionUtil {
      *
      * @param fromType the source class
      * @param toType   the destination class
-     * @return whether casting is possible
+     * @return true if the source type can be safely cast to the target type, otherwise false
      */
     public static boolean checkCastable(@NotNull Class<?> fromType, @NotNull Class<?> toType) {
         if (fromType.isPrimitive()) {
@@ -448,10 +455,11 @@ public class ReflectionUtil {
     }
 
     /**
-     * Create a new instance of the class with unsafe allocator
+     * Creates a new instance of the class with unsafe allocator
      *
+     * @param <T>          the type of the object to be instantiated
      * @param instanceType the class to create instance
-     * @return created instance
+     * @return the created instance
      * @throws InvocationTargetException if exception occurs in invoked underlying method
      * @throws IllegalAccessException    if the method object is enforcing Java language access control and the underlying method is inaccessible
      * @throws InstantiationException    if the class object represents an abstract class, an interface
@@ -471,12 +479,13 @@ public class ReflectionUtil {
     }
 
     /**
-     * Create a new instance of the class through constructor
+     * Creates a new instance of the class through constructor
      *
+     * @param <T>          the type of the object to be instantiated
      * @param instanceType the class to create instance
      * @param objects      the argument of the constructor
-     * @return created instance
-     * @throws IllegalArgumentException  if the class doesn't have matched constructor
+     * @return the created instance
+     * @throws IllegalArgumentException  if the class doesn't have a matched constructor
      * @throws InvocationTargetException if exception occurs in invoked underlying method
      * @throws IllegalAccessException    if the method object is enforcing Java language access control and the underlying method is inaccessible
      * @throws InstantiationException    if the class object represents an abstract class, an interface

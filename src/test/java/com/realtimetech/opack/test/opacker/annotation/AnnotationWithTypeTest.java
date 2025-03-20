@@ -127,10 +127,10 @@ public class AnnotationWithTypeTest {
 
     @Test
     public void test() throws SerializeException, DeserializeException, OpackAssert.AssertException {
-        Opacker opacker = new Opacker.Builder()
+        Opacker opacker = Opacker.Builder.create()
                 .setEnableWrapListElementType(true)
                 .setEnableWrapMapElementType(true)
-                .create();
+                .build();
         WithTypeClass originalObject = new WithTypeClass();
 
         OpackValue serialized = opacker.serialize(originalObject);

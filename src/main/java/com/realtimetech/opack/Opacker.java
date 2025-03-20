@@ -61,6 +61,15 @@ import java.util.*;
 
 public class Opacker {
     public static class Builder {
+        /**
+         * Creates a new instance of the builder class
+         *
+         * @return the created builder
+         */
+        public static @NotNull Builder create() {
+            return new Builder();
+        }
+
         private int valueStackInitialSize;
         private int contextStackInitialSize;
 
@@ -71,7 +80,7 @@ public class Opacker {
 
         private @NotNull ClassLoader classLoader;
 
-        public Builder() {
+        Builder() {
             this.valueStackInitialSize = 512;
             this.contextStackInitialSize = 128;
 
@@ -83,47 +92,91 @@ public class Opacker {
             this.classLoader = this.getClass().getClassLoader();
         }
 
+        /**
+         * Sets the initial size of the value stack
+         *
+         * @param valueStackInitialSize the initial size for the value stack
+         * @return the current builder instance for method chaining
+         */
         public @NotNull Builder setValueStackInitialSize(int valueStackInitialSize) {
             this.valueStackInitialSize = valueStackInitialSize;
             return this;
         }
 
+        /**
+         * Sets the initial size of the context stack
+         *
+         * @param contextStackInitialSize the initial size to set for the context stack
+         * @return the current builder instance for method chaining
+         */
         public @NotNull Builder setContextStackInitialSize(int contextStackInitialSize) {
             this.contextStackInitialSize = contextStackInitialSize;
             return this;
         }
 
+        /**
+         * Sets whether wrapping of list element types is enabled or not
+         *
+         * @param enableWrapListElementType the flag indicating if list element types should be wrapped
+         * @return the current builder instance for method chaining
+         */
         public @NotNull Builder setEnableWrapListElementType(boolean enableWrapListElementType) {
             this.enableWrapListElementType = enableWrapListElementType;
             return this;
         }
 
+        /**
+         * Sets whether wrapping of map element types is enabled or not
+         *
+         * @param enableWrapMapElementType the flag indicating if map element types should be wrapped
+         * @return the current builder instance for method chaining
+         */
         public @NotNull Builder setEnableWrapMapElementType(boolean enableWrapMapElementType) {
             this.enableWrapMapElementType = enableWrapMapElementType;
             return this;
         }
 
+        /**
+         * Sets whether enums should be converted to their ordinal value instead of string representation
+         * during serialization and deserialization
+         *
+         * @param enableConvertEnumToOrdinal the flag indicating whether to enable conversion of enums to ordinals
+         * @return the current builder instance for method chaining
+         */
         public @NotNull Builder setEnableConvertEnumToOrdinal(boolean enableConvertEnumToOrdinal) {
             this.enableConvertEnumToOrdinal = enableConvertEnumToOrdinal;
             return this;
         }
 
+        /**
+         * Sets whether recursive dependencies should be converted to null during serialization
+         *
+         * @param enableConvertRecursiveDependencyToNull the flag indicating whether recursive dependencies
+         *                                               should be converted to null
+         * @return the current builder instance for method chaining
+         */
         public @NotNull Builder setEnableConvertRecursiveDependencyToNull(boolean enableConvertRecursiveDependencyToNull) {
             this.enableConvertRecursiveDependencyToNull = enableConvertRecursiveDependencyToNull;
             return this;
         }
 
+        /**
+         * Sets the class loader to be used by the builder
+         *
+         * @param classLoader the {@link ClassLoader} to be set
+         * @return the current builder instance for method chaining
+         */
         public @NotNull Builder setClassLoader(@NotNull ClassLoader classLoader) {
             this.classLoader = classLoader;
             return this;
         }
 
         /**
-         * Create the {@link Opacker Opacker} through this builder
+         * Build the {@link Opacker Opacker}
          *
-         * @return created opacker
+         * @return the created opacker
          */
-        public @NotNull Opacker create() {
+        public @NotNull Opacker build() {
             return new Opacker(this);
         }
     }
@@ -146,12 +199,12 @@ public class Opacker {
     @NotNull State state;
 
     /**
-     * Constructs the Opacker with the builder of Opacker.
+     * Constructs the Opacker with the builder
      *
      * @param builder the builder of Opacker
      * @throws IllegalStateException if the predefined transformer cannot be instanced
      */
-    private Opacker(@NotNull Builder builder) {
+    Opacker(@NotNull Builder builder) {
         this.classLoader = builder.classLoader;
         this.typeBaker = new TypeBaker(this);
 
@@ -193,10 +246,21 @@ public class Opacker {
         this.enableConvertRecursiveDependencyToNull = builder.enableConvertRecursiveDependencyToNull;
     }
 
+
+    /**
+     * Retrieves the {@link ClassLoader ClassLoader} associated with the Opacker instance
+     *
+     * @return the {@link ClassLoader ClassLoader} used by this Opacker instance
+     */
     public @NotNull ClassLoader getClassLoader() {
         return classLoader;
     }
 
+    /**
+     * Retrieves the {@link TypeBaker TypeBaker} instance associated with this Opacker
+     *
+     * @return the {@link TypeBaker TypeBaker} used by this Opacker instance
+     */
     public @NotNull TypeBaker getTypeBaker() {
         return this.typeBaker;
     }
@@ -214,7 +278,7 @@ public class Opacker {
     }
 
     /**
-     * Serializes the object to {@link OpackValue OpackValue}
+     * Serializes the object to {@link OpackValue#isAllowType(Class) Objects of the type allowed by OpackValue}
      *
      * @param object the object to be serialized
      * @return the serialized object
@@ -247,7 +311,7 @@ public class Opacker {
      *
      * @param baseType the class of object to be serialized
      * @param object   the object to be serialized
-     * @return prepared opack value
+     * @return the prepared opack value
      * @throws SerializeException if a problem occurs during serializing, if the baseType cannot be baked into {@link BakedType BakedType}
      */
     private @Nullable Object prepareObjectSerialize(@NotNull Class<?> baseType, @NotNull Object object) throws SerializeException {
@@ -393,6 +457,7 @@ public class Opacker {
     /**
      * Deserializes the object to object of the target class
      *
+     * @param <T>        the type of the object to be deserialized
      * @param type       the target class
      * @param opackValue the opack value to be deserialized
      * @return the deserialized object
@@ -403,8 +468,9 @@ public class Opacker {
     }
 
     /**
-     * Deserializes the object to object of the target class
+     * Deserializes the {@link OpackValue#isAllowType(Class) Objects of the type allowed by OpackValue} to object of the target class
      *
+     * @param <T>    the type of the object to be deserialized
      * @param type   the target class
      * @param object the object to be deserialized
      * @return the deserialized object
@@ -444,7 +510,7 @@ public class Opacker {
      *
      * @param goalType the class of object to be deserialized
      * @param object   the object to be deserialized
-     * @return prepared object
+     * @return the prepared object
      * @throws DeserializeException if a problem occurs during deserializing
      */
     private synchronized @Nullable Object prepareObjectDeserialize(@NotNull Class<?> goalType, @NotNull Object object, boolean withType, @Nullable Transformer fieldTransformer) throws DeserializeException {
@@ -503,7 +569,7 @@ public class Opacker {
             }
 
             /*
-                Optimize algorithm for big array
+                Optimize algorithm for a big array
              */
             if (OpackArray.isAllowArray(goalType)) {
                 int dimensions = ReflectionUtil.getArrayDimension(goalType);

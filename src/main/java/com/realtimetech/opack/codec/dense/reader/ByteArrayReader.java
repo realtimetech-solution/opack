@@ -168,7 +168,7 @@ public class ByteArrayReader implements Reader {
     /**
      * Reads the next bytes of data from the input stream
      *
-     * @param bytes the byte array to write the bytes read
+     * @param bytes the byte array to write
      * @throws IOException if an I/O exception occurs
      */
     public void readBytes(byte @NotNull [] bytes) throws IOException {

@@ -33,10 +33,10 @@ import java.util.List;
 
 public final class OpackArray extends AbstractOpackValue<List<Object>> {
     /**
-     * Returns whether component type for specific class of array object is primitive type
+     * Returns whether component type for specific class of array object is a primitive type
      *
      * @param arrayType the class of array object
-     * @return true if component type for the class of array object is a primitive class
+     * @return true if the component type for the class of array object is a primitive class
      */
     public static boolean isAllowArray(@NotNull Class<?> arrayType) {
         if (arrayType.isArray()) {
@@ -49,10 +49,10 @@ public final class OpackArray extends AbstractOpackValue<List<Object>> {
     }
 
     /**
-     * Create the opack array through array object of which component type is the primitive type
+     * Creates the opack array through an array object of which the component type is the primitive type
      *
-     * @param arrayObject the array object for create
-     * @return created opack array
+     * @param arrayObject the array object
+     * @return the created opack array
      * @throws IllegalArgumentException if the component type for array object is not primitive type, if the array object is not 1 dimension
      */
     public static OpackArray createWithArrayObject(@NotNull Object arrayObject) {
@@ -64,7 +64,7 @@ public final class OpackArray extends AbstractOpackValue<List<Object>> {
     /**
      * Constructs an opack array with the specified array object of which component type is the primitive type
      *
-     * @param arrayObject the array object for create
+     * @param arrayObject the array object
      * @throws IllegalArgumentException if the component type for array object is not primitive type, if the array object is not 1 dimension
      */
     private OpackArray(@NotNull Object arrayObject) {
@@ -97,8 +97,8 @@ public final class OpackArray extends AbstractOpackValue<List<Object>> {
     /**
      * Constructs an opack array with the specified collection object
      *
-     * @param collection the collection for create
-     * @throws IllegalArgumentException if type of the element in collection is not allowed in opack value
+     * @param collection the collection
+     * @throws IllegalArgumentException if a type of the element in a collection is not allowed in opack value
      */
     public OpackArray(@NotNull Collection<Object> collection) {
         this(collection.size());
@@ -125,17 +125,17 @@ public final class OpackArray extends AbstractOpackValue<List<Object>> {
     }
 
     /**
-     * Constructs an empty opack array without underlying list
+     * Constructs an empty opack array without an underlying list
      */
     public OpackArray() {
         this.nativeArray = false;
     }
 
     /**
-     * Create and return the underlying list of this opack array
+     * Creates and return the underlying list of this opack array
      * This method will be called if {@link AbstractOpackValue#get() get()} method is called, when this opack array does not have an underlying list
      *
-     * @return underlying list
+     * @return the underlying list
      */
     @Override
     protected @NotNull ArrayList<Object> createLazyValue() {
@@ -158,10 +158,10 @@ public final class OpackArray extends AbstractOpackValue<List<Object>> {
     /**
      * Replaces the value at the specified position in this opack array with the specified value
      *
-     * @param index index of the value to replace
-     * @param value value to be stored at the specified position
+     * @param index the index of the value to replace
+     * @param value the value to be stored at the specified position
      * @return the value previously at the specified position
-     * @throws IllegalArgumentException if type of the value is not allowed in opack value
+     * @throws IllegalArgumentException if a type of the value is not allowed in opack value
      */
     public Object set(int index, Object value) {
         if (value != null) {
@@ -178,7 +178,7 @@ public final class OpackArray extends AbstractOpackValue<List<Object>> {
      *
      * @param value the value to be appended to this list
      * @return true if this opack array changed as a result of the call
-     * @throws IllegalArgumentException if type of the value is not allowed in opack value
+     * @throws IllegalArgumentException if a type of the value is not allowed in opack value
      */
     public boolean add(Object value) {
         if (value != null) {
@@ -191,7 +191,7 @@ public final class OpackArray extends AbstractOpackValue<List<Object>> {
     }
 
     /**
-     * Removes the first occurrence of the specified value from this opack array, if it is present
+     * Removes the first occurrence of the specified value from this opack array if it is present
      *
      * @param value the value to be removed from this opack array, if present
      * @return true if this opack array contained the specified value
@@ -203,7 +203,7 @@ public final class OpackArray extends AbstractOpackValue<List<Object>> {
     /**
      * Returns the value at the specified position in this opack array
      *
-     * @param index index of the value to replace
+     * @param index the index of the value to replace
      * @return the value
      */
     public Object get(int index) {
@@ -213,7 +213,7 @@ public final class OpackArray extends AbstractOpackValue<List<Object>> {
     /**
      * Returns the value at the specified position in this opack array as an opack value
      *
-     * @param index index of the value to replace
+     * @param index the index of the value to replace
      * @return the value
      */
     public OpackValue getAsOpackValue(int index) {
@@ -229,7 +229,7 @@ public final class OpackArray extends AbstractOpackValue<List<Object>> {
     /**
      * Returns the value at the specified position in this opack array as an opack array
      *
-     * @param index index of the value to replace
+     * @param index the index of the value to replace
      * @return the value
      */
     public OpackArray getAsOpackArray(int index) {
@@ -245,7 +245,7 @@ public final class OpackArray extends AbstractOpackValue<List<Object>> {
     /**
      * Returns the value at the specified position in this opack array as an opack object
      *
-     * @param index index of the value to replace
+     * @param index the index of the value to replace
      * @return the value
      */
     public OpackObject getAsOpackObject(int index) {
@@ -261,7 +261,7 @@ public final class OpackArray extends AbstractOpackValue<List<Object>> {
     /**
      * Returns the value at the specified position in this opack array as a char
      *
-     * @param index index of the value to replace
+     * @param index the index of the value to replace
      * @return the value
      */
     public char getAsChar(int index) {
@@ -279,7 +279,7 @@ public final class OpackArray extends AbstractOpackValue<List<Object>> {
     /**
      * Returns the value at the specified position in this opack array as a string
      *
-     * @param index index of the value to replace
+     * @param index the index of the value to replace
      * @return the value
      */
     public String getAsString(int index) {
@@ -289,7 +289,7 @@ public final class OpackArray extends AbstractOpackValue<List<Object>> {
     /**
      * Returns the value at the specified position in this opack array as a byte
      *
-     * @param index index of the value to replace
+     * @param index the index of the value to replace
      * @return the value
      */
     public byte getAsByte(int index) {
@@ -307,7 +307,7 @@ public final class OpackArray extends AbstractOpackValue<List<Object>> {
     /**
      * Returns the value at the specified position in this opack array as a short
      *
-     * @param index index of the value to replace
+     * @param index the index of the value to replace
      * @return the value
      */
     public short getAsShort(int index) {
@@ -325,7 +325,7 @@ public final class OpackArray extends AbstractOpackValue<List<Object>> {
     /**
      * Returns the value at the specified position in this opack array as an int
      *
-     * @param index index of the value to replace
+     * @param index the index of the value to replace
      * @return the value
      */
     public int getAsInt(int index) {
@@ -343,7 +343,7 @@ public final class OpackArray extends AbstractOpackValue<List<Object>> {
     /**
      * Returns the value at the specified position in this opack array as a float
      *
-     * @param index index of the value to replace
+     * @param index the index of the value to replace
      * @return the value
      */
     public float getAsFloat(int index) {
@@ -361,7 +361,7 @@ public final class OpackArray extends AbstractOpackValue<List<Object>> {
     /**
      * Returns the value at the specified position in this opack array as a double
      *
-     * @param index index of the value to replace
+     * @param index the index of the value to replace
      * @return the value
      */
     public double getAsDouble(int index) {
@@ -392,7 +392,7 @@ public final class OpackArray extends AbstractOpackValue<List<Object>> {
      * @return a string representation of the List
      */
     @Override
-    protected String toString(List<Object> value) {
+    protected @NotNull String toString(List<Object> value) {
         StringBuilder stringBuilder = new StringBuilder();
 
         stringBuilder.append('[');
@@ -419,7 +419,7 @@ public final class OpackArray extends AbstractOpackValue<List<Object>> {
      * @return a deep copy of this opack array instance
      */
     @Override
-    public OpackArray clone() {
+    public @NotNull OpackArray clone() {
         OpackArray opackArray = new OpackArray(this.length());
 
         for (int index = 0; index < this.length(); index++) {
@@ -454,7 +454,7 @@ public final class OpackArray extends AbstractOpackValue<List<Object>> {
     /**
      * Returns the hash code of this opack array
      *
-     * @return hash code
+     * @return the hash code
      */
     @Override
     public int hashCode() {

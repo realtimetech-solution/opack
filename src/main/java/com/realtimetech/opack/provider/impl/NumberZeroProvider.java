@@ -34,7 +34,7 @@ public class NumberZeroProvider implements DefaultValueProvider {
      *
      * @param opacker  the opacker
      * @param object   the property owner
-     * @param property the property to provide default value
+     * @param property the property to provide a default value
      * @return the default value
      */
     @Override

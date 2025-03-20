@@ -166,7 +166,7 @@ public class TransformClassTest {
 
     @Test
     public void test() throws SerializeException, DeserializeException, OpackAssert.AssertException {
-        Opacker opacker = new Opacker.Builder().create();
+        Opacker opacker = Opacker.Builder.create().build();
         ClassTransformClass originalObject = new ClassTransformClass();
 
         OpackValue serialized = opacker.serialize(originalObject);

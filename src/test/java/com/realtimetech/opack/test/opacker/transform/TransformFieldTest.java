@@ -43,7 +43,7 @@ public class TransformFieldTest {
          * @param opacker      the opacker
          * @param originalType the original type
          * @param value        the value to be serialized
-         * @return opack value
+         * @return the opack value
          */
         @Override
         public @Nullable Object serialize(@NotNull Opacker opacker, @NotNull Class<?> originalType, @Nullable Object value) {
@@ -76,7 +76,7 @@ public class TransformFieldTest {
 
     @Test
     public void test() throws SerializeException, DeserializeException, OpackAssert.AssertException {
-        Opacker opacker = new Opacker.Builder().create();
+        Opacker opacker = Opacker.Builder.create().build();
         FieldTransformClass originalObject = new FieldTransformClass();
 
         OpackValue serialized = opacker.serialize(originalObject);
