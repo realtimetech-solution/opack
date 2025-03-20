@@ -64,7 +64,7 @@ public class UnsafeOpackValue {
      * @param opackArray the opack array
      * @return the native list
      */
-    public static List<Object> getList(@NotNull OpackArray opackArray) {
+    public static @NotNull List<Object> getList(@NotNull OpackArray opackArray) {
         try {
             //noinspection unchecked
             return (List<Object>) OPACK_GETTER_METHOD.invoke(opackArray);
@@ -80,7 +80,7 @@ public class UnsafeOpackValue {
      * @param opackObject the opack object
      * @return the native map
      */
-    public static Map<Object, Object> getMap(@NotNull OpackObject opackObject) {
+    public static @NotNull Map<Object, Object> getMap(@NotNull OpackObject opackObject) {
         try {
             //noinspection unchecked
             return (Map<Object, Object>) OPACK_GETTER_METHOD.invoke(opackObject);

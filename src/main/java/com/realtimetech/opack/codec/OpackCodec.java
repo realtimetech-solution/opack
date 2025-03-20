@@ -54,7 +54,7 @@ public abstract class OpackCodec<I, O> {
      *
      * @param output the output to encode
      * @param object the object to encode
-     * @throws EncodeException if a problem occurs during encoding, if the type of data to be encoded is not allowed in specific codec
+     * @throws EncodeException if a problem occurs during encoding, if the type of data to be encoded is not allowed in a specific codec
      */
     public final synchronized void fromObject(@NotNull O output, @NotNull Object object) throws EncodeException {
         try {
@@ -68,8 +68,8 @@ public abstract class OpackCodec<I, O> {
      * Decodes the value encoded through a specific codec
      *
      * @param input the input to decode
-     * @return decoded value
-     * @throws DecodeException if a problem occurs during decoding, if the type of data to be decoded is not allowed in specific codec
+     * @return the decoded value
+     * @throws DecodeException if a problem occurs during decoding, if the type of data to be decoded is not allowed in a specific codec
      */
     public final synchronized Object toObject(@NotNull I input) throws DecodeException {
         try {
@@ -84,7 +84,7 @@ public abstract class OpackCodec<I, O> {
      *
      * @param output the output to encode
      * @param object the object to encode
-     * @throws EncodeException if a problem occurs during encoding, if the type of data to be encoded is not allowed in specific codec
+     * @throws EncodeException if a problem occurs during encoding, if the type of data to be encoded is not allowed in a specific codec
      */
     public final synchronized void fromOpackValue(@NotNull O output, @NotNull OpackValue object) throws EncodeException {
         try {
@@ -98,8 +98,8 @@ public abstract class OpackCodec<I, O> {
      * Decodes the value encoded through a specific codec
      *
      * @param input the input to decode
-     * @return decoded value
-     * @throws DecodeException if a problem occurs during decoding, if the type of data to be decoded is not allowed in specific codec
+     * @return the decoded value
+     * @throws DecodeException if a problem occurs during decoding, if the type of data to be decoded is not allowed in a specific codec
      */
     public final synchronized OpackValue toOpackValue(@NotNull I input) throws DecodeException {
         try {
@@ -121,7 +121,7 @@ public abstract class OpackCodec<I, O> {
      *
      * @param output     the output to encode
      * @param opackValue the opack value to encode
-     * @throws EncodeException if a problem occurs during encoding, if the type of data to be encoded is not allowed in specific codec
+     * @throws EncodeException if a problem occurs during encoding, if the type of data to be encoded is not allowed in a specific codec
      */
     @Deprecated(forRemoval = true)
     public final synchronized void encode(@NotNull O output, @NotNull OpackValue opackValue) throws EncodeException {
@@ -136,8 +136,8 @@ public abstract class OpackCodec<I, O> {
      * Decodes the value encoded through a specific codec
      *
      * @param input the input to decode
-     * @return decoded value
-     * @throws DecodeException if a problem occurs during decoding, if the type of data to be decoded is not allowed in specific codec
+     * @return the decoded value
+     * @throws DecodeException if a problem occurs during decoding, if the type of data to be decoded is not allowed in a specific codec
      */
     @Deprecated(forRemoval = true)
     public final synchronized OpackValue decode(@NotNull I input) throws DecodeException {

@@ -43,6 +43,15 @@ import java.util.Map;
 
 public final class JsonCodec extends OpackCodec<String, Writer> {
     public final static class Builder {
+        /**
+         * Creates a new instance of the builder class
+         *
+         * @return the created builder
+         */
+        public static @NotNull Builder create() {
+            return new Builder();
+        }
+
         private int encodeStackInitialSize;
         private int encodeStringBufferSize;
         private int decodeStackInitialSize;
@@ -51,9 +60,9 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
         private boolean enableConvertCharacterToString;
         private boolean usePrettyFormat;
 
-        public Builder() {
-            this.allowAnyValueToKey = false;
-            this.enableConvertCharacterToString = true;
+        Builder() {
+            this.allowAnyValueToKey = true;
+            this.enableConvertCharacterToString = false;
             this.usePrettyFormat = false;
 
             this.encodeStringBufferSize = 1024;
@@ -61,42 +70,82 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
             this.decodeStackInitialSize = 128;
         }
 
+        /**
+         * Sets the size of the buffer used for encoding strings
+         *
+         * @param encodeStringBufferSize the new buffer size for encoding strings
+         * @return the current builder instance for method chaining
+         */
         public @NotNull Builder setEncodeStringBufferSize(int encodeStringBufferSize) {
             this.encodeStringBufferSize = encodeStringBufferSize;
             return this;
         }
 
+        /**
+         * Sets the initial size of the stack used during the encoding process
+         *
+         * @param encodeStackInitialSize the new initial size for the encoding stack
+         * @return the current builder instance for method chaining
+         */
         public @NotNull Builder setEncodeStackInitialSize(int encodeStackInitialSize) {
             this.encodeStackInitialSize = encodeStackInitialSize;
             return this;
         }
 
+        /**
+         * Sets the initial size of the stack used during the decoding process
+         *
+         * @param decodeStackInitialSize the new initial size for the decoding stack
+         * @return the current builder instance for method chaining
+         */
         public @NotNull Builder setDecodeStackInitialSize(int decodeStackInitialSize) {
             this.decodeStackInitialSize = decodeStackInitialSize;
             return this;
         }
 
+        /**
+         * Sets whether any value is allowed for a key during the encoding or decoding process
+         *
+         * @param allowAnyValueToKey the flag indicating if any value is allowed for a key.
+         *                           If true, any value is permitted; if false, stricter rules might apply.
+         * @return the current builder instance for method chaining.
+         */
         public @NotNull Builder setAllowAnyValueToKey(boolean allowAnyValueToKey) {
             this.allowAnyValueToKey = allowAnyValueToKey;
             return this;
         }
 
+        /**
+         * Sets whether characters should be converted to strings during the encoding or decoding process
+         *
+         * @param enableConvertCharacterToString the flag indicating if characters should be converted to strings.
+         *                                       If true, characters are converted to strings; if false, they remain as characters.
+         * @return the current builder instance for method chaining.
+         */
         public @NotNull Builder setEnableConvertCharacterToString(boolean enableConvertCharacterToString) {
             this.enableConvertCharacterToString = enableConvertCharacterToString;
             return this;
         }
 
+        /**
+         * Sets whether the output should be formatted in a "pretty" style, meaning it will include
+         * line breaks and indentation for improved readability
+         *
+         * @param usePrettyFormat the flag indicating if the output should use pretty formatting.
+         *                        If true, pretty formatting is enabled; if false, compact formatting is used.
+         * @return the current builder instance for method chaining.
+         */
         public @NotNull Builder setUsePrettyFormat(boolean usePrettyFormat) {
             this.usePrettyFormat = usePrettyFormat;
             return this;
         }
 
         /**
-         * Create the {@link JsonCodec JsonCodec}
+         * Build the {@link JsonCodec JsonCodec}
          *
-         * @return created json codec
+         * @return the created {@link JsonCodec JsonCodec}
          */
-        public @NotNull JsonCodec create() {
+        public @NotNull JsonCodec build() {
             return new JsonCodec(this);
         }
     }
@@ -172,7 +221,7 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
      *
      * @param builder the builder of JsonCodec
      */
-    private JsonCodec(@NotNull Builder builder) {
+    JsonCodec(@NotNull Builder builder) {
         super();
 
         this.encodeLiteralStringWriter = new StringWriter(builder.encodeStringBufferSize);
@@ -193,8 +242,8 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
      *
      * @param writer the string writer for writing encoded object
      * @param object the object to encode
-     * @return whether object is encoded
-     * @throws IllegalArgumentException if the type of data to be encoded is not allowed in json format
+     * @return true if the encoding process for the provided object is completed, or false if additional processing is required
+     * @throws IllegalArgumentException if the type of data to be encoded is not allowed in JSON format
      * @throws ArithmeticException      if the data to be encoded is infinite
      */
     private boolean encodeLiteral(final @NotNull Writer writer, @Nullable Object object) throws IOException {
@@ -277,7 +326,7 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
      *
      * @param writer     the writer
      * @param nativeList the native list to encode
-     * @throws IllegalArgumentException if the type of data to be encoded is not allowed in json format
+     * @throws IllegalArgumentException if the type of data to be encoded is not allowed in JSON format
      */
     private boolean encodeNativeArray(@NotNull Writer writer, @NotNull NativeList nativeList) throws IOException {
         Object arrayObject = nativeList.getArrayObject();
@@ -514,10 +563,10 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
     }
 
     /**
-     * Encodes the {@link OpackValue OpackValue} to json string
+     * Encodes the {@link OpackValue OpackValue} to JSON string
      *
      * @param opackValue the opack value to encode
-     * @throws IllegalArgumentException if the type of data to be encoded is not allowed in json format
+     * @throws IllegalArgumentException if the type of data to be encoded is not allowed in JSON format
      */
     @Override
     protected void encodeObject(@NotNull Writer writer, @Nullable Object opackValue) throws IOException {
@@ -711,11 +760,11 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
     }
 
     /**
-     * Encodes the OpackValue to json string
+     * Encodes the OpackValue to JSON string
      *
      * @param opackValue the opack value to encode
-     * @return returns encoded string
-     * @throws EncodeException if a problem occurs during encoding, if the type of data to be encoded is not allowed in specific codec
+     * @return the encoded string
+     * @throws EncodeException if a problem occurs during encoding, if the type of data to be encoded is not allowed in a specific codec
      */
     @Deprecated(forRemoval = true)
     public synchronized @NotNull String encode(@NotNull OpackValue opackValue) throws EncodeException {
@@ -791,11 +840,11 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
     }
 
     /**
-     * Decodes the json string to {@link OpackValue OpackValue}
+     * Decodes the JSON string to {@link OpackValue OpackValue}
      *
-     * @param data the json string to decode
-     * @return OpackValue
-     * @throws IOException if there is a syntax problem with the json string, if the json string has a unicode whose unknown pattern
+     * @param data the JSON string to decode
+     * @return the opack value
+     * @throws IOException if there is a syntax problem with the JSON string, if the JSON string has a Unicode whose unknown pattern
      */
     @Override
     protected @Nullable Object decodeObject(@NotNull String data) throws IOException {
@@ -950,7 +999,7 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
                 case '\r':
                 case '\n':
                 case '\t': {
-                    // Skip no-meaning character
+                    // Skip a no-meaning character
                     break;
                 }
 

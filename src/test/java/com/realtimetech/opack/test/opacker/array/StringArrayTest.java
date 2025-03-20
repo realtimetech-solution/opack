@@ -49,7 +49,7 @@ public class StringArrayTest {
 
     @Test
     public void test() throws SerializeException, DeserializeException, OpackAssert.AssertException {
-        Opacker opacker = new Opacker.Builder().create();
+        Opacker opacker = Opacker.Builder.create().build();
         StringArrayClass originalObject = new StringArrayClass();
 
         OpackValue serialized = opacker.serialize(originalObject);

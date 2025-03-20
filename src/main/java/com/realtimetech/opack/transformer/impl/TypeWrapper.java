@@ -40,7 +40,7 @@ public class TypeWrapper {
      *
      * @param opacker the opacker
      * @param object  the object to be serialized
-     * @return wrapped object
+     * @return the wrapped object
      * @throws SerializeException if a problem occurs during serializing
      */
     public static @Nullable Object wrapObject(@NotNull Opacker opacker, @Nullable Object object) throws SerializeException {
@@ -78,11 +78,11 @@ public class TypeWrapper {
     }
 
     /**
-     * Unwrap opack object into object using proper object type
+     * Unwrap opack object into object using a proper object type
      *
      * @param opacker the opacker
      * @param object  the object to be unwrapped
-     * @return unwrapped object
+     * @return the unwrapped object
      * @throws DeserializeException if a problem occurs during deserializing
      */
     public static @Nullable Object unwrapObject(@NotNull Opacker opacker, @Nullable Object object) throws DeserializeException {

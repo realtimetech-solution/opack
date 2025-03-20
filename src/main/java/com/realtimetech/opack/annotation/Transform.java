@@ -40,14 +40,14 @@ import java.lang.annotation.Target;
 })
 public @interface Transform {
     /**
-     * Return the transformer for annotated class or field
+     * Return the transformer for an annotated class or field
      *
      * @return the transformer class
      */
     @NotNull Class<? extends Transformer> transformer();
 
     /**
-     * @return true if transformer is inheritable
+     * @return true if the transformer is inheritable, false otherwise
      */
     boolean inheritable() default false;
 }

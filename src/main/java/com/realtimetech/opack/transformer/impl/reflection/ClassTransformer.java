@@ -35,7 +35,7 @@ public class ClassTransformer implements Transformer {
      * @param opacker      the opacker
      * @param originalType the original type
      * @param object       the object to be serialized
-     * @return opack value
+     * @return the opack value
      */
     @Override
     public @Nullable Object serialize(@NotNull Opacker opacker, @NotNull Class<?> originalType, @Nullable Object object) {
@@ -52,7 +52,7 @@ public class ClassTransformer implements Transformer {
      * @param opacker  the opacker
      * @param goalType the goal type to deserialize
      * @param object   the object to be deserialized
-     * @return deserialized value
+     * @return the deserialized value
      * @throws DeserializeException if a problem occurs during deserializing
      */
     @Override

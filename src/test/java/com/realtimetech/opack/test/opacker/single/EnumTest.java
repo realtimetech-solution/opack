@@ -52,7 +52,7 @@ public class EnumTest {
     @Test
     public void test() throws SerializeException, DeserializeException, OpackAssert.AssertException {
         {
-            Opacker opacker = new Opacker.Builder().create();
+            Opacker opacker = Opacker.Builder.create().build();
             EnumTest.EnumClass originalObject = new EnumTest.EnumClass();
 
             OpackValue serialized = opacker.serialize(originalObject);
@@ -63,7 +63,9 @@ public class EnumTest {
             OpackAssert.assertEquals(originalObject, deserialized);
         }
         {
-            Opacker opacker = new Opacker.Builder().setEnableConvertEnumToOrdinal(true).create();
+            Opacker opacker = Opacker.Builder.create()
+                    .setEnableConvertEnumToOrdinal(true)
+                    .build();
             EnumTest.EnumClass originalObject = new EnumTest.EnumClass();
 
             OpackValue serialized = opacker.serialize(originalObject);

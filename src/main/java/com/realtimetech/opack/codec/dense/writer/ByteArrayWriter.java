@@ -54,7 +54,7 @@ public class ByteArrayWriter implements Writer {
     /**
      * Returns the current byte array size
      *
-     * @return bytes length
+     * @return the length
      */
     public int getLength() {
         return this.currentIndex;
@@ -68,7 +68,7 @@ public class ByteArrayWriter implements Writer {
     }
 
     /**
-     * If the needSize is larger than the current size, increase array
+     * If the needSize is larger than the current size, increase an array
      *
      * @param requireSize the need more size
      */
@@ -187,7 +187,7 @@ public class ByteArrayWriter implements Writer {
     }
 
     /**
-     * @return an array containing all the bytes in this writer in proper sequence
+     * @return a new byte array containing the data currently written in the buffer
      */
     public byte @NotNull [] toByteArray() {
         byte[] byteArray = new byte[this.currentIndex];

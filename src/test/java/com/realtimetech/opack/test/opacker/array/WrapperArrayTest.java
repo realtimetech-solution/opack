@@ -103,7 +103,7 @@ public class WrapperArrayTest {
 
     @Test
     public void test() throws SerializeException, DeserializeException, OpackAssert.AssertException {
-        Opacker opacker = new Opacker.Builder().create();
+        Opacker opacker = Opacker.Builder.create().build();
         WrapperArrayClass originalObject = new WrapperArrayClass();
 
         OpackValue serialized = opacker.serialize(originalObject);

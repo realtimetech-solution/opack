@@ -30,7 +30,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Fields annotated with @Type(type=xxxx.class) will serialize and deserialize to explicit type instead of fields type
+ * Fields annotated with @Type(type=xxxx.class) will serialize and deserialize to explicit type instead of the field's type
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({

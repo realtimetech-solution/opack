@@ -42,10 +42,10 @@ public interface OpackValue {
     }
 
     /**
-     * Return whether the specific class is an allowed type in opack value
+     * Determines whether the specified class type is an allowed type for Opack values.
      *
-     * @param type the target class
-     * @return whether class is an allowed type
+     * @param type the class type to check
+     * @return true if the given class type is allowed, false otherwise
      */
     static boolean isAllowType(@NotNull Class<?> type) {
         return ReflectionUtil.isWrapperType(type) ||
@@ -59,7 +59,7 @@ public interface OpackValue {
     /**
      * Clone this opack value
      *
-     * @return cloned opack value
+     * @return the cloned opack value
      */
-    OpackValue clone();
+    @NotNull OpackValue clone();
 }

@@ -47,10 +47,11 @@ public class AnnotationIgnoreFieldTest {
     @SuppressWarnings("ConstantValue")
     @Test
     public void test() throws SerializeException, DeserializeException, OpackAssert.AssertException {
-        Opacker opacker = new Opacker.Builder().create();
+        Opacker opacker = Opacker.Builder.create().build();
         IgnoreFieldTestClass originalObject = new IgnoreFieldTestClass();
 
         OpackValue serialized = opacker.serialize(originalObject);
+        assert serialized != null;
         IgnoreFieldTestClass deserialized = opacker.deserialize(IgnoreFieldTestClass.class, serialized);
         assert deserialized != null;
         OpackAssert.assertEquals(originalObject, deserialized);

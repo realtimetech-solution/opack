@@ -43,7 +43,7 @@ public class AnnotationNameFieldTest {
 
     @Test
     public void test() throws SerializeException, DeserializeException, OpackAssert.AssertException {
-        Opacker opacker = new Opacker.Builder().create();
+        Opacker opacker = Opacker.Builder.create().build();
         SerializedNameFieldTestClass originalObject = new SerializedNameFieldTestClass();
 
         OpackValue serialized = opacker.serialize(originalObject);

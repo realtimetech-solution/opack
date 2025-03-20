@@ -71,8 +71,9 @@ public class FastStack<T> {
     }
 
     /**
+     * @param <D>    the type of the object being added, which must extend the stack's type parameter T
      * @param object the element to push
-     * @return pushed element
+     * @return the pushed element
      */
     public <D extends T> D push(D object) {
         if (this.currentIndex >= this.currentSize) {
@@ -85,7 +86,7 @@ public class FastStack<T> {
     }
 
     /**
-     * @return element array
+     * @return the element array
      */
     public @Nullable T @NotNull [] getArray() {
         return objects;
@@ -153,7 +154,7 @@ public class FastStack<T> {
     /**
      * Returns the element at the top of this stack and removes it
      *
-     * @return The object at the top of this stack
+     * @return the object at the top of this stack
      */
     public T pop() {
         if (this.currentIndex == 0)

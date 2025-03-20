@@ -32,9 +32,9 @@ public final class NativeList implements List<Object> {
     final @NotNull Object arrayObject;
 
     /**
-     * Constructs a NativeList with array object
+     * Constructs a NativeList with an array object
      *
-     * @param arrayObject the array object for create
+     * @param arrayObject the array object
      * @throws IllegalArgumentException if this object does not represent an array class
      */
     public NativeList(@NotNull Object arrayObject) {
@@ -73,7 +73,7 @@ public final class NativeList implements List<Object> {
     /**
      * Returns true if this list contains the specified element
      *
-     * @param o element whose presence in this list is to be tested
+     * @param o the element whose presence in this list is to be tested
      * @return true if this list contains the specified element
      */
     @Override
@@ -88,7 +88,7 @@ public final class NativeList implements List<Object> {
     }
 
     /**
-     * @return an iterator over the elements in this list in proper sequence
+     * @return an iterator over the elements in this list
      */
     @Override
     public @NotNull Iterator<Object> iterator() {
@@ -96,9 +96,7 @@ public final class NativeList implements List<Object> {
     }
 
     /**
-     * Returns an array containing all the elements in this list in proper sequence
-     *
-     * @return all elements of this list
+     * @return an array containing all elements of this list
      */
     @Override
     public Object @NotNull [] toArray() {
@@ -112,7 +110,7 @@ public final class NativeList implements List<Object> {
     }
 
     /**
-     * Returns an array containing all the elements in this list in proper sequence (from first to last element)
+     * Returns an array containing all the elements in this list in a proper sequence (from first to the last element)
      * The runtime type of the returned array is that of the specified array
      *
      * @param array the array to get type
@@ -154,7 +152,7 @@ public final class NativeList implements List<Object> {
     /**
      * Returns true if this list contains all the elements of the specified collection
      *
-     * @param c collection to be checked for containment in this list
+     * @param c the collection to be checked for containment in this list
      * @return true if this list contains all the elements of the specified collection
      */
     @Override
@@ -262,7 +260,7 @@ public final class NativeList implements List<Object> {
      * Returns the index of the first occurrence of the specified element in this list, or -1 if this list does not contain the element
      * More formally, returns the lowest index i such that Objects.equals(o, get(i)), or -1 if there is no such index
      *
-     * @param o element to search for
+     * @param o the element to search for
      * @return the index of the first occurrence of the specified element in this list, or -1 if this list does not contain the element
      */
     @Override
@@ -280,7 +278,7 @@ public final class NativeList implements List<Object> {
      * Returns the index of the last occurrence of the specified element in this list, or -1 if this list does not contain the element
      * More formally, returns the highest index i such that Objects.equals(o, get(i)), or -1 if there is no such index
      *
-     * @param o element to search for
+     * @param o the element to search for
      * @return the index of the last occurrence of the specified element in this list, or -1 if this list does not contain the element
      */
     @Override
@@ -335,7 +333,7 @@ public final class NativeList implements List<Object> {
     /**
      * Returns the hash code of this list
      *
-     * @return hash code
+     * @return the hash code
      */
     @Override
     public int hashCode() {
@@ -348,7 +346,7 @@ public final class NativeList implements List<Object> {
     }
 
     /**
-     * @return a list iterator over the elements in this list (in proper sequence)
+     * @return a list iterator over the elements in this list (in a proper sequence)
      */
     @NotNull
     @Override
@@ -357,12 +355,14 @@ public final class NativeList implements List<Object> {
     }
 
     /**
-     * Returns a list iterator over the elements in this list (in proper sequence), starting at the specified position in the list
-     * The specified index indicates the first element that would be returned by an initial call to {@link ListIterator#next() next}
+     * Returns a list iterator over the elements in this list (in a proper sequence),
+     * starting at the specified position in the list
+     * The specified index indicates the first element
+     * that would be returned by an initial call to {@link ListIterator#next() next}
      * An initial call to {@link ListIterator#previous previous}previous would return the element with the specified index minus one
      *
-     * @param index index of the first element to be returned from the list iterator (by a call to {@link ListIterator#next next})
-     * @return a list iterator over the elements in this list (in proper sequence), starting at the specified position in the list
+     * @param index the index of the first element to be returned from the list iterator (by a call to {@link ListIterator#next next})
+     * @return a list iterator over the elements in this list (in a proper sequence), starting at the specified position in the list
      */
     @NotNull
     @Override
@@ -373,8 +373,8 @@ public final class NativeList implements List<Object> {
     /**
      * Returns a view of the portion of this list between the specified fromIndex, inclusive, and toIndex, exclusive (If fromIndex and toIndex are equal, the returned list is empty.)
      *
-     * @param fromIndex low endpoint (inclusive) of the subList
-     * @param toIndex   high endpoint (exclusive) of the subList
+     * @param fromIndex the low endpoint (inclusive) of the subList
+     * @param toIndex   the high endpoint (exclusive) of the subList
      * @return a view of the specified range within this list
      * @throws IndexOutOfBoundsException for an illegal endpoint index value {@code fromIndex < 0 || toIndex > size || fromIndex > toIndex}
      */

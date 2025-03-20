@@ -29,7 +29,7 @@ import java.io.OutputStream;
 
 public class OutputStreamWriter implements Writer {
     /**
-     * Create OutputStreamWriter
+     * Creates OutputStreamWriter
      *
      * @param outputStream the output stream
      * @return the output stream writer

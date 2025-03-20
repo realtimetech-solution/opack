@@ -106,7 +106,9 @@ public class WrapListElementTest {
     }
 
     private void common(boolean enableWrapListElementType) throws SerializeException, DeserializeException, OpackAssert.AssertException {
-        Opacker opacker = new Opacker.Builder().setEnableWrapListElementType(enableWrapListElementType).create();
+        Opacker opacker = Opacker.Builder.create()
+                .setEnableWrapListElementType(enableWrapListElementType)
+                .build();
         WrapListClass originalObject = new WrapListClass();
 
         OpackValue serialized = opacker.serialize(originalObject);

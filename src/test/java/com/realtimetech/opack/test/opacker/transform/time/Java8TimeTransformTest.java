@@ -49,7 +49,7 @@ public class Java8TimeTransformTest {
 
     @Test
     public void test() throws SerializeException, DeserializeException, OpackAssert.AssertException {
-        Opacker opacker = new Opacker.Builder().create();
+        Opacker opacker = Opacker.Builder.create().build();
         Java8TimeTransformClass originalObject = new Java8TimeTransformClass();
 
         OpackValue serialized = opacker.serialize(originalObject);
