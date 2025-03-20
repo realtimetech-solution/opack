@@ -587,8 +587,6 @@ public final class DenseCodec extends OpackCodec<Reader, Writer> {
                 Object currentValue = this.decodeStack.peek();
                 Object[] context = this.decodeContextStack.peek();
 
-                assert context != null;
-
                 Integer size = (Integer) context[0];
                 Integer offset = (Integer) context[1];
 
