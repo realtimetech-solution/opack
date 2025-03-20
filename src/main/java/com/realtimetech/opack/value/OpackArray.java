@@ -158,8 +158,8 @@ public final class OpackArray extends AbstractOpackValue<List<Object>> {
     /**
      * Replaces the value at the specified position in this opack array with the specified value
      *
-     * @param index index of the value to replace
-     * @param value value to be stored at the specified position
+     * @param index the index of the value to replace
+     * @param value the value to be stored at the specified position
      * @return the value previously at the specified position
      * @throws IllegalArgumentException if a type of the value is not allowed in opack value
      */
@@ -203,7 +203,7 @@ public final class OpackArray extends AbstractOpackValue<List<Object>> {
     /**
      * Returns the value at the specified position in this opack array
      *
-     * @param index index of the value to replace
+     * @param index the index of the value to replace
      * @return the value
      */
     public Object get(int index) {
@@ -213,7 +213,7 @@ public final class OpackArray extends AbstractOpackValue<List<Object>> {
     /**
      * Returns the value at the specified position in this opack array as an opack value
      *
-     * @param index index of the value to replace
+     * @param index the index of the value to replace
      * @return the value
      */
     public OpackValue getAsOpackValue(int index) {
@@ -229,7 +229,7 @@ public final class OpackArray extends AbstractOpackValue<List<Object>> {
     /**
      * Returns the value at the specified position in this opack array as an opack array
      *
-     * @param index index of the value to replace
+     * @param index the index of the value to replace
      * @return the value
      */
     public OpackArray getAsOpackArray(int index) {
@@ -245,7 +245,7 @@ public final class OpackArray extends AbstractOpackValue<List<Object>> {
     /**
      * Returns the value at the specified position in this opack array as an opack object
      *
-     * @param index index of the value to replace
+     * @param index the index of the value to replace
      * @return the value
      */
     public OpackObject getAsOpackObject(int index) {
@@ -261,7 +261,7 @@ public final class OpackArray extends AbstractOpackValue<List<Object>> {
     /**
      * Returns the value at the specified position in this opack array as a char
      *
-     * @param index index of the value to replace
+     * @param index the index of the value to replace
      * @return the value
      */
     public char getAsChar(int index) {
@@ -279,7 +279,7 @@ public final class OpackArray extends AbstractOpackValue<List<Object>> {
     /**
      * Returns the value at the specified position in this opack array as a string
      *
-     * @param index index of the value to replace
+     * @param index the index of the value to replace
      * @return the value
      */
     public String getAsString(int index) {
@@ -289,7 +289,7 @@ public final class OpackArray extends AbstractOpackValue<List<Object>> {
     /**
      * Returns the value at the specified position in this opack array as a byte
      *
-     * @param index index of the value to replace
+     * @param index the index of the value to replace
      * @return the value
      */
     public byte getAsByte(int index) {
@@ -307,7 +307,7 @@ public final class OpackArray extends AbstractOpackValue<List<Object>> {
     /**
      * Returns the value at the specified position in this opack array as a short
      *
-     * @param index index of the value to replace
+     * @param index the index of the value to replace
      * @return the value
      */
     public short getAsShort(int index) {
@@ -325,7 +325,7 @@ public final class OpackArray extends AbstractOpackValue<List<Object>> {
     /**
      * Returns the value at the specified position in this opack array as an int
      *
-     * @param index index of the value to replace
+     * @param index the index of the value to replace
      * @return the value
      */
     public int getAsInt(int index) {
@@ -343,7 +343,7 @@ public final class OpackArray extends AbstractOpackValue<List<Object>> {
     /**
      * Returns the value at the specified position in this opack array as a float
      *
-     * @param index index of the value to replace
+     * @param index the index of the value to replace
      * @return the value
      */
     public float getAsFloat(int index) {
@@ -361,7 +361,7 @@ public final class OpackArray extends AbstractOpackValue<List<Object>> {
     /**
      * Returns the value at the specified position in this opack array as a double
      *
-     * @param index index of the value to replace
+     * @param index the index of the value to replace
      * @return the value
      */
     public double getAsDouble(int index) {

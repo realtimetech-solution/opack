@@ -78,7 +78,7 @@ public class StringWriter extends Writer {
     /**
      * Writes a string
      *
-     * @param string String to be written
+     * @param string the string
      */
     @Override
     public void write(@NotNull String string) {

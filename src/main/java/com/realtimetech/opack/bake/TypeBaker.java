@@ -113,7 +113,7 @@ public final class TypeBaker {
      *
      * @param type        the class to be the target
      * @param transformer the transformer to register
-     * @param inheritable whether transformer is inheritable
+     * @param inheritable the flag indicating transformer is inheritable
      * @return true if the predefined transformer registration is successful, false otherwise
      */
     public synchronized boolean registerPredefinedTransformer(@NotNull Class<?> type, @NotNull Transformer transformer, boolean inheritable) {
@@ -152,7 +152,7 @@ public final class TypeBaker {
      *
      * @param type            the class to be the target
      * @param transformerType the predefined transformer to register
-     * @param inheritable     whether transformer is inheritable
+     * @param inheritable     the flag indicating transformer is inheritable
      * @return true if the predefined transformer registration is successful, false otherwise
      * @throws InstantiationException if a transformer class object cannot be instantiated
      */
@@ -211,7 +211,7 @@ public final class TypeBaker {
      *
      * @param transformers     the transformer list for adding
      * @param annotatedElement the element to be targeted
-     * @param root             whether the element is not super class (whether the element is the root)
+     * @param root             the flag indicating whether the element is not super class (whether the element is the root)
      * @throws BakeException if a transformer class object cannot be instantiated
      */
     private void addTransformer(@NotNull List<@NotNull Transformer> transformers, @NotNull AnnotatedElement annotatedElement, boolean root) throws BakeException {

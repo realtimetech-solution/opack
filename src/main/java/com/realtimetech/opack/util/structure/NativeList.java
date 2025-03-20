@@ -73,7 +73,7 @@ public final class NativeList implements List<Object> {
     /**
      * Returns true if this list contains the specified element
      *
-     * @param o element whose presence in this list is to be tested
+     * @param o the element whose presence in this list is to be tested
      * @return true if this list contains the specified element
      */
     @Override
@@ -152,7 +152,7 @@ public final class NativeList implements List<Object> {
     /**
      * Returns true if this list contains all the elements of the specified collection
      *
-     * @param c collection to be checked for containment in this list
+     * @param c the collection to be checked for containment in this list
      * @return true if this list contains all the elements of the specified collection
      */
     @Override
@@ -260,7 +260,7 @@ public final class NativeList implements List<Object> {
      * Returns the index of the first occurrence of the specified element in this list, or -1 if this list does not contain the element
      * More formally, returns the lowest index i such that Objects.equals(o, get(i)), or -1 if there is no such index
      *
-     * @param o element to search for
+     * @param o the element to search for
      * @return the index of the first occurrence of the specified element in this list, or -1 if this list does not contain the element
      */
     @Override
@@ -278,7 +278,7 @@ public final class NativeList implements List<Object> {
      * Returns the index of the last occurrence of the specified element in this list, or -1 if this list does not contain the element
      * More formally, returns the highest index i such that Objects.equals(o, get(i)), or -1 if there is no such index
      *
-     * @param o element to search for
+     * @param o the element to search for
      * @return the index of the last occurrence of the specified element in this list, or -1 if this list does not contain the element
      */
     @Override
@@ -361,7 +361,7 @@ public final class NativeList implements List<Object> {
      * that would be returned by an initial call to {@link ListIterator#next() next}
      * An initial call to {@link ListIterator#previous previous}previous would return the element with the specified index minus one
      *
-     * @param index index of the first element to be returned from the list iterator (by a call to {@link ListIterator#next next})
+     * @param index the index of the first element to be returned from the list iterator (by a call to {@link ListIterator#next next})
      * @return a list iterator over the elements in this list (in a proper sequence), starting at the specified position in the list
      */
     @NotNull
@@ -373,8 +373,8 @@ public final class NativeList implements List<Object> {
     /**
      * Returns a view of the portion of this list between the specified fromIndex, inclusive, and toIndex, exclusive (If fromIndex and toIndex are equal, the returned list is empty.)
      *
-     * @param fromIndex low endpoint (inclusive) of the subList
-     * @param toIndex   high endpoint (exclusive) of the subList
+     * @param fromIndex the low endpoint (inclusive) of the subList
+     * @param toIndex   the high endpoint (exclusive) of the subList
      * @return a view of the specified range within this list
      * @throws IndexOutOfBoundsException for an illegal endpoint index value {@code fromIndex < 0 || toIndex > size || fromIndex > toIndex}
      */

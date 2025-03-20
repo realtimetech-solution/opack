@@ -48,7 +48,7 @@ public class DefaultValueProviderFactory {
     /**
      * Returns default value provider instance
      *
-     * @param <P>                      The type parameter extending {@link DefaultValueProvider}.
+     * @param <P>                      the type parameter extending {@link DefaultValueProvider}.
      * @param defaultValueProviderType the default value provider class
      * @return the default value provider instance
      * @throws InstantiationException if the default value provider class object cannot be instantiated; if the default value provider is not in the default value provider class
