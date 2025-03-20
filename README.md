@@ -10,22 +10,23 @@
 
 Opack is a Java library that can serialize/deserialize between Java objects and common objects(OpackValue). Also, common objects can be encoded or decoded as JSON or Bytes(Dense).
 
-**We faster than GSON and Kryo.** (See [tests](./src/test/java/com/realtimetech/opack/test/performance))
+**We faster than GSON and Kryo and Jackson.** (See [tests](./src/test/java/com/realtimetech/opack/test/performance))
 <details>
-  <summary>Click to see performance result</summary>
+  <summary>Click to see performance benchmark result</summary>
 
 ```
 # GsonPerformanceTest
-  Gson  : 7094ms
-  Opack : 2613ms
+	Gson(T)	: 4441ms
+	Gson(D)	: 2839ms
+	Opack  	: 2756ms
 
 # KryoPerformanceTest
- Kryo  : 7227ms
- Opack : 2304ms
+	Kryo 	: 3110ms
+	Opack	: 688ms
 
 # JacksonPerformanceTest
- Jackson: 6412ms
- Opack  : 6404ms
+	Jackson	: 4626ms
+	Opack  	: 3750ms
 ```
 
 </details>
