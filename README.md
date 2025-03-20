@@ -10,22 +10,23 @@
 
 Opack is a Java library that can serialize/deserialize between Java objects and common objects(OpackValue). Also, common objects can be encoded or decoded as JSON or Bytes(Dense).
 
-**We faster than GSON and Kryo.** (See [tests](./src/test/java/com/realtimetech/opack/test/performance))
+**We faster than GSON and Kryo and Jackson.** (See [tests](./src/test/java/com/realtimetech/opack/test/performance))
 <details>
-  <summary>Click to see performance result</summary>
+  <summary>Click to see performance benchmark result</summary>
 
 ```
 # GsonPerformanceTest
-  Gson  : 7094ms
-  Opack : 2613ms
+	Gson(T)	: 4441ms
+	Gson(D)	: 2839ms
+	Opack  	: 2756ms
 
 # KryoPerformanceTest
- Kryo  : 7227ms
- Opack : 2304ms
+	Kryo 	: 3110ms
+	Opack	: 688ms
 
 # JacksonPerformanceTest
- Jackson: 6412ms
- Opack  : 6404ms
+	Jackson	: 4626ms
+	Opack  	: 3750ms
 ```
 
 </details>
@@ -68,7 +69,7 @@ Maven:
 ```java
 public class Usage {
     public static void main(String[] arguments) {
-        Opacker opacker = new Opacker.Builder().create();
+        Opacker opacker = Opacker.Builder.create().build();
 
         SomeObject someObject = new SomeObject();
 
@@ -82,7 +83,7 @@ public class Usage {
 ```java
 public class Usage {
     public static void main(String[] arguments) {
-        Opacker opacker = new Opacker.Builder()
+        Opacker opacker = Opacker.Builder.create()
                 .setContextStackInitialSize(128)                    // (Optional) Creation size of stack for processing
                 .setValueStackInitialSize(512)                      // (Optional) Creation size of stack for processing
 
@@ -90,7 +91,9 @@ public class Usage {
                 .setEnableWrapMapElementType(false)                 // (Optional) When converting elements of a map, record the type as well
                 .setEnableConvertEnumToOrdinal(false)               // (Optional) Convert enum to ordinal or name
                 .setEnableConvertRecursiveDependencyToNull(false)   // (Optional) Convert recursive depandency, record null
-                .create();
+
+                .setClassLoader(Usage.class.getClassLoader())       // (Optional) Class loader for processing
+                .build();
 
         OpackValue serializedSomeObject = null;
 
@@ -101,10 +104,12 @@ public class Usage {
 
 #### 3. Json Codec
 
+##### General Usage
+
 ```java
 public class Usage {
     public static void main(String[] arguments) {
-        JsonCodec jsonCodec = new JsonCodec.Builder()
+        JsonCodec jsonCodec = JsonCodec.Builder.create()
                 .setEncodeStackInitialSize(128)             // (Optional) Creation size of stack for processing
                 .setEncodeStringBufferSize(1024)            // (Optional) Creation size of stack for processing
                 .setDecodeStackInitialSize(128)             // (Optional) Creation size of stack for processing
@@ -113,7 +118,7 @@ public class Usage {
                 .setEnableConvertCharacterToString(false)   // (Optional) Convert character to string instead of character int value
                 .setUsePrettyFormat(false)                  // (Optional) When encoding, it prints formatted
 
-                .create();
+                .build();
 
         OpackValue opackValue;
 
@@ -130,18 +135,34 @@ public class Usage {
 }
 ```
 
+##### Easy Usage
+
+```java
+public class Usage {
+    public static void main(String[] arguments) {
+        OpackValue opackValue;
+
+        // Encode
+        String json = Json.encode(opackValue);
+
+        // Decode
+        OpackValue decodedOpackValue = Json.decode(json);
+    }
+}
+```
+
 #### 4. Dense Codec
 
 ```java
 public class Usage {
     public static void main(String[] arguments) {
-        DenseCodec denseCodec = new DenseCodec.Builder()
+        DenseCodec denseCodec = DenseCodec.Builder.create()
                 .setEncodeStackInitialSize(128)         // (Optional) Creation size of stack for processing
                 .setDecodeStackInitialSize(128)         // (Optional) Creation size of stack for processing
 
                 .setIgnoreVersionCompare(false)         // (Optional) Ignore compare dense codec version in data
 
-                .create();
+                .build();
 
         OpackValue opackValue;
 
@@ -199,21 +220,21 @@ public class SomeObject {
 ```java
 public class ByteToBase64Transformer implements Transformer {
     @Override
-    public Object serialize(Opacker opacker, Object value) throws SerializeException {
-        if (value instanceof byte[]) {
-            return Base64.getEncoder().encodeToString((byte[]) value);
+    public @Nullable Object serialize(@NotNull Opacker opacker, @NotNull Class<?> originalType, @Nullable Object object) throws SerializeException {
+        if (object instanceof byte[]) {
+            return Base64.getEncoder().encodeToString((byte[]) object);
         }
 
-        return value;
+        return object;
     }
 
     @Override
-    public Object deserialize(Opacker opacker, Class<?> goalType, Object value) throws DeserializeException {
-        if (value instanceof String) {
-            return Base64.getDecoder().decode((String) value);
+    public @Nullable Object deserialize(@NotNull Opacker opacker, @NotNull Class<?> goalType, @Nullable Object object) throws DeserializeException {
+        if (object instanceof String) {
+            return Base64.getDecoder().decode((String) object);
         }
 
-        return value;
+        return object;
     }
 }
 
@@ -244,9 +265,9 @@ public class SomeObject {
 public class AnimalTransformer implements Transformer {
     // Remove a `sound` from a serialized `Animal`
     @Override
-    public Object serialize(Opacker opacker, Object value) throws SerializeException {
-        if (value instanceof Animal) {
-            Animal animal = (Animal) value;
+    public @Nullable Object serialize(@NotNull Opacker opacker, @NotNull Class<?> originalType, @Nullable Object object) throws SerializeException {
+        if (object instanceof Animal) {
+            Animal animal = (Animal) object;
             OpackValue opackValue = opacker.serialize(animal);
 
             if (opackValue instanceof OpackObject) {
@@ -256,21 +277,21 @@ public class AnimalTransformer implements Transformer {
             }
         }
 
-        return value;
+        return object;
     }
 
     // Restore `sound` from `Animal` before deserialization
     @Override
-    public Object deserialize(Opacker opacker, Class<?> goalType, Object value) throws DeserializeException {
-        if (value instanceof OpackObject) {
+    public @Nullable Object deserialize(@NotNull Opacker opacker, @NotNull Class<?> goalType, @Nullable Object object) throws DeserializeException {
+        if (object instanceof OpackObject) {
             if (Animal.class.isAssignableFrom(goalType)) {
-                OpackObject opackObject = (OpackObject) value;
+                OpackObject opackObject = (OpackObject) object;
                 Animal animal = (Animal) opacker.deserialize(goalType, opackObject);
                 animal.setSound(animal.bark());
             }
         }
 
-        return value;
+        return object;
     }
 }
 
@@ -307,21 +328,21 @@ public class SomeObject {
 ```java
 public class Usage {
     public static void main(String[] arguments) {
-        OpackObject<String, OpackValue> rootObject = new OpackObject<>();
+        OpackObject rootObject = new OpackObject();
 
         {
-            OpackArray<Integer> opackArray = new OpackArray<>();
+            OpackArray opackArray = new OpackArray();
             opackArray.add(Integer.MAX_VALUE);
             rootObject.put("array", opackArray);
         }
 
         {
-            OpackArray<?> opackArray = OpackArray.createWithArrayObject(new int[]{1, 2, 3, 4, 5, 6});
+            OpackArray opackArray = OpackArray.createWithArrayObject(new int[]{1, 2, 3, 4, 5, 6});
             rootObject.put("unmodifiable(but, really fast) array", opackArray);
         }
 
         {
-            OpackObject<Object, Object> opackObject = new OpackObject<>();
+            OpackObject opackObject = new OpackObject();
             opackObject.put("int", 1);
             opackObject.put("float", 1.1f);
             opackObject.put("long", Long.MAX_VALUE);
@@ -336,8 +357,8 @@ public class Usage {
             rootObject.put("number_map", opackObject);
         }
 
-        OpackArray<Integer> opackArray = (OpackArray) rootObject.get("array");
-        OpackObject<Object, Object> opackObject = (OpackObject) rootObject.get("number_map");
+        OpackArray opackArray = (OpackArray) rootObject.get("array");
+        OpackObject opackObject = (OpackObject) rootObject.get("number_map");
 
         System.out.println("1024 is " + (opackObject.get(1024)));
         System.out.println("Array length is " + (opackArray.length()));
