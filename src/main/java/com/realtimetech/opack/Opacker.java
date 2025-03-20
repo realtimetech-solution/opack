@@ -278,7 +278,7 @@ public class Opacker {
     }
 
     /**
-     * Serializes the object to {@link OpackValue OpackValue} or {@link OpackValue#isAllowType(Class) Objects of the type allowed by OpackValue}
+     * Serializes the object to {@link OpackValue#isAllowType(Class) Objects of the type allowed by OpackValue}
      *
      * @param object the object to be serialized
      * @return the serialized object
@@ -468,7 +468,7 @@ public class Opacker {
     }
 
     /**
-     * Deserializes the {@link OpackValue OpackValue} or {@link OpackValue#isAllowType(Class) Objects of the type allowed by OpackValue} to object of the target class
+     * Deserializes the {@link OpackValue#isAllowType(Class) Objects of the type allowed by OpackValue} to object of the target class
      *
      * @param <T>    the type of the object to be deserialized
      * @param type   the target class

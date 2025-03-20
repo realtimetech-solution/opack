@@ -144,7 +144,7 @@ public class FastStack<T> {
      *
      * @return the element at the top of this stack
      */
-    public @NotNull T peek() {
+    public @Nullable T peek() {
         if (this.currentIndex == 0)
             throw new EmptyStackException();
 
