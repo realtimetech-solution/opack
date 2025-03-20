@@ -959,11 +959,7 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
                     this.decodeBaseStack.pop();
 
                     if (!this.decodeBaseStack.isEmpty()) {
-                        Integer peek = this.decodeBaseStack.peek();
-
-                        assert peek != null;
-
-                        currentContextIndex = peek;
+                        currentContextIndex = this.decodeBaseStack.peek();
                         currentContext = (OpackValue) this.decodeValueStack.get(currentContextIndex);
                         currentContextType = currentContext == null ? null : currentContext.getClass();
                     } else {
