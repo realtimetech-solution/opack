@@ -20,7 +20,7 @@
  * limitations under the License.
  */
 
-package com.realtimetech.opack.benchmark;
+package com.realtimetech.opack.benchmark.old;
 
 import com.realtimetech.opack.Opacker;
 import com.realtimetech.opack.codec.json.JsonCodec;

@@ -27,17 +27,15 @@ import com.realtimetech.opack.annotation.WithType;
 import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.test.OpackAssert;
+import com.realtimetech.opack.test.RandomUtil;
 import com.realtimetech.opack.value.OpackValue;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 
 public class AnnotationWithTypeTest {
-    static final Random RANDOM = new Random();
-
     @SuppressWarnings("ALL")
     public static class ObjectClass {
         private Object nullValue;
@@ -50,8 +48,8 @@ public class AnnotationWithTypeTest {
             this.nullValue = null;
 
             this.stringValue = "object_string_value" + System.currentTimeMillis();
-            this.intValue = RANDOM.nextInt();
-            this.integerValue = RANDOM.nextInt();
+            this.intValue = RandomUtil.nextInt();
+            this.integerValue = RandomUtil.nextInt();
         }
     }
 
