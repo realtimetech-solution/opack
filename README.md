@@ -118,6 +118,8 @@ public class Usage {
                 .setEnableConvertCharacterToString(false)   // (Optional) Convert character to string instead of character int value
                 .setUsePrettyFormat(false)                  // (Optional) When encoding, it prints formatted
 
+                .setRoundingMode(RoundingMode.ROUND_EVEN)   // (Optional) Rounding mode to be used for double string conversion
+
                 .build();
 
         OpackValue opackValue;

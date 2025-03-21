@@ -55,7 +55,6 @@ public class TotalBenchmarkTest {
     static final int DENSE_DECODE_LOOP = 2048;
     static final int DENSE_DECODE_ITERATION = 8;
 
-
     public static void main(String[] args) throws EncodeException, SerializeException {
         // Benchmark
         BenchmarkTable benchmarkTable = new BenchmarkTable(BenchmarkTable.ColumnType.STRING, BenchmarkTable.ColumnType.TIME, BenchmarkTable.ColumnType.NUMBER);

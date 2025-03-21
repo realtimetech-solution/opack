@@ -23,6 +23,8 @@
 package com.realtimetech.opack.codec.json;
 
 import com.realtimetech.opack.codec.OpackCodec;
+import com.realtimetech.opack.codec.json.ryu.RyuDouble;
+import com.realtimetech.opack.codec.json.ryu.RyuFloat;
 import com.realtimetech.opack.exception.DecodeException;
 import com.realtimetech.opack.exception.EncodeException;
 import com.realtimetech.opack.util.StringWriter;
@@ -61,6 +63,8 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
         private boolean enableConvertCharacterToString;
         private boolean usePrettyFormat;
 
+        private @NotNull RoundingMode roundingMode;
+
         Builder() {
             this.allowAnyValueToKey = true;
             this.enableConvertCharacterToString = false;
@@ -69,6 +73,8 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
             this.encodeStringBufferSize = 1024;
             this.encodeStackInitialSize = 128;
             this.decodeStackInitialSize = 128;
+
+            this.roundingMode = RoundingMode.ROUND_EVEN;
         }
 
         /**
@@ -138,6 +144,17 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
          */
         public @NotNull Builder setUsePrettyFormat(boolean usePrettyFormat) {
             this.usePrettyFormat = usePrettyFormat;
+            return this;
+        }
+
+        /**
+         * Sets the rounding mode to be used for double string conversion
+         *
+         * @param roundingMode the rounding mode to be applied. Must not be null.
+         * @return the current builder instance for method chaining.
+         */
+        public @NotNull Builder setRoundingMode(@NotNull RoundingMode roundingMode) {
+            this.roundingMode = roundingMode;
             return this;
         }
 
@@ -312,6 +329,8 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
     private final boolean enableConvertCharacterToString;
     private final boolean usePrettyFormat;
 
+    private final @NotNull RoundingMode roundingMode;
+
     /**
      * Constructs the JsonCodec with the builder of JsonCodec.
      *
@@ -331,6 +350,8 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
         this.allowAnyValueToKey = builder.allowAnyValueToKey;
         this.enableConvertCharacterToString = builder.enableConvertCharacterToString;
         this.usePrettyFormat = builder.usePrettyFormat;
+
+        this.roundingMode = builder.roundingMode;
     }
 
 
@@ -591,13 +612,16 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
             return true;
         } else {
             // Asserts
-            if (objectType == Double.class) {
+            boolean isDouble = objectType == Double.class;
+            boolean isFloat = objectType == Float.class;
+
+            if (isDouble) {
                 double doubleValue = (Double) object;
 
                 if (Double.isNaN(doubleValue) || Double.isInfinite(doubleValue) || !Double.isFinite(doubleValue)) {
                     throw new EncodeException("Only finite values are allowed in json format.");
                 }
-            } else if (objectType == Float.class) {
+            } else if (isFloat) {
                 float floatValue = (Float) object;
 
                 if (Float.isNaN(floatValue) || Float.isInfinite(floatValue) || !Float.isFinite(floatValue)) {
@@ -607,6 +631,10 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
 
             if (objectType == Character.class) {
                 writer.write(Integer.toString((char) object));
+            } else if (isDouble) {
+                writer.write(RyuDouble.toString((Double) object, this.roundingMode));
+            } else if (isFloat) {
+                writer.write(RyuDouble.toString((Float) object, this.roundingMode));
             } else {
                 writer.write(object.toString());
             }
@@ -733,7 +761,7 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
                     writer.write(CONST_SEPARATOR_CHARACTER);
                 }
 
-                writer.write(Float.toString(array[index]));
+                writer.write(RyuFloat.toString(array[index], this.roundingMode));
             }
 
             writer.write(CONST_ARRAY_CLOSE_CHARACTER);
@@ -765,7 +793,7 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
                     writer.write(CONST_SEPARATOR_CHARACTER);
                 }
 
-                writer.write(Double.toString(array[index]));
+                writer.write(RyuDouble.toString(array[index], this.roundingMode));
             }
 
             writer.write(CONST_ARRAY_CLOSE_CHARACTER);
