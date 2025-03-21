@@ -22,14 +22,13 @@
 
 package com.realtimetech.opack.test.performance;
 
+import com.realtimetech.opack.test.RandomUtil;
 import com.realtimetech.opack.test.opacker.array.PrimitiveArrayTest;
 import com.realtimetech.opack.test.opacker.array.WrapperArrayTest;
 import com.realtimetech.opack.test.opacker.single.ObjectTest;
 import com.realtimetech.opack.test.opacker.single.PrimitiveTest;
 import com.realtimetech.opack.test.opacker.single.StringTest;
 import com.realtimetech.opack.test.opacker.single.WrapperTest;
-
-import java.util.Random;
 
 @SuppressWarnings("ALL")
 public class PerformanceClass {
@@ -52,8 +51,6 @@ public class PerformanceClass {
         return end - start;
     }
 
-    static final Random RANDOM = new Random();
-
     private WrapperTest.WrapperClass wrapperClassValue;
     private WrapperTest.WrapperClass[] wrapperClassArrayValue;
 
@@ -73,7 +70,7 @@ public class PerformanceClass {
     private ObjectTest.ObjectClass[] objectClassArrayValue;
 
     public PerformanceClass() {
-        int length = RANDOM.nextInt(5) + 5;
+        int length = RandomUtil.nextInt(5) + 5;
 
         this.wrapperClassValue = new WrapperTest.WrapperClass();
         this.wrapperClassArrayValue = new WrapperTest.WrapperClass[length];

@@ -26,14 +26,11 @@ import com.realtimetech.opack.Opacker;
 import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.test.OpackAssert;
+import com.realtimetech.opack.test.RandomUtil;
 import com.realtimetech.opack.value.OpackValue;
 import org.junit.jupiter.api.Test;
 
-import java.util.Random;
-
 public class PrimitiveTest {
-    static final Random RANDOM = new Random();
-
     @SuppressWarnings("ALL")
     public static class PrimitiveClass {
         private boolean booleanValue;
@@ -50,18 +47,18 @@ public class PrimitiveTest {
         private long longValue;
 
         public PrimitiveClass() {
-            this.booleanValue = RANDOM.nextBoolean();
+            this.booleanValue = RandomUtil.nextBoolean();
 
-            this.byteValue = (byte) RANDOM.nextInt();
-            this.charValue = (char) RANDOM.nextInt();
+            this.byteValue = (byte) RandomUtil.nextInt();
+            this.charValue = (char) RandomUtil.nextInt();
 
-            this.shortValue = (short) RANDOM.nextInt();
+            this.shortValue = (short) RandomUtil.nextInt();
 
-            this.intValue = RANDOM.nextInt();
-            this.floatValue = RANDOM.nextFloat();
+            this.intValue = RandomUtil.nextInt();
+            this.floatValue = RandomUtil.nextFloat();
 
-            this.doubleValue = RANDOM.nextDouble();
-            this.longValue = RANDOM.nextLong();
+            this.doubleValue = RandomUtil.nextDouble();
+            this.longValue = RandomUtil.nextLong();
         }
     }
 

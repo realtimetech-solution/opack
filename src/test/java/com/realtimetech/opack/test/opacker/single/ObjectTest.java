@@ -26,14 +26,11 @@ import com.realtimetech.opack.Opacker;
 import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.test.OpackAssert;
+import com.realtimetech.opack.test.RandomUtil;
 import com.realtimetech.opack.value.OpackValue;
 import org.junit.jupiter.api.Test;
 
-import java.util.Random;
-
 public class ObjectTest {
-    static final Random RANDOM = new Random();
-
     @SuppressWarnings("ALL")
     public static class SubObjectClass {
         private Object nullValue;
@@ -46,8 +43,8 @@ public class ObjectTest {
             this.nullValue = null;
 
             this.stringValue = "sub_object_string_value" + System.currentTimeMillis();
-            this.intValue = RANDOM.nextInt();
-            this.integerValue = RANDOM.nextInt();
+            this.intValue = RandomUtil.nextInt();
+            this.integerValue = RandomUtil.nextInt();
         }
     }
 

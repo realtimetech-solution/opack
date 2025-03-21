@@ -27,16 +27,14 @@ import com.realtimetech.opack.annotation.Type;
 import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.test.OpackAssert;
+import com.realtimetech.opack.test.RandomUtil;
 import com.realtimetech.opack.test.opacker.single.ObjectTest;
 import com.realtimetech.opack.value.OpackValue;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Array;
-import java.util.Random;
 
 public class AnnotationTypeObjectTest {
-    static final Random RANDOM = new Random();
-
     @SuppressWarnings("ALL")
     public static class ExplicitObjectClass {
         private Object nullValue;
@@ -49,7 +47,7 @@ public class AnnotationTypeObjectTest {
 
         public ExplicitObjectClass() {
             this.nullValue = null;
-            int length = RANDOM.nextInt(5) + 5;
+            int length = RandomUtil.nextInt(5) + 5;
 
             this.subObjectArrayValue = new ObjectTest.SubObjectClass[length];
             for (int index = 0; index < length; index++) {
