@@ -26,6 +26,7 @@ import com.realtimetech.opack.Opacker;
 import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.test.OpackAssert;
+import com.realtimetech.opack.transformer.impl.time.annotation.TimeFormat;
 import com.realtimetech.opack.value.OpackValue;
 import org.junit.jupiter.api.Test;
 
@@ -47,6 +48,22 @@ public class Java8TimeTransformTest {
         }
     }
 
+    @SuppressWarnings("ALL")
+    public static class Java8TimeTransformWithFormatClass {
+        @TimeFormat("yyyy-MM-dd")
+        private LocalDate localDate;
+        @TimeFormat("HH:mm:ss.SSSSSSSSS")
+        private LocalTime localTime;
+        @TimeFormat("yyyy-MM-dd HH:mm:ss.SSSSSSSSS")
+        private LocalDateTime localDateTime;
+
+        public Java8TimeTransformWithFormatClass() {
+            this.localDate = LocalDate.now();
+            this.localTime = LocalTime.now();
+            this.localDateTime = LocalDateTime.now();
+        }
+    }
+
     @Test
     public void test() throws SerializeException, DeserializeException, OpackAssert.AssertException {
         Opacker opacker = Opacker.Builder.create().build();
@@ -55,6 +72,18 @@ public class Java8TimeTransformTest {
         OpackValue serialized = opacker.serialize(originalObject);
         assert serialized != null;
         Java8TimeTransformClass deserialized = opacker.deserialize(Java8TimeTransformClass.class, serialized);
+
+        OpackAssert.assertEquals(originalObject, deserialized);
+    }
+
+    @Test
+    public void test_with_format() throws SerializeException, DeserializeException, OpackAssert.AssertException {
+        Opacker opacker = Opacker.Builder.create().build();
+        Java8TimeTransformWithFormatClass originalObject = new Java8TimeTransformWithFormatClass();
+
+        OpackValue serialized = opacker.serialize(originalObject);
+        assert serialized != null;
+        Java8TimeTransformWithFormatClass deserialized = opacker.deserialize(Java8TimeTransformWithFormatClass.class, serialized);
 
         OpackAssert.assertEquals(originalObject, deserialized);
     }

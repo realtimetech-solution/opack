@@ -23,12 +23,15 @@
 package com.realtimetech.opack.transformer.impl.time.java8;
 
 import com.realtimetech.opack.Opacker;
+import com.realtimetech.opack.capture.CapturedType;
 import com.realtimetech.opack.transformer.Transformer;
+import com.realtimetech.opack.transformer.impl.time.annotation.TimeFormat;
 import com.realtimetech.opack.value.OpackArray;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 public class LocalTimeTransformer implements Transformer {
     /**
@@ -43,6 +46,13 @@ public class LocalTimeTransformer implements Transformer {
     public @Nullable Object serialize(@NotNull Opacker.Context context, @NotNull Class<?> originalType, @Nullable Object object) {
         if (object instanceof LocalTime) {
             LocalTime localTime = (LocalTime) object;
+            CapturedType.FieldProperty currentFieldProperty = context.getCurrentFieldProperty();
+
+            if (currentFieldProperty != null) {
+                TimeFormat timeFormat = currentFieldProperty.getField().getAnnotation(TimeFormat.class);
+
+                return localTime.format(DateTimeFormatter.ofPattern(timeFormat.value()));
+            }
 
             return OpackArray.createWithArrayObject(
                     new int[]{
@@ -67,7 +77,16 @@ public class LocalTimeTransformer implements Transformer {
      */
     @Override
     public @Nullable Object deserialize(@NotNull Opacker.Context context, @NotNull Class<?> goalType, @Nullable Object object) {
-        if (object instanceof OpackArray) {
+        if (object instanceof String) {
+            String string = (String) object;
+            CapturedType.FieldProperty currentFieldProperty = context.getCurrentFieldProperty();
+
+            if (currentFieldProperty != null) {
+                TimeFormat timeFormat = currentFieldProperty.getField().getAnnotation(TimeFormat.class);
+
+                return LocalTime.parse(string, DateTimeFormatter.ofPattern(timeFormat.value()));
+            }
+        } else if (object instanceof OpackArray) {
             OpackArray opackArray = (OpackArray) object;
 
             if (opackArray.length() == 4) {

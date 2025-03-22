@@ -28,6 +28,8 @@ import org.jetbrains.annotations.Nullable;
 import java.io.ObjectInputStream;
 import java.io.ObjectStreamClass;
 import java.lang.reflect.*;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -145,6 +147,10 @@ public class ReflectionUtil {
                 return number.doubleValue();
             } else if (type == long.class || type == Long.class) {
                 return number.longValue();
+            } else if (type == BigInteger.class) {
+                return BigInteger.valueOf(number.longValue());
+            } else if (type == BigDecimal.class) {
+                return BigDecimal.valueOf(number.longValue());
             }
         } else if (objectType == Boolean.class) {
             if (type == boolean.class || type == Boolean.class) {

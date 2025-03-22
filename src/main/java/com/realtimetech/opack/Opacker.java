@@ -41,6 +41,7 @@ import com.realtimetech.opack.transformer.impl.time.DateTransformer;
 import com.realtimetech.opack.transformer.impl.time.java8.LocalDateTimeTransformer;
 import com.realtimetech.opack.transformer.impl.time.java8.LocalDateTransformer;
 import com.realtimetech.opack.transformer.impl.time.java8.LocalTimeTransformer;
+import com.realtimetech.opack.transformer.impl.uuid.UUIDTransformer;
 import com.realtimetech.opack.util.OpackArrayConverter;
 import com.realtimetech.opack.util.ReflectionUtil;
 import com.realtimetech.opack.util.structure.FastStack;
@@ -279,6 +280,8 @@ public class Opacker {
             this.typeCapturer.registerPredefinedTransformer(LocalDate.class, LocalDateTransformer.class, true);
             this.typeCapturer.registerPredefinedTransformer(LocalTime.class, LocalTimeTransformer.class, true);
             this.typeCapturer.registerPredefinedTransformer(LocalDateTime.class, LocalDateTimeTransformer.class, true);
+
+            this.typeCapturer.registerPredefinedTransformer(UUID.class, UUIDTransformer.class, true);
 
             this.typeCapturer.registerPredefinedTransformer(Class.class, ClassTransformer.class, true);
         } catch (InstantiationException exception) {
@@ -669,7 +672,7 @@ public class Opacker {
             } else if (goalType.isAssignableFrom(object.getClass())) {
                 return object;
             } else {
-                throw new DeserializeException("Found object, stack corruption.");
+                throw new DeserializeException("Failed to convert object(" + object + ") to the specified goal type: " + goalType.getName() + ". This could be due to a missing Transformer.");
             }
         } catch (TypeCaptureException exception) {
             throw new DeserializeException("Can't capture " + goalType.getName() + " class information.", exception);

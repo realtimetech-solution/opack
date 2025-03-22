@@ -23,10 +23,15 @@
 package com.realtimetech.opack.transformer.impl.time;
 
 import com.realtimetech.opack.Opacker;
+import com.realtimetech.opack.capture.CapturedType;
+import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.transformer.Transformer;
+import com.realtimetech.opack.transformer.impl.time.annotation.TimeFormat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class DateTransformer implements Transformer {
@@ -41,7 +46,16 @@ public class DateTransformer implements Transformer {
     @Override
     public @Nullable Object serialize(@NotNull Opacker.Context context, @NotNull Class<?> originalType, @Nullable Object object) {
         if (object instanceof Date) {
-            return ((Date) object).getTime();
+            Date date = (Date) object;
+            CapturedType.FieldProperty currentFieldProperty = context.getCurrentFieldProperty();
+
+            if (currentFieldProperty != null) {
+                TimeFormat timeFormat = currentFieldProperty.getField().getAnnotation(TimeFormat.class);
+
+                return new SimpleDateFormat(timeFormat.value()).format(date);
+            }
+
+            return date.getTime();
         }
 
         return object;
@@ -54,10 +68,23 @@ public class DateTransformer implements Transformer {
      * @param goalType the goal type to deserialize
      * @param object   the object to be deserialized
      * @return the deserialized value
+     * @throws DeserializeException if a problem occurs during deserializing
      */
     @Override
-    public @Nullable Object deserialize(@NotNull Opacker.Context context, @NotNull Class<?> goalType, @Nullable Object object) {
-        if (object instanceof Long) {
+    public @Nullable Object deserialize(@NotNull Opacker.Context context, @NotNull Class<?> goalType, @Nullable Object object) throws DeserializeException {
+        if (object instanceof String) {
+            CapturedType.FieldProperty currentFieldProperty = context.getCurrentFieldProperty();
+
+            if (currentFieldProperty != null) {
+                TimeFormat timeFormat = currentFieldProperty.getField().getAnnotation(TimeFormat.class);
+
+                try {
+                    return new SimpleDateFormat(timeFormat.value()).parse((String) object);
+                } catch (ParseException parseException) {
+                    throw new DeserializeException(parseException);
+                }
+            }
+        } else if (object instanceof Long) {
             return new Date((Long) object);
         }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 REALTIMETECH All Rights Reserved
+ * Copyright (C) 2025 REALTIMETECH All Rights Reserved
  *
  * Licensed either under the Apache License, Version 2.0, or (at your option)
  * under the terms of the GNU General Public License as published by
@@ -20,22 +20,19 @@
  * limitations under the License.
  */
 
-package com.realtimetech.opack.transformer.impl.time;
+package com.realtimetech.opack.transformer.impl.uuid;
 
 import com.realtimetech.opack.Opacker;
-import com.realtimetech.opack.capture.CapturedType;
 import com.realtimetech.opack.exception.DeserializeException;
+import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.transformer.Transformer;
-import com.realtimetech.opack.transformer.impl.time.annotation.TimeFormat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
+import java.nio.file.Path;
+import java.util.UUID;
 
-public class CalendarTransformer implements Transformer {
+public class UUIDTransformer implements Transformer {
     /**
      * Serialize specific value to opack value
      *
@@ -43,20 +40,12 @@ public class CalendarTransformer implements Transformer {
      * @param originalType the original type
      * @param object       the object to be serialized
      * @return the opack value
+     * @throws SerializeException if a problem occurs during serializing
      */
     @Override
-    public @Nullable Object serialize(@NotNull Opacker.Context context, @NotNull Class<?> originalType, @Nullable Object object) {
-        if (object instanceof Calendar) {
-            Calendar calendar = (Calendar) object;
-            CapturedType.FieldProperty currentFieldProperty = context.getCurrentFieldProperty();
-
-            if (currentFieldProperty != null) {
-                TimeFormat timeFormat = currentFieldProperty.getField().getAnnotation(TimeFormat.class);
-
-                return new SimpleDateFormat(timeFormat.value()).format(calendar.getTime());
-            }
-
-            return calendar.getTime().getTime();
+    public @Nullable Object serialize(@NotNull Opacker.Context context, @NotNull Class<?> originalType, @Nullable Object object) throws SerializeException {
+        if (object instanceof UUID) {
+            return ((UUID) object).toString();
         }
 
         return object;
@@ -69,30 +58,12 @@ public class CalendarTransformer implements Transformer {
      * @param goalType the goal type to deserialize
      * @param object   the object to be deserialized
      * @return the deserialized value
+     * @throws DeserializeException if a problem occurs during deserializing
      */
     @Override
     public @Nullable Object deserialize(@NotNull Opacker.Context context, @NotNull Class<?> goalType, @Nullable Object object) throws DeserializeException {
         if (object instanceof String) {
-            Calendar calendar = Calendar.getInstance();
-            CapturedType.FieldProperty currentFieldProperty = context.getCurrentFieldProperty();
-
-            if (currentFieldProperty != null) {
-                TimeFormat timeFormat = currentFieldProperty.getField().getAnnotation(TimeFormat.class);
-
-                try {
-                    calendar.setTime(new SimpleDateFormat(timeFormat.value()).parse((String) object));
-                } catch (ParseException parseException) {
-                    throw new DeserializeException(parseException);
-                }
-
-                return calendar;
-            }
-        } else if (object instanceof Long) {
-            Calendar calendar = Calendar.getInstance();
-
-            calendar.setTime(new Date((Long) object));
-
-            return calendar;
+            return UUID.fromString(String.valueOf(object));
         }
 
         return object;
