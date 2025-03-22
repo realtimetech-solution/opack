@@ -30,10 +30,11 @@ import com.realtimetech.opack.value.OpackArray;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class LocalDateTimeTransformer implements Transformer {
+public class ZonedDateTimeTransformer implements Transformer {
     /**
      * Serialize specific value to opack value
      *
@@ -44,27 +45,28 @@ public class LocalDateTimeTransformer implements Transformer {
      */
     @Override
     public @Nullable Object serialize(@NotNull Opacker.Context context, @NotNull Class<?> originalType, @Nullable Object object) {
-        if (object instanceof LocalDateTime) {
-            LocalDateTime localDateTime = (LocalDateTime) object;
+        if (object instanceof ZonedDateTime) {
+            ZonedDateTime zonedDateTime = (ZonedDateTime) object;
             CapturedType.FieldProperty currentFieldProperty = context.getCurrentFieldProperty();
 
             if (currentFieldProperty != null) {
                 TimeFormat timeFormat = currentFieldProperty.getField().getAnnotation(TimeFormat.class);
 
                 if (timeFormat != null) {
-                    return localDateTime.format(DateTimeFormatter.ofPattern(timeFormat.value()));
+                    return zonedDateTime.format(DateTimeFormatter.ofPattern(timeFormat.value()));
                 }
             }
 
             return OpackArray.createWithArrayObject(
                     new int[]{
-                            localDateTime.getYear(),
-                            localDateTime.getMonthValue(),
-                            localDateTime.getDayOfMonth(),
-                            localDateTime.getHour(),
-                            localDateTime.getMinute(),
-                            localDateTime.getSecond(),
-                            localDateTime.getNano()
+                            zonedDateTime.getYear(),
+                            zonedDateTime.getMonthValue(),
+                            zonedDateTime.getDayOfMonth(),
+                            zonedDateTime.getHour(),
+                            zonedDateTime.getMinute(),
+                            zonedDateTime.getSecond(),
+                            zonedDateTime.getNano(),
+                            zonedDateTime.getOffset().getTotalSeconds()
                     }
             );
         }
@@ -90,21 +92,22 @@ public class LocalDateTimeTransformer implements Transformer {
                 TimeFormat timeFormat = currentFieldProperty.getField().getAnnotation(TimeFormat.class);
 
                 if (timeFormat != null) {
-                    return LocalDateTime.parse(string, DateTimeFormatter.ofPattern(timeFormat.value()));
+                    return ZonedDateTime.parse(string, DateTimeFormatter.ofPattern(timeFormat.value()));
                 }
             }
         } else if (object instanceof OpackArray) {
             OpackArray opackArray = (OpackArray) object;
 
-            if (opackArray.length() == 7) {
-                return LocalDateTime.of(
+            if (opackArray.length() == 8) {
+                return ZonedDateTime.of(
                         opackArray.getAsInt(0),
                         opackArray.getAsInt(1),
                         opackArray.getAsInt(2),
                         opackArray.getAsInt(3),
                         opackArray.getAsInt(4),
                         opackArray.getAsInt(5),
-                        opackArray.getAsInt(6)
+                        opackArray.getAsInt(6),
+                        ZoneOffset.ofTotalSeconds(opackArray.getAsInt(7))
                 );
             }
         }

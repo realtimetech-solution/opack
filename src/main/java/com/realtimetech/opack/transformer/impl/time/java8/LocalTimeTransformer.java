@@ -51,7 +51,9 @@ public class LocalTimeTransformer implements Transformer {
             if (currentFieldProperty != null) {
                 TimeFormat timeFormat = currentFieldProperty.getField().getAnnotation(TimeFormat.class);
 
-                return localTime.format(DateTimeFormatter.ofPattern(timeFormat.value()));
+                if (timeFormat != null) {
+                    return localTime.format(DateTimeFormatter.ofPattern(timeFormat.value()));
+                }
             }
 
             return OpackArray.createWithArrayObject(
@@ -84,7 +86,9 @@ public class LocalTimeTransformer implements Transformer {
             if (currentFieldProperty != null) {
                 TimeFormat timeFormat = currentFieldProperty.getField().getAnnotation(TimeFormat.class);
 
-                return LocalTime.parse(string, DateTimeFormatter.ofPattern(timeFormat.value()));
+                if (timeFormat != null) {
+                    return LocalTime.parse(string, DateTimeFormatter.ofPattern(timeFormat.value()));
+                }
             }
         } else if (object instanceof OpackArray) {
             OpackArray opackArray = (OpackArray) object;

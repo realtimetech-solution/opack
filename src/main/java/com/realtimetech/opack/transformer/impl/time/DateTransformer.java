@@ -52,7 +52,9 @@ public class DateTransformer implements Transformer {
             if (currentFieldProperty != null) {
                 TimeFormat timeFormat = currentFieldProperty.getField().getAnnotation(TimeFormat.class);
 
-                return new SimpleDateFormat(timeFormat.value()).format(date);
+                if (timeFormat != null) {
+                    return new SimpleDateFormat(timeFormat.value()).format(date);
+                }
             }
 
             return date.getTime();
@@ -78,10 +80,12 @@ public class DateTransformer implements Transformer {
             if (currentFieldProperty != null) {
                 TimeFormat timeFormat = currentFieldProperty.getField().getAnnotation(TimeFormat.class);
 
-                try {
-                    return new SimpleDateFormat(timeFormat.value()).parse((String) object);
-                } catch (ParseException parseException) {
-                    throw new DeserializeException(parseException);
+                if (timeFormat != null) {
+                    try {
+                        return new SimpleDateFormat(timeFormat.value()).parse((String) object);
+                    } catch (ParseException parseException) {
+                        throw new DeserializeException(parseException);
+                    }
                 }
             }
         } else if (object instanceof Long) {

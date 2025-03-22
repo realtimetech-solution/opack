@@ -29,6 +29,7 @@ import com.realtimetech.opack.exception.DecodeException;
 import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.test.OpackAssert;
+import com.realtimetech.opack.transformer.impl.time.annotation.TimeFormat;
 import com.realtimetech.opack.value.OpackValue;
 import org.junit.jupiter.api.Test;
 
@@ -90,6 +91,7 @@ public class JavaJsonBenchmarkTest {
             private long[] phones;
             private String address;
             private String about;
+            @TimeFormat("yyyy-MM-dd")
             private LocalDate registered;
             private double latitude;
             private double longitude;
@@ -141,7 +143,7 @@ public class JavaJsonBenchmarkTest {
                 StringBuilder sb = new StringBuilder();
                 sb.append('[');
                 boolean first = true;
-                for(long l : nums) {
+                for (long l : nums) {
                     if (first) first = false;
                     else sb.append(',');
                     sb.append(l);
@@ -331,6 +333,7 @@ public class JavaJsonBenchmarkTest {
         public static final class Partner {
             private long id;
             private String name;
+            @TimeFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSX")
             private OffsetDateTime since;
 
             public Partner() {

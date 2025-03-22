@@ -30,9 +30,7 @@ import com.realtimetech.opack.transformer.impl.time.annotation.TimeFormat;
 import com.realtimetech.opack.value.OpackValue;
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 
 public class Java8TimeTransformTest {
     @SuppressWarnings("ALL")
@@ -41,10 +39,22 @@ public class Java8TimeTransformTest {
         private LocalTime localTime;
         private LocalDateTime localDateTime;
 
+        /*
+        private OffsetTime offsetTime;
+        private OffsetDateTime offsetDateTime;
+        private ZonedDateTime zonedDateTime;
+        */
+
         public Java8TimeTransformClass() {
             this.localDate = LocalDate.now();
             this.localTime = LocalTime.now();
             this.localDateTime = LocalDateTime.now();
+
+            /*
+            this.offsetTime = OffsetTime.now();
+            this.offsetDateTime = OffsetDateTime.now();
+            this.zonedDateTime = ZonedDateTime.now();
+             */
         }
     }
 
@@ -57,10 +67,21 @@ public class Java8TimeTransformTest {
         @TimeFormat("yyyy-MM-dd HH:mm:ss.SSSSSSSSS")
         private LocalDateTime localDateTime;
 
+        @TimeFormat("HH:mm:ss.SSSSSSSSS")
+        private OffsetTime offsetTime;
+        @TimeFormat("yyyy-MM-dd HH:mm:ss.SSSSSSSSS")
+        private OffsetDateTime offsetDateTime;
+        @TimeFormat("yyyy-MM-dd HH:mm:ss.SSSSSSSSS")
+        private ZonedDateTime zonedDateTime;
+
         public Java8TimeTransformWithFormatClass() {
             this.localDate = LocalDate.now();
             this.localTime = LocalTime.now();
             this.localDateTime = LocalDateTime.now();
+
+            this.offsetTime = OffsetTime.now();
+            this.offsetDateTime = OffsetDateTime.now();
+            this.zonedDateTime = ZonedDateTime.now();
         }
     }
 

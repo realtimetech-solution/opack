@@ -30,9 +30,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.nio.file.Path;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -170,6 +168,9 @@ public class OpackAssert {
                     originalObject instanceof LocalDate ||
                     originalObject instanceof LocalTime ||
                     originalObject instanceof LocalDateTime ||
+                    originalObject instanceof OffsetDateTime ||
+                    originalObject instanceof OffsetTime ||
+                    originalObject instanceof ZonedDateTime ||
                     originalObject instanceof Class) {
                 OpackAssert.assertEquals(originalObject.toString(), targetObject.toString());
             } else {

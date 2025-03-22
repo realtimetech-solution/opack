@@ -38,9 +38,7 @@ import com.realtimetech.opack.transformer.impl.path.PathTransformer;
 import com.realtimetech.opack.transformer.impl.reflection.ClassTransformer;
 import com.realtimetech.opack.transformer.impl.time.CalendarTransformer;
 import com.realtimetech.opack.transformer.impl.time.DateTransformer;
-import com.realtimetech.opack.transformer.impl.time.java8.LocalDateTimeTransformer;
-import com.realtimetech.opack.transformer.impl.time.java8.LocalDateTransformer;
-import com.realtimetech.opack.transformer.impl.time.java8.LocalTimeTransformer;
+import com.realtimetech.opack.transformer.impl.time.java8.*;
 import com.realtimetech.opack.transformer.impl.uuid.UUIDTransformer;
 import com.realtimetech.opack.util.OpackArrayConverter;
 import com.realtimetech.opack.util.ReflectionUtil;
@@ -55,9 +53,7 @@ import java.io.File;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.util.*;
 
 public class Opacker {
@@ -280,6 +276,9 @@ public class Opacker {
             this.typeCapturer.registerPredefinedTransformer(LocalDate.class, LocalDateTransformer.class, true);
             this.typeCapturer.registerPredefinedTransformer(LocalTime.class, LocalTimeTransformer.class, true);
             this.typeCapturer.registerPredefinedTransformer(LocalDateTime.class, LocalDateTimeTransformer.class, true);
+            this.typeCapturer.registerPredefinedTransformer(OffsetTime.class, OffsetTimeTransformer.class, true);
+            this.typeCapturer.registerPredefinedTransformer(OffsetDateTime.class, OffsetDateTimeTransformer.class, true);
+            this.typeCapturer.registerPredefinedTransformer(ZonedDateTime.class, ZonedDateTimeTransformer.class, true);
 
             this.typeCapturer.registerPredefinedTransformer(UUID.class, UUIDTransformer.class, true);
 
@@ -660,7 +659,7 @@ public class Opacker {
                             throw new DeserializeException("Can't create instance using unsafe method.", exception);
                         }
                     } else {
-                        throw new DeserializeException("Target class is object. but, object is not OpackObject.");
+                        throw new DeserializeException("Target class is object. but, object(" + object + ") is not OpackObject.");
                     }
                 }
 

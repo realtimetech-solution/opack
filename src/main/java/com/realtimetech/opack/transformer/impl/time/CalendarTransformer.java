@@ -53,7 +53,9 @@ public class CalendarTransformer implements Transformer {
             if (currentFieldProperty != null) {
                 TimeFormat timeFormat = currentFieldProperty.getField().getAnnotation(TimeFormat.class);
 
-                return new SimpleDateFormat(timeFormat.value()).format(calendar.getTime());
+                if (timeFormat != null) {
+                    return new SimpleDateFormat(timeFormat.value()).format(calendar.getTime());
+                }
             }
 
             return calendar.getTime().getTime();
@@ -79,13 +81,15 @@ public class CalendarTransformer implements Transformer {
             if (currentFieldProperty != null) {
                 TimeFormat timeFormat = currentFieldProperty.getField().getAnnotation(TimeFormat.class);
 
-                try {
-                    calendar.setTime(new SimpleDateFormat(timeFormat.value()).parse((String) object));
-                } catch (ParseException parseException) {
-                    throw new DeserializeException(parseException);
-                }
+                if (timeFormat != null) {
+                    try {
+                        calendar.setTime(new SimpleDateFormat(timeFormat.value()).parse((String) object));
+                    } catch (ParseException parseException) {
+                        throw new DeserializeException(parseException);
+                    }
 
-                return calendar;
+                    return calendar;
+                }
             }
         } else if (object instanceof Long) {
             Calendar calendar = Calendar.getInstance();

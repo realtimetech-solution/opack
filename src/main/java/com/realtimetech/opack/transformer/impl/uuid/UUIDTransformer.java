@@ -29,7 +29,6 @@ import com.realtimetech.opack.transformer.Transformer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.nio.file.Path;
 import java.util.UUID;
 
 public class UUIDTransformer implements Transformer {
