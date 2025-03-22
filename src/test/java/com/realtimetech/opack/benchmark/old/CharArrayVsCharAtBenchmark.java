@@ -20,7 +20,7 @@
  * limitations under the License.
  */
 
-package com.realtimetech.opack.benchmark;
+package com.realtimetech.opack.benchmark.old;
 
 public class CharArrayVsCharAtBenchmark {
     private static final int TINY_SIZE = 10;

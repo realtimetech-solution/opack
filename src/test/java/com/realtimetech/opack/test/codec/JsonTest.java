@@ -24,6 +24,8 @@ package com.realtimetech.opack.test.codec;
 
 import com.realtimetech.opack.Opacker;
 import com.realtimetech.opack.codec.json.JsonCodec;
+import com.realtimetech.opack.codec.json.ryu.RyuJsonDouble;
+import com.realtimetech.opack.codec.json.ryu.RyuJsonFloat;
 import com.realtimetech.opack.exception.DecodeException;
 import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.EncodeException;
@@ -176,5 +178,56 @@ public class JsonTest {
         OpackValue decodedObject = jsonCodec.decode(encoded);
 
         OpackAssert.assertEquals(originalObject, decodedObject);
+    }
+
+    private void testRyuFloat(float value) {
+        String string1 = Float.toString(value);
+        String string2 = RyuJsonFloat.toString(value);
+
+        float float1 = Float.parseFloat(string1);
+        float float2 = Float.parseFloat(string2);
+
+        Assertions.assertEquals(float1, float2);
+    }
+
+    private void testRyuDouble(double value) {
+        String string1 = Double.toString(value);
+        String string2 = RyuJsonDouble.toString(value);
+
+        double double1 = Double.parseDouble(string1);
+        double double2 = Double.parseDouble(string2);
+
+        Assertions.assertEquals(double1, double2);
+    }
+
+    @Test
+    public void test_ryu() {
+        long iteration = 1024 * 1024;
+
+        testRyuFloat(Float.MAX_VALUE);
+        testRyuFloat(Float.MIN_VALUE);
+        testRyuFloat(Float.NEGATIVE_INFINITY);
+        testRyuFloat(Float.POSITIVE_INFINITY);
+        testRyuFloat(Float.MIN_NORMAL);
+        testRyuFloat(Float.NaN);
+        testRyuFloat(Integer.MAX_VALUE);
+        testRyuFloat(Integer.MIN_VALUE);
+
+        testRyuDouble(Double.MAX_VALUE);
+        testRyuDouble(Double.MIN_VALUE);
+        testRyuDouble(Double.NEGATIVE_INFINITY);
+        testRyuDouble(Double.POSITIVE_INFINITY);
+        testRyuDouble(Double.MIN_NORMAL);
+        testRyuDouble(Double.NaN);
+        testRyuDouble(Long.MAX_VALUE);
+        testRyuDouble(Long.MIN_VALUE);
+
+        for (int i = 0; i < iteration; i++) {
+            float floatValue = (float) Math.random();
+            double doubleValue = Math.random();
+
+            testRyuFloat(floatValue);
+            testRyuDouble(doubleValue);
+        }
     }
 }

@@ -20,57 +20,39 @@
  * limitations under the License.
  */
 
-package com.realtimetech.opack.test.opacker.single;
+package com.realtimetech.opack.test.opacker.map;
 
 import com.realtimetech.opack.Opacker;
 import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.test.OpackAssert;
-import com.realtimetech.opack.test.RandomUtil;
+import com.realtimetech.opack.test.opacker.list.GenericListTest;
 import com.realtimetech.opack.value.OpackValue;
 import org.junit.jupiter.api.Test;
 
-public class ObjectTest {
+import java.util.HashMap;
+
+public class GenericMapTest {
     @SuppressWarnings("ALL")
-    public static class SubObjectClass {
-        private Object nullValue;
+    public static class GenericMapClass {
+        private HashMap<String, GenericListTest.TestElement> wrappedTypeMap;
 
-        private String stringValue;
-        private int intValue;
-        private Integer integerValue;
-
-        public SubObjectClass() {
-            this.nullValue = null;
-
-            this.stringValue = "sub_object_string_value" + System.currentTimeMillis();
-            this.intValue = RandomUtil.nextInt();
-            this.integerValue = RandomUtil.nextInt();
-        }
-    }
-
-    @SuppressWarnings("ALL")
-    public static class ObjectClass {
-        private Object nullValue;
-
-        private SubObjectClass subObjectValue1;
-        private SubObjectClass subObjectValue2;
-
-        public ObjectClass() {
-            this.nullValue = null;
-
-            this.subObjectValue1 = new SubObjectClass();
-            this.subObjectValue2 = new SubObjectClass();
+        public GenericMapClass() {
+            this.wrappedTypeMap = new HashMap<>();
+            this.wrappedTypeMap.put("k1", new GenericListTest.TestElement());
+            this.wrappedTypeMap.put("k2", new GenericListTest.TestElement());
+            this.wrappedTypeMap.put("k3", new GenericListTest.TestElement());
         }
     }
 
     @Test
     public void test() throws SerializeException, DeserializeException, OpackAssert.AssertException {
         Opacker opacker = Opacker.Builder.create().build();
-        ObjectClass originalObject = new ObjectClass();
+        GenericMapClass originalObject = new GenericMapClass();
 
         OpackValue serialized = opacker.serialize(originalObject);
         assert serialized != null;
-        ObjectClass deserialized = opacker.deserialize(ObjectClass.class, serialized);
+        GenericMapClass deserialized = opacker.deserialize(GenericMapClass.class, serialized);
 
         OpackAssert.assertEquals(originalObject, deserialized);
     }

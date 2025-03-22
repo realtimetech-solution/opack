@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 REALTIMETECH All Rights Reserved
+ * Copyright (C) 2025 REALTIMETECH All Rights Reserved
  *
  * Licensed either under the Apache License, Version 2.0, or (at your option)
  * under the terms of the GNU General Public License as published by
@@ -20,25 +20,37 @@
  * limitations under the License.
  */
 
-package com.realtimetech.opack.provider.impl;
+package com.realtimetech.opack.test;
 
-import com.realtimetech.opack.Opacker;
-import com.realtimetech.opack.capture.CapturedType;
-import com.realtimetech.opack.provider.DefaultValueProvider;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-public class StringEmptyProvider implements DefaultValueProvider {
-    /**
-     * Deserialize opack value
-     *
-     * @param context       the opacker context
-     * @param object        the field property owner
-     * @param fieldProperty the field property to provide a default value
-     * @return the default value
-     */
-    @Override
-    public @Nullable Object provide(@NotNull Opacker.Context context, @NotNull Object object, @NotNull CapturedType.FieldProperty fieldProperty) {
-        return "";
+import java.util.Random;
+
+public class RandomUtil {
+    private static final long SEED = 3783655506793900820L;
+    private static final @NotNull Random RANDOM = new Random(SEED);
+
+    public static int nextInt() {
+        return RANDOM.nextInt();
+    }
+
+    public static int nextInt(int bound) {
+        return RANDOM.nextInt(bound);
+    }
+
+    public static float nextFloat() {
+        return RANDOM.nextFloat();
+    }
+
+    public static boolean nextBoolean() {
+        return RANDOM.nextBoolean();
+    }
+
+    public static double nextDouble() {
+        return RANDOM.nextDouble();
+    }
+
+    public static long nextLong() {
+        return RANDOM.nextLong();
     }
 }

@@ -26,16 +26,13 @@ import com.realtimetech.opack.Opacker;
 import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.test.OpackAssert;
+import com.realtimetech.opack.test.RandomUtil;
 import com.realtimetech.opack.value.OpackObject;
 import com.realtimetech.opack.value.OpackValue;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.Random;
-
 public class EnumTest {
-    static final Random RANDOM = new Random();
-
     public enum EnumData {
         TYPE_A, TYPE_B, TYPE_1, TYPE_2
     }
@@ -45,7 +42,7 @@ public class EnumTest {
         private EnumData enumData;
 
         public EnumClass() {
-            this.enumData = EnumData.values()[RANDOM.nextInt(EnumData.values().length)];
+            this.enumData = EnumData.values()[RandomUtil.nextInt(EnumData.values().length)];
         }
     }
 

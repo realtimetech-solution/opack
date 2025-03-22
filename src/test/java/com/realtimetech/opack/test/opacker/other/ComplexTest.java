@@ -26,6 +26,7 @@ import com.realtimetech.opack.Opacker;
 import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.test.OpackAssert;
+import com.realtimetech.opack.test.RandomUtil;
 import com.realtimetech.opack.test.opacker.annotation.AnnotationTypeObjectTest;
 import com.realtimetech.opack.test.opacker.array.PrimitiveArrayTest;
 import com.realtimetech.opack.test.opacker.array.WrapperArrayTest;
@@ -39,11 +40,7 @@ import com.realtimetech.opack.test.opacker.transform.TransformFieldTest;
 import com.realtimetech.opack.value.OpackValue;
 import org.junit.jupiter.api.Test;
 
-import java.util.Random;
-
 public class ComplexTest {
-    static final Random RANDOM = new Random();
-
     @SuppressWarnings("ALL")
     public static class ComplexClass {
         private WrapperTest.WrapperClass wrapperClassValue;
@@ -77,7 +74,7 @@ public class ComplexTest {
         private TransformClassTest.ClassTransformClass[] classTransformClassArrayValue;
 
         public ComplexClass() {
-            int length = RANDOM.nextInt(5) + 5;
+            int length = RandomUtil.nextInt(5) + 5;
 
             this.wrapperClassValue = new WrapperTest.WrapperClass();
             this.wrapperClassArrayValue = new WrapperTest.WrapperClass[length];

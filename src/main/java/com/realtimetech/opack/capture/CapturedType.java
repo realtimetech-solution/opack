@@ -20,7 +20,7 @@
  * limitations under the License.
  */
 
-package com.realtimetech.opack.bake;
+package com.realtimetech.opack.capture;
 
 import com.realtimetech.opack.provider.DefaultValueProvider;
 import com.realtimetech.opack.transformer.Transformer;
@@ -28,21 +28,43 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 
-public final class BakedType {
-    public final static class Property {
+public final class CapturedType {
+    public static final class FieldProperty {
         private final @NotNull Field field;
         private final @NotNull String name;
         private final @NotNull Class<?> type;
+        private final @NotNull Class<?> @NotNull [] genericTypes;
         private final boolean withType;
 
         private final @Nullable Transformer transformer;
         private final @Nullable DefaultValueProvider defaultValueProvider;
 
-        public Property(@NotNull Field field, @Nullable String name, @Nullable Class<?> type, boolean withType, @Nullable Transformer transformer, @Nullable DefaultValueProvider defaultValueProvider) {
+        public FieldProperty(@NotNull Field field, @Nullable String name, @Nullable Class<?> type, boolean withType, @Nullable Transformer transformer, @Nullable DefaultValueProvider defaultValueProvider) {
             this.field = field;
             this.name = name == null ? this.field.getName() : name;
             this.type = type == null ? this.field.getType() : type;
+
+            Type fieldGenericType = this.field.getGenericType();
+            List<Class<?>> genericTypes = new ArrayList<>();
+
+            if (fieldGenericType instanceof ParameterizedType) {
+                ParameterizedType parameterizedType = (ParameterizedType) fieldGenericType;
+                Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
+
+                for (Type actualTypeArgument : actualTypeArguments) {
+                    if (actualTypeArgument instanceof Class) {
+                        genericTypes.add((Class<?>) actualTypeArgument);
+                    }
+                }
+            }
+
+            this.genericTypes = genericTypes.toArray(new Class<?>[0]);
+
             this.withType = withType;
 
             this.transformer = transformer;
@@ -59,6 +81,10 @@ public final class BakedType {
 
         public @NotNull Class<?> getType() {
             return type;
+        }
+
+        public @NotNull Class<?> @NotNull [] getGenericTypes() {
+            return genericTypes;
         }
 
         public boolean isWithType() {
@@ -106,9 +132,9 @@ public final class BakedType {
 
     final @NotNull Class<?> type;
     final @NotNull Transformer @NotNull [] transformers;
-    final @NotNull Property @NotNull [] fields;
+    final @NotNull FieldProperty @NotNull [] fields;
 
-    public BakedType(@NotNull Class<?> type, @NotNull Transformer @NotNull [] transformers, @NotNull Property @NotNull [] fields) {
+    public CapturedType(@NotNull Class<?> type, @NotNull Transformer @NotNull [] transformers, @NotNull FieldProperty @NotNull [] fields) {
         this.type = type;
         this.transformers = transformers;
         this.fields = fields;
@@ -122,7 +148,7 @@ public final class BakedType {
         return transformers;
     }
 
-    public @NotNull Property @NotNull [] getFields() {
+    public @NotNull FieldProperty @NotNull [] getFields() {
         return fields;
     }
 }

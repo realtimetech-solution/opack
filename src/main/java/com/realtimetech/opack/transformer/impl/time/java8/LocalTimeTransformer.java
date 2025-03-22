@@ -34,13 +34,13 @@ public class LocalTimeTransformer implements Transformer {
     /**
      * Serialize specific value to opack value
      *
-     * @param opacker      the opacker
+     * @param context      the opacker context
      * @param originalType the original type
      * @param object       the object to be serialized
      * @return the opack value
      */
     @Override
-    public @Nullable Object serialize(@NotNull Opacker opacker, @NotNull Class<?> originalType, @Nullable Object object) {
+    public @Nullable Object serialize(@NotNull Opacker.Context context, @NotNull Class<?> originalType, @Nullable Object object) {
         if (object instanceof LocalTime) {
             LocalTime localTime = (LocalTime) object;
 
@@ -60,13 +60,13 @@ public class LocalTimeTransformer implements Transformer {
     /**
      * Deserialize opack value
      *
-     * @param opacker  the opacker
+     * @param context  the opacker context
      * @param goalType the goal type to deserialize
      * @param object   the object to be deserialized
      * @return the deserialized value
      */
     @Override
-    public @Nullable Object deserialize(@NotNull Opacker opacker, @NotNull Class<?> goalType, @Nullable Object object) {
+    public @Nullable Object deserialize(@NotNull Opacker.Context context, @NotNull Class<?> goalType, @Nullable Object object) {
         if (object instanceof OpackArray) {
             OpackArray opackArray = (OpackArray) object;
 

@@ -38,12 +38,12 @@ public class TypeWrapper {
     /**
      * Wrap object into opack object with object type
      *
-     * @param opacker the opacker
+     * @param context the opacker context
      * @param object  the object to be serialized
      * @return the wrapped object
      * @throws SerializeException if a problem occurs during serializing
      */
-    public static @Nullable Object wrapObject(@NotNull Opacker opacker, @Nullable Object object) throws SerializeException {
+    public static @Nullable Object wrapObject(@NotNull Opacker.Context context, @Nullable Object object) throws SerializeException {
         if (object == null) {
             return null;
         }
@@ -60,14 +60,14 @@ public class TypeWrapper {
 
             for (int index = 0; index < length; index++) {
                 Object element = ReflectionUtil.getArrayItem(object, index);
-                Object wrappedObject = TypeWrapper.wrapObject(opacker, element);
+                Object wrappedObject = TypeWrapper.wrapObject(context, element);
 
                 opackArray.add(wrappedObject);
             }
 
             opackObject.put("value", opackArray);
         } else {
-            Object serializedObject = opacker.serializeObject(object);
+            Object serializedObject = context.getOpacker().serializeObject(object);
 
             opackObject.put("value", serializedObject);
         }
@@ -80,12 +80,12 @@ public class TypeWrapper {
     /**
      * Unwrap opack object into object using a proper object type
      *
-     * @param opacker the opacker
+     * @param context the opacker context
      * @param object  the object to be unwrapped
      * @return the unwrapped object
      * @throws DeserializeException if a problem occurs during deserializing
      */
-    public static @Nullable Object unwrapObject(@NotNull Opacker opacker, @Nullable Object object) throws DeserializeException {
+    public static @Nullable Object unwrapObject(@NotNull Opacker.Context context, @Nullable Object object) throws DeserializeException {
         if (object == null) {
             return null;
         }
@@ -108,7 +108,7 @@ public class TypeWrapper {
         }
 
         try {
-            Class<?> objectType = Class.forName((String) type, true, opacker.getClassLoader());
+            Class<?> objectType = Class.forName((String) type, true, context.getOpacker().getClassLoader());
 
             if (objectType.isArray()) {
                 Class<?> componentType = objectType.getComponentType();
@@ -124,7 +124,7 @@ public class TypeWrapper {
                     Object element = opackArray.get(index);
 
                     if (element != null) {
-                        element = TypeWrapper.unwrapObject(opacker, element);
+                        element = TypeWrapper.unwrapObject(context, element);
                     }
 
                     ReflectionUtil.setArrayItem(arrayObject, index, element);
@@ -132,7 +132,7 @@ public class TypeWrapper {
 
                 return arrayObject;
             } else {
-                return opacker.deserializeObject(objectType, value);
+                return context.getOpacker().deserializeObject(objectType, value);
             }
         } catch (ClassNotFoundException classNotFoundException) {
             throw new DeserializeException(classNotFoundException);

@@ -26,14 +26,11 @@ import com.realtimetech.opack.Opacker;
 import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.test.OpackAssert;
+import com.realtimetech.opack.test.RandomUtil;
 import com.realtimetech.opack.value.OpackValue;
 import org.junit.jupiter.api.Test;
 
-import java.util.Random;
-
 public class WrapperTest {
-    static final Random RANDOM = new Random();
-
     @SuppressWarnings("ALL")
     public static class WrapperClass {
         private Boolean booleanValue;
@@ -60,14 +57,14 @@ public class WrapperTest {
         private Long longNullValue;
 
         public WrapperClass() {
-            this.booleanValue = RANDOM.nextBoolean();
-            this.byteValue = (byte) RANDOM.nextInt();
-            this.characterValue = (char) RANDOM.nextInt();
-            this.shortValue = (short) RANDOM.nextInt();
-            this.integerValue = RANDOM.nextInt();
-            this.floatValue = RANDOM.nextFloat();
-            this.doubleValue = RANDOM.nextDouble();
-            this.longValue = RANDOM.nextLong();
+            this.booleanValue = RandomUtil.nextBoolean();
+            this.byteValue = (byte) RandomUtil.nextInt();
+            this.characterValue = (char) RandomUtil.nextInt();
+            this.shortValue = (short) RandomUtil.nextInt();
+            this.integerValue = RandomUtil.nextInt();
+            this.floatValue = RandomUtil.nextFloat();
+            this.doubleValue = RandomUtil.nextDouble();
+            this.longValue = RandomUtil.nextLong();
 
             this.booleanNullValue = null;
             this.byteNullValue = null;

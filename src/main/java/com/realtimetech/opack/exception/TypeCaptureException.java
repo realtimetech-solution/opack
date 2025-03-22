@@ -25,10 +25,10 @@ package com.realtimetech.opack.exception;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Thrown when a problem occurs during baking a class
+ * Thrown when a problem occurs during capturing a class
  */
-public class BakeException extends Exception {
-    public BakeException(@NotNull Throwable cause) {
+public class TypeCaptureException extends Exception {
+    public TypeCaptureException(@NotNull Throwable cause) {
         super(cause);
     }
 }

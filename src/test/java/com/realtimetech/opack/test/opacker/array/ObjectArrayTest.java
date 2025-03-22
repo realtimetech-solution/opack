@@ -26,15 +26,12 @@ import com.realtimetech.opack.Opacker;
 import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.test.OpackAssert;
+import com.realtimetech.opack.test.RandomUtil;
 import com.realtimetech.opack.test.opacker.single.ObjectTest;
 import com.realtimetech.opack.value.OpackValue;
 import org.junit.jupiter.api.Test;
 
-import java.util.Random;
-
 public class ObjectArrayTest {
-    static final Random RANDOM = new Random();
-
     @SuppressWarnings("ALL")
     public static class ObjectArrayClass {
         private Object nullValue;
@@ -44,7 +41,7 @@ public class ObjectArrayTest {
 
         public ObjectArrayClass() {
             this.nullValue = null;
-            int length = RANDOM.nextInt(5) + 5;
+            int length = RandomUtil.nextInt(5) + 5;
 
             this.subObjectArrayValue = new ObjectTest.SubObjectClass[length];
             for (int index = 0; index < length; index++) {
@@ -56,7 +53,7 @@ public class ObjectArrayTest {
                 this.subObjectArrayWithNullValue[index] = new ObjectTest.SubObjectClass();
             }
 
-            this.subObjectArrayWithNullValue[RANDOM.nextInt(length)] = null;
+            this.subObjectArrayWithNullValue[RandomUtil.nextInt(length)] = null;
         }
     }
 

@@ -20,11 +20,11 @@
  * limitations under the License.
  */
 
-package com.realtimetech.opack.bake;
+package com.realtimetech.opack.capture;
 
 import com.realtimetech.opack.Opacker;
 import com.realtimetech.opack.annotation.*;
-import com.realtimetech.opack.exception.BakeException;
+import com.realtimetech.opack.exception.TypeCaptureException;
 import com.realtimetech.opack.provider.DefaultValueProvider;
 import com.realtimetech.opack.provider.DefaultValueProviderFactory;
 import com.realtimetech.opack.transformer.Transformer;
@@ -39,7 +39,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-public final class TypeBaker {
+public final class TypeCapturer {
     public static final class PredefinedTransformer {
         private final @NotNull Transformer transformer;
         private final boolean inheritable;
@@ -69,22 +69,22 @@ public final class TypeBaker {
     private final @NotNull TransformerFactory transformerFactory;
     private final @NotNull DefaultValueProviderFactory defaultValueProviderFactory;
 
-    private final @NotNull HashMap<@NotNull Class<?>, @NotNull BakedType> backedTypeMap;
+    private final @NotNull HashMap<@NotNull Class<?>, @NotNull CapturedType> capturedTypeMap;
     private final @NotNull HashMap<@NotNull Class<?>, @NotNull List<@NotNull PredefinedTransformer>> predefinedTransformerMap;
 
 
     /**
-     * Constructs a new instance of TypeBaker.
+     * Constructs a new instance of TypeCapturer.
      *
      * @param opacker the Opacker instance used for managing serialization and deserialization processes
      */
-    public TypeBaker(@NotNull Opacker opacker) {
+    public TypeCapturer(@NotNull Opacker opacker) {
         this.opacker = opacker;
 
         this.transformerFactory = new TransformerFactory(opacker);
         this.defaultValueProviderFactory = new DefaultValueProviderFactory(opacker);
 
-        this.backedTypeMap = new HashMap<>();
+        this.capturedTypeMap = new HashMap<>();
         this.predefinedTransformerMap = new HashMap<>();
     }
 
@@ -212,9 +212,9 @@ public final class TypeBaker {
      * @param transformers     the transformer list for adding
      * @param annotatedElement the element to be targeted
      * @param root             the flag indicating whether the element is not super class (whether the element is the root)
-     * @throws BakeException if a transformer class object cannot be instantiated
+     * @throws TypeCaptureException if a transformer class object cannot be instantiated
      */
-    private void addTransformer(@NotNull List<@NotNull Transformer> transformers, @NotNull AnnotatedElement annotatedElement, boolean root) throws BakeException {
+    private void addTransformer(@NotNull List<@NotNull Transformer> transformers, @NotNull AnnotatedElement annotatedElement, boolean root) throws TypeCaptureException {
         if (annotatedElement instanceof Class) {
             Class<?> elementType = (Class<?>) annotatedElement;
             Class<?> superType = elementType.getSuperclass();
@@ -254,7 +254,7 @@ public final class TypeBaker {
                 try {
                     transformers.add(this.transformerFactory.get(transformerType));
                 } catch (InstantiationException e) {
-                    throw new BakeException(e);
+                    throw new TypeCaptureException(e);
                 }
             }
         }
@@ -265,9 +265,9 @@ public final class TypeBaker {
      *
      * @param annotatedElement the element that annotated {@link Transform Transform}
      * @return the transformers
-     * @throws BakeException if a transformer class object cannot be instantiated
+     * @throws TypeCaptureException if a transformer class object cannot be instantiated
      */
-    private @NotNull Transformer @NotNull [] getTransformer(@NotNull AnnotatedElement annotatedElement) throws BakeException {
+    private @NotNull Transformer @NotNull [] getTransformer(@NotNull AnnotatedElement annotatedElement) throws TypeCaptureException {
         List<Transformer> transformers = new LinkedList<>();
 
         this.addTransformer(transformers, annotatedElement, true);
@@ -306,22 +306,22 @@ public final class TypeBaker {
     }
 
     /**
-     * Bake the class into {@link BakedType BakedType}
+     * Capture the class into {@link CapturedType CapturedType}
      *
-     * @param bakeType the type to bake
-     * @return the baked type info
-     * @throws BakeException if a problem occurs during baking a class into {@link BakedType BakedType}
+     * @param clazz the class to capture
+     * @return the captured type
+     * @throws TypeCaptureException if a problem occurs during capturing a class into {@link CapturedType CapturedType}
      */
-    private @NotNull BakedType bake(@NotNull Class<?> bakeType) throws BakeException {
-        List<BakedType.Property> properties = new LinkedList<>();
+    private @NotNull CapturedType capture(@NotNull Class<?> clazz) throws TypeCaptureException {
+        List<CapturedType.FieldProperty> properties = new LinkedList<>();
         Transformer[] transformers = new Transformer[0];
 
-        if (!bakeType.isArray() &&
-                bakeType != String.class &&
-                !ReflectionUtil.isPrimitiveType(bakeType) &&
-                !ReflectionUtil.isWrapperType(bakeType)) {
+        if (!clazz.isArray() &&
+                clazz != String.class &&
+                !ReflectionUtil.isPrimitiveType(clazz) &&
+                !ReflectionUtil.isWrapperType(clazz)) {
 
-            Field[] fields = ReflectionUtil.getAccessibleFields(bakeType);
+            Field[] fields = ReflectionUtil.getAccessibleFields(clazz);
             for (Field field : fields) {
                 if (field.isAnnotationPresent(Ignore.class)) {
                     continue;
@@ -343,37 +343,37 @@ public final class TypeBaker {
                     try {
                         defaultValueProvider = this.defaultValueProviderFactory.get(defaultValueProviderType);
                     } catch (InstantiationException e) {
-                        throw new BakeException(e);
+                        throw new TypeCaptureException(e);
                     }
                 }
 
-                properties.add(new BakedType.Property(field, name, type, withType, fieldTransformers.length > 0 ? fieldTransformers[0] : null, defaultValueProvider));
+                properties.add(new CapturedType.FieldProperty(field, name, type, withType, fieldTransformers.length > 0 ? fieldTransformers[0] : null, defaultValueProvider));
             }
 
-            transformers = this.getTransformer(bakeType);
+            transformers = this.getTransformer(clazz);
         }
 
-        return new BakedType(bakeType, transformers, properties.toArray(new BakedType.Property[0]));
+        return new CapturedType(clazz, transformers, properties.toArray(new CapturedType.FieldProperty[0]));
     }
 
     /**
-     * Returns BakedType for target class
+     * Returns CapturedType for target class
      *
-     * @param bakeType the class to be baked
+     * @param clazz the class to get
      * @return the class info
-     * @throws BakeException if a problem occurs during baking a class into class info
+     * @throws TypeCaptureException if a problem occurs during capturing a class into class info
      */
-    public @NotNull BakedType get(@NotNull Class<?> bakeType) throws BakeException {
-        if (!this.backedTypeMap.containsKey(bakeType)) {
-            synchronized (this.backedTypeMap) {
-                if (!this.backedTypeMap.containsKey(bakeType)) {
-                    BakedType bakedType = this.bake(bakeType);
+    public @NotNull CapturedType get(@NotNull Class<?> clazz) throws TypeCaptureException {
+        if (!this.capturedTypeMap.containsKey(clazz)) {
+            synchronized (this.capturedTypeMap) {
+                if (!this.capturedTypeMap.containsKey(clazz)) {
+                    CapturedType capturedType = this.capture(clazz);
 
-                    this.backedTypeMap.put(bakeType, bakedType);
+                    this.capturedTypeMap.put(clazz, capturedType);
                 }
             }
         }
 
-        return this.backedTypeMap.get(bakeType);
+        return this.capturedTypeMap.get(clazz);
     }
 }

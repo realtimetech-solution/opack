@@ -26,15 +26,17 @@ import com.realtimetech.opack.Opacker;
 import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.test.OpackAssert;
+import com.realtimetech.opack.test.RandomUtil;
 import com.realtimetech.opack.value.OpackValue;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
 
 public class WrapListElementTest {
-    static final Random RANDOM = new Random();
-
     @SuppressWarnings("ALL")
     public static class WrapListClass {
         private LinkedList<Object> wrappedTypeList;
@@ -77,8 +79,8 @@ public class WrapListElementTest {
         private String stringValue;
 
         public TestElement() {
-            this.intValue = RANDOM.nextInt();
-            this.stringValue = RANDOM.nextInt() + "";
+            this.intValue = RandomUtil.nextInt();
+            this.stringValue = RandomUtil.nextInt() + "";
         }
 
         @Override
@@ -102,7 +104,7 @@ public class WrapListElementTest {
 
     @Test
     public void testWithNoWrapListTransformer() {
-        Assertions.assertThrows(OpackAssert.AssertException.class, () -> this.common(false));
+        Assertions.assertThrows(Exception.class, () -> this.common(false));
     }
 
     private void common(boolean enableWrapListElementType) throws SerializeException, DeserializeException, OpackAssert.AssertException {

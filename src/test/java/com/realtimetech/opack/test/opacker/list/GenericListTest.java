@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 REALTIMETECH All Rights Reserved
+ * Copyright (C) 2025 REALTIMETECH All Rights Reserved
  *
  * Licensed either under the Apache License, Version 2.0, or (at your option)
  * under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
  * limitations under the License.
  */
 
-package com.realtimetech.opack.test.opacker.single;
+package com.realtimetech.opack.test.opacker.list;
 
 import com.realtimetech.opack.Opacker;
 import com.realtimetech.opack.exception.DeserializeException;
@@ -30,47 +30,54 @@ import com.realtimetech.opack.test.RandomUtil;
 import com.realtimetech.opack.value.OpackValue;
 import org.junit.jupiter.api.Test;
 
-public class ObjectTest {
+import java.util.LinkedList;
+import java.util.Objects;
+
+public class GenericListTest {
     @SuppressWarnings("ALL")
-    public static class SubObjectClass {
-        private Object nullValue;
+    public static class GenericListClass {
+        private LinkedList<TestElement> genericTypeList;
 
-        private String stringValue;
-        private int intValue;
-        private Integer integerValue;
-
-        public SubObjectClass() {
-            this.nullValue = null;
-
-            this.stringValue = "sub_object_string_value" + System.currentTimeMillis();
-            this.intValue = RandomUtil.nextInt();
-            this.integerValue = RandomUtil.nextInt();
+        public GenericListClass() {
+            this.genericTypeList = new LinkedList<>();
+            this.genericTypeList.add(new TestElement());
+            this.genericTypeList.add(new TestElement());
+            this.genericTypeList.add(new TestElement());
         }
     }
 
     @SuppressWarnings("ALL")
-    public static class ObjectClass {
-        private Object nullValue;
+    public static class TestElement {
+        private int intValue;
+        private String stringValue;
 
-        private SubObjectClass subObjectValue1;
-        private SubObjectClass subObjectValue2;
+        public TestElement() {
+            this.intValue = RandomUtil.nextInt();
+            this.stringValue = RandomUtil.nextInt() + "";
+        }
 
-        public ObjectClass() {
-            this.nullValue = null;
+        @Override
+        public boolean equals(Object object) {
+            if (this == object) return true;
+            if (object == null || getClass() != object.getClass()) return false;
+            TestElement that = (TestElement) object;
+            return intValue == that.intValue && Objects.equals(stringValue, that.stringValue);
+        }
 
-            this.subObjectValue1 = new SubObjectClass();
-            this.subObjectValue2 = new SubObjectClass();
+        @Override
+        public int hashCode() {
+            return Objects.hash(intValue, stringValue);
         }
     }
 
     @Test
     public void test() throws SerializeException, DeserializeException, OpackAssert.AssertException {
         Opacker opacker = Opacker.Builder.create().build();
-        ObjectClass originalObject = new ObjectClass();
+        GenericListClass originalObject = new GenericListClass();
 
         OpackValue serialized = opacker.serialize(originalObject);
         assert serialized != null;
-        ObjectClass deserialized = opacker.deserialize(ObjectClass.class, serialized);
+        GenericListClass deserialized = opacker.deserialize(GenericListClass.class, serialized);
 
         OpackAssert.assertEquals(originalObject, deserialized);
     }

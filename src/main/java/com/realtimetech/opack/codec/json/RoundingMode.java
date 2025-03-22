@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 REALTIMETECH All Rights Reserved
+ * Copyright (C) 2025 REALTIMETECH All Rights Reserved
  *
  * Licensed either under the Apache License, Version 2.0, or (at your option)
  * under the terms of the GNU General Public License as published by
@@ -20,25 +20,33 @@
  * limitations under the License.
  */
 
-package com.realtimetech.opack.provider.impl;
+package com.realtimetech.opack.codec.json;
 
-import com.realtimetech.opack.Opacker;
-import com.realtimetech.opack.capture.CapturedType;
-import com.realtimetech.opack.provider.DefaultValueProvider;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+public enum RoundingMode {
+    CONSERVATIVE {
+        @Override
+        public boolean acceptUpperBound(boolean even) {
+            return false;
+        }
 
-public class StringEmptyProvider implements DefaultValueProvider {
-    /**
-     * Deserialize opack value
-     *
-     * @param context       the opacker context
-     * @param object        the field property owner
-     * @param fieldProperty the field property to provide a default value
-     * @return the default value
-     */
-    @Override
-    public @Nullable Object provide(@NotNull Opacker.Context context, @NotNull Object object, @NotNull CapturedType.FieldProperty fieldProperty) {
-        return "";
-    }
+        @Override
+        public boolean acceptLowerBound(boolean even) {
+            return false;
+        }
+    },
+    ROUND_EVEN {
+        @Override
+        public boolean acceptUpperBound(boolean even) {
+            return even;
+        }
+
+        @Override
+        public boolean acceptLowerBound(boolean even) {
+            return even;
+        }
+    };
+
+    public abstract boolean acceptUpperBound(boolean even);
+
+    public abstract boolean acceptLowerBound(boolean even);
 }

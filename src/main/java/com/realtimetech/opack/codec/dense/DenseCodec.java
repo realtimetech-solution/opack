@@ -45,7 +45,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public final class DenseCodec extends OpackCodec<Reader, Writer> {
-    public final static class Builder {
+    public static final class Builder {
         /**
          * Creates a new instance of the builder class
          *
