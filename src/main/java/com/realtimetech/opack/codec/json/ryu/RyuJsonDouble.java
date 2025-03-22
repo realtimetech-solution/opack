@@ -42,7 +42,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.math.BigInteger;
 
-public final class RyuDouble {
+public final class RyuJsonDouble {
     // Constants for internal double representation
     private static final int DOUBLE_MANTISSA_BITS = 52;
     private static final long DOUBLE_MANTISSA_MASK = (1L << DOUBLE_MANTISSA_BITS) - 1;
@@ -86,7 +86,7 @@ public final class RyuDouble {
                         .intValueExact();
             }
 
-            // Fill inverse table when i is within bounds
+            // Fill inverse table when `i` is within bounds
             if (i < POWER5_INVERSE_SPLIT.length) {
                 int shiftAmount = powerOf5BitLength - 1 + POWER5_INVERSE_TOTAL_BIT_COUNT;
                 BigInteger inverse = BigInteger.ONE.shiftLeft(shiftAmount).divide(powerOf5).add(BigInteger.ONE);

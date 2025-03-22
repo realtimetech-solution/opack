@@ -42,7 +42,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.math.BigInteger;
 
-public final class RyuFloat {
+public final class RyuJsonFloat {
     // Constants for internal float representation
     private static final int FLOAT_MANTISSA_BITS = 23;
     private static final int FLOAT_MANTISSA_MASK = (1 << FLOAT_MANTISSA_BITS) - 1;
