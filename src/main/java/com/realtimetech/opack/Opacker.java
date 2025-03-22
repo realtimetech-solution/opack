@@ -24,9 +24,9 @@ package com.realtimetech.opack;
 
 import com.realtimetech.opack.capture.CapturedType;
 import com.realtimetech.opack.capture.TypeCapturer;
-import com.realtimetech.opack.exception.TypeCaptureException;
 import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
+import com.realtimetech.opack.exception.TypeCaptureException;
 import com.realtimetech.opack.transformer.Transformer;
 import com.realtimetech.opack.transformer.impl.TypeWrapper;
 import com.realtimetech.opack.transformer.impl.file.FileTransformer;
