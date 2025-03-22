@@ -32,11 +32,10 @@ import org.jetbrains.annotations.Nullable;
  * Helper class for easy to use {@link JsonCodec}
  */
 public final class Json {
-    private static final @NotNull JsonCodec JSON_CODEC = JsonCodec.Builder.create()
+    private static final @NotNull ThreadLocal<JsonCodec> JSON_CODEC_THREAD_LOCAL = ThreadLocal.withInitial(() -> JsonCodec.Builder.create()
             .setEnableConvertCharacterToString(true)
             .setAllowAnyValueToKey(false)
-            .build();
-
+            .build());
 
     /**
      * Encodes the {@link OpackValue OpackValue} into JSON string
@@ -46,7 +45,7 @@ public final class Json {
      * @throws EncodeException if a problem occurs during encoding, if the type of data to be encoded is not allowed in a specific codec
      */
     public static @NotNull String encode(@NotNull OpackValue opackValue) throws EncodeException {
-        return JSON_CODEC.encode(opackValue);
+        return JSON_CODEC_THREAD_LOCAL.get().encode(opackValue);
     }
 
     /**
@@ -57,7 +56,7 @@ public final class Json {
      * @throws EncodeException if a problem occurs during encoding, if the type of data to be encoded is not allowed in a specific codec
      */
     public static @NotNull String encodeObject(@NotNull Object object) throws EncodeException {
-        return JSON_CODEC.encodeObject(object);
+        return JSON_CODEC_THREAD_LOCAL.get().encodeObject(object);
     }
 
 
@@ -69,7 +68,7 @@ public final class Json {
      * @throws DecodeException if a problem occurs during decoding
      */
     public static @NotNull OpackValue decode(@NotNull String input) throws DecodeException {
-        return JSON_CODEC.decode(input);
+        return JSON_CODEC_THREAD_LOCAL.get().decode(input);
     }
 
     /**
@@ -80,6 +79,6 @@ public final class Json {
      * @throws DecodeException if a problem occurs during decoding
      */
     public static @Nullable Object decodeObject(@NotNull String input) throws DecodeException {
-        return JSON_CODEC.decodeObject(input);
+        return JSON_CODEC_THREAD_LOCAL.get().decodeObject(input);
     }
 }
