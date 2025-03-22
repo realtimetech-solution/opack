@@ -30,10 +30,10 @@ import java.util.List;
 
 public class BenchmarkTable {
     public enum ColumnType {
-        STRING, NUMBER, BYTES, TIME;
+        STRING, NUMBER, BYTES, TIME
     }
 
-    static @NotNull DecimalFormat DECIMAL_FORMAT = new DecimalFormat("###,###.###");
+    private static final @NotNull DecimalFormat DECIMAL_FORMAT = new DecimalFormat("###,###.###");
 
     static @NotNull String getFormattedNumber(Number number) {
         return DECIMAL_FORMAT.format(number);
@@ -73,9 +73,7 @@ public class BenchmarkTable {
             throw new IllegalArgumentException("Mismatch columns size and values.");
         }
 
-        for (int column = 0; column < this.columnTypes.length; column++) {
-            this.titles[column] = titles[column];
-        }
+        System.arraycopy(titles, 0, this.titles, 0, this.columnTypes.length);
 
         return this;
     }

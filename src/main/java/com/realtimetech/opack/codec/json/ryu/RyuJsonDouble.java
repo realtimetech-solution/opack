@@ -86,7 +86,7 @@ public final class RyuJsonDouble {
                         .intValueExact();
             }
 
-            // Fill inverse table when i is within bounds
+            // Fill inverse table when `i` is within bounds
             if (i < POWER5_INVERSE_SPLIT.length) {
                 int shiftAmount = powerOf5BitLength - 1 + POWER5_INVERSE_TOTAL_BIT_COUNT;
                 BigInteger inverse = BigInteger.ONE.shiftLeft(shiftAmount).divide(powerOf5).add(BigInteger.ONE);

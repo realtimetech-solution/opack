@@ -38,7 +38,7 @@ public class StringEmptyProvider implements DefaultValueProvider {
      * @return the default value
      */
     @Override
-    public @Nullable Object provide(@NotNull Opacker opacker, @NotNull Object object, BakedType.@NotNull Property property) {
+    public @Nullable Object provide(@NotNull Opacker opacker, @NotNull Object object, @NotNull BakedType.Property property) {
         return "";
     }
 }

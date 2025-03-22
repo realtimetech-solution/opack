@@ -31,11 +31,11 @@ import com.realtimetech.opack.test.performance.PerformanceClass;
 import com.realtimetech.opack.value.OpackValue;
 
 public class TotalBenchmarkTest {
-    static final boolean ENABLE_SERIALIZE_TEST = true;
+    static final boolean ENABLE_SERIALIZE_TEST = false;
     static final int SERIALIZE_LOOP = 15872;
     static final int SERIALIZE_ITERATION = 8;
 
-    static final boolean ENABLE_DESERIALIZE_TEST = true;
+    static final boolean ENABLE_DESERIALIZE_TEST = false;
     static final int DESERIALIZE_LOOP = 15680;
     static final int DESERIALIZE_ITERATION = 8;
 
@@ -47,11 +47,11 @@ public class TotalBenchmarkTest {
     static final int JSON_DECODE_LOOP = 128;
     static final int JSON_DECODE_ITERATION = 8;
 
-    static final boolean ENABLE_DENSE_ENCODE_TEST = true;
+    static final boolean ENABLE_DENSE_ENCODE_TEST = false;
     static final int DENSE_ENCODE_LOOP = 1280;
     static final int DENSE_ENCODE_ITERATION = 8;
 
-    static final boolean ENABLE_DENSE_DECODE_TEST = true;
+    static final boolean ENABLE_DENSE_DECODE_TEST = false;
     static final int DENSE_DECODE_LOOP = 2048;
     static final int DENSE_DECODE_ITERATION = 8;
 

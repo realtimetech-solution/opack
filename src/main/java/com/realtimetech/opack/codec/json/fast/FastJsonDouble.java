@@ -146,7 +146,7 @@ public final class FastJsonDouble {
         int exponent = 0;
 
         int significandDigits = -1;
-        int fractionDigits = 0;
+        int fractionDigits;
 
         while (index < end) {
             char character = charArray[index++];
