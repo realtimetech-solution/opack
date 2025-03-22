@@ -39,20 +39,20 @@ public class ListTransformer extends DataStructureTransformer {
     /**
      * Serialize specific value to opack value
      *
-     * @param opacker      the opacker
+     * @param context      the opacker context
      * @param originalType the original type
      * @param object       the object to be serialized
      * @return the opack value
      * @throws SerializeException if a problem occurs during serializing
      */
     @Override
-    public @Nullable Object serialize(@NotNull Opacker opacker, @NotNull Class<?> originalType, @Nullable Object object) throws SerializeException {
+    public @Nullable Object serialize(@NotNull Opacker.Context context, @NotNull Class<?> originalType, @Nullable Object object) throws SerializeException {
         if (object instanceof List) {
             List<?> list = (List<?>) object;
             OpackArray opackArray = new OpackArray(list.size());
 
             for (Object element : list) {
-                opackArray.add(this.serializeObject(opacker, element));
+                opackArray.add(this.serializeObject(context, element));
             }
 
             return opackArray;
@@ -64,14 +64,14 @@ public class ListTransformer extends DataStructureTransformer {
     /**
      * Deserialize opack value
      *
-     * @param opacker  the opacker
+     * @param context  the opacker context
      * @param goalType the goal type to deserialize
      * @param object   the object to be deserialized
      * @return the deserialized value
      * @throws DeserializeException if a problem occurs during deserializing
      */
     @Override
-    public @Nullable Object deserialize(@NotNull Opacker opacker, @NotNull Class<?> goalType, @Nullable Object object) throws DeserializeException {
+    public @Nullable Object deserialize(@NotNull Opacker.Context context, @NotNull Class<?> goalType, @Nullable Object object) throws DeserializeException {
         if (object instanceof OpackArray) {
             OpackArray opackArray = (OpackArray) object;
 
@@ -79,11 +79,17 @@ public class ListTransformer extends DataStructureTransformer {
                 try {
                     //noinspection unchecked
                     List<Object> list = (List<Object>) ReflectionUtil.createInstance(goalType);
+                    Class<?> genericType = null;
+
+                    if (context.getCurrentFieldProperty() != null) {
+                        Class<?>[] genericTypes = context.getCurrentFieldProperty().getGenericTypes();
+                        genericType = genericTypes.length > 0 ? genericTypes[0] : null;
+                    }
 
                     for (int index = 0; index < opackArray.length(); index++) {
                         Object element = opackArray.get(index);
 
-                        list.add(this.deserializeObject(opacker, element));
+                        list.add(this.deserializeObject(context, genericType, element));
                     }
 
                     return list;
@@ -99,15 +105,15 @@ public class ListTransformer extends DataStructureTransformer {
     /**
      * Serializes the element to {@link OpackValue OpackValue}
      *
-     * @param opacker the opacker
+     * @param context the opacker context
      * @param element the element to be serialized
      * @return the serialized value
      * @throws SerializeException if a problem occurs during serializing
      */
     @Override
-    protected @Nullable Object serializeObject(@NotNull Opacker opacker, @Nullable Object element) throws SerializeException {
+    protected @Nullable Object serializeObject(@NotNull Opacker.Context context, @Nullable Object element) throws SerializeException {
         if (element != null && !OpackValue.isAllowType(element.getClass())) {
-            return opacker.serializeObject(element);
+            return context.getOpacker().serializeObject(element);
         }
 
         return element;
@@ -116,12 +122,18 @@ public class ListTransformer extends DataStructureTransformer {
     /**
      * Deserializes the {@link OpackValue OpackValue}
      *
-     * @param opacker the opacker
-     * @param element the element to be deserialized
+     * @param context     the opacker
+     * @param genericType the generic type of data structure to deserialize an object
+     * @param element     the element to be deserialized
      * @return the deserialized element
+     * @throws DeserializeException if a problem occurs during deserializing
      */
     @Override
-    protected @Nullable Object deserializeObject(@NotNull Opacker opacker, @Nullable Object element) throws DeserializeException {
+    protected @Nullable Object deserializeObject(@NotNull Opacker.Context context, @Nullable Class<?> genericType, @Nullable Object element) throws DeserializeException {
+        if (genericType != null && element != null) {
+            return context.getOpacker().deserializeObject(genericType, element);
+        }
+
         return element;
     }
 }

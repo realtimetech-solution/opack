@@ -40,13 +40,13 @@ public class TransformFieldTest {
         /**
          * Serialize specific value to opack value
          *
-         * @param opacker      the opacker
+         * @param context      the opacker context
          * @param originalType the original type
          * @param value        the value to be serialized
          * @return the opack value
          */
         @Override
-        public @Nullable Object serialize(@NotNull Opacker opacker, @NotNull Class<?> originalType, @Nullable Object value) {
+        public @Nullable Object serialize(@NotNull Opacker.Context context, @NotNull Class<?> originalType, @Nullable Object value) {
             if (value instanceof byte[]) {
                 return new String(((byte[]) value), StandardCharsets.UTF_8);
             }
@@ -55,7 +55,7 @@ public class TransformFieldTest {
         }
 
         @Override
-        public Object deserialize(@NotNull Opacker opacker, @NotNull Class<?> goalType, Object value) {
+        public Object deserialize(@NotNull Opacker.Context context, @NotNull Class<?> goalType, Object value) {
             if (value instanceof String && goalType == byte[].class) {
                 return ((String) value).getBytes(StandardCharsets.UTF_8);
             }

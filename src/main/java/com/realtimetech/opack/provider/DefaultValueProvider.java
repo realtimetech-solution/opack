@@ -23,7 +23,7 @@
 package com.realtimetech.opack.provider;
 
 import com.realtimetech.opack.Opacker;
-import com.realtimetech.opack.bake.BakedType;
+import com.realtimetech.opack.capture.CapturedType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -31,10 +31,10 @@ public interface DefaultValueProvider {
     /**
      * Deserialize opack value
      *
-     * @param opacker  the opacker
-     * @param object   the property owner
-     * @param property the property to provide a default value
+     * @param context       the opacker context
+     * @param object        the field property owner
+     * @param fieldProperty the field property to provide a default value
      * @return the default value
      */
-    @Nullable Object provide(@NotNull Opacker opacker, @NotNull Object object, @NotNull BakedType.Property property);
+    @Nullable Object provide(@NotNull Opacker.Context context, @NotNull Object object, @NotNull CapturedType.FieldProperty fieldProperty);
 }

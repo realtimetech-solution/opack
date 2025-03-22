@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 REALTIMETECH All Rights Reserved
+ * Copyright (C) 2025 REALTIMETECH All Rights Reserved
  *
  * Licensed either under the Apache License, Version 2.0, or (at your option)
  * under the terms of the GNU General Public License as published by
@@ -28,48 +28,21 @@ import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.test.OpackAssert;
 import com.realtimetech.opack.test.RandomUtil;
 import com.realtimetech.opack.value.OpackValue;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Objects;
 
-public class WrapListElementTest {
+public class GenericListTest {
     @SuppressWarnings("ALL")
-    public static class WrapListClass {
-        private LinkedList<Object> wrappedTypeList;
+    public static class GenericListClass {
+        private LinkedList<TestElement> genericTypeList;
 
-        public WrapListClass() {
-            this.wrappedTypeList = new LinkedList<>();
-            this.wrappedTypeList.add(null);
-            this.wrappedTypeList.add("test 1");
-            this.wrappedTypeList.add(new TestElement());
-
-            {
-                LinkedList<Object> linkedList = new LinkedList<Object>();
-
-                linkedList.add(new WrapListElementTest.TestElement());
-
-                this.wrappedTypeList.add(linkedList);
-            }
-
-            {
-                List<Object>[] linkedListArray = new List[4];
-
-                for (int index = 0; index < linkedListArray.length; index++) {
-                    if (index % 2 == 0) {
-                        linkedListArray[index] = new ArrayList<>();
-                    } else {
-                        linkedListArray[index] = new LinkedList<>();
-                    }
-
-                    linkedListArray[index].add(new WrapListElementTest.TestElement());
-                }
-
-                this.wrappedTypeList.add(linkedListArray);
-            }
+        public GenericListClass() {
+            this.genericTypeList = new LinkedList<>();
+            this.genericTypeList.add(new TestElement());
+            this.genericTypeList.add(new TestElement());
+            this.genericTypeList.add(new TestElement());
         }
     }
 
@@ -98,24 +71,13 @@ public class WrapListElementTest {
     }
 
     @Test
-    public void testWithWrapListTransformer() throws SerializeException, DeserializeException, OpackAssert.AssertException {
-        this.common(true);
-    }
-
-    @Test
-    public void testWithNoWrapListTransformer() {
-        Assertions.assertThrows(Exception.class, () -> this.common(false));
-    }
-
-    private void common(boolean enableWrapListElementType) throws SerializeException, DeserializeException, OpackAssert.AssertException {
-        Opacker opacker = Opacker.Builder.create()
-                .setEnableWrapListElementType(enableWrapListElementType)
-                .build();
-        WrapListClass originalObject = new WrapListClass();
+    public void test() throws SerializeException, DeserializeException, OpackAssert.AssertException {
+        Opacker opacker = Opacker.Builder.create().build();
+        GenericListClass originalObject = new GenericListClass();
 
         OpackValue serialized = opacker.serialize(originalObject);
         assert serialized != null;
-        WrapListClass deserialized = opacker.deserialize(WrapListClass.class, serialized);
+        GenericListClass deserialized = opacker.deserialize(GenericListClass.class, serialized);
 
         OpackAssert.assertEquals(originalObject, deserialized);
     }

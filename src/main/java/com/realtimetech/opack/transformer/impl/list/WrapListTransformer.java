@@ -34,26 +34,26 @@ public class WrapListTransformer extends ListTransformer {
     /**
      * Serializes the element to {@link OpackValue OpackValue}
      *
-     * @param opacker the opacker
+     * @param context the opacker context
      * @param element the element to be serialized
      * @return the serialized value
      * @throws SerializeException if a problem occurs during serializing
      */
     @Override
-    protected @Nullable Object serializeObject(@NotNull Opacker opacker, @Nullable Object element) throws SerializeException {
-        return TypeWrapper.wrapObject(opacker, element);
+    protected @Nullable Object serializeObject(@NotNull Opacker.Context context, @Nullable Object element) throws SerializeException {
+        return TypeWrapper.wrapObject(context, element);
     }
 
     /**
      * Deserializes the {@link OpackValue OpackValue}
      *
-     * @param opacker the opacker
+     * @param context the opacker context
      * @param element the element to be deserialized
      * @return the deserialized element
      * @throws DeserializeException if a problem occurs during deserializing
      */
     @Override
-    protected @Nullable Object deserializeObject(@NotNull Opacker opacker, @Nullable Object element) throws DeserializeException {
-        return TypeWrapper.unwrapObject(opacker, element);
+    protected @Nullable Object deserializeObject(@NotNull Opacker.Context context, @NotNull Class<?> genericType, @Nullable Object element) throws DeserializeException {
+        return TypeWrapper.unwrapObject(context, element);
     }
 }

@@ -41,11 +41,11 @@ public class TotalBenchmarkTest {
 
     static final boolean ENABLE_JSON_ENCODE_TEST = true;
     static final int JSON_ENCODE_LOOP = 192;
-    static final int JSON_ENCODE_ITERATION = 8;
+    static final int JSON_ENCODE_ITERATION = 16;
 
     static final boolean ENABLE_JSON_DECODE_TEST = true;
     static final int JSON_DECODE_LOOP = 128;
-    static final int JSON_DECODE_ITERATION = 8;
+    static final int JSON_DECODE_ITERATION = 16;
 
     static final boolean ENABLE_DENSE_ENCODE_TEST = false;
     static final int DENSE_ENCODE_LOOP = 1280;
