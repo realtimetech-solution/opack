@@ -22,9 +22,9 @@
 
 package com.realtimetech.opack;
 
-import com.realtimetech.opack.bake.BakedType;
-import com.realtimetech.opack.bake.TypeBaker;
-import com.realtimetech.opack.exception.BakeException;
+import com.realtimetech.opack.capture.CapturedType;
+import com.realtimetech.opack.capture.TypeCapturer;
+import com.realtimetech.opack.exception.TypeCaptureException;
 import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.transformer.Transformer;
@@ -60,7 +60,7 @@ import java.time.LocalTime;
 import java.util.*;
 
 public class Opacker {
-    public static class Builder {
+    public static final class Builder {
         /**
          * Creates a new instance of the builder class
          *
@@ -181,15 +181,55 @@ public class Opacker {
         }
     }
 
+    public static final class Context {
+        private final @NotNull Opacker opacker;
+
+        private @Nullable CapturedType superType;
+
+        private @Nullable CapturedType.FieldProperty currentFieldProperty;
+
+        public Context(@NotNull Opacker opacker) {
+            this.opacker = opacker;
+
+            this.superType = null;
+            this.currentFieldProperty = null;
+        }
+
+        public @NotNull Opacker getOpacker() {
+            return this.opacker;
+        }
+
+        public @Nullable CapturedType getSuperType() {
+            return this.superType;
+        }
+
+        public void setSuperType(@Nullable CapturedType superType) {
+            this.superType = superType;
+        }
+
+        public @Nullable CapturedType.FieldProperty getCurrentFieldProperty() {
+            return this.currentFieldProperty;
+        }
+
+        public void setCurrentFieldProperty(@Nullable CapturedType.FieldProperty currentFieldProperty) {
+            this.currentFieldProperty = currentFieldProperty;
+        }
+
+        void clear() {
+            this.superType = null;
+            this.currentFieldProperty = null;
+        }
+    }
+
     public enum State {
         NONE, SERIALIZE, DESERIALIZE
     }
 
     private final @NotNull ClassLoader classLoader;
-    private final @NotNull TypeBaker typeBaker;
+    private final @NotNull TypeCapturer typeCapturer;
 
     private final @NotNull FastStack<@NotNull Object> objectStack;
-    private final @NotNull FastStack<@NotNull BakedType> typeStack;
+    private final @NotNull FastStack<@NotNull CapturedType> typeStack;
     private final @NotNull FastStack<@NotNull OpackValue> valueStack;
     private final @NotNull HashSet<@NotNull Object> overlapSet;
 
@@ -197,6 +237,8 @@ public class Opacker {
     private final boolean enableConvertRecursiveDependencyToNull;
 
     @NotNull State state;
+
+    @NotNull Context context;
 
     /**
      * Constructs the Opacker with the builder
@@ -206,38 +248,39 @@ public class Opacker {
      */
     Opacker(@NotNull Builder builder) {
         this.classLoader = builder.classLoader;
-        this.typeBaker = new TypeBaker(this);
+        this.typeCapturer = new TypeCapturer(this);
 
         this.objectStack = new FastStack<>(builder.contextStackInitialSize);
         this.typeStack = new FastStack<>(builder.contextStackInitialSize);
         this.valueStack = new FastStack<>(builder.valueStackInitialSize);
         this.overlapSet = new HashSet<>();
         this.state = State.NONE;
+        this.context = new Context(this);
 
         try {
             if (builder.enableWrapListElementType) {
-                this.typeBaker.registerPredefinedTransformer(List.class, WrapListTransformer.class, true);
+                this.typeCapturer.registerPredefinedTransformer(List.class, WrapListTransformer.class, true);
             } else {
-                this.typeBaker.registerPredefinedTransformer(List.class, ListTransformer.class, true);
+                this.typeCapturer.registerPredefinedTransformer(List.class, ListTransformer.class, true);
             }
 
             if (builder.enableWrapMapElementType) {
-                this.typeBaker.registerPredefinedTransformer(Map.class, WrapMapTransformer.class, true);
+                this.typeCapturer.registerPredefinedTransformer(Map.class, WrapMapTransformer.class, true);
             } else {
-                this.typeBaker.registerPredefinedTransformer(Map.class, MapTransformer.class, true);
+                this.typeCapturer.registerPredefinedTransformer(Map.class, MapTransformer.class, true);
             }
 
-            this.typeBaker.registerPredefinedTransformer(File.class, FileTransformer.class, true);
-            this.typeBaker.registerPredefinedTransformer(Path.class, PathTransformer.class, true);
+            this.typeCapturer.registerPredefinedTransformer(File.class, FileTransformer.class, true);
+            this.typeCapturer.registerPredefinedTransformer(Path.class, PathTransformer.class, true);
 
-            this.typeBaker.registerPredefinedTransformer(Date.class, DateTransformer.class, true);
-            this.typeBaker.registerPredefinedTransformer(Calendar.class, CalendarTransformer.class, true);
+            this.typeCapturer.registerPredefinedTransformer(Date.class, DateTransformer.class, true);
+            this.typeCapturer.registerPredefinedTransformer(Calendar.class, CalendarTransformer.class, true);
 
-            this.typeBaker.registerPredefinedTransformer(LocalDate.class, LocalDateTransformer.class, true);
-            this.typeBaker.registerPredefinedTransformer(LocalTime.class, LocalTimeTransformer.class, true);
-            this.typeBaker.registerPredefinedTransformer(LocalDateTime.class, LocalDateTimeTransformer.class, true);
+            this.typeCapturer.registerPredefinedTransformer(LocalDate.class, LocalDateTransformer.class, true);
+            this.typeCapturer.registerPredefinedTransformer(LocalTime.class, LocalTimeTransformer.class, true);
+            this.typeCapturer.registerPredefinedTransformer(LocalDateTime.class, LocalDateTimeTransformer.class, true);
 
-            this.typeBaker.registerPredefinedTransformer(Class.class, ClassTransformer.class, true);
+            this.typeCapturer.registerPredefinedTransformer(Class.class, ClassTransformer.class, true);
         } catch (InstantiationException exception) {
             throw new IllegalStateException(exception);
         }
@@ -257,12 +300,12 @@ public class Opacker {
     }
 
     /**
-     * Retrieves the {@link TypeBaker TypeBaker} instance associated with this Opacker
+     * Retrieves the {@link TypeCapturer TypeCapturer} instance associated with this Opacker
      *
-     * @return the {@link TypeBaker TypeBaker} used by this Opacker instance
+     * @return the {@link TypeCapturer TypeCapturer} used by this Opacker instance
      */
-    public @NotNull TypeBaker getTypeBaker() {
-        return this.typeBaker;
+    public @NotNull TypeCapturer getTypeCapturer() {
+        return this.typeCapturer;
     }
 
 
@@ -300,6 +343,7 @@ public class Opacker {
 
             if (this.state == State.NONE) {
                 this.overlapSet.clear();
+                this.context.clear();
             }
         }
 
@@ -312,14 +356,14 @@ public class Opacker {
      * @param baseType the class of object to be serialized
      * @param object   the object to be serialized
      * @return the prepared opack value
-     * @throws SerializeException if a problem occurs during serializing, if the baseType cannot be baked into {@link BakedType BakedType}
+     * @throws SerializeException if a problem occurs during serializing, if the baseType cannot be captured into {@link CapturedType CapturedType}
      */
     private @Nullable Object prepareObjectSerialize(@NotNull Class<?> baseType, @NotNull Object object) throws SerializeException {
         try {
-            BakedType bakedType = this.typeBaker.get(baseType);
+            CapturedType capturedType = this.typeCapturer.get(baseType);
 
-            for (Transformer transformer : bakedType.getTransformers()) {
-                object = transformer.serialize(this, baseType, object);
+            for (Transformer transformer : capturedType.getTransformers()) {
+                object = transformer.serialize(this.context, baseType, object);
 
                 if (object == null) {
                     return null;
@@ -391,11 +435,11 @@ public class Opacker {
             this.overlapSet.add(object);
             this.objectStack.push(object);
             this.valueStack.push(opackValue);
-            this.typeStack.push(bakedType);
+            this.typeStack.push(capturedType);
 
             return opackValue;
-        } catch (BakeException exception) {
-            throw new SerializeException("Can't bake " + baseType.getName() + " class information.", exception);
+        } catch (TypeCaptureException exception) {
+            throw new SerializeException("Can't capture " + baseType.getName() + " class information.", exception);
         }
     }
 
@@ -408,11 +452,15 @@ public class Opacker {
         while (this.objectStack.getSize() > endOfStack) {
             Object object = this.objectStack.pop();
             OpackValue opackValue = this.valueStack.pop();
-            BakedType bakedType = this.typeStack.pop();
+            CapturedType capturedType = this.typeStack.pop();
+
+            this.context.setSuperType(capturedType);
 
             if (opackValue instanceof OpackArray) {
                 OpackArray opackArray = (OpackArray) opackValue;
                 int length = Array.getLength(object);
+
+                this.context.setCurrentFieldProperty(null);
 
                 for (int index = 0; index < length; index++) {
                     Object element = ReflectionUtil.getArrayItem(object, index);
@@ -426,27 +474,29 @@ public class Opacker {
             } else if (opackValue instanceof OpackObject) {
                 OpackObject opackObject = (OpackObject) opackValue;
 
-                for (BakedType.Property property : bakedType.getFields()) {
+                for (CapturedType.FieldProperty fieldProperty : capturedType.getFields()) {
                     try {
-                        Object element = property.get(object);
-                        Class<?> fieldType = property.getType();
+                        Object element = fieldProperty.get(object);
+                        Class<?> fieldType = fieldProperty.getType();
 
-                        if (property.isWithType()) {
-                            element = TypeWrapper.wrapObject(this, element);
+                        this.context.setCurrentFieldProperty(fieldProperty);
+
+                        if (fieldProperty.isWithType()) {
+                            element = TypeWrapper.wrapObject(this.context, element);
                         }
 
-                        if (property.getTransformer() != null) {
-                            element = property.getTransformer().serialize(this, fieldType, element);
+                        if (fieldProperty.getTransformer() != null) {
+                            element = fieldProperty.getTransformer().serialize(this.context, fieldType, element);
                         }
 
                         if (element != null) {
-                            opackObject.put(property.getName(), this.prepareObjectSerialize(fieldType, element));
+                            opackObject.put(fieldProperty.getName(), this.prepareObjectSerialize(fieldType, element));
                         } else {
-                            opackObject.put(property.getName(), null);
+                            opackObject.put(fieldProperty.getName(), null);
                         }
 
                     } catch (IllegalAccessException exception) {
-                        throw new SerializeException("Can't get " + property.getName() + " field data in " + bakedType.getType().getSimpleName() + ".", exception);
+                        throw new SerializeException("Can't get " + fieldProperty.getName() + " field data in " + capturedType.getType().getSimpleName() + ".", exception);
                     }
                 }
             }
@@ -499,6 +549,7 @@ public class Opacker {
 
             if (this.state == State.NONE) {
                 this.overlapSet.clear();
+                this.context.clear();
             }
         }
 
@@ -515,12 +566,12 @@ public class Opacker {
      */
     private synchronized @Nullable Object prepareObjectDeserialize(@NotNull Class<?> goalType, @NotNull Object object, boolean withType, @Nullable Transformer fieldTransformer) throws DeserializeException {
         try {
-            BakedType bakedType = this.typeBaker.get(goalType);
+            CapturedType capturedType = this.typeCapturer.get(goalType);
 
-            Transformer[] transformers = bakedType.getTransformers();
+            Transformer[] transformers = capturedType.getTransformers();
 
             for (int index = transformers.length - 1; index >= 0; index--) {
-                object = transformers[index].deserialize(this, goalType, object);
+                object = transformers[index].deserialize(this.context, goalType, object);
 
                 if (object == null) {
                     return null;
@@ -528,7 +579,7 @@ public class Opacker {
             }
 
             if (fieldTransformer != null) {
-                object = fieldTransformer.deserialize(this, goalType, object);
+                object = fieldTransformer.deserialize(this.context, goalType, object);
 
                 if (object == null) {
                     return null;
@@ -536,7 +587,7 @@ public class Opacker {
             }
 
             if (withType) {
-                object = TypeWrapper.unwrapObject(this, object);
+                object = TypeWrapper.unwrapObject(this.context, object);
 
                 if (object == null) {
                     return null;
@@ -612,7 +663,7 @@ public class Opacker {
 
                 this.objectStack.push(targetObject);
                 this.valueStack.push(opackValue);
-                this.typeStack.push(bakedType);
+                this.typeStack.push(capturedType);
 
                 return targetObject;
             } else if (goalType.isAssignableFrom(object.getClass())) {
@@ -620,8 +671,8 @@ public class Opacker {
             } else {
                 throw new DeserializeException("Found object, stack corruption.");
             }
-        } catch (BakeException exception) {
-            throw new DeserializeException("Can't bake " + goalType.getName() + " class information.", exception);
+        } catch (TypeCaptureException exception) {
+            throw new DeserializeException("Can't capture " + goalType.getName() + " class information.", exception);
         }
     }
 
@@ -634,12 +685,16 @@ public class Opacker {
         while (this.objectStack.getSize() > endOfStack) {
             Object object = this.objectStack.pop();
             OpackValue opackValue = this.valueStack.pop();
-            BakedType bakedType = this.typeStack.pop();
+            CapturedType capturedType = this.typeStack.pop();
+
+            this.context.setSuperType(capturedType);
 
             if (opackValue instanceof OpackArray) {
                 OpackArray opackArray = (OpackArray) opackValue;
                 Class<?> componentType = object.getClass().getComponentType();
                 int length = opackArray.length();
+
+                this.context.setCurrentFieldProperty(null);
 
                 for (int index = 0; index < length; index++) {
                     Object element = opackArray.get(index);
@@ -658,35 +713,37 @@ public class Opacker {
                 }
             } else if (opackValue instanceof OpackObject) {
                 OpackObject opackObject = (OpackObject) opackValue;
-                for (BakedType.Property property : bakedType.getFields()) {
-                    String propertyName = property.getName();
+                for (CapturedType.FieldProperty fieldProperty : capturedType.getFields()) {
+                    String propertyName = fieldProperty.getName();
 
                     try {
                         Object element;
-                        Class<?> fieldType = property.getType();
-                        Class<?> actualFieldType = property.getField().getType();
+                        Class<?> fieldType = fieldProperty.getType();
+                        Class<?> actualFieldType = fieldProperty.getField().getType();
+
+                        this.context.setCurrentFieldProperty(fieldProperty);
 
                         if (opackObject.containsKey(propertyName)) {
                             element = opackObject.get(propertyName);
-                        } else if (property.getDefaultValueProvider() != null) {
-                            element = property.getDefaultValueProvider().provide(this, object, property);
+                        } else if (fieldProperty.getDefaultValueProvider() != null) {
+                            element = fieldProperty.getDefaultValueProvider().provide(this.context, object, fieldProperty);
                         } else {
-                            throw new DeserializeException("Missing " + property.getName() + " property value of for " + bakedType.getType().getSimpleName() + " in given opack value.");
+                            throw new DeserializeException("Missing " + fieldProperty.getName() + " fieldProperty value of for " + capturedType.getType().getSimpleName() + " in given opack value.");
                         }
 
                         Object propertyValue = null;
 
                         if (element != null) {
-                            Object deserializedValue = this.prepareObjectDeserialize(fieldType, element, property.isWithType(), property.getTransformer());
+                            Object deserializedValue = this.prepareObjectDeserialize(fieldType, element, fieldProperty.isWithType(), fieldProperty.getTransformer());
 
                             if (deserializedValue != null) {
                                 propertyValue = ReflectionUtil.cast(actualFieldType, deserializedValue);
                             }
                         }
 
-                        property.set(object, propertyValue);
+                        fieldProperty.set(object, propertyValue);
                     } catch (IllegalAccessException | IllegalArgumentException exception) {
-                        throw new DeserializeException("Can't set " + property.getName() + " field in " + bakedType.getType().getSimpleName() + ".", exception);
+                        throw new DeserializeException("Can't set " + fieldProperty.getName() + " field in " + capturedType.getType().getSimpleName() + ".", exception);
                     }
                 }
             }

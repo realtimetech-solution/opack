@@ -124,32 +124,7 @@ public class StringWriter extends Writer {
 
         this.increaseArray(length);
 
-        if (length > 4) {
-            System.arraycopy(src, offset, this.chars, this.currentIndex, length);
-        } else {
-            // Optimized code for small array
-
-            switch (length) {
-                case 4:
-                    this.chars[this.currentIndex] = src[offset];
-                    this.chars[this.currentIndex + 1] = src[offset + 1];
-                    this.chars[this.currentIndex + 2] = src[offset + 2];
-                    this.chars[this.currentIndex + 3] = src[offset + 3];
-                    break;
-                case 3:
-                    this.chars[this.currentIndex] = src[offset];
-                    this.chars[this.currentIndex + 1] = src[offset + 1];
-                    this.chars[this.currentIndex + 2] = src[offset + 2];
-                    break;
-                case 2:
-                    this.chars[this.currentIndex] = src[offset];
-                    this.chars[this.currentIndex + 1] = src[offset + 1];
-                    break;
-                case 1:
-                    this.chars[this.currentIndex] = src[offset];
-                    break;
-            }
-        }
+        System.arraycopy(src, offset, this.chars, this.currentIndex, length);
 
         this.currentIndex += length;
     }

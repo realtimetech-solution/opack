@@ -43,7 +43,7 @@ import java.nio.charset.StandardCharsets;
 public class TransformClassTest {
     public static class ClassTransformer implements Transformer {
         @Override
-        public @Nullable Object serialize(@NotNull Opacker opacker, @NotNull Class<?> originalType, @Nullable Object value) {
+        public @Nullable Object serialize(@NotNull Opacker.Context context, @NotNull Class<?> originalType, @Nullable Object value) {
             if (value instanceof ClassTransformInheritable) {
                 ClassTransformInheritable classTransformInheritable = (ClassTransformInheritable) value;
                 return new String(classTransformInheritable.bytes, StandardCharsets.UTF_8);
@@ -57,7 +57,7 @@ public class TransformClassTest {
         }
 
         @Override
-        public @Nullable Object deserialize(@NotNull Opacker opacker, @NotNull Class<?> goalType, @Nullable Object value) throws DeserializeException {
+        public @Nullable Object deserialize(@NotNull Opacker.Context context, @NotNull Class<?> goalType, @Nullable Object value) throws DeserializeException {
             if (value instanceof String && ClassTransformInheritable.class.isAssignableFrom(goalType)) {
                 try {
                     ClassTransformInheritable classTransformInheritable = (ClassTransformInheritable) ReflectionUtil.createInstanceUnsafe(goalType);

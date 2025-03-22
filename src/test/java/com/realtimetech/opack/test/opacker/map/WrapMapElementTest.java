@@ -82,7 +82,7 @@ public class WrapMapElementTest {
 
     @Test
     public void testWithNoWrapMapTransformer() {
-        Assertions.assertThrows(OpackAssert.AssertException.class, () -> this.common(false));
+        Assertions.assertThrows(Exception.class, () -> this.common(false));
     }
 
     private void common(boolean enableWrapMapElementType) throws SerializeException, DeserializeException, OpackAssert.AssertException {

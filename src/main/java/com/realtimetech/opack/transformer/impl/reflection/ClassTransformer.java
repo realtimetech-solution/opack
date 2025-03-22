@@ -32,13 +32,13 @@ public class ClassTransformer implements Transformer {
     /**
      * Serialize specific value to opack value
      *
-     * @param opacker      the opacker
+     * @param context      the opacker context
      * @param originalType the original type
      * @param object       the object to be serialized
      * @return the opack value
      */
     @Override
-    public @Nullable Object serialize(@NotNull Opacker opacker, @NotNull Class<?> originalType, @Nullable Object object) {
+    public @Nullable Object serialize(@NotNull Opacker.Context context, @NotNull Class<?> originalType, @Nullable Object object) {
         if (object instanceof Class<?>) {
             return ((Class<?>) object).getName();
         }
@@ -49,17 +49,17 @@ public class ClassTransformer implements Transformer {
     /**
      * Deserialize opack value
      *
-     * @param opacker  the opacker
+     * @param context  the opacker context
      * @param goalType the goal type to deserialize
      * @param object   the object to be deserialized
      * @return the deserialized value
      * @throws DeserializeException if a problem occurs during deserializing
      */
     @Override
-    public @Nullable Object deserialize(@NotNull Opacker opacker, @NotNull Class<?> goalType, @Nullable Object object) throws DeserializeException {
+    public @Nullable Object deserialize(@NotNull Opacker.Context context, @NotNull Class<?> goalType, @Nullable Object object) throws DeserializeException {
         if (object instanceof String) {
             try {
-                return Class.forName((String) object, true, opacker.getClassLoader());
+                return Class.forName((String) object, true, context.getOpacker().getClassLoader());
             } catch (ClassNotFoundException classNotFoundException) {
                 throw new DeserializeException("Failed to load class with set class loader.", classNotFoundException);
             }

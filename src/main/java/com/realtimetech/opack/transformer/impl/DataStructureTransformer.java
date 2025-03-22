@@ -34,21 +34,22 @@ public abstract class DataStructureTransformer implements Transformer {
     /**
      * Serializes the element to {@link OpackValue OpackValue}
      *
-     * @param opacker the opacker
+     * @param context the opacker context
      * @param element the element to be serialized
      * @return the serialized value
      * @throws SerializeException if a problem occurs during serializing
      */
-    protected abstract @Nullable Object serializeObject(@NotNull Opacker opacker, @Nullable Object element) throws SerializeException;
+    protected abstract @Nullable Object serializeObject(@NotNull Opacker.Context context, @Nullable Object element) throws SerializeException;
 
     /**
      * Deserializes the {@link OpackValue OpackValue}
      *
-     * @param opacker the opacker
-     * @param element the element to be deserialized
+     * @param context     the opacker
+     * @param genericType the generic type of data structure to deserialize an object
+     * @param element     the element to be deserialized
      * @return the deserialized element
      * @throws DeserializeException if a problem occurs during deserializing
      */
-    protected abstract @Nullable Object deserializeObject(@NotNull Opacker opacker, @Nullable Object element) throws DeserializeException;
+    protected abstract @Nullable Object deserializeObject(@NotNull Opacker.Context context, @Nullable Class<?> genericType, @Nullable Object element) throws DeserializeException;
 
 }
