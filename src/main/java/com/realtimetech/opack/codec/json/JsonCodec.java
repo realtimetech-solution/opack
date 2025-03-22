@@ -23,8 +23,10 @@
 package com.realtimetech.opack.codec.json;
 
 import com.realtimetech.opack.codec.OpackCodec;
-import com.realtimetech.opack.codec.json.ryu.RyuDouble;
-import com.realtimetech.opack.codec.json.ryu.RyuFloat;
+import com.realtimetech.opack.codec.json.fast.FastJsonDouble;
+import com.realtimetech.opack.codec.json.fast.FastJsonLong;
+import com.realtimetech.opack.codec.json.ryu.RyuJsonDouble;
+import com.realtimetech.opack.codec.json.ryu.RyuJsonFloat;
 import com.realtimetech.opack.exception.DecodeException;
 import com.realtimetech.opack.exception.EncodeException;
 import com.realtimetech.opack.util.StringWriter;
@@ -39,13 +41,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 
 public final class JsonCodec extends OpackCodec<String, Writer> {
-    public final static class Builder {
+    public static final class Builder {
         /**
          * Creates a new instance of the builder class
          *
@@ -252,70 +252,6 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
         }
     }
 
-    /**
-     * Parses the given string into a {@link Number}
-     *
-     * @param string the input string to parse into a number
-     * @return the parsed number, either a {@link Long} or {@link BigInteger}, depending on the value
-     * @throws NumberFormatException if the input string is empty, contains invalid characters,
-     *                               has leading zeros, or represents an invalid number format
-     */
-    private static @NotNull Number parseLongFast(@NotNull String string) {
-        if (string.isEmpty()) {
-            throw new NumberFormatException("Not allow empty input");
-        }
-
-        int index = 0;
-        int length = string.length();
-        long limit = -Long.MAX_VALUE;
-        boolean negative = false;
-        char firstCharacter = string.charAt(index);
-
-        if (firstCharacter == '-') {
-            limit = Long.MIN_VALUE;
-            negative = true;
-            index++;
-        }
-
-        if (firstCharacter == '+') {
-            index++;
-        }
-
-        if (index >= length) {
-            throw new NumberFormatException("Can't have lone \"+\" or \"-\": \"" + string + "\"");
-        }
-
-        if (string.charAt(index) == '0' && length > index + 1) {
-            throw new NumberFormatException("Leading zeros not allowed: \"" + string + "\"");
-        }
-
-        long multiplyLimit = limit / 10;
-        long result = 0;
-
-        while (index < length) {
-            char character = string.charAt(index++);
-
-            if (character < '0' || character > '9') {
-                throw new NumberFormatException("Invalid digit: \"" + string + "\"");
-            }
-
-            if (result < multiplyLimit) {
-                return new BigInteger(string);
-            }
-
-            int digit = character - '0';
-
-            result *= 10;
-
-            if (result < limit + digit) {
-                return new BigInteger(string);
-            }
-
-            result -= digit;
-        }
-
-        return negative ? result : -result;
-    }
 
     private final @NotNull StringWriter encodeLiteralStringWriter;
     private final @NotNull StringWriter encodeStringWriter;
@@ -632,9 +568,9 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
             if (objectType == Character.class) {
                 writer.write(Integer.toString((char) object));
             } else if (isDouble) {
-                writer.write(RyuDouble.toString((Double) object, this.roundingMode));
+                writer.write(RyuJsonDouble.toString((Double) object, this.roundingMode));
             } else if (isFloat) {
-                writer.write(RyuDouble.toString((Float) object, this.roundingMode));
+                writer.write(RyuJsonDouble.toString((Float) object, this.roundingMode));
             } else {
                 writer.write(object.toString());
             }
@@ -761,7 +697,7 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
                     writer.write(CONST_SEPARATOR_CHARACTER);
                 }
 
-                writer.write(RyuFloat.toString(array[index], this.roundingMode));
+                writer.write(RyuJsonFloat.toString(array[index], this.roundingMode));
             }
 
             writer.write(CONST_ARRAY_CLOSE_CHARACTER);
@@ -793,7 +729,7 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
                     writer.write(CONST_SEPARATOR_CHARACTER);
                 }
 
-                writer.write(RyuDouble.toString(array[index], this.roundingMode));
+                writer.write(RyuJsonDouble.toString(array[index], this.roundingMode));
             }
 
             writer.write(CONST_ARRAY_CLOSE_CHARACTER);
@@ -854,12 +790,50 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
             writer.write(CONST_ARRAY_CLOSE_CHARACTER);
 
             return true;
+        } else if (arrayType == Float[].class) {
+            Object[] array = (Object[]) arrayObject;
+
+            writer.write(CONST_ARRAY_OPEN_CHARACTER);
+
+            for (int index = 0; index < array.length; index++) {
+                if (index != 0) {
+                    writer.write(CONST_SEPARATOR_CHARACTER);
+                }
+
+                if (array[index] == null) {
+                    writer.write(CONST_NULL_CHARACTER);
+                } else {
+                    writer.write(RyuJsonFloat.toString((Float) array[index], this.roundingMode));
+                }
+            }
+
+            writer.write(CONST_ARRAY_CLOSE_CHARACTER);
+
+            return true;
+        } else if (arrayType == Double[].class) {
+            Object[] array = (Object[]) arrayObject;
+
+            writer.write(CONST_ARRAY_OPEN_CHARACTER);
+
+            for (int index = 0; index < array.length; index++) {
+                if (index != 0) {
+                    writer.write(CONST_SEPARATOR_CHARACTER);
+                }
+
+                if (array[index] == null) {
+                    writer.write(CONST_NULL_CHARACTER);
+                } else {
+                    writer.write(RyuJsonDouble.toString((Double) array[index], this.roundingMode));
+                }
+            }
+
+            writer.write(CONST_ARRAY_CLOSE_CHARACTER);
+
+            return true;
         } else if (arrayType == Byte[].class ||
                 arrayType == Short[].class ||
                 arrayType == Integer[].class ||
-                arrayType == Float[].class ||
-                arrayType == Long[].class ||
-                arrayType == Double[].class) {
+                arrayType == Long[].class) {
             Object[] array = (Object[]) arrayObject;
 
             writer.write(CONST_ARRAY_OPEN_CHARACTER);
@@ -1204,22 +1178,15 @@ public final class JsonCodec extends OpackCodec<String, Writer> {
                                 }
                             }
 
-                            String numberString = new String(charArray, startAnchor - 1, pointer - startAnchor + 1);
 
                             if (decimal) {
                                 if (charArray[pointer - 1] == '.') {
                                     throw new DecodeException("A decimal number cannot end with a dot(.) at " + pointer + "(" + charArray[pointer - 1] + ").");
                                 }
 
-                                double doubleValue = Double.parseDouble(numberString);
-
-                                if (Double.isFinite(doubleValue)) {
-                                    this.decodeValueStack.push(doubleValue);
-                                } else {
-                                    this.decodeValueStack.push(new BigDecimal(numberString));
-                                }
+                                this.decodeValueStack.push(FastJsonDouble.parseDouble(charArray, startAnchor - 1, pointer - startAnchor + 1));
                             } else {
-                                this.decodeValueStack.push(JsonCodec.parseLongFast(numberString));
+                                this.decodeValueStack.push(FastJsonLong.parseLong(charArray, startAnchor - 1, pointer - startAnchor + 1));
                             }
 
                             break;

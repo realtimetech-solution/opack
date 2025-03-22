@@ -30,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.Field;
 
 public final class BakedType {
-    public final static class Property {
+    public static final class Property {
         private final @NotNull Field field;
         private final @NotNull String name;
         private final @NotNull Class<?> type;

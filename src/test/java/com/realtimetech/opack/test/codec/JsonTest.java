@@ -24,8 +24,8 @@ package com.realtimetech.opack.test.codec;
 
 import com.realtimetech.opack.Opacker;
 import com.realtimetech.opack.codec.json.JsonCodec;
-import com.realtimetech.opack.codec.json.ryu.RyuDouble;
-import com.realtimetech.opack.codec.json.ryu.RyuFloat;
+import com.realtimetech.opack.codec.json.ryu.RyuJsonDouble;
+import com.realtimetech.opack.codec.json.ryu.RyuJsonFloat;
 import com.realtimetech.opack.exception.DecodeException;
 import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.EncodeException;
@@ -182,7 +182,7 @@ public class JsonTest {
 
     private void testRyuFloat(float value) {
         String string1 = Float.toString(value);
-        String string2 = RyuFloat.toString(value);
+        String string2 = RyuJsonFloat.toString(value);
 
         float float1 = Float.parseFloat(string1);
         float float2 = Float.parseFloat(string2);
@@ -192,7 +192,7 @@ public class JsonTest {
 
     private void testRyuDouble(double value) {
         String string1 = Double.toString(value);
-        String string2 = RyuDouble.toString(value);
+        String string2 = RyuJsonDouble.toString(value);
 
         double double1 = Double.parseDouble(string1);
         double double2 = Double.parseDouble(string2);

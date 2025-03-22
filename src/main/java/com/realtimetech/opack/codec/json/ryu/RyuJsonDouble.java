@@ -42,7 +42,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.math.BigInteger;
 
-public final class RyuDouble {
+public final class RyuJsonDouble {
     // Constants for internal double representation
     private static final int DOUBLE_MANTISSA_BITS = 52;
     private static final long DOUBLE_MANTISSA_MASK = (1L << DOUBLE_MANTISSA_BITS) - 1;
