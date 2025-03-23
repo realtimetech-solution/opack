@@ -26,6 +26,7 @@ import com.realtimetech.opack.Opacker;
 import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.test.OpackAssert;
+import com.realtimetech.opack.transformer.impl.time.annotation.TimeFormat;
 import com.realtimetech.opack.value.OpackValue;
 import org.junit.jupiter.api.Test;
 
@@ -46,6 +47,21 @@ public class TimeTransformTest {
         }
     }
 
+    @SuppressWarnings("ALL")
+    public static class TimeTransformWithFormatClass {
+        @TimeFormat("yyyy-MM-dd HH:mm:ss.SSSSSSSSS")
+        private Date date;
+        @TimeFormat("yyyy-MM-dd HH:mm:ss.SSSSSSSSS")
+        private Calendar calendar;
+
+        public TimeTransformWithFormatClass() {
+            this.date = new Date();
+
+            this.calendar = Calendar.getInstance();
+            this.calendar.setTime(new Date());
+        }
+    }
+
     @Test
     public void test() throws SerializeException, DeserializeException, OpackAssert.AssertException {
         Opacker opacker = Opacker.Builder.create().build();
@@ -54,6 +70,18 @@ public class TimeTransformTest {
         OpackValue serialized = opacker.serialize(originalObject);
         assert serialized != null;
         TimeTransformClass deserialized = opacker.deserialize(TimeTransformClass.class, serialized);
+
+        OpackAssert.assertEquals(originalObject, deserialized);
+    }
+
+    @Test
+    public void test_with_format() throws SerializeException, DeserializeException, OpackAssert.AssertException {
+        Opacker opacker = Opacker.Builder.create().build();
+        TimeTransformWithFormatClass originalObject = new TimeTransformWithFormatClass();
+
+        OpackValue serialized = opacker.serialize(originalObject);
+        assert serialized != null;
+        TimeTransformWithFormatClass deserialized = opacker.deserialize(TimeTransformWithFormatClass.class, serialized);
 
         OpackAssert.assertEquals(originalObject, deserialized);
     }

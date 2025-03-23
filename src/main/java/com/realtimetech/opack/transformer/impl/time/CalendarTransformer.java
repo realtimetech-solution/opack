@@ -23,10 +23,15 @@
 package com.realtimetech.opack.transformer.impl.time;
 
 import com.realtimetech.opack.Opacker;
+import com.realtimetech.opack.capture.CapturedType;
+import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.transformer.Transformer;
+import com.realtimetech.opack.transformer.impl.time.annotation.TimeFormat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -42,7 +47,18 @@ public class CalendarTransformer implements Transformer {
     @Override
     public @Nullable Object serialize(@NotNull Opacker.Context context, @NotNull Class<?> originalType, @Nullable Object object) {
         if (object instanceof Calendar) {
-            return ((Calendar) object).getTime().getTime();
+            Calendar calendar = (Calendar) object;
+            CapturedType.FieldProperty fieldProperty = context.getFieldProperty();
+
+            if (fieldProperty != null) {
+                TimeFormat timeFormat = fieldProperty.getField().getAnnotation(TimeFormat.class);
+
+                if (timeFormat != null) {
+                    return new SimpleDateFormat(timeFormat.value()).format(calendar.getTime());
+                }
+            }
+
+            return calendar.getTime().getTime();
         }
 
         return object;
@@ -57,8 +73,25 @@ public class CalendarTransformer implements Transformer {
      * @return the deserialized value
      */
     @Override
-    public @Nullable Object deserialize(@NotNull Opacker.Context context, @NotNull Class<?> goalType, @Nullable Object object) {
-        if (object instanceof Long) {
+    public @Nullable Object deserialize(@NotNull Opacker.Context context, @NotNull Class<?> goalType, @Nullable Object object) throws DeserializeException {
+        if (object instanceof String) {
+            Calendar calendar = Calendar.getInstance();
+            CapturedType.FieldProperty fieldProperty = context.getFieldProperty();
+
+            if (fieldProperty != null) {
+                TimeFormat timeFormat = fieldProperty.getField().getAnnotation(TimeFormat.class);
+
+                if (timeFormat != null) {
+                    try {
+                        calendar.setTime(new SimpleDateFormat(timeFormat.value()).parse((String) object));
+                    } catch (ParseException parseException) {
+                        throw new DeserializeException(parseException);
+                    }
+
+                    return calendar;
+                }
+            }
+        } else if (object instanceof Long) {
             Calendar calendar = Calendar.getInstance();
 
             calendar.setTime(new Date((Long) object));

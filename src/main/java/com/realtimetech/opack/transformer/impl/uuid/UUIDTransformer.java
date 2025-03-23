@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 REALTIMETECH All Rights Reserved
+ * Copyright (C) 2025 REALTIMETECH All Rights Reserved
  *
  * Licensed either under the Apache License, Version 2.0, or (at your option)
  * under the terms of the GNU General Public License as published by
@@ -20,21 +20,18 @@
  * limitations under the License.
  */
 
-package com.realtimetech.opack.transformer.impl.time;
+package com.realtimetech.opack.transformer.impl.uuid;
 
 import com.realtimetech.opack.Opacker;
-import com.realtimetech.opack.capture.CapturedType;
 import com.realtimetech.opack.exception.DeserializeException;
+import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.transformer.Transformer;
-import com.realtimetech.opack.transformer.impl.time.annotation.TimeFormat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.UUID;
 
-public class DateTransformer implements Transformer {
+public class UUIDTransformer implements Transformer {
     /**
      * Serialize specific value to opack value
      *
@@ -42,22 +39,12 @@ public class DateTransformer implements Transformer {
      * @param originalType the original type
      * @param object       the object to be serialized
      * @return the opack value
+     * @throws SerializeException if a problem occurs during serializing
      */
     @Override
-    public @Nullable Object serialize(@NotNull Opacker.Context context, @NotNull Class<?> originalType, @Nullable Object object) {
-        if (object instanceof Date) {
-            Date date = (Date) object;
-            CapturedType.FieldProperty fieldProperty = context.getFieldProperty();
-
-            if (fieldProperty != null) {
-                TimeFormat timeFormat = fieldProperty.getField().getAnnotation(TimeFormat.class);
-
-                if (timeFormat != null) {
-                    return new SimpleDateFormat(timeFormat.value()).format(date);
-                }
-            }
-
-            return date.getTime();
+    public @Nullable Object serialize(@NotNull Opacker.Context context, @NotNull Class<?> originalType, @Nullable Object object) throws SerializeException {
+        if (object instanceof UUID) {
+            return ((UUID) object).toString();
         }
 
         return object;
@@ -75,21 +62,7 @@ public class DateTransformer implements Transformer {
     @Override
     public @Nullable Object deserialize(@NotNull Opacker.Context context, @NotNull Class<?> goalType, @Nullable Object object) throws DeserializeException {
         if (object instanceof String) {
-            CapturedType.FieldProperty fieldProperty = context.getFieldProperty();
-
-            if (fieldProperty != null) {
-                TimeFormat timeFormat = fieldProperty.getField().getAnnotation(TimeFormat.class);
-
-                if (timeFormat != null) {
-                    try {
-                        return new SimpleDateFormat(timeFormat.value()).parse((String) object);
-                    } catch (ParseException parseException) {
-                        throw new DeserializeException(parseException);
-                    }
-                }
-            }
-        } else if (object instanceof Long) {
-            return new Date((Long) object);
+            return UUID.fromString(String.valueOf(object));
         }
 
         return object;

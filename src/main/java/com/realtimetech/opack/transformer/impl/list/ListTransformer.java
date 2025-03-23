@@ -81,9 +81,8 @@ public class ListTransformer extends DataStructureTransformer {
                     List<Object> list = (List<Object>) ReflectionUtil.createInstance(goalType);
                     Class<?> genericType = null;
 
-                    if (context.getCurrentFieldProperty() != null) {
-                        Class<?>[] genericTypes = context.getCurrentFieldProperty().getGenericTypes();
-                        genericType = genericTypes.length > 0 ? genericTypes[0] : null;
+                    if (context.getFieldProperty() != null) {
+                        genericType = context.getFieldProperty().getGenericType(0);
                     }
 
                     for (int index = 0; index < opackArray.length(); index++) {

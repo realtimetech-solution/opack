@@ -23,12 +23,15 @@
 package com.realtimetech.opack.transformer.impl.time.java8;
 
 import com.realtimetech.opack.Opacker;
+import com.realtimetech.opack.capture.CapturedType;
 import com.realtimetech.opack.transformer.Transformer;
+import com.realtimetech.opack.transformer.impl.time.annotation.TimeFormat;
 import com.realtimetech.opack.value.OpackArray;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class LocalDateTransformer implements Transformer {
     /**
@@ -43,6 +46,15 @@ public class LocalDateTransformer implements Transformer {
     public @Nullable Object serialize(@NotNull Opacker.Context context, @NotNull Class<?> originalType, @Nullable Object object) {
         if (object instanceof LocalDate) {
             LocalDate localDate = (LocalDate) object;
+            CapturedType.FieldProperty fieldProperty = context.getFieldProperty();
+
+            if (fieldProperty != null) {
+                TimeFormat timeFormat = fieldProperty.getField().getAnnotation(TimeFormat.class);
+
+                if (timeFormat != null) {
+                    return localDate.format(DateTimeFormatter.ofPattern(timeFormat.value()));
+                }
+            }
 
             return OpackArray.createWithArrayObject(
                     new int[]{
@@ -66,7 +78,18 @@ public class LocalDateTransformer implements Transformer {
      */
     @Override
     public @Nullable Object deserialize(@NotNull Opacker.Context context, @NotNull Class<?> goalType, @Nullable Object object) {
-        if (object instanceof OpackArray) {
+        if (object instanceof String) {
+            String string = (String) object;
+            CapturedType.FieldProperty fieldProperty = context.getFieldProperty();
+
+            if (fieldProperty != null) {
+                TimeFormat timeFormat = fieldProperty.getField().getAnnotation(TimeFormat.class);
+
+                if (timeFormat != null) {
+                    return LocalDate.parse(string, DateTimeFormatter.ofPattern(timeFormat.value()));
+                }
+            }
+        } else if (object instanceof OpackArray) {
             OpackArray opackArray = (OpackArray) object;
 
             if (opackArray.length() == 3) {
