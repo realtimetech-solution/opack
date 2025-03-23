@@ -183,13 +183,13 @@ public class Opacker {
 
         private @Nullable CapturedType superType;
 
-        private @Nullable CapturedType.FieldProperty currentFieldProperty;
+        private @Nullable CapturedType.FieldProperty fieldProperty;
 
         public Context(@NotNull Opacker opacker) {
             this.opacker = opacker;
 
             this.superType = null;
-            this.currentFieldProperty = null;
+            this.fieldProperty = null;
         }
 
         public @NotNull Opacker getOpacker() {
@@ -204,17 +204,21 @@ public class Opacker {
             this.superType = superType;
         }
 
-        public @Nullable CapturedType.FieldProperty getCurrentFieldProperty() {
-            return this.currentFieldProperty;
+        public @Nullable CapturedType.FieldProperty getFieldProperty() {
+            return this.fieldProperty;
         }
 
-        public void setCurrentFieldProperty(@Nullable CapturedType.FieldProperty currentFieldProperty) {
-            this.currentFieldProperty = currentFieldProperty;
+        public void setFieldProperty(@Nullable CapturedType.FieldProperty fieldProperty) {
+            this.fieldProperty = fieldProperty;
         }
 
         void clear() {
             this.superType = null;
-            this.currentFieldProperty = null;
+            this.fieldProperty = null;
+        }
+
+        public @NotNull String getPositionString() {
+            return "{" + "superType=" + superType + ", fieldProperty=" + fieldProperty + '}';
         }
     }
 
@@ -428,7 +432,7 @@ public class Opacker {
 
             if (this.overlapSet.contains(object)) {
                 if (!this.enableConvertRecursiveDependencyToNull) {
-                    throw new SerializeException("Recursive dependencies are not serializable.");
+                    throw new SerializeException("Recursive dependencies are not serializable. " + this.context.getPositionString());
                 }
 
                 return null;
@@ -441,7 +445,7 @@ public class Opacker {
 
             return opackValue;
         } catch (TypeCaptureException exception) {
-            throw new SerializeException("Can't capture " + baseType.getName() + " class information.", exception);
+            throw new SerializeException("Can't capture " + baseType.getName() + " class information. " + this.context.getPositionString(), exception);
         }
     }
 
@@ -462,7 +466,7 @@ public class Opacker {
                 OpackArray opackArray = (OpackArray) opackValue;
                 int length = Array.getLength(object);
 
-                this.context.setCurrentFieldProperty(null);
+                this.context.setFieldProperty(null);
 
                 for (int index = 0; index < length; index++) {
                     Object element = ReflectionUtil.getArrayItem(object, index);
@@ -481,7 +485,7 @@ public class Opacker {
                         Object element = fieldProperty.get(object);
                         Class<?> fieldType = fieldProperty.getType();
 
-                        this.context.setCurrentFieldProperty(fieldProperty);
+                        this.context.setFieldProperty(fieldProperty);
 
                         if (fieldProperty.isWithType()) {
                             element = TypeWrapper.wrapObject(this.context, element);
@@ -498,7 +502,7 @@ public class Opacker {
                         }
 
                     } catch (IllegalAccessException exception) {
-                        throw new SerializeException("Can't get " + fieldProperty.getName() + " field data in " + capturedType.getType().getSimpleName() + ".", exception);
+                        throw new SerializeException("Can't get " + fieldProperty.getName() + " field data in " + capturedType.getType().getSimpleName() + ". " + this.context.getPositionString(), exception);
                     }
                 }
             }
@@ -646,7 +650,7 @@ public class Opacker {
 
                         targetObject = Array.newInstance(goalType.getComponentType(), opackArray.length());
                     } else {
-                        throw new DeserializeException("Target class is array. but, object is not OpackArray.");
+                        throw new DeserializeException("Deserialize target class is array. but, object(" + object + ") is not OpackArray. " + this.context.getPositionString());
                     }
                 } else {
                     if (object instanceof OpackObject) {
@@ -659,7 +663,7 @@ public class Opacker {
                             throw new DeserializeException("Can't create instance using unsafe method.", exception);
                         }
                     } else {
-                        throw new DeserializeException("Target class is object. but, object(" + object + ") is not OpackObject.");
+                        throw new DeserializeException("Deserialize target class is object. but, object(" + object + ") is not OpackObject. " + this.context.getPositionString());
                     }
                 }
 
@@ -671,10 +675,10 @@ public class Opacker {
             } else if (goalType.isAssignableFrom(object.getClass())) {
                 return object;
             } else {
-                throw new DeserializeException("Failed to convert object(" + object + ") to the specified goal type: " + goalType.getName() + ". This could be due to a missing Transformer.");
+                throw new DeserializeException("Failed to convert object(" + object + ") to the specified goal type: " + goalType.getName() + ". This could be due to a missing Transformer. " + this.context.getPositionString());
             }
         } catch (TypeCaptureException exception) {
-            throw new DeserializeException("Can't capture " + goalType.getName() + " class information.", exception);
+            throw new DeserializeException("Can't capture " + goalType.getName() + " class information. " + this.context.getPositionString(), exception);
         }
     }
 
@@ -696,7 +700,7 @@ public class Opacker {
                 Class<?> componentType = object.getClass().getComponentType();
                 int length = opackArray.length();
 
-                this.context.setCurrentFieldProperty(null);
+                this.context.setFieldProperty(null);
 
                 for (int index = 0; index < length; index++) {
                     Object element = opackArray.get(index);
@@ -723,14 +727,14 @@ public class Opacker {
                         Class<?> fieldType = fieldProperty.getType();
                         Class<?> actualFieldType = fieldProperty.getField().getType();
 
-                        this.context.setCurrentFieldProperty(fieldProperty);
+                        this.context.setFieldProperty(fieldProperty);
 
                         if (opackObject.containsKey(propertyName)) {
                             element = opackObject.get(propertyName);
                         } else if (fieldProperty.getDefaultValueProvider() != null) {
                             element = fieldProperty.getDefaultValueProvider().provide(this.context, object, fieldProperty);
                         } else {
-                            throw new DeserializeException("Missing " + fieldProperty.getName() + " fieldProperty value of for " + capturedType.getType().getSimpleName() + " in given opack value.");
+                            throw new DeserializeException("Missing " + fieldProperty.getName() + " field property value of for " + capturedType.getType().getSimpleName() + " in given opack value. " + this.context.getPositionString());
                         }
 
                         Object propertyValue = null;
@@ -745,7 +749,7 @@ public class Opacker {
 
                         fieldProperty.set(object, propertyValue);
                     } catch (IllegalAccessException | IllegalArgumentException exception) {
-                        throw new DeserializeException("Can't set " + fieldProperty.getName() + " field in " + capturedType.getType().getSimpleName() + ".", exception);
+                        throw new DeserializeException("Can't set " + fieldProperty.getName() + " field in " + capturedType.getType().getSimpleName() + ". " + this.context.getPositionString(), exception);
                     }
                 }
             }

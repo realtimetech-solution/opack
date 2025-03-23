@@ -27,11 +27,11 @@ import com.realtimetech.opack.transformer.Transformer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public final class CapturedType {
     public static final class FieldProperty {
@@ -39,6 +39,7 @@ public final class CapturedType {
         private final @NotNull String name;
         private final @NotNull Class<?> type;
         private final @NotNull Class<?> @NotNull [] genericTypes;
+        private final @NotNull Map<Class<? extends Annotation>, Annotation[]> annotations;
         private final boolean withType;
 
         private final @Nullable Transformer transformer;
@@ -65,6 +66,19 @@ public final class CapturedType {
 
             this.genericTypes = genericTypes.toArray(new Class<?>[0]);
 
+            Map<Class<? extends Annotation>, List<Annotation>> annotations = new HashMap<>();
+            for (Annotation annotation : this.field.getAnnotations()) {
+                if (!annotations.containsKey(annotation.annotationType())) {
+                    annotations.put(annotation.annotationType(), new LinkedList<Annotation>());
+                }
+                annotations.get(annotation.annotationType()).add(annotation);
+            }
+
+            this.annotations = new HashMap<>();
+            for (Map.Entry<Class<? extends Annotation>, List<Annotation>> entry : annotations.entrySet()) {
+                this.annotations.put(entry.getKey(), entry.getValue().toArray(new Annotation[0]));
+            }
+
             this.withType = withType;
 
             this.transformer = transformer;
@@ -85,6 +99,29 @@ public final class CapturedType {
 
         public @NotNull Class<?> @NotNull [] getGenericTypes() {
             return genericTypes;
+        }
+
+        public @Nullable Class<?> getGenericType(int index) {
+            if (index < 0 || index >= genericTypes.length) {
+                return null;
+            }
+
+            return genericTypes[index];
+        }
+
+        public @NotNull Map<Class<? extends Annotation>, Annotation[]> getAnnotations() {
+            return annotations;
+        }
+
+        @SuppressWarnings("unchecked")
+        public <T extends Annotation> @NotNull T @Nullable [] getAnnotations(Class<T> annotationType) {
+            return (T[]) annotations.get(annotationType);
+        }
+
+        @SuppressWarnings("unchecked")
+        public <T extends Annotation> @Nullable T getAnnotation(Class<T> annotationType) {
+            Annotation[] annotations = this.annotations.get(annotationType);
+            return annotations != null && annotations.length > 0 ? (T) annotations[0] : null;
         }
 
         public boolean isWithType() {

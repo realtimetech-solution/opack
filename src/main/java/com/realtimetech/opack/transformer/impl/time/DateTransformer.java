@@ -47,10 +47,10 @@ public class DateTransformer implements Transformer {
     public @Nullable Object serialize(@NotNull Opacker.Context context, @NotNull Class<?> originalType, @Nullable Object object) {
         if (object instanceof Date) {
             Date date = (Date) object;
-            CapturedType.FieldProperty currentFieldProperty = context.getCurrentFieldProperty();
+            CapturedType.FieldProperty fieldProperty = context.getFieldProperty();
 
-            if (currentFieldProperty != null) {
-                TimeFormat timeFormat = currentFieldProperty.getField().getAnnotation(TimeFormat.class);
+            if (fieldProperty != null) {
+                TimeFormat timeFormat = fieldProperty.getField().getAnnotation(TimeFormat.class);
 
                 if (timeFormat != null) {
                     return new SimpleDateFormat(timeFormat.value()).format(date);
@@ -75,10 +75,10 @@ public class DateTransformer implements Transformer {
     @Override
     public @Nullable Object deserialize(@NotNull Opacker.Context context, @NotNull Class<?> goalType, @Nullable Object object) throws DeserializeException {
         if (object instanceof String) {
-            CapturedType.FieldProperty currentFieldProperty = context.getCurrentFieldProperty();
+            CapturedType.FieldProperty fieldProperty = context.getFieldProperty();
 
-            if (currentFieldProperty != null) {
-                TimeFormat timeFormat = currentFieldProperty.getField().getAnnotation(TimeFormat.class);
+            if (fieldProperty != null) {
+                TimeFormat timeFormat = fieldProperty.getField().getAnnotation(TimeFormat.class);
 
                 if (timeFormat != null) {
                     try {

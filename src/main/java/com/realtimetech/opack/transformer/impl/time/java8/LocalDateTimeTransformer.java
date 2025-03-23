@@ -46,10 +46,10 @@ public class LocalDateTimeTransformer implements Transformer {
     public @Nullable Object serialize(@NotNull Opacker.Context context, @NotNull Class<?> originalType, @Nullable Object object) {
         if (object instanceof LocalDateTime) {
             LocalDateTime localDateTime = (LocalDateTime) object;
-            CapturedType.FieldProperty currentFieldProperty = context.getCurrentFieldProperty();
+            CapturedType.FieldProperty fieldProperty = context.getFieldProperty();
 
-            if (currentFieldProperty != null) {
-                TimeFormat timeFormat = currentFieldProperty.getField().getAnnotation(TimeFormat.class);
+            if (fieldProperty != null) {
+                TimeFormat timeFormat = fieldProperty.getField().getAnnotation(TimeFormat.class);
 
                 if (timeFormat != null) {
                     return localDateTime.format(DateTimeFormatter.ofPattern(timeFormat.value()));
@@ -84,10 +84,10 @@ public class LocalDateTimeTransformer implements Transformer {
     public @Nullable Object deserialize(@NotNull Opacker.Context context, @NotNull Class<?> goalType, @Nullable Object object) {
         if (object instanceof String) {
             String string = (String) object;
-            CapturedType.FieldProperty currentFieldProperty = context.getCurrentFieldProperty();
+            CapturedType.FieldProperty fieldProperty = context.getFieldProperty();
 
-            if (currentFieldProperty != null) {
-                TimeFormat timeFormat = currentFieldProperty.getField().getAnnotation(TimeFormat.class);
+            if (fieldProperty != null) {
+                TimeFormat timeFormat = fieldProperty.getField().getAnnotation(TimeFormat.class);
 
                 if (timeFormat != null) {
                     return LocalDateTime.parse(string, DateTimeFormatter.ofPattern(timeFormat.value()));

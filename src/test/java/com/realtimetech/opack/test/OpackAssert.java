@@ -161,6 +161,18 @@ public class OpackAssert {
                 if (!originalObject.equals(targetObject)) {
                     OpackAssert.throwException(originalObject, targetObject);
                 }
+            } else if (originalObject instanceof OffsetDateTime) {
+                if (!((OffsetDateTime) originalObject).isEqual((OffsetDateTime) targetObject)) {
+                    OpackAssert.throwException(originalObject, targetObject);
+                }
+            } else if (originalObject instanceof OffsetTime) {
+                if (!((OffsetTime) originalObject).isEqual((OffsetTime) targetObject)) {
+                    OpackAssert.throwException(originalObject, targetObject);
+                }
+            } else if (originalObject instanceof ZonedDateTime) {
+                if (!((ZonedDateTime) originalObject).isEqual((ZonedDateTime) targetObject)) {
+                    OpackAssert.throwException(originalObject, targetObject);
+                }
             } else if ((originalObject instanceof File && targetObject instanceof File) ||
                     (originalObject instanceof Path && targetObject instanceof Path) ||
                     (originalObject instanceof Date && targetObject instanceof Date) ||
@@ -168,9 +180,6 @@ public class OpackAssert {
                     originalObject instanceof LocalDate ||
                     originalObject instanceof LocalTime ||
                     originalObject instanceof LocalDateTime ||
-                    originalObject instanceof OffsetDateTime ||
-                    originalObject instanceof OffsetTime ||
-                    originalObject instanceof ZonedDateTime ||
                     originalObject instanceof Class) {
                 OpackAssert.assertEquals(originalObject.toString(), targetObject.toString());
             } else {

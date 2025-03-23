@@ -39,22 +39,18 @@ public class Java8TimeTransformTest {
         private LocalTime localTime;
         private LocalDateTime localDateTime;
 
-        /*
         private OffsetTime offsetTime;
         private OffsetDateTime offsetDateTime;
         private ZonedDateTime zonedDateTime;
-        */
 
         public Java8TimeTransformClass() {
             this.localDate = LocalDate.now();
             this.localTime = LocalTime.now();
             this.localDateTime = LocalDateTime.now();
 
-            /*
             this.offsetTime = OffsetTime.now();
             this.offsetDateTime = OffsetDateTime.now();
             this.zonedDateTime = ZonedDateTime.now();
-             */
         }
     }
 
@@ -67,11 +63,11 @@ public class Java8TimeTransformTest {
         @TimeFormat("yyyy-MM-dd HH:mm:ss.SSSSSSSSS")
         private LocalDateTime localDateTime;
 
-        @TimeFormat("HH:mm:ss.SSSSSSSSS")
+        @TimeFormat("HH:mm:ss.SSSSSSSSSXXXZ")
         private OffsetTime offsetTime;
-        @TimeFormat("yyyy-MM-dd HH:mm:ss.SSSSSSSSS")
+        @TimeFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSXXXZ")
         private OffsetDateTime offsetDateTime;
-        @TimeFormat("yyyy-MM-dd HH:mm:ss.SSSSSSSSS")
+        @TimeFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSXXXZ")
         private ZonedDateTime zonedDateTime;
 
         public Java8TimeTransformWithFormatClass() {

@@ -23,14 +23,11 @@
 package com.realtimetech.opack.transformer.impl.time.java8;
 
 import com.realtimetech.opack.Opacker;
-import com.realtimetech.opack.capture.CapturedType;
 import com.realtimetech.opack.transformer.Transformer;
 import com.realtimetech.opack.transformer.impl.time.annotation.TimeFormat;
-import com.realtimetech.opack.value.OpackArray;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -47,28 +44,17 @@ public class ZonedDateTimeTransformer implements Transformer {
     public @Nullable Object serialize(@NotNull Opacker.Context context, @NotNull Class<?> originalType, @Nullable Object object) {
         if (object instanceof ZonedDateTime) {
             ZonedDateTime zonedDateTime = (ZonedDateTime) object;
-            CapturedType.FieldProperty currentFieldProperty = context.getCurrentFieldProperty();
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ISO_ZONED_DATE_TIME;
 
-            if (currentFieldProperty != null) {
-                TimeFormat timeFormat = currentFieldProperty.getField().getAnnotation(TimeFormat.class);
+            if (context.getFieldProperty() != null) {
+                TimeFormat timeFormat = context.getFieldProperty().getAnnotation(TimeFormat.class);
 
                 if (timeFormat != null) {
-                    return zonedDateTime.format(DateTimeFormatter.ofPattern(timeFormat.value()));
+                    dateTimeFormatter = DateTimeFormatter.ofPattern(timeFormat.value());
                 }
             }
 
-            return OpackArray.createWithArrayObject(
-                    new int[]{
-                            zonedDateTime.getYear(),
-                            zonedDateTime.getMonthValue(),
-                            zonedDateTime.getDayOfMonth(),
-                            zonedDateTime.getHour(),
-                            zonedDateTime.getMinute(),
-                            zonedDateTime.getSecond(),
-                            zonedDateTime.getNano(),
-                            zonedDateTime.getOffset().getTotalSeconds()
-                    }
-            );
+            return zonedDateTime.format(dateTimeFormatter);
         }
 
         return object;
@@ -86,30 +72,17 @@ public class ZonedDateTimeTransformer implements Transformer {
     public @Nullable Object deserialize(@NotNull Opacker.Context context, @NotNull Class<?> goalType, @Nullable Object object) {
         if (object instanceof String) {
             String string = (String) object;
-            CapturedType.FieldProperty currentFieldProperty = context.getCurrentFieldProperty();
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ISO_ZONED_DATE_TIME;
 
-            if (currentFieldProperty != null) {
-                TimeFormat timeFormat = currentFieldProperty.getField().getAnnotation(TimeFormat.class);
+            if (context.getFieldProperty() != null) {
+                TimeFormat timeFormat = context.getFieldProperty().getAnnotation(TimeFormat.class);
 
                 if (timeFormat != null) {
-                    return ZonedDateTime.parse(string, DateTimeFormatter.ofPattern(timeFormat.value()));
+                    dateTimeFormatter = DateTimeFormatter.ofPattern(timeFormat.value());
                 }
             }
-        } else if (object instanceof OpackArray) {
-            OpackArray opackArray = (OpackArray) object;
 
-            if (opackArray.length() == 8) {
-                return ZonedDateTime.of(
-                        opackArray.getAsInt(0),
-                        opackArray.getAsInt(1),
-                        opackArray.getAsInt(2),
-                        opackArray.getAsInt(3),
-                        opackArray.getAsInt(4),
-                        opackArray.getAsInt(5),
-                        opackArray.getAsInt(6),
-                        ZoneOffset.ofTotalSeconds(opackArray.getAsInt(7))
-                );
-            }
+            return ZonedDateTime.parse(string, dateTimeFormatter);
         }
 
         return object;

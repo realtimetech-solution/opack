@@ -150,7 +150,7 @@ public class ReflectionUtil {
             } else if (type == BigInteger.class) {
                 return BigInteger.valueOf(number.longValue());
             } else if (type == BigDecimal.class) {
-                return BigDecimal.valueOf(number.longValue());
+                return BigDecimal.valueOf(number.doubleValue());
             }
         } else if (objectType == Boolean.class) {
             if (type == boolean.class || type == Boolean.class) {

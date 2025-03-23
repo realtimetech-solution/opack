@@ -23,15 +23,12 @@
 package com.realtimetech.opack.transformer.impl.time.java8;
 
 import com.realtimetech.opack.Opacker;
-import com.realtimetech.opack.capture.CapturedType;
 import com.realtimetech.opack.transformer.Transformer;
 import com.realtimetech.opack.transformer.impl.time.annotation.TimeFormat;
-import com.realtimetech.opack.value.OpackArray;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.OffsetTime;
-import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 
 public class OffsetTimeTransformer implements Transformer {
@@ -47,25 +44,17 @@ public class OffsetTimeTransformer implements Transformer {
     public @Nullable Object serialize(@NotNull Opacker.Context context, @NotNull Class<?> originalType, @Nullable Object object) {
         if (object instanceof OffsetTime) {
             OffsetTime offsetTime = (OffsetTime) object;
-            CapturedType.FieldProperty currentFieldProperty = context.getCurrentFieldProperty();
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ISO_OFFSET_TIME;
 
-            if (currentFieldProperty != null) {
-                TimeFormat timeFormat = currentFieldProperty.getField().getAnnotation(TimeFormat.class);
+            if (context.getFieldProperty() != null) {
+                TimeFormat timeFormat = context.getFieldProperty().getAnnotation(TimeFormat.class);
 
                 if (timeFormat != null) {
-                    return offsetTime.format(DateTimeFormatter.ofPattern(timeFormat.value()));
+                    dateTimeFormatter = DateTimeFormatter.ofPattern(timeFormat.value());
                 }
             }
 
-            return OpackArray.createWithArrayObject(
-                    new int[]{
-                            offsetTime.getHour(),
-                            offsetTime.getMinute(),
-                            offsetTime.getSecond(),
-                            offsetTime.getNano(),
-                            offsetTime.getOffset().getTotalSeconds()
-                    }
-            );
+            return offsetTime.format(dateTimeFormatter);
         }
 
         return object;
@@ -83,27 +72,17 @@ public class OffsetTimeTransformer implements Transformer {
     public @Nullable Object deserialize(@NotNull Opacker.Context context, @NotNull Class<?> goalType, @Nullable Object object) {
         if (object instanceof String) {
             String string = (String) object;
-            CapturedType.FieldProperty currentFieldProperty = context.getCurrentFieldProperty();
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ISO_OFFSET_TIME;
 
-            if (currentFieldProperty != null) {
-                TimeFormat timeFormat = currentFieldProperty.getField().getAnnotation(TimeFormat.class);
+            if (context.getFieldProperty() != null) {
+                TimeFormat timeFormat = context.getFieldProperty().getAnnotation(TimeFormat.class);
 
                 if (timeFormat != null) {
-                    return OffsetTime.parse(string, DateTimeFormatter.ofPattern(timeFormat.value()));
+                    dateTimeFormatter = DateTimeFormatter.ofPattern(timeFormat.value());
                 }
             }
-        } else if (object instanceof OpackArray) {
-            OpackArray opackArray = (OpackArray) object;
 
-            if (opackArray.length() == 5) {
-                return OffsetTime.of(
-                        opackArray.getAsInt(0),
-                        opackArray.getAsInt(1),
-                        opackArray.getAsInt(2),
-                        opackArray.getAsInt(3),
-                        ZoneOffset.ofTotalSeconds(opackArray.getAsInt(4))
-                );
-            }
+            return OffsetTime.parse(string, dateTimeFormatter);
         }
 
         return object;

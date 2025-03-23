@@ -23,15 +23,12 @@
 package com.realtimetech.opack.transformer.impl.time.java8;
 
 import com.realtimetech.opack.Opacker;
-import com.realtimetech.opack.capture.CapturedType;
 import com.realtimetech.opack.transformer.Transformer;
 import com.realtimetech.opack.transformer.impl.time.annotation.TimeFormat;
-import com.realtimetech.opack.value.OpackArray;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 
 public class OffsetDateTimeTransformer implements Transformer {
@@ -47,28 +44,17 @@ public class OffsetDateTimeTransformer implements Transformer {
     public @Nullable Object serialize(@NotNull Opacker.Context context, @NotNull Class<?> originalType, @Nullable Object object) {
         if (object instanceof OffsetDateTime) {
             OffsetDateTime offsetDateTime = (OffsetDateTime) object;
-            CapturedType.FieldProperty currentFieldProperty = context.getCurrentFieldProperty();
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 
-            if (currentFieldProperty != null) {
-                TimeFormat timeFormat = currentFieldProperty.getField().getAnnotation(TimeFormat.class);
+            if (context.getFieldProperty() != null) {
+                TimeFormat timeFormat = context.getFieldProperty().getAnnotation(TimeFormat.class);
 
                 if (timeFormat != null) {
-                    return offsetDateTime.format(DateTimeFormatter.ofPattern(timeFormat.value()));
+                    dateTimeFormatter = DateTimeFormatter.ofPattern(timeFormat.value());
                 }
             }
 
-            return OpackArray.createWithArrayObject(
-                    new int[]{
-                            offsetDateTime.getYear(),
-                            offsetDateTime.getMonthValue(),
-                            offsetDateTime.getDayOfMonth(),
-                            offsetDateTime.getHour(),
-                            offsetDateTime.getMinute(),
-                            offsetDateTime.getSecond(),
-                            offsetDateTime.getNano(),
-                            offsetDateTime.getOffset().getTotalSeconds()
-                    }
-            );
+            return offsetDateTime.format(dateTimeFormatter);
         }
 
         return object;
@@ -86,30 +72,17 @@ public class OffsetDateTimeTransformer implements Transformer {
     public @Nullable Object deserialize(@NotNull Opacker.Context context, @NotNull Class<?> goalType, @Nullable Object object) {
         if (object instanceof String) {
             String string = (String) object;
-            CapturedType.FieldProperty currentFieldProperty = context.getCurrentFieldProperty();
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 
-            if (currentFieldProperty != null) {
-                TimeFormat timeFormat = currentFieldProperty.getField().getAnnotation(TimeFormat.class);
+            if (context.getFieldProperty() != null) {
+                TimeFormat timeFormat = context.getFieldProperty().getAnnotation(TimeFormat.class);
 
                 if (timeFormat != null) {
-                    return OffsetDateTime.parse(string, DateTimeFormatter.ofPattern(timeFormat.value()));
+                    dateTimeFormatter = DateTimeFormatter.ofPattern(timeFormat.value());
                 }
             }
-        } else if (object instanceof OpackArray) {
-            OpackArray opackArray = (OpackArray) object;
 
-            if (opackArray.length() == 8) {
-                return OffsetDateTime.of(
-                        opackArray.getAsInt(0),
-                        opackArray.getAsInt(1),
-                        opackArray.getAsInt(2),
-                        opackArray.getAsInt(3),
-                        opackArray.getAsInt(4),
-                        opackArray.getAsInt(5),
-                        opackArray.getAsInt(6),
-                        ZoneOffset.ofTotalSeconds(opackArray.getAsInt(7))
-                );
-            }
+            return OffsetDateTime.parse(string, dateTimeFormatter);
         }
 
         return object;

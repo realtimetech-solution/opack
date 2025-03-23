@@ -48,10 +48,10 @@ public class CalendarTransformer implements Transformer {
     public @Nullable Object serialize(@NotNull Opacker.Context context, @NotNull Class<?> originalType, @Nullable Object object) {
         if (object instanceof Calendar) {
             Calendar calendar = (Calendar) object;
-            CapturedType.FieldProperty currentFieldProperty = context.getCurrentFieldProperty();
+            CapturedType.FieldProperty fieldProperty = context.getFieldProperty();
 
-            if (currentFieldProperty != null) {
-                TimeFormat timeFormat = currentFieldProperty.getField().getAnnotation(TimeFormat.class);
+            if (fieldProperty != null) {
+                TimeFormat timeFormat = fieldProperty.getField().getAnnotation(TimeFormat.class);
 
                 if (timeFormat != null) {
                     return new SimpleDateFormat(timeFormat.value()).format(calendar.getTime());
@@ -76,10 +76,10 @@ public class CalendarTransformer implements Transformer {
     public @Nullable Object deserialize(@NotNull Opacker.Context context, @NotNull Class<?> goalType, @Nullable Object object) throws DeserializeException {
         if (object instanceof String) {
             Calendar calendar = Calendar.getInstance();
-            CapturedType.FieldProperty currentFieldProperty = context.getCurrentFieldProperty();
+            CapturedType.FieldProperty fieldProperty = context.getFieldProperty();
 
-            if (currentFieldProperty != null) {
-                TimeFormat timeFormat = currentFieldProperty.getField().getAnnotation(TimeFormat.class);
+            if (fieldProperty != null) {
+                TimeFormat timeFormat = fieldProperty.getField().getAnnotation(TimeFormat.class);
 
                 if (timeFormat != null) {
                     try {

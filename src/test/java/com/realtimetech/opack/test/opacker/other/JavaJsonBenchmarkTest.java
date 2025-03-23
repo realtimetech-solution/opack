@@ -333,7 +333,6 @@ public class JavaJsonBenchmarkTest {
         public static final class Partner {
             private long id;
             private String name;
-            @TimeFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSX")
             private OffsetDateTime since;
 
             public Partner() {
