@@ -496,7 +496,9 @@ public class Opacker {
                         }
 
                         if (element != null) {
-                            opackObject.put(fieldProperty.getName(), this.prepareObjectSerialize(fieldType, element));
+                            Class<?> baseType = fieldProperty.isWithType() ? element.getClass() : fieldType;
+
+                            opackObject.put(fieldProperty.getName(), this.prepareObjectSerialize(baseType, element));
                         } else {
                             opackObject.put(fieldProperty.getName(), null);
                         }
@@ -572,6 +574,18 @@ public class Opacker {
      */
     private synchronized @Nullable Object prepareObjectDeserialize(@NotNull Class<?> goalType, @NotNull Object object, boolean withType, @Nullable Transformer fieldTransformer) throws DeserializeException {
         try {
+            if (withType) {
+                if (fieldTransformer != null) {
+                    object = fieldTransformer.deserialize(this.context, goalType, object);
+
+                    if (object == null) {
+                        return null;
+                    }
+                }
+
+                return TypeWrapper.unwrapObject(this.context, object);
+            }
+
             CapturedType capturedType = this.typeCapturer.get(goalType);
 
             Transformer[] transformers = capturedType.getTransformers();
@@ -586,14 +600,6 @@ public class Opacker {
 
             if (fieldTransformer != null) {
                 object = fieldTransformer.deserialize(this.context, goalType, object);
-
-                if (object == null) {
-                    return null;
-                }
-            }
-
-            if (withType) {
-                object = TypeWrapper.unwrapObject(this.context, object);
 
                 if (object == null) {
                     return null;

@@ -1,5 +1,23 @@
 # Ignore Gradle project-specific cache directory
 .gradle
+.maven
 
-# Ignore Gradle build output directory
-build
+# Ignore IntelliJ personal files
+*.iml
+*.ipr
+*.iws
+.idea/libraries
+.idea/misc.xml
+.idea/workspace.xml
+.idea/modules.xml
+.idea/artifacts/
+.idea/**/dataSources/
+.idea/**/dataSources.ids
+.idea/**/dataSources.local.xml
+.idea/**/sqlDataSources.xml
+.idea/**/dynamic.xml
+.idea/**/uiDesigner.xml
+.idea/**/dbnavigator.xml
+
+# Ignore Build Directory
+build/

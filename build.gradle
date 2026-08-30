@@ -20,89 +20,21 @@
  * limitations under the License.
  */
 plugins {
-    id 'java'
-    id "signing"
-    id "maven"
+    id 'java-library'
+    id 'com.vanniktech.maven.publish' version '0.37.0'
 }
 
-group 'com.realtimetech'
-archivesBaseName = "opack"
-version = "0.2.1"
-
-compileJava.options.encoding = 'UTF-8'
+group = 'com.realtimetech'
+version = '0.2.2-SNAPSHOT'
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
+    options.release = 11
 }
 
-tasks.register('javadocJar', Jar) {
-    archiveClassifier = 'javadoc'
-    from javadoc
-}
-
-tasks.register('sourcesJar', Jar) {
-    archiveClassifier = 'sources'
-    from sourceSets.main.allSource
-}
-
-artifacts {
-    archives javadocJar, sourcesJar
-}
-
-signing {
-    sign configurations.archives
-}
-
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-            repository(url: "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                authentication(userName: findProperty('ossrhUsername'), password: findProperty('ossrhPassword'))
-            }
-
-            snapshotRepository(url: "https://s01.oss.sonatype.org/content/repositories/snapshots/") {
-                authentication(userName: findProperty('ossrhUsername'), password: findProperty('ossrhPassword'))
-            }
-
-            pom.project {
-                name 'opack'
-                packaging 'jar'
-                description 'A object serialize and deserialize, encode and decode library'
-                url 'https://github.com/realtimetech-solution/opack'
-
-                scm {
-                    connection "scm:git:https://github.com/realtimetech-solution/opack"
-                    developerConnection "scm:git:ssh://github.com/realtimetech-solution/opack.git"
-                    url "https://github.com/realtimetech-solution/opack"
-                }
-
-                licenses {
-                    license {
-                        name 'The Apache License, Version 2.0'
-                        url 'https://www.apache.org/licenses/LICENSE-2.0.txt'
-                    }
-                }
-
-                developers {
-                    developer {
-                        id "realtimetech"
-                        name "RealtimeTech"
-                    }
-                    developer {
-                        id "devjeonghwan"
-                        name "Jeonghwan Park"
-                        email = "dev.parkjeonghwan@gmail.com"
-                    }
-                    developer {
-                        id "rodamin"
-                        name "Soyeon Kim"
-                        email = "epals8962@realtimetech.co.kr"
-                    }
-                }
-            }
-        }
+tasks.register('printProjectVersion') {
+    doLast {
+        println project.version
     }
 }
 
@@ -113,16 +45,64 @@ repositories {
 dependencies {
     implementation 'org.jetbrains:annotations:24.1.0'
 
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.11.1'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.11.2'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.11.1'
+    testImplementation platform('org.junit:junit-bom:5.11.2')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
     // For performance test
-    testImplementation group: 'com.google.code.gson', name: 'gson', version: '2.12.1'
-    testImplementation group: 'com.esotericsoftware', name: 'kryo', version: '5.6.2'
-    testImplementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.18.3'
+    testImplementation 'com.google.code.gson:gson:2.12.1'
+    testImplementation 'com.esotericsoftware:kryo:5.6.2'
+    testImplementation 'com.fasterxml.jackson.core:jackson-databind:2.18.3'
 }
 
 test {
     useJUnitPlatform()
+
+    jvmArgs '--add-opens=java.base/java.time=ALL-UNNAMED',
+            '--add-opens=java.base/java.util=ALL-UNNAMED'
+}
+
+mavenPublishing {
+    publishToMavenCentral()
+    signAllPublications()
+
+    coordinates(project.group.toString(), project.name, project.version.toString())
+
+    pom {
+        name = 'opack'
+        description = 'An object serialization, deserialization, encoding, and decoding library'
+        inceptionYear = '2021'
+        url = 'https://github.com/realtimetech-solution/opack'
+
+        licenses {
+            license {
+                name = 'The Apache License, Version 2.0'
+                url = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
+                distribution = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
+            }
+        }
+
+        developers {
+            developer {
+                id = 'realtimetech'
+                name = 'RealtimeTech'
+            }
+            developer {
+                id = 'devjeonghwan'
+                name = 'Jeonghwan Park'
+                email = 'dev.parkjeonghwan@gmail.com'
+            }
+            developer {
+                id = 'rodamin'
+                name = 'Soyeon Kim'
+                email = 'epals8962@realtimetech.co.kr'
+            }
+        }
+
+        scm {
+            connection = 'scm:git:https://github.com/realtimetech-solution/opack.git'
+            developerConnection = 'scm:git:ssh://git@github.com/realtimetech-solution/opack.git'
+            url = 'https://github.com/realtimetech-solution/opack'
+        }
+    }
 }

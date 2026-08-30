@@ -24,11 +24,10 @@ package com.realtimetech.opack.test.opacker.other;
 
 import com.realtimetech.opack.Opacker;
 import com.realtimetech.opack.annotation.Type;
-import com.realtimetech.opack.codec.json.Json;
-import com.realtimetech.opack.exception.DecodeException;
 import com.realtimetech.opack.exception.DeserializeException;
 import com.realtimetech.opack.exception.SerializeException;
 import com.realtimetech.opack.test.OpackAssert;
+import com.realtimetech.opack.test.RandomUtil;
 import com.realtimetech.opack.transformer.impl.time.annotation.TimeFormat;
 import com.realtimetech.opack.value.OpackValue;
 import org.junit.jupiter.api.Test;
@@ -36,6 +35,7 @@ import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.*;
 
 public class JavaJsonBenchmarkTest {
@@ -398,10 +398,117 @@ public class JavaJsonBenchmarkTest {
         }
     }
 
+    public static void fillClients(Clients clients, int size) {
+        clients.setClients(new ArrayList<>());
+
+        for (int i = 0; i < size; i++) {
+            appendClient(clients);
+        }
+    }
+
+    private static int appendClient(Clients uc) {
+        int expectedSize = 2; // {}
+
+        Clients.Client u = new Clients.Client();
+        u.setId(Math.abs(RandomUtil.nextLong()));
+        expectedSize += 9 + Long.toString(u.getId()).length(); // ,'id':''
+        u.setIndex(RandomUtil.nextInt(0, Integer.MAX_VALUE));
+        expectedSize += 11 + Integer.toString(u.getIndex()).length(); // ,'index':''
+        u.setGuid(RandomUtil.nextUUID());
+        expectedSize += 10 + 36; // ,'guid':''
+        u.setIsActive(RandomUtil.nextInt(0, 2) == 1);
+        expectedSize += 17 + (u.getIsActive() ? 4 : 5); // ,'isActive':''
+        u.setBalance(RandomUtil.randomBigDecimal());
+        expectedSize += 16 + u.getBalance().toPlainString().length(); // ,'balance':''
+        u.setPicture(RandomUtil.randomAlphanumeric(100));
+        expectedSize += 16 + u.getPicture().length(); // ,'picture':''
+        u.setAge(RandomUtil.nextInt(0, 100));
+        expectedSize += 9 + Integer.toString(u.getAge()).length(); // ,'age':''
+        u.setEyeColor(Clients.EyeColor.fromNumber(RandomUtil.nextInt(3)));
+        expectedSize += 17 + u.getEyeColor().name().length(); // ,'eyeColor':''
+        u.setName(RandomUtil.randomAlphanumeric(20));
+        expectedSize += 10 + u.getName().length(); // ,'name':''
+        u.setGender(RandomUtil.randomAlphanumeric(20));
+        expectedSize += 12 + u.getGender().length(); // ,'gender':''
+        u.setCompany(RandomUtil.randomAlphanumeric(20));
+        expectedSize += 13 + u.getCompany().length(); // ,'company':''
+        u.setEmails(new String[]{
+                RandomUtil.randomAlphabetic(RandomUtil.nextInt(100)),
+                RandomUtil.randomAlphabetic(RandomUtil.nextInt(100)),
+                RandomUtil.randomAlphabetic(RandomUtil.nextInt(100))
+        });
+        int calcSize = 0;
+        for (String e : u.getEmails()) {
+            calcSize += 3 + e.length();
+        }
+        expectedSize += 11 + calcSize; // ,'email':''
+        u.setPhones(new long[]{
+                RandomUtil.nextInt(10),
+                RandomUtil.nextInt(10),
+                RandomUtil.nextInt(10),
+                RandomUtil.nextInt(10)
+        });
+        calcSize = 0;
+        for (long p : u.getPhones()) {
+            calcSize += 1 + Long.toString(p).length();
+        }
+        expectedSize += 11 + calcSize; // ,'phone':''
+        u.setAddress(RandomUtil.randomAlphanumeric(20));
+        expectedSize += 13 + u.getAddress().length(); // ,'address':''
+        u.setAbout(RandomUtil.randomAlphanumeric(20));
+        expectedSize += 11 + u.getAbout().length(); // ,'about':''
+        u.setRegistered(LocalDate.of(1900 + RandomUtil.nextInt(110), 1 + RandomUtil.nextInt(12), 1 + RandomUtil.nextInt(28)));
+        expectedSize += 16 + 10; // ,'registered':''
+        u.setLatitude(RandomUtil.nextDouble(0, 90));
+        expectedSize += 14 + Double.toString(u.getLatitude()).length(); // ,'latitude':''
+        u.setLongitude(RandomUtil.nextDouble(0, 180));
+        expectedSize += 15 + Double.toString(u.getLongitude()).length(); // ,'longitude':''
+
+        u.setTags(new ArrayList<>());
+        expectedSize += 10; // ,'tags':[]
+        int nTags = RandomUtil.nextInt(0, 50);
+        for (int i = 0; i < nTags; i++) {
+            String t = RandomUtil.randomAlphanumeric(10);
+            u.getTags().add(t);
+            expectedSize += t.length(); // '',
+        }
+
+        int nPartners = RandomUtil.nextInt(0, 30);
+        u.setPartners(new ArrayList<>());
+        expectedSize += 13; // ,'partners':[]
+        for (int i = 0; i < nPartners; i++) {
+            long id = RandomUtil.nextLong();
+            String name = RandomUtil.randomAlphabetic(30);
+            OffsetDateTime at = OffsetDateTime.of(
+                    1900 + RandomUtil.nextInt(110),
+                    1 + RandomUtil.nextInt(12),
+                    1 + RandomUtil.nextInt(28),
+                    RandomUtil.nextInt(24),
+                    RandomUtil.nextInt(60),
+                    RandomUtil.nextInt(60),
+                    RandomUtil.nextInt(1000000000),
+                    ZoneOffset.UTC
+            );
+            u.getPartners().add(Clients.Partner.create(id, name, at));
+            expectedSize += Long.toString(id).length() + name.length() + 50; // {'id':'','name':'','since':''},
+        }
+
+        uc.getClients().add(u);
+
+        return expectedSize;
+    }
+
     @Test
-    public void test() throws SerializeException, DeserializeException, OpackAssert.AssertException, DecodeException {
+    public void test() throws SerializeException, DeserializeException, OpackAssert.AssertException {
+        Clients clients = new Clients();
+        fillClients(clients, 8);
+
         Opacker opacker = Opacker.Builder.create().build();
-        OpackValue serialized = Json.decode("{\"clients\":[{\"id\":112673038484856810,\"index\":1344055720,\"guid\":\"60688132-8a21-b944-f888-f509a6b90256\",\"isActive\":false,\"balance\":0.04548297857634076,\"picture\":\"vAwEeFeE9EM0mrfkg2ujwjCf77kbBYALtM9hutQ0cKRGmJkxM1nInZfBYXLZpCJOwGuoyv1bg9ocf7K4A8VrzTN1z23ifDgRkY6s\",\"age\":60,\"eyeColor\":\"BLUE\",\"name\":\"tnJW03NKSqfdWFShb4Zx\",\"gender\":\"mkHYjEd9AdQ9qugcOVPr\",\"company\":\"QBC3vKiRZz9KzZUFL387\",\"emails\":[],\"phones\":[746929031,561717506,990959217,1768136872,500288955,1213970016,1796482738,28628332,2066852063],\"address\":\"m9qwxh8ck4ZqfcTEn8DC\",\"about\":\"GPsNVdldwX7l5sKShO21\",\"registered\":\"1926-05-06\",\"latitude\":33.206450907142155,\"longitude\":22.589461322126944,\"tags\":[\"sgIXdOUPvN\",\"EaSpiLhL3E\",\"KheRxPm0oS\",\"njVbMOrzMf\",\"tKnGw8SNUk\",\"W56syc0sUv\",\"tnyhobz3Nm\",\"JO7ymoPNhf\",\"8oDGnPQeIX\",\"EP2Vgxe29b\",\"TMCD1h0s8V\",\"BjsKUHxlb2\",\"Gb10kL3FHo\",\"Mkyc0gT5wf\",\"FqOWswKKbb\",\"EURPNlWQHx\",\"NJjxMOFU1K\",\"oHCD4oBfIh\",\"uHYI3is1O8\",\"1ufor6JqZy\",\"JU7sDQCSFA\",\"LUiAfaDpgP\",\"Gp0ppmYBhh\",\"QQ7971iGtk\",\"NS8yP3IfVE\",\"pctZBahLR2\",\"k2msx6HoFv\",\"mRG8LGeAhx\",\"Ctp5PqxJc9\",\"cEP1p05GVa\",\"PqRmLI7U28\",\"Eb7UVo4nlI\",\"trDbHQy2sp\",\"ysv0FegxwU\",\"mlyr8PucKO\",\"W9Wqp4A8aL\",\"J56dFrPCbb\",\"y1fsnL7OXA\",\"tdvMCRMNCR\",\"OXdmNUvM4I\"],\"partners\":[{\"id\":6942554547810915627,\"name\":\"DwuzOOeuPautxtTzMHOvIxVHIboVis\",\"since\":\"1909-05-23T23:29:37.098674093Z\"},{\"id\":-8518542767576114527,\"name\":\"bGZuDwWWosUOgPbJzCviDkFUbvGDIn\",\"since\":\"1938-05-04T13:50:04.017434661Z\"},{\"id\":601371629166935988,\"name\":\"PlnjVauJisRvtUMkKZMaWDlFefJCwL\",\"since\":\"1987-05-09T20:46:24.620521962Z\"},{\"id\":4375579985883232220,\"name\":\"xAwXgtrZEcUxnPQJIRqXAmKCncRDTY\",\"since\":\"1990-11-01T06:38:20.380789524Z\"},{\"id\":8317268803618076921,\"name\":\"QQdmSLNtYJXcpLMQINKSzWQxJVQxLF\",\"since\":\"1940-05-18T10:51:42.883428669Z\"},{\"id\":4285484400196566404,\"name\":\"lfpUWBYwPYbMvRTtRvdORyZyCDJzlZ\",\"since\":\"2003-10-13T22:27:11.929616204Z\"},{\"id\":2265074678478192283,\"name\":\"alBTLDrrFIAdLOkRhGAYjrkgSYUoee\",\"since\":\"1980-12-02T14:27:57.767475522Z\"},{\"id\":8350482858520968813,\"name\":\"gOnmVOFQLyDkQFKmKPSRSozRHhmYoI\",\"since\":\"2008-01-07T15:11:04.239970727Z\"},{\"id\":-6587118629753263393,\"name\":\"TuFtTDQNEQGscizafoDcSRwMhkdTSB\",\"since\":\"1964-02-13T23:30:54.254993783Z\"},{\"id\":-2402179798706660819,\"name\":\"sJHfDYWhXfbQyXkAaiIyPAedPuRqEg\",\"since\":\"1934-12-12T23:22:00.430680784Z\"}]}]}");
+
+        OpackValue serialized = opacker.serialize(clients);
+        assert serialized != null;
         Clients deserialized = opacker.deserialize(Clients.class, serialized);
+
+        OpackAssert.assertEquals(clients, deserialized);
     }
 }

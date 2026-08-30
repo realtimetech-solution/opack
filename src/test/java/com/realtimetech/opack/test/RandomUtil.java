@@ -24,7 +24,9 @@ package com.realtimetech.opack.test;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.math.BigDecimal;
 import java.util.Random;
+import java.util.UUID;
 
 public class RandomUtil {
     private static final long SEED = 3783655506793900820L;
@@ -36,6 +38,10 @@ public class RandomUtil {
 
     public static int nextInt(int bound) {
         return RANDOM.nextInt(bound);
+    }
+
+    public static int nextInt(int min, int max) {
+        return RANDOM.nextInt(max - min) + min;
     }
 
     public static float nextFloat() {
@@ -50,7 +56,37 @@ public class RandomUtil {
         return RANDOM.nextDouble();
     }
 
+    public static double nextDouble(double min, double max) {
+        return RANDOM.nextDouble() * (max - min) + min;
+    }
+
     public static long nextLong() {
         return RANDOM.nextLong();
+    }
+
+    public static @NotNull String randomAlphabetic(int length) {
+        StringBuilder builder = new StringBuilder(length);
+        for (int i = 0; i < length; i++) {
+            builder.append((char) (RANDOM.nextInt(26) + 'a'));
+        }
+        return builder.toString();
+    }
+
+    public static @NotNull String randomAlphanumeric(int length) {
+        StringBuilder builder = new StringBuilder(length);
+        for (int i = 0; i < length; i++) {
+            builder.append((char) (RANDOM.nextInt(122 - 48) + 48));
+        }
+        return builder.toString();
+    }
+
+    public static @NotNull UUID nextUUID() {
+        long mostSignificantBits = RANDOM.nextLong();
+        long leastSignificantBits = RANDOM.nextLong();
+        return new UUID(mostSignificantBits, leastSignificantBits);
+    }
+
+    public static @NotNull BigDecimal randomBigDecimal() {
+        return BigDecimal.valueOf(nextDouble());
     }
 }
