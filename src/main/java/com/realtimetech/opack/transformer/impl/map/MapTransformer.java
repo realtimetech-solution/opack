@@ -87,10 +87,9 @@ public class MapTransformer extends DataStructureTransformer {
                     Class<?> keyGenericType = null;
                     Class<?> valueGenericType = null;
 
-                    if (context.getCurrentFieldProperty() != null) {
-                        Class<?>[] genericTypes = context.getCurrentFieldProperty().getGenericTypes();
-                        keyGenericType = genericTypes.length > 0 ? genericTypes[0] : null;
-                        valueGenericType = genericTypes.length > 1 ? genericTypes[1] : null;
+                    if (context.getFieldProperty() != null) {
+                        keyGenericType = context.getFieldProperty().getGenericType(0);
+                        valueGenericType = context.getFieldProperty().getGenericType(1);
                     }
 
                     for (Map.Entry<Object, Object> element : opackObject.entrySet()) {

@@ -222,7 +222,7 @@ public class SomeObject {
 ```java
 public class ByteToBase64Transformer implements Transformer {
     @Override
-    public @Nullable Object serialize(@NotNull Opacker opacker, @NotNull Class<?> originalType, @Nullable Object object) throws SerializeException {
+    public @Nullable Object serialize(@NotNull Opacker.Context context, @NotNull Class<?> originalType, @Nullable Object object) throws SerializeException {
         if (object instanceof byte[]) {
             return Base64.getEncoder().encodeToString((byte[]) object);
         }
@@ -231,7 +231,7 @@ public class ByteToBase64Transformer implements Transformer {
     }
 
     @Override
-    public @Nullable Object deserialize(@NotNull Opacker opacker, @NotNull Class<?> goalType, @Nullable Object object) throws DeserializeException {
+    public @Nullable Object deserialize(@NotNull Opacker.Context context, @NotNull Class<?> goalType, @Nullable Object object) throws DeserializeException {
         if (object instanceof String) {
             return Base64.getDecoder().decode((String) object);
         }
@@ -261,16 +261,42 @@ public class SomeObject {
 }
 ```
 
-#### 4. Class Transformer
+#### 4. Time Format
+
+```java
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+
+public class SomeObject {
+    // The below fields will serialize formatted using a given pattern
+    @TimeFormat("yyyy-MM-dd HH:mm:ss.SSSSSSSSS")
+    private Date date;
+
+    @TimeFormat("yyyy-MM-dd HH:mm:ss.SSSSSSSSS")
+    private Calendar date;
+
+    @TimeFormat("yyyy-MM-dd HH:mm:ss.SSSSSSSSS")
+    private LocalTime date;
+
+    @TimeFormat("yyyy-MM-dd")
+    private LocalDate date;
+
+    @TimeFormat("yyyy-MM-dd HH:mm:ss.SSSSSSSSS")
+    private LocalDateTime date;
+}
+```
+
+#### 5. Class Transformer
 
 ```java
 public class AnimalTransformer implements Transformer {
     // Remove a `sound` from a serialized `Animal`
     @Override
-    public @Nullable Object serialize(@NotNull Opacker opacker, @NotNull Class<?> originalType, @Nullable Object object) throws SerializeException {
+    public @Nullable Object serialize(@NotNull Opacker.Context context, @NotNull Class<?> originalType, @Nullable Object object) throws SerializeException {
         if (object instanceof Animal) {
             Animal animal = (Animal) object;
-            OpackValue opackValue = opacker.serialize(animal);
+            OpackValue opackValue = context.getOpacker().serialize(animal);
 
             if (opackValue instanceof OpackObject) {
                 OpackObject opackObject = (OpackObject) opackValue;
@@ -284,11 +310,11 @@ public class AnimalTransformer implements Transformer {
 
     // Restore `sound` from `Animal` before deserialization
     @Override
-    public @Nullable Object deserialize(@NotNull Opacker opacker, @NotNull Class<?> goalType, @Nullable Object object) throws DeserializeException {
+    public @Nullable Object deserialize(@NotNull Opacker.Context context, @NotNull Class<?> goalType, @Nullable Object object) throws DeserializeException {
         if (object instanceof OpackObject) {
             if (Animal.class.isAssignableFrom(goalType)) {
                 OpackObject opackObject = (OpackObject) object;
-                Animal animal = (Animal) opacker.deserialize(goalType, opackObject);
+                Animal animal = (Animal) context.getOpacker().deserialize(goalType, opackObject);
                 animal.setSound(animal.bark());
             }
         }
@@ -325,7 +351,7 @@ public class SomeObject {
 }
 ```
 
-#### 5. Handling Opack Value
+#### 6. Handling Opack Value
 
 ```java
 public class Usage {

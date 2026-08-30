@@ -30,9 +30,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.nio.file.Path;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -161,6 +159,18 @@ public class OpackAssert {
                 }
             } else if (OpackValue.isAllowType(originalObject.getClass())) {
                 if (!originalObject.equals(targetObject)) {
+                    OpackAssert.throwException(originalObject, targetObject);
+                }
+            } else if (originalObject instanceof OffsetDateTime) {
+                if (!((OffsetDateTime) originalObject).isEqual((OffsetDateTime) targetObject)) {
+                    OpackAssert.throwException(originalObject, targetObject);
+                }
+            } else if (originalObject instanceof OffsetTime) {
+                if (!((OffsetTime) originalObject).isEqual((OffsetTime) targetObject)) {
+                    OpackAssert.throwException(originalObject, targetObject);
+                }
+            } else if (originalObject instanceof ZonedDateTime) {
+                if (!((ZonedDateTime) originalObject).isEqual((ZonedDateTime) targetObject)) {
                     OpackAssert.throwException(originalObject, targetObject);
                 }
             } else if ((originalObject instanceof File && targetObject instanceof File) ||

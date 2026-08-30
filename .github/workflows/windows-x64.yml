@@ -1,0 +1,191 @@
+name: windows-x64
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: [ self-hosted, windows, x64 ]
+
+    env:
+      JAVA_HOME: 'C:\jdk\v25.0.0'
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Add Build Environments
+        run: |
+          "$env:JAVA_HOME\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+      - name: Validate Project Version Policy
+        run: |
+          $projectVersion = (& .\gradlew.bat -q printProjectVersion --no-daemon).Trim()
+          $isSnapshotVersion = $projectVersion.EndsWith("-SNAPSHOT")
+
+          if ("${{ github.event_name }}" -eq "pull_request") {
+              $targetBranch = "${{ github.base_ref }}"
+          } else {
+              $targetBranch = "${{ github.ref_name }}"
+          }
+
+          if ($targetBranch -eq "main" -and $isSnapshotVersion) {
+              throw "Main branch requires a release version without -SNAPSHOT. Current version: $projectVersion"
+          }
+
+          "PROJECT_VERSION=$projectVersion" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Build and Test
+        run: .\gradlew.bat clean test --no-daemon
+
+      - name: Upload Unit Test Report
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-report-${{ runner.os }}-${{ runner.arch }}
+          path: |
+            **/build/reports/tests/test/**
+          retention-days: 14
+
+      - name: Upload Gradle Problems Report
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: gradle-problems-report-${{ runner.os }}-${{ runner.arch }}
+          path: |
+            **/build/reports/problems/**
+          retention-days: 14
+
+  publish-snapshot:
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/develop' && success() }}
+
+    needs: test
+    runs-on: [ self-hosted, windows, x64 ]
+
+    env:
+      JAVA_HOME: 'C:\jdk\v25.0.0'
+      MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
+      MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
+      ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_USERNAME }}
+      ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_PASSWORD }}
+
+    concurrency:
+      group: maven-central-publish-develop
+      cancel-in-progress: false
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Add Build Environments
+        run: |
+          "$env:JAVA_HOME\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+      - name: Validate Maven Central Secrets
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:MAVEN_USERNAME)) {
+              throw "Missing secret MAVEN_USERNAME."
+          }
+
+          if ([string]::IsNullOrWhiteSpace($env:MAVEN_PASSWORD)) {
+              throw "Missing secret MAVEN_PASSWORD."
+          }
+
+      - name: Check Snapshot Publish Eligibility
+        id: snapshot-version
+        run: |
+          $projectVersion = (& .\gradlew.bat -q printProjectVersion --no-daemon).Trim()
+
+          "project_version=$projectVersion" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
+          if ($projectVersion.EndsWith("-SNAPSHOT")) {
+              "should_publish=true" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          } else {
+              Write-Host "Skipping snapshot publish because develop currently has release version: $projectVersion"
+              "should_publish=false" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          }
+
+      - name: Publish Snapshot to Maven Central Portal
+        if: ${{ steps.snapshot-version.outputs.should_publish == 'true' }}
+        run: .\gradlew.bat clean publishToMavenCentral --no-daemon
+
+      - name: Upload Maven Artifacts
+        if: ${{ always() && steps.snapshot-version.outputs.should_publish == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: maven-upload-artifacts-${{ runner.os }}-${{ runner.arch }}-develop
+          path: |
+            build/libs/**
+            build/publications/**
+            build/centralPortal/**
+          if-no-files-found: ignore
+          retention-days: 7
+
+  publish-release:
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && success() }}
+
+    needs: test
+    runs-on: [ self-hosted, windows, x64 ]
+
+    env:
+      JAVA_HOME: 'C:\jdk\v25.0.0'
+      MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
+      MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
+      MAVEN_SIGNING_KEY: ${{ secrets.MAVEN_SIGNING_KEY }}
+      MAVEN_SIGNING_PASSWORD: ${{ secrets.MAVEN_SIGNING_PASSWORD }}
+      ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_USERNAME }}
+      ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_PASSWORD }}
+      ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.MAVEN_SIGNING_KEY }}
+      ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.MAVEN_SIGNING_PASSWORD }}
+
+    concurrency:
+      group: maven-central-publish-main
+      cancel-in-progress: false
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Add Build Environments
+        run: |
+          "$env:JAVA_HOME\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+      - name: Validate Maven Central Secrets
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:MAVEN_USERNAME)) {
+              throw "Missing secret MAVEN_USERNAME."
+          }
+
+          if ([string]::IsNullOrWhiteSpace($env:MAVEN_PASSWORD)) {
+              throw "Missing secret MAVEN_PASSWORD."
+          }
+
+          if ([string]::IsNullOrWhiteSpace($env:MAVEN_SIGNING_KEY)) {
+              throw "Missing secret MAVEN_SIGNING_KEY."
+          }
+
+      - name: Validate Release Publish Eligibility
+        run: |
+          $projectVersion = (& .\gradlew.bat -q printProjectVersion --no-daemon).Trim()
+
+          if ($projectVersion.EndsWith("-SNAPSHOT")) {
+              throw "Main branch requires a release version without -SNAPSHOT. Current version: $projectVersion"
+          }
+
+      - name: Publish Release to Maven Central Portal
+        run: .\gradlew.bat clean publishAndReleaseToMavenCentral --no-daemon
+
+      - name: Upload Maven Artifacts
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: maven-upload-artifacts-${{ runner.os }}-${{ runner.arch }}-main
+          path: |
+            build/libs/**
+            build/publications/**
+            build/centralPortal/**
+          if-no-files-found: ignore
+          retention-days: 7

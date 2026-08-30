@@ -23,17 +23,15 @@
 package com.realtimetech.opack.transformer.impl.time.java8;
 
 import com.realtimetech.opack.Opacker;
-import com.realtimetech.opack.capture.CapturedType;
 import com.realtimetech.opack.transformer.Transformer;
 import com.realtimetech.opack.transformer.impl.time.annotation.TimeFormat;
-import com.realtimetech.opack.value.OpackArray;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.time.LocalTime;
+import java.time.OffsetTime;
 import java.time.format.DateTimeFormatter;
 
-public class LocalTimeTransformer implements Transformer {
+public class OffsetTimeTransformer implements Transformer {
     /**
      * Serialize specific value to opack value
      *
@@ -44,26 +42,19 @@ public class LocalTimeTransformer implements Transformer {
      */
     @Override
     public @Nullable Object serialize(@NotNull Opacker.Context context, @NotNull Class<?> originalType, @Nullable Object object) {
-        if (object instanceof LocalTime) {
-            LocalTime localTime = (LocalTime) object;
-            CapturedType.FieldProperty fieldProperty = context.getFieldProperty();
+        if (object instanceof OffsetTime) {
+            OffsetTime offsetTime = (OffsetTime) object;
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ISO_OFFSET_TIME;
 
-            if (fieldProperty != null) {
-                TimeFormat timeFormat = fieldProperty.getField().getAnnotation(TimeFormat.class);
+            if (context.getFieldProperty() != null) {
+                TimeFormat timeFormat = context.getFieldProperty().getAnnotation(TimeFormat.class);
 
                 if (timeFormat != null) {
-                    return localTime.format(DateTimeFormatter.ofPattern(timeFormat.value()));
+                    dateTimeFormatter = DateTimeFormatter.ofPattern(timeFormat.value());
                 }
             }
 
-            return OpackArray.createWithArrayObject(
-                    new int[]{
-                            localTime.getHour(),
-                            localTime.getMinute(),
-                            localTime.getSecond(),
-                            localTime.getNano()
-                    }
-            );
+            return offsetTime.format(dateTimeFormatter);
         }
 
         return object;
@@ -81,26 +72,17 @@ public class LocalTimeTransformer implements Transformer {
     public @Nullable Object deserialize(@NotNull Opacker.Context context, @NotNull Class<?> goalType, @Nullable Object object) {
         if (object instanceof String) {
             String string = (String) object;
-            CapturedType.FieldProperty fieldProperty = context.getFieldProperty();
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ISO_OFFSET_TIME;
 
-            if (fieldProperty != null) {
-                TimeFormat timeFormat = fieldProperty.getField().getAnnotation(TimeFormat.class);
+            if (context.getFieldProperty() != null) {
+                TimeFormat timeFormat = context.getFieldProperty().getAnnotation(TimeFormat.class);
 
                 if (timeFormat != null) {
-                    return LocalTime.parse(string, DateTimeFormatter.ofPattern(timeFormat.value()));
+                    dateTimeFormatter = DateTimeFormatter.ofPattern(timeFormat.value());
                 }
             }
-        } else if (object instanceof OpackArray) {
-            OpackArray opackArray = (OpackArray) object;
 
-            if (opackArray.length() == 4) {
-                return LocalTime.of(
-                        opackArray.getAsInt(0),
-                        opackArray.getAsInt(1),
-                        opackArray.getAsInt(2),
-                        opackArray.getAsInt(3)
-                );
-            }
+            return OffsetTime.parse(string, dateTimeFormatter);
         }
 
         return object;
